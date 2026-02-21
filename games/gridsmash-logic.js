@@ -172,6 +172,24 @@ function getRandomPiece() {
     return { cells: PIECES[idx].map(c => [...c]), special: null };
 }
 
+/* === ROTATE PIECE 90° CLOCKWISE === */
+function rotatePiece(piece) {
+    const cells = piece.cells;
+    // Find bounds
+    let minR = Infinity, minC = Infinity;
+    cells.forEach(([r, c]) => { minR = Math.min(minR, r); minC = Math.min(minC, c); });
+    // Normalize to origin
+    const norm = cells.map(([r, c]) => [r - minR, c - minC]);
+    // Rotate 90° clockwise: (r,c) -> (c, maxR - r)
+    const maxR = Math.max(...norm.map(([r]) => r));
+    const rotated = norm.map(([r, c]) => [c, maxR - r]);
+    // Normalize again
+    let rMin = Infinity, cMin = Infinity;
+    rotated.forEach(([r, c]) => { rMin = Math.min(rMin, r); cMin = Math.min(cMin, c); });
+    piece.cells = rotated.map(([r, c]) => [r - rMin, c - cMin]);
+    return piece;
+}
+
 function randFloat() { return G.rng ? G.rng.next() : Math.random(); }
 function randInt(a, b) { return G.rng ? G.rng.nextInt(a, b) : Math.floor(Math.random() * (b - a + 1)) + a; }
 function shuffleArr(arr) {
@@ -311,13 +329,49 @@ function setupDragListeners() {
     const wrap = document.getElementById('gs-canvas-wrap');
     const dock = document.getElementById('gs-dock');
     const wildSlot = document.getElementById('gs-wild-slot');
-    // Dock pieces
+    // Track tap timing for rotation vs drag
+    let tapStartTime = 0;
+    let tapIdx = -1;
+    let tapMoved = false;
+    // Dock pieces: short tap = rotate, long press / drag = start drag
     dock.addEventListener('pointerdown', e => {
         const pc = e.target.closest('canvas');
         if (!pc || pc.classList.contains('placed')) return;
         const idx = parseInt(pc.dataset.idx);
-        startDrag(idx, G.pieces[idx], e);
-        pc.classList.add('dragging');
+        tapStartTime = Date.now();
+        tapIdx = idx;
+        tapMoved = false;
+        // Delay starting drag to differentiate tap vs drag
+        G._tapTimer = setTimeout(() => {
+            tapIdx = -1; // No longer a tap
+            startDrag(idx, G.pieces[idx], e);
+            pc.classList.add('dragging');
+        }, 200);
+    });
+    dock.addEventListener('pointermove', e => {
+        if (tapIdx >= 0) {
+            tapMoved = true;
+            // If moved, immediately start drag
+            clearTimeout(G._tapTimer);
+            const pc = dock.querySelectorAll('canvas')[tapIdx];
+            if (pc && !pc.classList.contains('placed') && !G.dragPiece) {
+                startDrag(tapIdx, G.pieces[tapIdx], e);
+                pc.classList.add('dragging');
+            }
+            tapIdx = -1;
+        }
+    });
+    dock.addEventListener('pointerup', e => {
+        if (tapIdx >= 0 && !tapMoved && (Date.now() - tapStartTime) < 200) {
+            clearTimeout(G._tapTimer);
+            // Short tap = rotate piece in dock
+            if (G.gameState === 'playing' && !G.piecesPlaced[tapIdx]) {
+                rotatePiece(G.pieces[tapIdx]);
+                SFX.play('tap');
+                renderDock();
+            }
+        }
+        tapIdx = -1;
     });
     // Wild piece
     wildSlot.addEventListener('pointerdown', e => {
@@ -327,6 +381,21 @@ function setupDragListeners() {
     // Move/up on window for flexibility
     window.addEventListener('pointermove', onDragMove);
     window.addEventListener('pointerup', onDragEnd);
+    // Right-click during drag = rotate piece
+    window.addEventListener('contextmenu', e => {
+        if (G.dragPiece) {
+            e.preventDefault();
+            rotatePiece(G.dragPiece);
+            SFX.play('tap');
+            // Recalculate placement validity
+            if (G.dragGridPos) {
+                G.dragValid = canPlace(G.dragPiece, G.dragGridPos.row, G.dragGridPos.col);
+            }
+            // Re-render dock to show rotated piece
+            if (G.dragIdx >= 0) renderDock();
+            drawGrid();
+        }
+    });
 }
 
 function startDrag(idx, piece, e) {
