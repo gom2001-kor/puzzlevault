@@ -493,6 +493,12 @@ function placePiece(piece, row, col, idx) {
     const regularPlaced = G.piecesPlaced.every(p => p);
     if (regularPlaced) {
         nextTurn();
+    } else {
+        // Check if remaining unplaced pieces can fit anywhere
+        if (!canAnyPieceFit()) {
+            G.gameState = 'lost';
+            endGame();
+        }
     }
 }
 
