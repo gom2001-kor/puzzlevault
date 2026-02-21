@@ -168,6 +168,8 @@
     }
 
     .daily-card {
+      display: flex;
+      flex-direction: column;
       background: var(--pv-card-bg);
       border: 1px solid var(--pv-border);
       border-radius: var(--pv-radius);
@@ -218,6 +220,7 @@
 
     .daily-card .pv-btn {
       width: 100%;
+      margin-top: auto;
     }
 
     .streak-badge {
@@ -296,6 +299,7 @@
     .game-card-body {
       padding: 8px 14px 18px;
       text-align: center;
+      flex: 1;
     }
 
     .game-card-name {
@@ -321,6 +325,7 @@
       background: rgba(37, 99, 235, 0.06);
       border-top: 1px solid var(--pv-border);
       transition: all 0.2s ease;
+      margin-top: auto;
     }
 
     .game-card-link:hover .game-card-play {
