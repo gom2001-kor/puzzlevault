@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GridSmash — Free Online Block Puzzle Game | PuzzleVault</title>
+    <meta name="description"
+        content="Place blocks, clear lines, and chase combos in GridSmash! A free browser-based block placement puzzle with special blocks, Shatter Zones, and daily challenges.">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/games/gridsmash">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="GridSmash — Block Puzzle Game | PuzzleVault">
+    <meta property="og:description" content="Place blocks, clear lines, chase combos! Free daily block puzzle.">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/games/gridsmash">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/css/global.css">
+    <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"VideoGame","name":"GridSmash","description":"Block placement puzzle game with combos and special blocks.","url":"https://puzzlevault.pages.dev/games/gridsmash","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+    <style>
+        .gs-page {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 16px
+        }
+
+        .gs-main {
+            flex: 1;
+            max-width: 500px;
+            width: 100%
+        }
+
+        .gs-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            display: none
+        }
+
+        @media(min-width:1024px) {
+            .gs-sidebar {
+                display: block
+            }
+        }
+
+        .gs-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0
+        }
+
+        .gs-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.2rem;
+            font-weight: 800
+        }
+
+        .gs-score-bar {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            font-size: .85rem
+        }
+
+        .gs-score-bar .val {
+            font-weight: 800;
+            font-size: 1.1rem
+        }
+
+        .gs-score-bar .lbl {
+            font-size: .65rem;
+            color: var(--pv-text-secondary);
+            text-transform: uppercase
+        }
+
+        .gs-zone-bar {
+            text-align: center;
+            padding: 4px 8px;
+            background: linear-gradient(90deg, #FDE68A, #FCD34D);
+            color: #92400E;
+            font-size: .8rem;
+            font-weight: 700;
+            border-radius: var(--pv-radius-sm);
+            margin-bottom: 4px;
+            display: none
+        }
+
+        .gs-canvas-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto
+        }
+
+        .gs-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            border-radius: var(--pv-radius);
+            box-shadow: var(--pv-shadow)
+        }
+
+        .gs-dock {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 0;
+            min-height: 80px;
+            align-items: flex-start
+        }
+
+        .gs-dock canvas {
+            cursor: grab;
+            border-radius: var(--pv-radius-sm);
+            transition: transform .15s, box-shadow .15s;
+            touch-action: none
+        }
+
+        .gs-dock canvas:hover {
+            transform: scale(1.05);
+            box-shadow: var(--pv-shadow-lg)
+        }
+
+        .gs-dock canvas.placed {
+            opacity: .2;
+            pointer-events: none
+        }
+
+        .gs-dock canvas.dragging {
+            opacity: .5
+        }
+
+        .gs-wild-slot {
+            display: none;
+            text-align: center;
+            margin-bottom: 8px
+        }
+
+        .gs-wild-slot canvas {
+            cursor: grab;
+            border: 2px dashed var(--pv-amber);
+            border-radius: var(--pv-radius-sm)
+        }
+
+        .gs-wild-slot .gs-wild-label {
+            font-size: .7rem;
+            color: var(--pv-amber);
+            font-weight: 600;
+            margin-top: 2px
+        }
+
+        .gs-mode-tabs {
+            margin-bottom: 8px
+        }
+
+        .gs-timer {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--pv-coral);
+            margin-bottom: 4px;
+            display: none
+        }
+
+        .gs-timer.safe {
+            color: var(--pv-emerald)
+        }
+
+        .gs-sprint-info {
+            text-align: center;
+            font-size: .85rem;
+            color: var(--pv-text-secondary);
+            margin-bottom: 4px;
+            display: none
+        }
+
+        .gs-icons {
+            display: flex;
+            gap: 4px
+        }
+
+        .gs-icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background .2s
+        }
+
+        .gs-icon-btn:hover {
+            background: var(--pv-grid-bg)
+        }
+
+        .gs-combo-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--pv-blue);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0;
+            transition: all .3s ease
+        }
+
+        .gs-combo-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1
+        }
+
+        .gs-combo-popup.fadeout {
+            transform: translate(-50%, -70%) scale(.8);
+            opacity: 0
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+    <main>
+        <div class="gs-page">
+            <div class="gs-main">
+                <div class="gs-top">
+                    <div class="gs-title"><span>🧱</span><span>GridSmash</span></div>
+                    <div class="gs-icons">
+                        <button class="gs-icon-btn" id="gs-btn-restart" aria-label="Restart" title="Restart"
+                            style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px">Restart</button>
+                        <button class="gs-icon-btn" id="gs-btn-undo" aria-label="Undo" style="display:none">↩️</button>
+                        <button class="gs-icon-btn" id="gs-btn-settings" aria-label="Sound">🔊</button>
+                    </div>
+                </div>
+                <div class="gs-score-bar">
+                    <div>
+                        <div class="val" id="gs-score">0</div>
+                        <div class="lbl">Score</div>
+                    </div>
+                    <div>
+                        <div class="val" id="gs-lines">0</div>
+                        <div class="lbl">Lines</div>
+                    </div>
+                    <div>
+                        <div class="val" id="gs-combo">0</div>
+                        <div class="lbl">Combo</div>
+                    </div>
+                    <div>
+                        <div class="val" id="gs-turn">1</div>
+                        <div class="lbl">Turn</div>
+                    </div>
+                </div>
+                <div class="gs-mode-tabs">
+                    <div class="pv-tabs" id="gs-tabs">
+                        <button class="pv-tab active" data-mode="classic">Classic</button>
+                        <button class="pv-tab" data-mode="daily">Daily</button>
+                        <button class="pv-tab" data-mode="zen">Zen</button>
+                        <button class="pv-tab" data-mode="sprint">Sprint 40</button>
+                    </div>
+                </div>
+                <div id="gs-timer" class="gs-timer"></div>
+                <div id="gs-sprint-info" class="gs-sprint-info"></div>
+                <div id="gs-zone-bar" class="gs-zone-bar"></div>
+                <div class="gs-canvas-wrap" id="gs-canvas-wrap">
+                    <canvas id="gs-canvas" width="500" height="500"></canvas>
+                    <div class="gs-combo-popup" id="gs-combo-popup"></div>
+                </div>
+                <div class="gs-wild-slot" id="gs-wild-slot"><canvas id="gs-wild-canvas" width="50" height="50"></canvas>
+                    <div class="gs-wild-label">⭐ Wild</div>
+                </div>
+                <div class="gs-dock" id="gs-dock"></div>
+            </div>
+            <div class="gs-sidebar">
+                <div class="ad-slot" id="ad-sidebar"></div>
+            </div>
+        </div>
+        <div class="result-overlay" id="gs-result">
+            <div class="result-card" id="gs-result-card"></div>
+        </div>
+        <!-- GAME OVER popup -->
+        <div class="result-overlay" id="gs-gameover" style="display:none">
+            <div class="result-card" style="text-align:center;padding:32px;position:relative">
+                <button onclick="closeGameOver()" aria-label="Close"
+                    style="position:absolute;top:8px;right:12px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--pv-text-secondary);padding:4px 8px;border-radius:50%;transition:background .2s"
+                    onmouseover="this.style.background='var(--pv-grid-bg)'"
+                    onmouseout="this.style.background='none'">✕</button>
+                <div style="font-size:3rem;margin-bottom:8px">💥</div>
+                <div style="font-size:2rem;font-weight:900;color:var(--pv-coral);margin-bottom:8px">GAME OVER</div>
+                <div style="font-size:.9rem;color:var(--pv-text-secondary);margin-bottom:20px">No more moves available!
+                </div>
+                <div id="gs-gameover-stats" style="display:flex;justify-content:center;gap:20px;margin-bottom:20px">
+                </div>
+                <div class="result-actions">
+                    <button class="pv-btn pv-btn-primary" onclick="closeGameOver();shareGS()">📤 Share</button>
+                    <button class="pv-btn pv-btn-secondary" onclick="closeGameOver();switchMode(G.mode)">🔄 Play
+                        Again</button>
+                </div>
+            </div>
+        </div>
+        <div id="ad-interstitial" style="display:none"><button class="ad-close-btn"
+                onclick="AdController.hideInterstitial()" aria-label="Close">✕</button>
+            <div class="ad-slot" style="width:300px;min-height:250px"></div>
+        </div>
+        <section class="game-guide pv-container">
+            <h2>How to Play GridSmash</h2>
+            <p>GridSmash is a strategic block placement puzzle played on a 10×10 grid. Each turn you receive three block
+                pieces of varying shapes and sizes. Drag and drop each piece onto the grid to place it — all three must
+                be placed before you receive new ones.</p>
+            <p>When you completely fill a row or column, it clears from the board and earns you points. Clear multiple
+                lines simultaneously for combo bonuses — the more lines at once, the higher the multiplier! Building
+                consecutive combos across turns multiplies your score even further.</p>
+            <p>Starting from turn 16, special blocks may appear. Crystal blocks (💎) explode on placement, clearing a
+                3×3 area. Frost blocks (🧊) freeze random cells that require two line clears to remove. Wild blocks (⭐)
+                are single golden cells you can place anywhere to fill gaps strategically.</p>
+            <p>Every 10 turns, the Shatter Zone activates on the bottom 2 rows. Line clears in the Zone score triple
+                points, but beware — if the Zone expires after 5 turns without being cleared, empty cells fill with
+                random blocks. Master the Zone timing for massive scores!</p>
+            <p>The game ends when none of the three new pieces can fit anywhere on the grid. Plan ahead, keep the board
+                clean, and chase those combos. Try Sprint 40 to race for the fastest 40-line clear, or relax with Zen
+                Mode for stress-free play.</p>
+        </section>
+        <section class="pv-faq pv-container">
+            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <details>
+                <summary>What are the different block shapes in GridSmash?</summary>
+                <p>GridSmash features 20 unique block shapes ranging from 1 to 5 cells. These include dots, lines,
+                    L-shapes, T-shapes, squares, plus signs, and more. Each turn you get 3 random pieces in different
+                    pastel colors.</p>
+            </details>
+            <details>
+                <summary>How do special blocks work?</summary>
+                <p>From turn 16 onward, there's a 20% chance one of your three pieces will be special. Crystal (💎)
+                    destroys a 3×3 area on placement. Frost (🧊) freezes 2 random cells. Wild (⭐) is a flexible 1×1
+                    block you can place anywhere.</p>
+            </details>
+            <details>
+                <summary>What is the Shatter Zone?</summary>
+                <p>Every 10 turns, the bottom 2 rows become a golden Shatter Zone for 5 turns. Any line clears in these
+                    rows score 3× points. If the Zone expires without being cleared, 50% of empty cells fill with random
+                    blocks.</p>
+            </details>
+            <details>
+                <summary>How is the score calculated?</summary>
+                <p>You earn points for placing blocks (1 per cell), clearing lines (100 per line with combo
+                    multipliers), and using Crystal blocks (10 per destroyed cell). Consecutive turn combos multiply
+                    your score up to 3×, and Shatter Zone clears give 3× bonus.</p>
+            </details>
+            <details>
+                <summary>What modes are available?</summary>
+                <p>Classic: play until game over. Daily Challenge: same piece sequence for everyone with a 3-minute
+                    timer. Zen: no score or pressure, just relax. Sprint 40: race to clear 40 lines as fast as possible.
+                </p>
+            </details>
+        </section>
+        <div class="cross-promo pv-container"></div>
+        <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
+    </main>
+    <footer id="pv-footer"></footer>
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/gridsmash-logic.js"></script>
+</body>
+
+</html>

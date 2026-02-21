@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — PuzzleVault</title>
+    <meta name="description"
+        content="Tips, strategies, and brain science — the PuzzleVault blog helps you become a better puzzle solver.">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/">
+    <link rel="stylesheet" href="/css/global.css">
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <main class="pv-container pv-section">
+        <h1 class="text-center">📝 PuzzleVault Blog</h1>
+        <p class="text-center mt-md" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+            Tips, strategies, brain science, and updates to help you become a better puzzle solver.
+        </p>
+
+        <!-- Category filter tabs -->
+        <div class="pv-tabs mt-lg" style="max-width: 400px; margin-left: auto; margin-right: auto;" id="blog-tabs">
+            <button class="pv-tab active" data-category="">All</button>
+            <button class="pv-tab" data-category="tips">Tips</button>
+            <button class="pv-tab" data-category="strategy">Strategy</button>
+            <button class="pv-tab" data-category="science">Science</button>
+            <button class="pv-tab" data-category="updates">Updates</button>
+        </div>
+
+        <!-- Blog posts grid -->
+        <div class="blog-grid mt-lg" id="blog-grid"></div>
+    </main>
+
+    <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
+
+    <footer id="pv-footer"></footer>
+
+    <script src="/js/blog-data.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+        function renderBlogGrid(category) {
+            const grid = document.getElementById('blog-grid');
+            if (!grid) return;
+
+            const posts = getBlogPosts(undefined, category || undefined);
+            grid.innerHTML = '';
+
+            if (posts.length === 0) {
+                grid.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">No posts found.</p>';
+                return;
+            }
+
+            posts.forEach(post => {
+                const card = document.createElement('a');
+                card.className = 'blog-card';
+                card.href = `/blog/posts/${post.slug}.html`;
+                card.innerHTML = `
+          <span class="blog-card-category">${post.category}</span>
+          <h3 class="blog-card-title">${post.title}</h3>
+          <p class="blog-card-desc">${post.description}</p>
+          <span class="blog-card-meta">${post.date} · ${post.readTime} min read</span>
+        `;
+                grid.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBlogGrid('');
+
+            // Tab filtering
+            document.getElementById('blog-tabs').addEventListener('click', e => {
+                const tab = e.target.closest('.pv-tab');
+                if (!tab) return;
+
+                document.querySelectorAll('#blog-tabs .pv-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                renderBlogGrid(tab.dataset.category);
+            });
+        });
+    </script>
+</body>
+
+</html>

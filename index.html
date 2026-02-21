@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PuzzleVault — Free Online Puzzle Games</title>
+  <meta name="description"
+    content="Play 10 free browser-based puzzle games. Challenge your mind daily with number deduction, block placement, pattern memory, color sorting, and more. No download needed.">
+  <meta name="theme-color" content="#2563EB">
+  <link rel="canonical" href="https://puzzlevault.pages.dev/">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PuzzleVault — Free Online Puzzle Games">
+  <meta property="og:description"
+    content="Play 10 free browser-based puzzle games. Challenge your mind daily. No download needed.">
+  <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+  <meta property="og:url" content="https://puzzlevault.pages.dev/">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PuzzleVault — Free Online Puzzle Games">
+  <meta name="twitter:description"
+    content="Play 10 free browser-based puzzle games. Challenge your mind daily. No download needed.">
+
+  <link rel="stylesheet" href="/css/global.css">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "PuzzleVault",
+    "url": "https://puzzlevault.pages.dev",
+    "description": "10 free browser-based puzzle games to challenge your mind every day.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://puzzlevault.pages.dev/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <style>
+    /* === Landing Page Specific Styles === */
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 64px 16px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .hero-logo-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.3));
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .hero-logo-text {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--pv-blue), var(--pv-violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+
+    .hero-tagline {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--pv-text);
+      margin-bottom: 8px;
+      animation: slideUp 0.6s ease 0.1s both;
+    }
+
+    .hero-subtext {
+      font-size: 1rem;
+      color: var(--pv-text-secondary);
+      max-width: 460px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+      animation: slideUp 0.6s ease 0.2s both;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--pv-blue), var(--pv-violet));
+      color: #fff;
+      border: none;
+      border-radius: var(--pv-radius);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+      text-decoration: none;
+      animation: slideUp 0.6s ease 0.3s both;
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(37, 99, 235, 0.4);
+    }
+
+    .hero-cta:active {
+      transform: scale(0.97);
+    }
+
+    /* Section headings */
+    .section-heading {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .section-heading h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .section-heading p {
+      font-size: 0.9rem;
+      color: var(--pv-text-secondary);
+    }
+
+    /* Daily Challenges */
+    .daily-section {
+      padding: 40px 0;
+    }
+
+    .daily-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 600px) {
+      .daily-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .daily-card {
+      background: var(--pv-card-bg);
+      border: 1px solid var(--pv-border);
+      border-radius: var(--pv-radius);
+      padding: 24px 20px;
+      text-align: center;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .daily-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--pv-blue), var(--pv-violet));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .daily-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--pv-shadow-lg);
+    }
+
+    .daily-card:hover::before {
+      opacity: 1;
+    }
+
+    .daily-card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .daily-card-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .daily-card-desc {
+      font-size: 0.85rem;
+      color: var(--pv-text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .daily-card .pv-btn {
+      width: 100%;
+    }
+
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--pv-amber), var(--pv-orange));
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+    }
+
+    /* All Games */
+    .games-section {
+      padding: 40px 0;
+    }
+
+    .all-games-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (min-width: 480px) {
+      .all-games-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .all-games-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .all-games-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+
+    .game-card-link {
+      display: flex;
+      flex-direction: column;
+      background: var(--pv-card-bg);
+      border: 1px solid var(--pv-border);
+      border-radius: var(--pv-radius);
+      overflow: hidden;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .game-card-link:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      border-color: var(--pv-blue);
+    }
+
+    .game-card-icon {
+      font-size: 2.8rem;
+      text-align: center;
+      padding: 24px 0 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .game-card-link:hover .game-card-icon {
+      transform: scale(1.15);
+    }
+
+    .game-card-body {
+      padding: 8px 14px 18px;
+      text-align: center;
+    }
+
+    .game-card-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--pv-text);
+    }
+
+    .game-card-desc {
+      font-size: 0.78rem;
+      color: var(--pv-text-secondary);
+      line-height: 1.4;
+    }
+
+    .game-card-play {
+      display: block;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--pv-blue);
+      background: rgba(37, 99, 235, 0.06);
+      border-top: 1px solid var(--pv-border);
+      transition: all 0.2s ease;
+    }
+
+    .game-card-link:hover .game-card-play {
+      background: var(--pv-blue);
+      color: #fff;
+    }
+
+    /* Blog preview */
+    .blog-section {
+      padding: 40px 0;
+    }
+
+    .blog-section .blog-grid {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .blog-view-all {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--pv-blue);
+      transition: color 0.2s ease;
+    }
+
+    .blog-view-all:hover {
+      color: var(--pv-violet);
+    }
+
+    /* Stats */
+    .stats-section {
+      padding: 40px 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 480px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .stat-card {
+      background: var(--pv-card-bg);
+      border: 1px solid var(--pv-border);
+      border-radius: var(--pv-radius);
+      padding: 20px 12px;
+      text-align: center;
+      transition: all 0.25s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--pv-shadow-lg);
+    }
+
+    .stat-card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .stat-card-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--pv-text);
+      margin-bottom: 4px;
+    }
+
+    .stat-card-label {
+      font-size: 0.75rem;
+      color: var(--pv-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Stagger animations */
+    .anim-stagger>* {
+      opacity: 0;
+      animation: slideUp 0.4s ease forwards;
+    }
+
+    .anim-stagger>*:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .anim-stagger>*:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .anim-stagger>*:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .anim-stagger>*:nth-child(4) {
+      animation-delay: 0.2s;
+    }
+
+    .anim-stagger>*:nth-child(5) {
+      animation-delay: 0.25s;
+    }
+
+    .anim-stagger>*:nth-child(6) {
+      animation-delay: 0.3s;
+    }
+
+    .anim-stagger>*:nth-child(7) {
+      animation-delay: 0.35s;
+    }
+
+    .anim-stagger>*:nth-child(8) {
+      animation-delay: 0.4s;
+    }
+
+    .anim-stagger>*:nth-child(9) {
+      animation-delay: 0.45s;
+    }
+
+    .anim-stagger>*:nth-child(10) {
+      animation-delay: 0.5s;
+    }
+  </style>
+</head>
+
+<body>
+  <header id="pv-header"></header>
+
+  <main>
+    <!-- ===== Hero Section ===== -->
+    <section class="hero">
+      <div class="hero-logo">
+        <span class="hero-logo-icon">🧩</span>
+        <span class="hero-logo-text">PuzzleVault</span>
+      </div>
+      <h1 class="hero-tagline">Free Brain Puzzles — No Download Needed</h1>
+      <p class="hero-subtext">
+        Challenge your mind with 10 unique puzzle games. Play directly in your browser.
+      </p>
+      <a href="#games" class="hero-cta">
+        ▶ Start Playing
+      </a>
+    </section>
+
+    <div class="pv-container">
+      <!-- ===== Daily Challenges ===== -->
+      <section class="daily-section">
+        <div class="section-heading">
+          <h2>📅 Today's Daily Challenges</h2>
+          <p>Fresh puzzles every day — can you keep your streak alive?</p>
+        </div>
+        <div class="daily-grid anim-stagger" id="daily-grid"></div>
+        <div class="text-center">
+          <div class="streak-badge" id="streak-badge" style="display: none;">
+            🔥 Your Streak: <span id="streak-count">0</span> days
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== All Games Grid ===== -->
+      <section class="games-section" id="games">
+        <div class="section-heading">
+          <h2>🎮 All Games</h2>
+          <p>10 unique puzzles — pick your favorite</p>
+        </div>
+        <div class="all-games-grid anim-stagger" id="all-games-grid"></div>
+      </section>
+
+      <!-- ===== Ad Slot ===== -->
+      <div class="ad-slot" id="ad-bottom"></div>
+
+      <!-- ===== Blog Preview ===== -->
+      <section class="blog-section">
+        <div class="section-heading">
+          <h2>📝 Latest from the Blog</h2>
+          <p>Tips, strategies, and brain science</p>
+        </div>
+        <div class="blog-posts-container"></div>
+        <a href="/blog/" class="blog-view-all">View All Posts →</a>
+      </section>
+
+      <!-- ===== Stats Section ===== -->
+      <section class="stats-section">
+        <div class="section-heading">
+          <h2>📊 Your Stats</h2>
+          <p>Track your progress across all games</p>
+        </div>
+        <div class="stats-grid anim-stagger">
+          <div class="stat-card">
+            <div class="stat-card-icon">🏆</div>
+            <div class="stat-card-value" id="stat-total-score">0</div>
+            <div class="stat-card-label">Total Score</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">🎮</div>
+            <div class="stat-card-value" id="stat-games-played">0</div>
+            <div class="stat-card-label">Games Played</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">🔥</div>
+            <div class="stat-card-value" id="stat-best-streak">0</div>
+            <div class="stat-card-label">Best Streak</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">⭐</div>
+            <div class="stat-card-value" id="stat-fav-game">—</div>
+            <div class="stat-card-label">Favorite Game</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer id="pv-footer"></footer>
+
+  <script src="/js/blog-data.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/adsense.js"></script>
+  <script>
+    /* === Game descriptions for landing page === */
+    const GAME_DESCRIPTIONS = {
+      numvault: 'Crack the secret number code',
+      gridsmash: 'Place blocks, clear lines, chase combos',
+      patternpop: 'How sharp is your memory?',
+      sortstack: 'Sort the colors into stacks',
+      quickcalc: 'Race against time with mental math',
+      tileturn: 'Flip tiles to light them all',
+      colorflow: 'Connect matching colors, fill the grid',
+      pipelink: 'Route energy through the circuit',
+      mergechain: 'Drop and merge numbers to 2048',
+      hexmatch: 'Match hex tiles in chain reactions',
+    };
+
+    /* === Daily Challenge featured games === */
+    const DAILY_FEATURED = ['numvault', 'gridsmash', 'colorflow'];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      /* --- Daily Challenges --- */
+      const dailyGrid = document.getElementById('daily-grid');
+      if (dailyGrid) {
+        DAILY_FEATURED.forEach(id => {
+          const game = PV_GAMES[id];
+          if (!game) return;
+          const card = document.createElement('div');
+          card.className = 'daily-card';
+          card.innerHTML = `
+            <div class="daily-card-icon">${game.emoji}</div>
+            <div class="daily-card-name">${game.name}</div>
+            <div class="daily-card-desc">${GAME_DESCRIPTIONS[id]}</div>
+            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary">Play Now</a>
+          `;
+          dailyGrid.appendChild(card);
+        });
+      }
+
+      /* --- Streak badge --- */
+      const maxStreak = getMaxStreak();
+      if (maxStreak > 0) {
+        const badge = document.getElementById('streak-badge');
+        if (badge) {
+          badge.style.display = 'inline-flex';
+          document.getElementById('streak-count').textContent = maxStreak;
+        }
+      }
+
+      /* --- All Games Grid --- */
+      const gamesGrid = document.getElementById('all-games-grid');
+      if (gamesGrid) {
+        Object.entries(PV_GAMES).forEach(([id, game]) => {
+          const card = document.createElement('a');
+          card.className = 'game-card-link';
+          card.href = game.path;
+          card.innerHTML = `
+            <div class="game-card-icon">${game.emoji}</div>
+            <div class="game-card-body">
+              <div class="game-card-name">${game.name}</div>
+              <div class="game-card-desc">${GAME_DESCRIPTIONS[id] || game.tagline}</div>
+            </div>
+            <div class="game-card-play">Play ▸</div>
+          `;
+          gamesGrid.appendChild(card);
+        });
+      }
+
+      /* --- Blog Cards --- */
+      renderBlogCards(3);
+
+      /* --- Stats --- */
+      const stats = getStats();
+      document.getElementById('stat-total-score').textContent = formatNumber(stats.totalScore);
+      document.getElementById('stat-games-played').textContent = formatNumber(stats.totalGames);
+
+      // Best streak (check all games)
+      const bestStreak = getMaxStreak();
+      document.getElementById('stat-best-streak').textContent = bestStreak;
+
+      // Favorite game (most played / highest score)
+      const favGame = getFavoriteGame(stats);
+      document.getElementById('stat-fav-game').textContent = favGame;
+    });
+
+    /**
+     * Get max streak across all games from localStorage.
+     * @returns {number}
+     */
+    function getMaxStreak() {
+      let max = 0;
+      Object.keys(PV_GAMES).forEach(id => {
+        const s = parseInt(localStorage.getItem('pv_' + id + '_streak') || '0');
+        if (s > max) max = s;
+      });
+      return max;
+    }
+
+    /**
+     * Determine the player's favorite game based on best scores.
+     * @param {{ bestScores: Object }} stats
+     * @returns {string} Game name or '—'
+     */
+    function getFavoriteGame(stats) {
+      const best = stats.bestScores;
+      if (!best || Object.keys(best).length === 0) return '—';
+      let topId = null;
+      let topScore = 0;
+      for (const [id, score] of Object.entries(best)) {
+        if (score > topScore) {
+          topScore = score;
+          topId = id;
+        }
+      }
+      if (topId && PV_GAMES[topId]) {
+        return PV_GAMES[topId].name;
+      }
+      return '—';
+    }
+  </script>
+</body>
+
+</html>
