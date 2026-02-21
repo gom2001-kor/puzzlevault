@@ -329,69 +329,77 @@ function setupDragListeners() {
     const wrap = document.getElementById('gs-canvas-wrap');
     const dock = document.getElementById('gs-dock');
     const wildSlot = document.getElementById('gs-wild-slot');
-    // Track tap timing for rotation vs drag
+    // Prevent default touch behavior on dock for reliable pointer events
+    dock.style.touchAction = 'none';
+    // Track tap vs drag
     let tapStartTime = 0;
     let tapIdx = -1;
-    let tapMoved = false;
-    // Dock pieces: short tap = rotate, long press / drag = start drag
+    let tapStartX = 0;
+    let tapStartY = 0;
+    const TAP_MOVE_THRESHOLD = 10; // pixels — ignore tiny movements (touch jitter)
+    const TAP_TIME_THRESHOLD = 250; // ms
+
+    // Dock pieces: short tap = rotate, drag = start drag
     dock.addEventListener('pointerdown', e => {
         const pc = e.target.closest('canvas');
         if (!pc || pc.classList.contains('placed')) return;
+        e.preventDefault();
         const idx = parseInt(pc.dataset.idx);
         tapStartTime = Date.now();
         tapIdx = idx;
-        tapMoved = false;
-        // Delay starting drag to differentiate tap vs drag
-        G._tapTimer = setTimeout(() => {
-            tapIdx = -1; // No longer a tap
-            startDrag(idx, G.pieces[idx], e);
-            pc.classList.add('dragging');
-        }, 200);
+        tapStartX = e.clientX;
+        tapStartY = e.clientY;
     });
-    dock.addEventListener('pointermove', e => {
+    // Detect drag start only when moved beyond threshold
+    window.addEventListener('pointermove', e => {
+        if (tapIdx >= 0 && !G.dragPiece) {
+            const dx = e.clientX - tapStartX;
+            const dy = e.clientY - tapStartY;
+            if (Math.abs(dx) > TAP_MOVE_THRESHOLD || Math.abs(dy) > TAP_MOVE_THRESHOLD) {
+                // Moved enough — start drag
+                const pc = dock.querySelectorAll('canvas')[tapIdx];
+                if (pc && !pc.classList.contains('placed')) {
+                    startDrag(tapIdx, G.pieces[tapIdx], e);
+                    pc.classList.add('dragging');
+                }
+                tapIdx = -1;
+            }
+        }
+        onDragMove(e);
+    });
+    // Detect tap (short press, no movement)
+    window.addEventListener('pointerup', e => {
         if (tapIdx >= 0) {
-            tapMoved = true;
-            // If moved, immediately start drag
-            clearTimeout(G._tapTimer);
-            const pc = dock.querySelectorAll('canvas')[tapIdx];
-            if (pc && !pc.classList.contains('placed') && !G.dragPiece) {
-                startDrag(tapIdx, G.pieces[tapIdx], e);
-                pc.classList.add('dragging');
+            const elapsed = Date.now() - tapStartTime;
+            const dx = e.clientX - tapStartX;
+            const dy = e.clientY - tapStartY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (elapsed < TAP_TIME_THRESHOLD && dist < TAP_MOVE_THRESHOLD) {
+                // Short tap without movement = rotate
+                if (G.gameState === 'playing' && !G.piecesPlaced[tapIdx]) {
+                    rotatePiece(G.pieces[tapIdx]);
+                    SFX.play('tap');
+                    renderDock();
+                }
             }
             tapIdx = -1;
         }
-    });
-    dock.addEventListener('pointerup', e => {
-        if (tapIdx >= 0 && !tapMoved && (Date.now() - tapStartTime) < 200) {
-            clearTimeout(G._tapTimer);
-            // Short tap = rotate piece in dock
-            if (G.gameState === 'playing' && !G.piecesPlaced[tapIdx]) {
-                rotatePiece(G.pieces[tapIdx]);
-                SFX.play('tap');
-                renderDock();
-            }
-        }
-        tapIdx = -1;
+        onDragEnd(e);
     });
     // Wild piece
     wildSlot.addEventListener('pointerdown', e => {
         if (G.wildUsed || !G.wildPiece) return;
         startDrag(-1, G.wildPiece, e);
     });
-    // Move/up on window for flexibility
-    window.addEventListener('pointermove', onDragMove);
-    window.addEventListener('pointerup', onDragEnd);
     // Right-click during drag = rotate piece
     window.addEventListener('contextmenu', e => {
         if (G.dragPiece) {
             e.preventDefault();
             rotatePiece(G.dragPiece);
             SFX.play('tap');
-            // Recalculate placement validity
             if (G.dragGridPos) {
                 G.dragValid = canPlace(G.dragPiece, G.dragGridPos.row, G.dragGridPos.col);
             }
-            // Re-render dock to show rotated piece
             if (G.dragIdx >= 0) renderDock();
             drawGrid();
         }
