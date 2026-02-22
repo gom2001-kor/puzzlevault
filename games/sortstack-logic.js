@@ -626,6 +626,7 @@ function renderResultCard(isWin, timeSeconds) {
         let shareText = `📚 SortStack ${state.mode === 'daily' ? 'Daily ' + new Date().toISOString().slice(0, 10) : state.difficulty}\nMoves: ${state.movesMade}\nTime: ${min}:${sec}\nhttps://puzzlevault.pages.dev/games/sortstack`;
 
         html = `
+            <button class="pv-modal-close" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--pv-text-secondary);" onclick="dismissResult()">✕</button>
             <div class="ss-result-title">🧩 Sort Complete!</div>
             <div class="ss-result-subtitle">${state.mode === 'daily' ? 'Daily Challenge' : state.difficulty + ' Mode'}</div>
             <div class="ss-result-stats">
@@ -643,6 +644,7 @@ function renderResultCard(isWin, timeSeconds) {
         `;
     } else {
         html = `
+            <button class="pv-modal-close" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--pv-text-secondary);" onclick="dismissResult()">✕</button>
             <div class="ss-result-title">Out of Moves!</div>
             <div class="ss-result-subtitle">${state.difficulty} Mode</div>
             <p style="margin-bottom: 24px; color: var(--pv-text-secondary); font-size: 0.9rem;">You've hit the move limit.</p>
@@ -656,6 +658,11 @@ function renderResultCard(isWin, timeSeconds) {
     if (window.AdController) {
         AdController.showInterstitial();
     }
+}
+
+window.dismissResult = function () {
+    const overlay = document.getElementById('ss-result');
+    if (overlay) overlay.classList.remove('show');
 }
 
 window.restartPlay = function () {

@@ -204,6 +204,7 @@
         }
 
         .ss-result-card {
+            position: relative;
             background: var(--pv-card-bg);
             padding: 32px 24px;
             border-radius: var(--pv-radius);
@@ -413,7 +414,7 @@
             </div>
         </div>
 
-        <div class="ss-result-overlay" id="ss-result">
+        <div class="ss-result-overlay" id="ss-result" onclick="if(event.target === this) dismissResult()">
             <div class="ss-result-card" id="ss-result-card">
                 <!-- Populated by JS -->
             </div>
