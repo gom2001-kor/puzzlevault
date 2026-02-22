@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initUIEvents();
     renderPacks();
     if (typeof renderCrossPromo === 'function') renderCrossPromo(GAME_ID);
+
+    const soundBtn = document.getElementById('tt-btn-settings');
+    if (soundBtn) soundBtn.textContent = localStorage.getItem('pv_sound') === 'off' ? '🔇' : '🔊';
 });
 
 function initUIEvents() {
@@ -45,8 +48,10 @@ function initUIEvents() {
     });
     document.getElementById('tt-btn-settings').addEventListener('click', () => {
         SFX.toggle();
+        document.getElementById('tt-btn-settings').textContent = SFX.enabled ? '🔊' : '🔇';
         showToast(SFX.enabled ? 'Sound On' : 'Sound Off');
     });
+    document.getElementById('tt-btn-stats').addEventListener('click', () => { SFX.play('tap'); showStatsModal(); });
 
     // Game Controls
     document.getElementById('tt-btn-undo').addEventListener('click', undoMove);
@@ -515,4 +520,43 @@ function handleWin() {
     if (state.currentLevel % 10 === 0 && window.AdController) {
         AdController.showInterstitial();
     }
+}
+
+// ---------------------------
+// Stats Modal
+// ---------------------------
+function showStatsModal() {
+    const progress = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_progress`)) || {};
+    let totalStars = 0;
+    let packsCompleted = 0;
+
+    PACKS.forEach(p => {
+        let starsForPack = 0;
+        let levelsCompleted = 0;
+        if (progress[p.id]) {
+            Object.values(progress[p.id]).forEach(s => {
+                starsForPack += s;
+                if (s > 0) levelsCompleted++;
+            });
+        }
+        totalStars += starsForPack;
+        if (levelsCompleted === p.levels) packsCompleted++;
+    });
+
+    const body = document.getElementById('tt-stats-body');
+    const totalMaxStars = PACKS.reduce((acc, p) => acc + (p.levels * 3), 0);
+
+    body.innerHTML = `
+        <div style="display:flex; justify-content:space-between; margin-bottom: 12px; font-size: 1.1rem; border-bottom: 1px solid var(--pv-border); padding-bottom: 8px;">
+            <span style="color:var(--pv-text-secondary);">Total Stars:</span> 
+            <strong><span style="color:var(--pv-amber);">⭐</span> ${totalStars} / ${totalMaxStars}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom: 12px; font-size: 1.1rem; border-bottom: 1px solid var(--pv-border); padding-bottom: 8px;">
+            <span style="color:var(--pv-text-secondary);">Packs Finished:</span> 
+            <strong>${packsCompleted} / ${PACKS.length}</strong>
+        </div>
+        <p style="font-size:0.9rem; color:var(--pv-text-secondary); text-align:center; margin-top:20px;">Keep turning tiles to earn more stars!</p>
+    `;
+
+    document.getElementById('tt-stats-modal').classList.add('open');
 }

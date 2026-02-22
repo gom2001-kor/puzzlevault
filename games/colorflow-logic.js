@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initUIEvents();
     renderPacks();
     if (typeof renderCrossPromo === 'function') renderCrossPromo(GAME_ID);
+
+    const soundBtn = document.getElementById('cf-btn-settings');
+    if (soundBtn) soundBtn.textContent = localStorage.getItem('pv_sound') === 'off' ? '🔇' : '🔊';
 });
 
 function initUIEvents() {
@@ -48,6 +51,7 @@ function initUIEvents() {
     document.getElementById('cf-btn-help').addEventListener('click', () => document.getElementById('cf-help-modal').classList.add('open'));
     document.getElementById('cf-btn-settings').addEventListener('click', () => {
         SFX.toggle();
+        document.getElementById('cf-btn-settings').textContent = SFX.enabled ? '🔊' : '🔇';
         showToast(SFX.enabled ? 'Sound On' : 'Sound Off');
     });
     document.getElementById('cf-btn-stats').addEventListener('click', () => { SFX.play('tap'); showStatsModal(); });

@@ -29,6 +29,9 @@ const TIME_PENALTY = 3000;
 document.addEventListener('DOMContentLoaded', () => {
     initUIEvents();
     if (typeof renderCrossPromo === 'function') renderCrossPromo(GAME_ID);
+
+    const soundBtn = document.getElementById('qc-btn-settings');
+    if (soundBtn) soundBtn.textContent = localStorage.getItem('pv_sound') === 'off' ? '🔇' : '🔊';
 });
 
 function initUIEvents() {
@@ -55,6 +58,7 @@ function initUIEvents() {
     });
     document.getElementById('qc-btn-settings').addEventListener('click', () => {
         SFX.toggle();
+        document.getElementById('qc-btn-settings').textContent = SFX.enabled ? '🔊' : '🔇';
         showToast(SFX.enabled ? 'Sound On' : 'Sound Off');
     });
     document.getElementById('qc-btn-stats').addEventListener('click', showStatsModal);

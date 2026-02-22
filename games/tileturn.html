@@ -462,6 +462,7 @@
                     <div class="tt-icons">
                         <button class="tt-icon-btn" id="tt-btn-help" aria-label="Help">❓</button>
                         <button class="tt-icon-btn" id="tt-btn-settings" aria-label="Sound">🔊</button>
+                        <button class="tt-icon-btn" id="tt-btn-stats" aria-label="Stats">📊</button>
                     </div>
                 </div>
 
@@ -561,6 +562,19 @@
             </div>
         </div>
 
+        <!-- Stats Modal -->
+        <div class="pv-modal" id="tt-stats-modal">
+            <div class="pv-modal-backdrop" onclick="document.getElementById('tt-stats-modal').classList.remove('open')">
+            </div>
+            <div class="pv-modal-content">
+                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+                <h3 style="margin-bottom:12px; font-size: 1.5rem; text-align: center;">📊 Statistics</h3>
+                <div id="tt-stats-body" style="text-align: left;">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
         <div id="ad-interstitial" style="display:none">
             <button class="ad-close-btn" aria-label="Close ad">✕</button>
             <div class="ad-slot" style="width:300px;min-height:250px"></div>
@@ -616,12 +630,12 @@
     <footer id="pv-footer"></footer>
 
     <!-- Scripts -->
-    <script src="../js/common.js"></script>
-    <script src="../js/adsense.js"></script>
-    <script src="../js/seed.js"></script>
-    <script src="../js/sfx.js"></script>
-    <script src="../js/share.js"></script>
-    <script src="./tileturn-logic.js"></script>
+    <script src="../js/common.js?v=3"></script>
+    <script src="../js/adsense.js?v=3"></script>
+    <script src="../js/seed.js?v=3"></script>
+    <script src="../js/sfx.js?v=3"></script>
+    <script src="../js/share.js?v=3"></script>
+    <script src="./tileturn-logic.js?v=3"></script>
 </body>
 
 </html>

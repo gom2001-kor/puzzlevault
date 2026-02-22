@@ -745,6 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('ss-btn-settings').addEventListener('click', () => {
         SFX.toggle();
+        document.getElementById('ss-btn-settings').textContent = SFX.enabled ? '🔊' : '🔇';
         showToast(SFX.enabled ? 'Sound On' : 'Sound Off');
     });
     document.getElementById('ss-btn-stats').addEventListener('click', () => {
