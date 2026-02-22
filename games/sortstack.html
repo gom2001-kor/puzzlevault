@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SortStack — Free Online Color Sorting Puzzle | PuzzleVault</title>
+    <meta name="description"
+        content="Sort colorful blocks into stacks in SortStack! A relaxing yet challenging free online color sorting puzzle with unlimited undos and multiple difficulty levels.">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/games/sortstack">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SortStack — Color Sorting Puzzle | PuzzleVault">
+    <meta property="og:description"
+        content="Sort the colorful blocks into matching stacks! Free daily sorting puzzle with multiple difficulty levels.">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/games/sortstack">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/css/global.css">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"VideoGame","name":"SortStack","description":"A color sorting puzzle game where you organize blocks into matching stacks.","url":"https://puzzlevault.pages.dev/games/sortstack","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    </script>
+    <style>
+        .ss-page {
+            display: flex;
+            justify-content: center;
+            gap: var(--pv-space-lg);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 var(--pv-space-md);
+        }
+
+        .ss-main {
+            flex: 1;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .ss-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        @media(min-width:1024px) {
+            .ss-sidebar {
+                display: block;
+            }
+        }
+
+        .ss-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+
+        .ss-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .ss-daily-tag {
+            font-size: 0.75rem;
+            color: var(--pv-blue);
+            font-weight: 600;
+            background: rgba(37, 99, 235, 0.1);
+            padding: 2px 8px;
+            border-radius: 100px;
+        }
+
+        .ss-icons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .ss-icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .ss-icon-btn:hover {
+            background: var(--pv-grid-bg);
+        }
+
+        .ss-mode-tabs {
+            margin-bottom: 12px;
+        }
+
+        .ss-game-area {
+            position: relative;
+            width: 100%;
+            background: var(--pv-bg-light);
+            border-radius: var(--pv-radius);
+            padding: 16px 0;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            align-items: center;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .ss-game-area {
+                background: var(--pv-bg-dark);
+            }
+        }
+
+        #ss-canvas {
+            display: block;
+            touch-action: pan-x pan-y;
+            margin: 0 auto;
+        }
+
+        .ss-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 8px;
+        }
+
+        .ss-moves-counter {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--pv-text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ss-moves-counter.danger {
+            color: var(--pv-coral);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .ss-undo-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--pv-card-bg);
+            border: 2px solid var(--pv-border);
+            border-radius: var(--pv-radius-sm);
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--pv-text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ss-undo-btn:hover:not(:disabled) {
+            background: var(--pv-grid-bg);
+            border-color: var(--pv-slate);
+        }
+
+        .ss-undo-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Result Overlay */
+        .ss-result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .ss-result-overlay.show {
+            display: flex;
+        }
+
+        .ss-result-card {
+            background: var(--pv-card-bg);
+            padding: 32px 24px;
+            border-radius: var(--pv-radius);
+            text-align: center;
+            max-width: 340px;
+            width: 90%;
+            box-shadow: var(--pv-shadow-lg);
+            animation: slideUp 0.3s ease-out;
+            color: var(--pv-text);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .ss-result-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .ss-result-subtitle {
+            font-size: 0.9rem;
+            color: var(--pv-text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .ss-result-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .ss-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ss-stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .ss-stat-lbl {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--pv-text-secondary);
+            margin-top: 4px;
+        }
+
+        .ss-result-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .ss-result-btn:active {
+            transform: scale(0.98);
+        }
+
+        .ss-btn-primary {
+            background: var(--pv-blue);
+            color: white;
+        }
+
+        .ss-btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .ss-btn-secondary {
+            background: var(--pv-grid-bg);
+            color: var(--pv-text);
+        }
+
+        .ss-btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .ss-diff-select {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        .ss-diff-btn {
+            padding: 12px;
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            background: var(--pv-card-bg);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .ss-diff-btn:hover {
+            border-color: var(--pv-blue);
+            box-shadow: var(--pv-shadow-lg);
+        }
+
+        .ss-diff-btn strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--pv-text);
+        }
+
+        .ss-diff-btn span {
+            font-size: 0.8rem;
+            color: var(--pv-text-secondary);
+        }
+
+        .ss-stats-row {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--pv-border);
+        }
+
+        .ss-stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .ss-stat-box {
+            text-align: center;
+        }
+
+        .ss-stat-box .val {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--pv-text);
+        }
+
+        .ss-stat-box .lbl {
+            font-size: 0.7rem;
+            color: var(--pv-text-secondary);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <main>
+        <div class="ss-page">
+            <div class="ss-main">
+                <div class="ss-top-bar">
+                    <div class="ss-title">
+                        <span>📚</span><span>SortStack</span>
+                        <span class="ss-daily-tag" id="ss-daily-tag" style="display:none"></span>
+                    </div>
+                    <div class="ss-icons">
+                        <button class="ss-icon-btn" id="ss-btn-help" aria-label="Help">❓</button>
+                        <button class="ss-icon-btn" id="ss-btn-stats" aria-label="Stats">📊</button>
+                        <button class="ss-icon-btn" id="ss-btn-settings" aria-label="Sound">🔊</button>
+                    </div>
+                </div>
+
+                <div class="ss-mode-tabs">
+                    <div class="pv-tabs" id="ss-tabs">
+                        <button class="pv-tab active" data-mode="daily">Daily</button>
+                        <button class="pv-tab" data-mode="free">Free Play</button>
+                    </div>
+                </div>
+
+                <div id="ss-diff-select" class="ss-diff-select" style="display:none">
+                    <!-- Dynamic difficulty buttons -->
+                </div>
+
+                <div id="ss-game-container">
+                    <div class="ss-controls">
+                        <div class="ss-moves-counter" id="ss-moves-counter">
+                            <!-- Moves: 10/40 -->
+                        </div>
+                        <button class="ss-undo-btn" id="ss-btn-undo" disabled>
+                            ↩️ Undo
+                        </button>
+                    </div>
+
+                    <div class="ss-game-area" id="ss-game-area">
+                        <canvas id="ss-canvas" width="500" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ss-sidebar">
+                <div class="ad-slot" id="ad-sidebar"></div>
+            </div>
+        </div>
+
+        <div class="ss-result-overlay" id="ss-result">
+            <div class="ss-result-card" id="ss-result-card">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <div id="ad-interstitial" style="display:none">
+            <button class="ad-close-btn" aria-label="Close ad">✕</button>
+            <div class="ad-slot" style="width:300px;min-height:250px"></div>
+        </div>
+
+        <section class="game-guide pv-container">
+            <h2>How to Play SortStack</h2>
+            <p>SortStack is a relaxing yet challenging color sorting puzzle. Your goal is to sort all the scattered
+                colored blocks so that each stack contains exactly 4 blocks of the same color.</p>
+            <p>Tap a stack to select its top block, then tap another stack to move the block there. You can only place a
+                block onto an empty stack or onto a stack where the top block matches its color. A stack can hold a
+                maximum of 4 blocks.</p>
+            <p><strong>Lock & Expansion:</strong> SortStack features a unique mechanic where completing a stack (4
+                matching colors) locks it into place with a satisfying animation, and a new empty stack appears at the
+                end of the line! This gives you progressively more workspace as you solve the puzzle.</p>
+            <p><strong>Undo Freely:</strong> Made a mistake? Don't worry! You can use the Undo button as many times as
+                you like without penalties or ads. Experimentation is part of the fun.</p>
+            <p><strong>Move Limits:</strong> While Easy and Medium modes let you play casually with unlimited moves,
+                Hard and Expert difficulties test your efficiency by imposing a strict move limit. Plan your sorts
+                carefully!</p>
+        </section>
+
+        <section class="pv-faq pv-container">
+            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <details>
+                <summary>How is SortStack different from other sorting games?</summary>
+                <p>Instead of the typical test tubes and round balls, SortStack uses a clean rectangular drawer
+                    aesthetic with square blocks. Additionally, its unique "Lock & Expand" mechanic rewards you with a
+                    new empty stack every time you complete a color, creating a satisfying progression as you play.</p>
+            </details>
+            <details>
+                <summary>Do I have to watch an ad to undo a move?</summary>
+                <p>No! SortStack provides unlimited undos completely free. We believe puzzle games should be relaxing
+                    and forgiving of simple misclicks.</p>
+            </details>
+            <details>
+                <summary>What are the different difficulty levels?</summary>
+                <p>SortStack offers four difficulties in Free Play: Easy (4 colors), Medium (6 colors), Hard (8 colors
+                    with a 40-move limit), and Expert (10 colors with a 50-move limit). Daily Challenge uses a
+                    pre-selected difficulty that changes every day.</p>
+            </details>
+            <details>
+                <summary>Are all puzzles solvable?</summary>
+                <p>Yes. Every single puzzle in SortStack is generated by starting from a perfectly solved state and
+                    applying random reverse-moves. This guarantees that every layout is 100% solvable.</p>
+            </details>
+        </section>
+
+        <div class="cross-promo pv-container"></div>
+        <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
+
+    </main>
+
+    <footer id="pv-footer"></footer>
+
+    <!-- Help Modal -->
+    <div class="pv-modal" id="ss-help-modal">
+        <div class="pv-modal-backdrop" onclick="document.getElementById('ss-help-modal').classList.remove('open')">
+        </div>
+        <div class="pv-modal-content">
+            <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+            <h3 style="margin-bottom:12px">How to Play</h3>
+            <p style="font-size:0.9rem;margin-bottom:8px">Sort all colors so each stack has 4 blocks of the same color.
+            </p>
+            <ul style="font-size:0.85rem; padding-left: 20px; color: var(--pv-text-secondary); line-height: 1.5;">
+                <li>Tap a stack to lift its top block.</li>
+                <li>Tap another stack to drop the block.</li>
+                <li>You can only drop on the SAME color or an EMPTY stack.</li>
+                <li>Complete a stack (4 matching) to LOCK it and get an extra empty stack!</li>
+                <li>Hard/Expert levels have Move Limits.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="pv-modal" id="ss-stats-modal">
+        <div class="pv-modal-backdrop" onclick="document.getElementById('ss-stats-modal').classList.remove('open')">
+        </div>
+        <div class="pv-modal-content" id="ss-stats-content">
+            <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+            <h3 style="margin-bottom:12px">📊 Statistics</h3>
+            <div id="ss-stats-body">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/sortstack-logic.js"></script>
+</body>
+
+</html>
