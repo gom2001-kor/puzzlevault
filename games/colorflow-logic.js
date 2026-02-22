@@ -28,7 +28,8 @@ let state = {
 
     activeColor: null,
     isDragging: false,
-    lastDrawnIdx: -1
+    lastDrawnIdx: -1,
+    history: []
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -49,6 +50,7 @@ function initUIEvents() {
         SFX.toggle();
         showToast(SFX.enabled ? 'Sound On' : 'Sound Off');
     });
+    document.getElementById('cf-btn-stats').addEventListener('click', () => { SFX.play('tap'); showStatsModal(); });
 
     document.getElementById('cf-btn-reset').addEventListener('click', resetBoard);
     document.getElementById('cf-btn-undo').addEventListener('click', undoLastPathSegment);
@@ -178,6 +180,7 @@ function startLevel(packId, levelIdx) {
     state.activeColor = null;
     state.isDragging = false;
     state.lastDrawnIdx = -1;
+    state.history = [];
 
     // Load puzzle
     const puzzle = getLevelData(state.size, levelIdx);
@@ -326,6 +329,13 @@ function getIdxFromEvent(e) {
     return parseInt(cell.dataset.idx);
 }
 
+function saveSnapshot() {
+    state.history.push({
+        paths: JSON.parse(JSON.stringify(state.paths)),
+        boardContent: JSON.parse(JSON.stringify(state.boardContent))
+    });
+}
+
 function handlePointerDown(e) {
     if (!state.isPlaying) return;
     e.preventDefault(); // prevent scroll
@@ -337,6 +347,8 @@ function handlePointerDown(e) {
 
     if (content.type === 'marker') {
         const col = content.color;
+
+        saveSnapshot();
 
         // If already connected, tapping the marker again breaks the path according to prompt instructions
         if (isColorConnected(col)) {
@@ -531,17 +543,22 @@ function severPath(colorToSever, severIdx) {
 }
 
 function undoLastPathSegment() {
-    if (!state.isPlaying) return;
-    // Iterate colors, find the deepest path element
-    // To properly support global undo we'd need a master history stack.
-    // Given the specifications state `Undo button (unlimited)`, we should
-    // implement a stack or just reset all. We will implement universal reset for now if a stack is too heavy.
-    // Actually, erasing paths via tapping is primary. We can just clear all boards.
-    resetBoard();
+    if (!state.isPlaying || !state.history || state.history.length === 0) return;
+
+    const snapshot = state.history.pop();
+    state.paths = snapshot.paths;
+    state.boardContent = snapshot.boardContent;
+
+    for (let i = 0; i < state.size * state.size; i++) {
+        renderCellVisuals(i);
+    }
+    updateMetaUI();
+    SFX.play('tap');
 }
 
 function resetBoard() {
     if (!state.isPlaying) return;
+    saveSnapshot();
     SFX.play('tap');
     state.boardContent.forEach(b => {
         if (b.type === 'path') {
@@ -641,4 +658,43 @@ function checkWinState() {
     document.getElementById('cf-result-modal').classList.add('open');
 
     if (state.levelIdx % 10 === 0 && window.AdController) AdController.showInterstitial();
+}
+
+// ---------------------------
+// Stats Modal
+// ---------------------------
+function showStatsModal() {
+    const progress = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_progress`)) || {};
+    let totalStars = 0;
+    let packsCompleted = 0;
+
+    PACKS.forEach(p => {
+        let starsForPack = 0;
+        let levelsCompleted = 0;
+        if (progress[p.id]) {
+            Object.values(progress[p.id]).forEach(s => {
+                starsForPack += s;
+                if (s > 0) levelsCompleted++;
+            });
+        }
+        totalStars += starsForPack;
+        if (levelsCompleted === p.levels) packsCompleted++;
+    });
+
+    const body = document.getElementById('cf-stats-body');
+    const totalMaxStars = PACKS.reduce((acc, p) => acc + (p.levels * 3), 0);
+
+    body.innerHTML = `
+        <div style="display:flex; justify-content:space-between; margin-bottom: 12px; font-size: 1.1rem; border-bottom: 1px solid var(--pv-border); padding-bottom: 8px;">
+            <span style="color:var(--pv-text-secondary);">Total Stars:</span> 
+            <strong><span style="color:var(--pv-amber);">⭐</span> ${totalStars} / ${totalMaxStars}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom: 12px; font-size: 1.1rem; border-bottom: 1px solid var(--pv-border); padding-bottom: 8px;">
+            <span style="color:var(--pv-text-secondary);">Packs Finished:</span> 
+            <strong>${packsCompleted} / ${PACKS.length}</strong>
+        </div>
+        <p style="font-size:0.9rem; color:var(--pv-text-secondary); text-align:center; margin-top:20px;">Keep connecting paths to earn more stars!</p>
+    `;
+
+    document.getElementById('cf-stats-modal').classList.add('open');
 }

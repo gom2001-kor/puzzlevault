@@ -735,6 +735,19 @@
             </div>
         </div>
 
+        <!-- Stats Modal -->
+        <div class="pv-modal" id="cf-stats-modal">
+            <div class="pv-modal-backdrop" onclick="document.getElementById('cf-stats-modal').classList.remove('open')">
+            </div>
+            <div class="pv-modal-content">
+                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+                <h3 style="margin-bottom:12px; font-size: 1.5rem; text-align: center;">📊 Statistics</h3>
+                <div id="cf-stats-body" style="text-align: left;">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
         <div id="ad-interstitial" style="display:none">
             <button class="ad-close-btn" aria-label="Close ad">✕</button>
             <div class="ad-slot" style="width:300px;min-height:250px"></div>
@@ -773,7 +786,6 @@
                 <p>The Flow Efficiency Bonus rewards players who can achieve 100% board coverage while also connecting
                     pairs with incredibly direct, short paths. If a path length is within 1.5x of the absolute shortest
                     mathematical distance (Manhattan distance), you'll earn +50 points per path.</p>
-            </details>
             </details>
         </section>
 
