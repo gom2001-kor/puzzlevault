@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, touch-action=none">
+    <title>ColorFlow — Beautiful Connect Puzzle | PuzzleVault</title>
+    <meta name="description"
+        content="Connect matching diamond markers with vibrant energy paths in ColorFlow. A unique, beautiful connection logic puzzle.">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/games/colorflow">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ColorFlow — Connect Puzzle | PuzzleVault">
+    <meta property="og:description"
+        content="Draw vibrant paths to connect diamonds across hundreds of logical puzzles. Can you achieve 100% flow coverage?">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+    <link rel="stylesheet" href="../css/global.css">
+
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"VideoGame","name":"ColorFlow","description":"Connect pairs of diamond markers with colored energy paths while aiming for maximum grid coverage.","url":"https://puzzlevault.pages.dev/games/colorflow","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    </script>
+    <style>
+        body {
+            /* Disable pull-to-refresh on mobile for drawing games */
+            overscroll-behavior-y: contain;
+        }
+
+        .cf-page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--pv-space-md);
+            display: flex;
+            gap: 24px;
+        }
+
+        .cf-main {
+            flex: 1;
+            width: 100%;
+        }
+
+        .cf-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        @media(min-width: 1024px) {
+            .cf-sidebar {
+                display: block;
+            }
+        }
+
+        /* Top Header */
+        .cf-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+
+        .cf-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cf-icons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .cf-icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .cf-icon-btn:hover {
+            background: var(--pv-grid-bg);
+        }
+
+        /* Screens */
+        .cf-screen {
+            display: none;
+        }
+
+        .cf-screen.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Pack List Screen */
+        .cf-pack-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .cf-pack-card {
+            background: var(--pv-card-bg);
+            border: 2px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cf-pack-card:hover {
+            border-color: var(--pv-blue);
+            transform: translateY(-2px);
+        }
+
+        .cf-pack-info {
+            flex: 1;
+        }
+
+        .cf-pack-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            color: var(--pv-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cf-pack-desc {
+            font-size: 0.85rem;
+            color: var(--pv-text-secondary);
+        }
+
+        .cf-pack-progress {
+            font-weight: 700;
+            color: var(--pv-emerald);
+            font-size: 0.9rem;
+            background: rgba(5, 150, 105, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        /* Level Select Screen */
+        .cf-top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .cf-back-btn {
+            background: var(--pv-grid-bg);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--pv-text);
+        }
+
+        .cf-pack-header-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .cf-level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 12px;
+        }
+
+        .cf-level-btn {
+            background: var(--pv-card-bg);
+            border: 2px solid var(--pv-border);
+            border-radius: var(--pv-radius-sm);
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .cf-level-btn:hover:not(.locked) {
+            border-color: var(--pv-blue);
+            background: var(--pv-blue);
+            color: white;
+        }
+
+        .cf-level-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--pv-grid-bg);
+        }
+
+        .cf-level-num {
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .cf-level-stars {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            letter-spacing: -2px;
+        }
+
+        .cf-star-empty {
+            color: #CBD5E1;
+        }
+
+        .cf-star-filled {
+            color: #F59E0B;
+            text-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Gameplay Screen - Visual Differentiation from Flow Free */
+        .cf-board-container {
+            background: var(--pv-bg-light);
+            /* LIGHT theme instead of black */
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--pv-border);
+        }
+
+        .cf-meta-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .cf-coverage {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--pv-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cf-cov-bar-bg {
+            width: 100px;
+            height: 10px;
+            background: var(--pv-grid-bg);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .cf-cov-fill {
+            height: 100%;
+            background: var(--pv-blue);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .cf-grid {
+            display: grid;
+            background: var(--pv-grid-bg);
+            /* Grid gaps */
+            gap: 2px;
+            /* Template columns/rows injected by JS */
+            border: 2px solid var(--pv-grid-bg);
+            touch-action: none;
+            /* Crucial for drawing */
+            position: relative;
+        }
+
+        .cf-cell {
+            background: var(--pv-card-bg);
+            /* Dimensions set by JS */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The uniquely styled Diamond Markers */
+        .cf-marker {
+            width: 45%;
+            height: 45%;
+            transform: rotate(45deg);
+            /* Diamond shape NOT circle */
+            border-radius: 3px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+            /* Above paths */
+        }
+
+        .cf-marker.connected {
+            animation: pulseMarker 1.5s infinite alternate;
+        }
+
+        @keyframes pulseMarker {
+            0% {
+                transform: rotate(45deg) scale(1.0);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            100% {
+                transform: rotate(45deg) scale(1.15);
+                box-shadow: 0 0 15px currentColor;
+            }
+        }
+
+        /* 
+           Path logic: 
+           Paths are 75% wide rects, not thin lines.
+           We use pseudo elements for connecting segments to centers.
+        */
+        .cf-path-core {
+            position: absolute;
+            background: currentColor;
+            z-index: 5;
+            /* The base class marks a cell as having a path of a color.
+               Actual directional fills are added via JS classes adding specific boxes */
+        }
+
+        /* 
+           Using thick 70% width bars for paths.
+           Top-to-center => top: 0, height: 50%, width: 70%, left: 15%
+           Bottom-to-center => bottom: 0, height: 50%, width: 70%, left: 15%
+           Left-to-center => left: 0, width: 50%, height: 70%, top: 15%
+           Right-to-center => right: 0, width: 50%, height: 70%, top: 15%
+           Center intersection => 70% x 70% in center
+        */
+        .cf-path-node {
+            position: absolute;
+            left: 15%;
+            top: 15%;
+            width: 70%;
+            height: 70%;
+            border-radius: 6px;
+            z-index: 5;
+        }
+
+        .cf-path-u {
+            position: absolute;
+            left: 15%;
+            top: 0;
+            width: 70%;
+            height: 50%;
+            z-index: 5;
+        }
+
+        .cf-path-d {
+            position: absolute;
+            left: 15%;
+            bottom: 0;
+            width: 70%;
+            height: 50%;
+            z-index: 5;
+        }
+
+        .cf-path-l {
+            position: absolute;
+            left: 0;
+            top: 15%;
+            width: 50%;
+            height: 70%;
+            z-index: 5;
+        }
+
+        .cf-path-r {
+            position: absolute;
+            right: 0;
+            top: 15%;
+            width: 50%;
+            height: 70%;
+            z-index: 5;
+        }
+
+        /* Flow Particle Animation across connected lines */
+        .cf-flow-fx {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 15;
+            pointer-events: none;
+            background-image: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: lightFlow 1.5s linear infinite;
+        }
+
+        .cf-marker.connected::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 4px;
+            background: inherit;
+            filter: blur(8px);
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        @keyframes lightFlow {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Color Palette Overrides for Gradient Paths and Solid Markers */
+        .c-1 {
+            color: var(--pv-coral);
+            background-color: var(--pv-coral);
+        }
+
+        .c-2 {
+            color: var(--pv-blue);
+            background-color: var(--pv-blue);
+        }
+
+        .c-3 {
+            color: var(--pv-emerald);
+            background-color: var(--pv-emerald);
+        }
+
+        .c-4 {
+            color: var(--pv-amber);
+            background-color: var(--pv-amber);
+        }
+
+        .c-5 {
+            color: var(--pv-violet);
+            background-color: var(--pv-violet);
+        }
+
+        .c-6 {
+            color: var(--pv-pink);
+            background-color: var(--pv-pink);
+        }
+
+        .c-7 {
+            color: var(--pv-orange);
+            background-color: var(--pv-orange);
+        }
+
+        .c-8 {
+            color: var(--pv-cyan);
+            background-color: var(--pv-cyan);
+        }
+
+        .c-9 {
+            color: var(--pv-lime);
+            background-color: var(--pv-lime);
+        }
+
+        /* Path gradient styling to distinguish from solid markers visually */
+        .cf-path-node,
+        .cf-path-u,
+        .cf-path-d,
+        .cf-path-l,
+        .cf-path-r {
+            background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%);
+        }
+
+        /* Controls */
+        .cf-controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            padding: 12px 20px;
+            border-radius: var(--pv-radius);
+            gap: 12px;
+        }
+
+        .cf-btn {
+            background: var(--pv-grid-bg);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--pv-text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cf-btn:hover {
+            background: #CBD5E1;
+        }
+
+        /* Flow Bonus Text Popup */
+        .flow-bonus-pop {
+            position: absolute;
+            color: var(--pv-amber);
+            font-weight: 900;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 100;
+            animation: popUpOut 1s forwards;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes popUpOut {
+            0% {
+                opacity: 0;
+                transform: translateY(10px) scale(0.8);
+            }
+
+            20% {
+                opacity: 1;
+                transform: translateY(-5px) scale(1.2);
+            }
+
+            80% {
+                opacity: 1;
+                transform: translateY(-20px) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+        }
+
+        /* Result Modal Overlay */
+        .cf-res-stars {
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            margin: 16px 0;
+        }
+
+        .cf-res-msg {
+            font-size: 1rem;
+            color: var(--pv-text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .cf-score-breakdown {
+            text-align: left;
+            background: var(--pv-bg-light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .cf-score-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .btn-primary {
+            background: var(--pv-blue);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .btn-secondary {
+            background: var(--pv-grid-bg);
+            color: var(--pv-text);
+            padding: 12px;
+            border: none;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <main>
+        <div class="cf-page">
+            <div class="cf-main">
+
+                <div class="cf-header">
+                    <div class="cf-title">
+                        <span>🎨</span><span>ColorFlow</span>
+                    </div>
+                    <div class="cf-icons">
+                        <button class="cf-icon-btn" id="cf-btn-help" aria-label="Help">❓</button>
+                        <button class="cf-icon-btn" id="cf-btn-settings" aria-label="Sound">🔊</button>
+                        <button class="cf-icon-btn" id="cf-btn-stats" aria-label="Stats">📊</button>
+                    </div>
+                </div>
+
+                <!-- VIEW 1: Packs -->
+                <div id="view-packs" class="cf-screen active">
+                    <p style="color:var(--pv-text-secondary); font-size:0.9rem;">Select a board size to begin.</p>
+                    <div class="cf-pack-list" id="cf-pack-list">
+                        <!-- Instantiated by JS -->
+                    </div>
+                </div>
+
+                <!-- VIEW 2: Levels -->
+                <div id="view-levels" class="cf-screen">
+                    <div class="cf-top-nav">
+                        <button class="cf-back-btn" id="cf-back-to-packs">← Packs</button>
+                        <div class="cf-pack-header-title" id="cf-pack-title">Pack 1</div>
+                        <div style="width: 70px;"></div><!-- Balance -->
+                    </div>
+                    <div class="cf-level-grid" id="cf-level-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- VIEW 3: Gameplay -->
+                <div id="view-game" class="cf-screen">
+                    <div class="cf-top-nav" style="margin-bottom: 8px;">
+                        <button class="cf-back-btn" id="cf-back-to-levels">← Levels</button>
+                        <div style="font-weight: 800; color:var(--pv-text);" id="cf-game-level-lbl">5×5 Level 1</div>
+                    </div>
+
+                    <div class="cf-board-container">
+                        <div class="cf-meta-bar">
+                            <div class="cf-coverage">
+                                Coverage: <span id="cf-cov-pct" style="width: 45px; display:inline-block;">0%</span>
+                                <div class="cf-cov-bar-bg">
+                                    <div class="cf-cov-fill" id="cf-cov-fill"></div>
+                                </div>
+                            </div>
+                            <div style="font-size:0.9rem; font-weight:700; color:var(--pv-text-secondary);">Pairs: <span
+                                    id="cf-pairs-lbl">0/4</span></div>
+                        </div>
+
+                        <div class="cf-grid" id="cf-grid" style="user-select: none; -webkit-user-select: none;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="cf-controls">
+                        <button class="cf-btn" id="cf-btn-undo" title="Remove last path">↩️ Undo Path</button>
+                        <button class="cf-btn" id="cf-btn-reset">🔄 Reset All</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="cf-sidebar">
+                <div class="ad-slot" id="ad-sidebar"></div>
+            </div>
+        </div>
+
+        <!-- Help Modal -->
+        <div class="pv-modal" id="cf-help-modal">
+            <div class="pv-modal-backdrop" onclick="document.getElementById('cf-help-modal').classList.remove('open')">
+            </div>
+            <div class="pv-modal-content" style="text-align:left;">
+                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+                <h3 style="margin-bottom:12px">How to Play</h3>
+                <p style="font-size:0.9rem; margin-bottom:12px; color:var(--pv-text-secondary);">Draw vibrant energy
+                    paths to securely connect all matching diamond crystals!</p>
+                <ul style="font-size:0.85rem; padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
+                    <li><strong>Draw:</strong> Touch a diamond and drag across the empty squares to connect it to its
+                        matching color companion.</li>
+                    <li><strong>Coverage:</strong> To earn ⭐⭐⭐ (3 stars), you must connect every single pair AND cover
+                        100% of the entire grid with no empty squares left behind.</li>
+                    <li><strong>Overlap:</strong> Paths cannot cross. If you draw a new path over an existing one, the
+                        old path will be severed (overwritten).</li>
+                    <li><strong>Erase:</strong> Make a mistake? Simply tap the starting diamond of any completed path to
+                        instantly clear it.</li>
+                </ul>
+                <p style="font-size:0.85rem; font-weight:700">⚡ Flow Bonus (Advanced):</p>
+                <p style="font-size:0.8rem; color:var(--pv-text-secondary);">Finding the shortest absolute distance
+                    between two diamonds while still filling the board will award you bonus points per pair!</p>
+            </div>
+        </div>
+
+        <!-- Result Modal -->
+        <div class="pv-modal" id="cf-result-modal">
+            <div class="pv-modal-backdrop"></div>
+            <div class="pv-modal-content">
+                <h2 style="font-size:1.8rem; margin-bottom:4px;">Circuit Complete!</h2>
+                <div class="cf-res-stars" id="cf-res-stars">⭐⭐⭐</div>
+                <div class="cf-res-msg" id="cf-res-msg">Perfect Coverage!</div>
+
+                <div class="cf-score-breakdown">
+                    <div class="cf-score-row"><span>Coverage Score:</span> <strong id="cf-res-cov-score">1000</strong>
+                    </div>
+                    <div class="cf-score-row"><span style="color:var(--pv-amber)">Flow Efficiency Bonus:</span> <strong
+                            id="cf-res-eff-score">+150</strong></div>
+                    <hr style="border:0; border-top:1px solid var(--pv-border); margin: 8px 0;">
+                    <div class="cf-score-row" style="font-size: 1.1rem;"><span>Total Points:</span> <strong
+                            id="cf-res-total" style="color:var(--pv-emerald)">1150</strong></div>
+                </div>
+
+                <button class="btn-primary" id="cf-btn-next">Next Puzzle</button>
+                <button class="btn-secondary"
+                    onclick="document.getElementById('cf-result-modal').classList.remove('open')">View Board</button>
+                <button class="btn-secondary" id="cf-btn-result-packs">Back to Packs</button>
+            </div>
+        </div>
+
+        <div id="ad-interstitial" style="display:none">
+            <button class="ad-close-btn" aria-label="Close ad">✕</button>
+            <div class="ad-slot" style="width:300px;min-height:250px"></div>
+        </div>
+
+        <!-- Cross Promo & Footer Area -->
+        <section class="game-guide pv-container" style="margin-top:40px;">
+            <h2>How to Play ColorFlow 🎨</h2>
+            <p>ColorFlow is an elegant pathing logic puzzle. Match up identically colored diamond markers with sweeping
+                energetic paths without leaving any tile uncolored.</p>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">🔶 The Rules</h3>
+            <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
+                <li>Drag from any diamond marker to begin charting a path. Use lateral horizontal or vertical moves
+                    only.</li>
+                <li>Connect the path to the other diamond of the exact same color to secure the connection. The line
+                    will illuminate vividly when securely locked.</li>
+                <li>You cannot intersect lines. If you draw over a different color's path, you will sever it!</li>
+            </ul>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">💯 Perfect 100% Coverage</h3>
+            <p>Connecting the nodes isn't enough for mastery. To unlock all 3 Stars, you must maneuver your paths in
+                such a way that **every single tile on the grid is occupied by a color gradient**. Watch the Coverage
+                meter closely!</p>
+        </section>
+
+        <section class="pv-faq pv-container">
+            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <details>
+                <summary>How do I erase a line?</summary>
+                <p>You can trace backwards to precisely shorten a line. To delete an entire completely drawn path
+                    instantly, just tap either of its starting or ending diamond markers.</p>
+            </details>
+            <details>
+                <summary>What is the 'Flow Eff. Bonus' in the results screen?</summary>
+                <p>The Flow Efficiency Bonus rewards players who can achieve 100% board coverage while also connecting
+                    pairs with incredibly direct, short paths. If a path length is within 1.5x of the absolute shortest
+                    mathematical distance (Manhattan distance), you'll earn +50 points per path.</p>
+            </details>
+            </details>
+        </section>
+
+        <div class="cross-promo pv-container"></div>
+        <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
+
+    </main>
+
+    <footer id="pv-footer"></footer>
+
+    <!-- Scripts -->
+    <script src="../js/common.js"></script>
+    <script src="../js/adsense.js"></script>
+    <script src="../js/seed.js"></script>
+    <script src="../js/sfx.js"></script>
+    <script src="../js/share.js"></script>
+    <script src="./colorflow-levels.js"></script>
+    <script src="./colorflow-logic.js"></script>
+</body>
+
+</html>
