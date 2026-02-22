@@ -101,7 +101,8 @@ function randomInt(min, max) {
 
 function shuffle(array) {
     if (state.rng) {
-        state.rng.shuffle(array);
+        const copy = state.rng.shuffle(array);
+        for (let i = 0; i < array.length; i++) array[i] = copy[i];
     } else {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
