@@ -575,6 +575,12 @@ function winGame() {
     // Save stats
     let timeTaken = Math.floor((Date.now() - state.startTime) / 1000);
 
+    let stats = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_stats`)) || {
+        played: 0, won: 0, bestEasy: null, bestMedium: null, bestHard: null, bestExpert: null
+    };
+    stats.played++;
+    stats.won++;
+
     // Save daily
     if (state.mode === 'daily') {
         const today = new Date().toISOString().slice(0, 10);
@@ -582,7 +588,31 @@ function winGame() {
             moves: state.movesMade,
             time: timeTaken
         }));
+
+        let streak = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_streak`)) || { current: 0, max: 0, lastDaily: null };
+        if (streak.lastDaily !== today) {
+            let yesterday = new Date();
+            yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+            let yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+            if (streak.lastDaily === yesterdayStr) {
+                streak.current++;
+            } else {
+                streak.current = 1;
+            }
+            if (streak.current > streak.max) streak.max = streak.current;
+            streak.lastDaily = today;
+            localStorage.setItem(`pv_${GAME_ID}_streak`, JSON.stringify(streak));
+        }
+    } else {
+        // Update best times for Free Play
+        let key = 'best' + state.difficulty;
+        if (stats[key] === null || timeTaken < stats[key]) {
+            stats[key] = timeTaken;
+        }
     }
+
+    localStorage.setItem(`pv_${GAME_ID}_stats`, JSON.stringify(stats));
 
     // Render result card
     renderResultCard(true, timeTaken);
@@ -591,6 +621,13 @@ function winGame() {
 function loseGame() {
     state.isGameOver = true;
     SFX.play('gameover');
+
+    let stats = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_stats`)) || {
+        played: 0, won: 0, bestEasy: null, bestMedium: null, bestHard: null, bestExpert: null
+    };
+    stats.played++;
+    localStorage.setItem(`pv_${GAME_ID}_stats`, JSON.stringify(stats));
+
     renderResultCard(false, 0);
 }
 
@@ -711,11 +748,36 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(SFX.enabled ? 'Sound On' : 'Sound Off');
     });
     document.getElementById('ss-btn-stats').addEventListener('click', () => {
-        // Example stats
-        document.getElementById('ss-stats-body').innerHTML = `
-            <div class="ss-stats-row"><div class="ss-stat-box"><div class="val">--</div><div class="lbl">Best Time</div></div></div>
-            <div style="text-align:center;color:var(--pv-text-secondary);font-size:0.8rem;padding:20px;">Detailed stats coming soon.</div>
+        let stats = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_stats`)) || { played: 0, won: 0, bestEasy: null, bestMedium: null, bestHard: null, bestExpert: null };
+        let streak = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_streak`)) || { current: 0, max: 0 };
+
+        let winRate = stats.played > 0 ? Math.round((stats.won / stats.played) * 100) : 0;
+
+        const formatTime = (secs) => {
+            if (secs === null) return '--';
+            const m = Math.floor(secs / 60);
+            const s = (secs % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        };
+
+        const html = `
+            <div class="ss-stats-row">
+                <div class="ss-stat-box"><div class="val">${stats.played}</div><div class="lbl">Played</div></div>
+                <div class="ss-stat-box"><div class="val">${winRate}%</div><div class="lbl">Win %</div></div>
+            </div>
+            <div class="ss-stats-row">
+                <div class="ss-stat-box"><div class="val">${streak.current}</div><div class="lbl">Current Streak</div></div>
+                <div class="ss-stat-box"><div class="val">${streak.max}</div><div class="lbl">Max Streak</div></div>
+            </div>
+            <h4 style="margin: 20px 0 12px; text-align: center; color: var(--pv-text); font-size: 0.9rem; text-transform: uppercase;">Best Times</h4>
+            <div class="ss-stats-row mb-lg">
+                <div class="ss-stat-box"><div class="val" style="color:var(--pv-emerald); font-size: 1rem;">${formatTime(stats.bestEasy)}</div><div class="lbl">Easy</div></div>
+                <div class="ss-stat-box"><div class="val" style="color:var(--pv-blue); font-size: 1rem;">${formatTime(stats.bestMedium)}</div><div class="lbl">Medium</div></div>
+                <div class="ss-stat-box"><div class="val" style="color:var(--pv-amber); font-size: 1rem;">${formatTime(stats.bestHard)}</div><div class="lbl">Hard</div></div>
+                <div class="ss-stat-box"><div class="val" style="color:var(--pv-coral); font-size: 1rem;">${formatTime(stats.bestExpert)}</div><div class="lbl">Expert</div></div>
+            </div>
         `;
+        document.getElementById('ss-stats-body').innerHTML = html;
         document.getElementById('ss-stats-modal').classList.add('open');
     });
 
