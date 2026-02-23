@@ -189,13 +189,16 @@ const PipeLink = {
 
         // Navigation
         document.getElementById('pl-back-to-packs').addEventListener('click', () => {
+            this.renderPackList();
             this.switchView('packs');
         });
         document.getElementById('pl-back-to-levels').addEventListener('click', () => {
+            this.renderLevelList();
             this.switchView('levels');
         });
         document.getElementById('pl-btn-result-packs').addEventListener('click', () => {
             document.getElementById('pl-result-modal').classList.remove('open');
+            this.renderPackList();
             this.switchView('packs');
         });
         document.getElementById('pl-btn-next').addEventListener('click', () => {
@@ -609,6 +612,7 @@ const PipeLink = {
     loadLevel(pack, level) {
         if (level > 20) {
             // Pack complete!
+            this.renderPackList();
             this.switchView('packs');
             return;
         }
@@ -621,6 +625,7 @@ const PipeLink = {
         if (!this.initialGridState) return;
         this.grid = JSON.parse(this.initialGridState);
         this.moves = 0;
+        this.gameState = 'playing';
         this.updateConnectionLogic();
         this.updateUI();
         this.drawBoard();
