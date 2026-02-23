@@ -303,8 +303,8 @@ const PipeLink = {
         this.sources.push(sA);
         this.dests.push(dA);
 
-        this.grid[sA.r][sA.c] = { type: 5, rot: 1, locked: true, colorA: true, colorB: false }; // Emit Right
-        this.grid[dA.r][dA.c] = { type: 6, rot: 3, locked: true, colorA: false, colorB: false }; // Receive Left
+        this.grid[sA.r][sA.c] = { type: 5, rot: 0, locked: true, colorA: true, colorB: false, targetRot: 0 }; // Emit Right
+        this.grid[dA.r][dA.c] = { type: 6, rot: 0, locked: true, colorA: false, colorB: false, targetRot: 0 };
 
         // Generate Path A
         this.carvePath(sA.r, sA.c, dA.r, dA.c, rng, 'A');
@@ -316,8 +316,8 @@ const PipeLink = {
             this.sources.push(sB);
             this.dests.push(dB);
 
-            this.grid[sB.r][sB.c] = { type: 5, rot: 2, locked: true, colorA: false, colorB: true }; // Emit Down
-            this.grid[dB.r][dB.c] = { type: 6, rot: 0, locked: true, colorA: false, colorB: false }; // Receive Up
+            this.grid[sB.r][sB.c] = { type: 5, rot: 1, locked: true, colorA: false, colorB: true, targetRot: 1 }; // Emit Down
+            this.grid[dB.r][dB.c] = { type: 6, rot: 0, locked: true, colorA: false, colorB: false, targetRot: 0 };
 
             this.carvePath(sB.r, sB.c, dB.r, dB.c, rng, 'B');
         }
@@ -382,7 +382,7 @@ const PipeLink = {
 
         if (initialPathR < 0 || initialPathR >= this.size || initialPathC < 0 || initialPathC >= this.size) return; // Edge case fail
 
-        const dfs = (r, c) => {
+        const dfs = (r, c, forcedDir = -1) => {
             if (r === dr && c === dc) {
                 return true;
             }
@@ -391,7 +391,11 @@ const PipeLink = {
 
             // Collect neighbors
             let neighbors = [0, 1, 2, 3];
-            neighbors = rng.shuffle(neighbors);
+            if (forcedDir !== -1) {
+                neighbors = [forcedDir];
+            } else {
+                neighbors = rng.shuffle(neighbors);
+            }
 
             path.push({ r, c });
 
@@ -405,11 +409,25 @@ const PipeLink = {
                         if (nr !== dr || nc !== dc) continue;
                     }
 
-                    if (dfs(nr, nc)) return true;
+                    // Dual Mode Cross Safety
+                    let nextForcedDir = -1;
+                    if (this.grid[nr][nc].type > 0 && (nr !== dr || nc !== dc)) {
+                        const existingTile = this.grid[nr][nc];
+                        if (existingTile.type !== 1) continue; // Only cross straights
+
+                        const isVertical = (existingTile.rot % 2 === 0);
+                        if (isVertical && (d === 0 || d === 2)) continue;
+                        if (!isVertical && (d === 1 || d === 3)) continue;
+
+                        nextForcedDir = d; // Force straight crossing
+                    }
+
+                    if (dfs(nr, nc, nextForcedDir)) return true;
                 }
             }
 
             path.pop();
+            visited[r][c] = false; // backtrack to allow other paths
             return false;
         };
 
@@ -442,16 +460,31 @@ const PipeLink = {
 
             // If already occupied, maybe upgrade to Cross
             if (this.grid[curr.r][curr.c].type > 0) {
-                this.grid[curr.r][curr.c] = { type: 4, rot: 0, locked: false, colorA: false, colorB: false }; // Cross
+                this.grid[curr.r][curr.c] = { type: 4, rot: 0, locked: false, colorA: false, colorB: false, targetRot: 0 }; // Cross
             } else {
-                this.grid[curr.r][curr.c] = { type: t.type, rot: t.rot, locked: false, colorA: false, colorB: false };
+                this.grid[curr.r][curr.c] = { type: t.type, rot: t.rot, locked: false, colorA: false, colorB: false, targetRot: t.rot };
                 // Sprinkling T-juncs naturally for difficulty
                 if (rng.next() > 0.8) {
                     const upgrade = this.upgradeToT(t.type, t.rot, rng);
-                    this.grid[curr.r][curr.c] = { type: 3, rot: upgrade.rot, locked: false, colorA: false, colorB: false };
+                    this.grid[curr.r][curr.c] = { type: 3, rot: upgrade.rot, locked: false, colorA: false, colorB: false, targetRot: upgrade.rot };
                 }
             }
         }
+
+        // Fix destination rotation based on how the path entered it
+        let secondToLast = fullSequence[fullSequence.length - 2];
+        let last = fullSequence[fullSequence.length - 1];
+        let enterDir = -1; // 0=Up, 1=Right, 2=Down, 3=Left
+        if (secondToLast.r < last.r) enterDir = 2; // Moving down
+        else if (secondToLast.r > last.r) enterDir = 0; // Moving up
+        else if (secondToLast.c < last.c) enterDir = 1; // Moving right
+        else if (secondToLast.c > last.c) enterDir = 3; // Moving left
+
+        // Dest (Type 6) base 'left' connects is [0,0,0,1].
+        // To receive from enterDir, we shift rot. rot = (enterDir + 3) % 4 gives exact mapping.
+        const destRot = (enterDir + 3) % 4;
+        this.grid[dr][dc].rot = destRot;
+        this.grid[dr][dc].targetRot = destRot;
     },
 
     getTileForIO(inD, outD) {
