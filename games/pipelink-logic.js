@@ -275,54 +275,75 @@ const PipeLink = {
         this.dualMode = (pack >= 4);
 
         // Seed based on pack and level
-        const rng = new SeededRandom(this.getGlobalSeed(pack, level));
+        let rng = new SeededRandom(this.getGlobalSeed(pack, level));
+        let success = false;
+        let attempts = 0;
 
-        // Initialize empty grid
-        this.grid = Array(this.size).fill().map((_, r) =>
-            Array(this.size).fill().map((_, c) => ({
-                type: 0, // empty
-                rot: 0,
-                locked: false,
-                colorA: false,
-                colorB: false
-            }))
-        );
+        while (!success && attempts < 100) {
+            attempts++;
 
-        this.sources = [];
-        this.dests = [];
+            // Initialize empty grid
+            this.grid = Array(this.size).fill().map((_, r) =>
+                Array(this.size).fill().map((_, c) => ({
+                    type: 0, // empty
+                    rot: 0,
+                    locked: false,
+                    colorA: false,
+                    colorB: false
+                }))
+            );
 
-        // Simple placeholder generator:
-        // In reality, this would use a generative algorithm to carve paths.
-        // For MVP, we will run a DFS walk to create one/two paths, then fill the rest.
+            this.sources = [];
+            this.dests = [];
 
-        // Place Source A and Dest A randomly on opposite sides for better puzzles
-        let r1 = rng.nextInt(0, this.size - 1);
-        let c1 = 0; // Left edge
-        let r2 = rng.nextInt(0, this.size - 1);
-        let c2 = this.size - 1; // Right edge
+            // Place Source A and Dest A randomly on opposite sides for better puzzles
+            let r1 = rng.nextInt(0, this.size - 1);
+            let c1 = 0; // Left edge
+            let r2 = rng.nextInt(0, this.size - 1);
+            let c2 = this.size - 1; // Right edge
 
-        let sA = { r: r1, c: c1, t: 'A' };
-        let dA = { r: r2, c: c2, t: 'A' };
-        this.sources.push(sA);
-        this.dests.push(dA);
+            let sA = { r: r1, c: c1, t: 'A' };
+            let dA = { r: r2, c: c2, t: 'A' };
+            this.sources.push(sA);
+            this.dests.push(dA);
 
-        this.grid[sA.r][sA.c] = { type: 5, rot: 0, locked: true, colorA: true, colorB: false, targetRot: 0 }; // Emit Right
-        this.grid[dA.r][dA.c] = { type: 6, rot: 0, locked: true, colorA: false, colorB: false, targetRot: 0 };
+            this.grid[sA.r][sA.c] = { type: 5, rot: 0, locked: true, colorA: true, colorB: false, targetRot: 0 }; // Emit Right
+            this.grid[dA.r][dA.c] = { type: 6, rot: 0, locked: true, colorA: false, colorB: false, targetRot: 0 };
 
-        // Generate Path A
-        this.carvePath(sA.r, sA.c, dA.r, dA.c, rng, 'A');
+            // Pre-allocate Dual Source B if needed
+            if (this.dualMode) {
+                let sB = { r: 0, c: rng.nextInt(1, this.size - 2), t: 'B' }; // Top edge
+                let dB = { r: this.size - 1, c: rng.nextInt(1, this.size - 2), t: 'B' }; // Bottom edge
 
-        // Dual Source Logic
-        if (this.dualMode) {
-            let sB = { r: 0, c: rng.nextInt(1, this.size - 2), t: 'B' }; // Top edge
-            let dB = { r: this.size - 1, c: rng.nextInt(1, this.size - 2), t: 'B' }; // Bottom edge
-            this.sources.push(sB);
-            this.dests.push(dB);
+                // Ensure B doesn't accidentally overlap A
+                while ((sB.r === sA.r && sB.c === sA.c) || (sB.r === dA.r && sB.c === dA.c)) {
+                    sB.c = rng.nextInt(1, this.size - 2);
+                }
+                while ((dB.r === sA.r && dB.c === sA.c) || (dB.r === dA.r && dB.c === dA.c)) {
+                    dB.c = rng.nextInt(1, this.size - 2);
+                }
 
-            this.grid[sB.r][sB.c] = { type: 5, rot: 1, locked: true, colorA: false, colorB: true, targetRot: 1 }; // Emit Down
-            this.grid[dB.r][dB.c] = { type: 6, rot: 0, locked: true, colorA: false, colorB: false, targetRot: 0 };
+                this.sources.push(sB);
+                this.dests.push(dB);
 
-            this.carvePath(sB.r, sB.c, dB.r, dB.c, rng, 'B');
+                this.grid[sB.r][sB.c] = { type: 5, rot: 1, locked: true, colorA: false, colorB: true, targetRot: 1 }; // Emit Down
+                this.grid[dB.r][dB.c] = { type: 6, rot: 0, locked: true, colorA: false, colorB: false, targetRot: 0 };
+            }
+
+            // Generate Path A
+            let pathAOK = this.carvePath(sA.r, sA.c, dA.r, dA.c, rng, 'A');
+
+            // Generate Path B
+            if (pathAOK) {
+                if (this.dualMode) {
+                    const sB = this.sources[1];
+                    const dB = this.dests[1];
+                    let pathBOK = this.carvePath(sB.r, sB.c, dB.r, dB.c, rng, 'B');
+                    if (pathBOK) success = true;
+                } else {
+                    success = true;
+                }
+            }
         }
 
         // Fill remaining empty cells with random valid-looking tiles
@@ -434,7 +455,7 @@ const PipeLink = {
             return false;
         };
 
-        dfs(initialPathR, initialPathC);
+        if (!dfs(initialPathR, initialPathC)) return false;
 
         // Assemble tiles from path
         let fullSequence = [{ r: sr, c: sc }, ...path, { r: dr, c: dc }];
@@ -488,6 +509,8 @@ const PipeLink = {
         const destRot = (enterDir + 3) % 4;
         this.grid[dr][dc].rot = destRot;
         this.grid[dr][dc].targetRot = destRot;
+
+        return true;
     },
 
     getTileForIO(inD, outD) {
