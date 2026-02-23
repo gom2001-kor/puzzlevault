@@ -279,7 +279,7 @@ const PipeLink = {
         let success = false;
         let attempts = 0;
 
-        while (!success && attempts < 100) {
+        while (!success && attempts < 2000) {
             attempts++;
 
             // Initialize empty grid
@@ -330,42 +330,73 @@ const PipeLink = {
                 this.grid[dB.r][dB.c] = { type: 6, rot: 0, locked: true, colorA: false, colorB: false, targetRot: 0 };
             }
 
-            // Generate Path A
-            let pathAOK = this.carvePath(sA.r, sA.c, dA.r, dA.c, rng, 'A');
+            // Generate Paths
+            let allowT = attempts < 500;
+            let pathAOK = this.carvePath(sA.r, sA.c, dA.r, dA.c, rng, 'A', allowT);
+            let pathBOK = true;
 
-            // Generate Path B
-            if (pathAOK) {
+            if (pathAOK && this.dualMode) {
+                const sB = this.sources[1];
+                const dB = this.dests[1];
+                pathBOK = this.carvePath(sB.r, sB.c, dB.r, dB.c, rng, 'B', allowT);
+            }
+
+            if (pathAOK && pathBOK) {
+                // Fill remaining empty cells with random valid-looking tiles
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        if (this.grid[r][c].type === 0) {
+                            this.grid[r][c].type = rng.nextInt(1, 3); // mostly straights and Ls
+                            this.grid[r][c].targetRot = rng.nextInt(0, 3);
+                            this.grid[r][c].rot = this.grid[r][c].targetRot; // temp for testing
+                        } else {
+                            this.grid[r][c].targetRot = this.grid[r][c].rot;
+                        }
+                    }
+                }
+
+                // Verify Solvability of targetRot state (checking for Dual Mode leaks)
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        this.grid[r][c].colorA = false;
+                        this.grid[r][c].colorB = false;
+                    }
+                }
+
+                this.traverseLine(sA, true, false);
+                let winA = this.grid[dA.r][dA.c].colorA;
+                let winB = !this.dualMode;
+
                 if (this.dualMode) {
                     const sB = this.sources[1];
                     const dB = this.dests[1];
-                    let pathBOK = this.carvePath(sB.r, sB.c, dB.r, dB.c, rng, 'B');
-                    if (pathBOK) success = true;
-                } else {
-                    success = true;
+                    this.traverseLine(sB, false, true);
+                    winB = this.grid[dB.r][dB.c].colorB;
                 }
-            }
-        }
 
-        // Fill remaining empty cells with random valid-looking tiles
-        for (let r = 0; r < this.size; r++) {
-            for (let c = 0; c < this.size; c++) {
-                if (this.grid[r][c].type === 0) {
-                    this.grid[r][c].type = rng.nextInt(1, 3); // mostly straights and Ls
-                    this.grid[r][c].rot = rng.nextInt(0, 3);
-                    this.grid[r][c].targetRot = this.grid[r][c].rot;
-                    // Locks in pack 5+
-                    if (pack >= 5 && rng.next() > 0.85) {
-                        this.grid[r][c].locked = true;
-                    }
-                } else {
-                    this.grid[r][c].targetRot = this.grid[r][c].rot;
-                    if (!this.grid[r][c].locked) {
-                        // In pack 5+, lock some correct path pieces too to serve as anchors
-                        if (pack >= 5 && rng.next() > 0.90 && this.grid[r][c].type !== 4) {
-                            this.grid[r][c].locked = true;
-                        } else {
-                            // Randomize rotation of path pieces so user has to solve
-                            this.grid[r][c].rot = rng.nextInt(0, 3);
+                // If perfectly solvable with no cross-circuit leaks
+                if (winA && winB) {
+                    success = true;
+                    // Apply scrambles and locks now that we know targetRot forms a valid un-leaked board
+                    for (let r = 0; r < this.size; r++) {
+                        for (let c = 0; c < this.size; c++) {
+                            // Clear test colors
+                            this.grid[r][c].colorA = false;
+                            this.grid[r][c].colorB = false;
+
+                            if (this.grid[r][c].type === 5 || this.grid[r][c].type === 6) {
+                                this.grid[r][c].locked = true; // Source/Dest always locked
+                            } else {
+                                this.grid[r][c].locked = false;
+                                // Lock randomly for difficulty (anchor points) in later packs
+                                if (pack >= 5 && rng.next() > 0.85 && this.grid[r][c].type !== 4) {
+                                    this.grid[r][c].locked = true;
+                                    this.grid[r][c].rot = this.grid[r][c].targetRot; // Must be locked in correct position
+                                } else {
+                                    // Scramble orientation for user to solve
+                                    this.grid[r][c].rot = rng.nextInt(0, 3);
+                                }
+                            }
                         }
                     }
                 }
@@ -386,7 +417,7 @@ const PipeLink = {
     /**
      * Generation Pathfinding
      */
-    carvePath(sr, sc, dr, dc, rng, pathType) {
+    carvePath(sr, sc, dr, dc, rng, pathType, allowT = true) {
         // A simple random walk that tries to reach dest
         // For puzzles, we represent the path as an array of coords, then instantiate tiles based on entry/exit.
 
@@ -488,7 +519,7 @@ const PipeLink = {
             } else {
                 this.grid[curr.r][curr.c] = { type: t.type, rot: t.rot, locked: false, colorA: false, colorB: false, targetRot: t.rot };
                 // Sprinkling T-juncs naturally for difficulty
-                if (rng.next() > 0.8) {
+                if (allowT && rng.next() > 0.8) {
                     const upgrade = this.upgradeToT(t.type, t.rot, rng);
                     this.grid[curr.r][curr.c] = { type: 3, rot: upgrade.rot, locked: false, colorA: false, colorB: false, targetRot: upgrade.rot };
                 }
