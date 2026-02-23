@@ -205,6 +205,15 @@ const PipeLink = {
         document.getElementById('pl-btn-reset').addEventListener('click', () => {
             this.resetLevel();
         });
+        document.getElementById('pl-btn-hint').addEventListener('click', () => {
+            if (window.AdController) {
+                AdController.showReward(() => {
+                    this.useHint();
+                });
+            } else {
+                this.useHint();
+            }
+        });
 
         // Modals & Extras
         document.getElementById('pl-btn-help').addEventListener('click', () => {
@@ -319,17 +328,21 @@ const PipeLink = {
                 if (this.grid[r][c].type === 0) {
                     this.grid[r][c].type = rng.nextInt(1, 3); // mostly straights and Ls
                     this.grid[r][c].rot = rng.nextInt(0, 3);
+                    this.grid[r][c].targetRot = this.grid[r][c].rot;
                     // Locks in pack 5+
                     if (pack >= 5 && rng.next() > 0.85) {
                         this.grid[r][c].locked = true;
                     }
-                } else if (!this.grid[r][c].locked) {
-                    // Randomize rotation of path pieces so user has to solve
-                    this.grid[r][c].rot = rng.nextInt(0, 3);
-
-                    // In pack 5+, lock some correct path pieces too to serve as anchors
-                    if (pack >= 5 && rng.next() > 0.90 && this.grid[r][c].type !== 4) {
-                        this.grid[r][c].locked = true;
+                } else {
+                    this.grid[r][c].targetRot = this.grid[r][c].rot;
+                    if (!this.grid[r][c].locked) {
+                        // In pack 5+, lock some correct path pieces too to serve as anchors
+                        if (pack >= 5 && rng.next() > 0.90 && this.grid[r][c].type !== 4) {
+                            this.grid[r][c].locked = true;
+                        } else {
+                            // Randomize rotation of path pieces so user has to solve
+                            this.grid[r][c].rot = rng.nextInt(0, 3);
+                        }
                     }
                 }
             }
@@ -583,6 +596,45 @@ const PipeLink = {
     /**
      * Interaction
      */
+    useHint() {
+        if (this.gameState !== 'playing') return;
+
+        // Find tiles that are not at their target rotation and are not locked
+        let wrongTiles = [];
+        for (let r = 0; r < this.size; r++) {
+            for (let c = 0; c < this.size; c++) {
+                if (!this.grid[r][c].locked && this.grid[r][c].rot !== this.grid[r][c].targetRot) {
+                    // Check if solving this would actually change connectivity (Crosses rotating 180 don't matter, but targetRot forces exact matches which is fine for hints)
+                    wrongTiles.push({ r, c });
+                }
+            }
+        }
+
+        if (wrongTiles.length === 0) return; // Everything is technically correct.
+
+        // Pick a random wrong tile
+        const rando = wrongTiles[Math.floor(Math.random() * wrongTiles.length)];
+        const cell = this.grid[rando.r][rando.c];
+
+        // Animate the fix
+        this.animations.push({
+            r: rando.r, c: rando.c,
+            type: 'rotate',
+            startRot: cell.rot,
+            endRot: cell.targetRot,
+            progress: 0,
+            duration: 300 // slightly slower for emphasis
+        });
+
+        cell.rot = cell.targetRot;
+        cell.locked = true; // Lock the hinted tile as an anchor to help the player
+
+        if (SFX) SFX.play('correct');
+
+        this.updateConnectionLogic();
+        this.updateUI();
+    },
+
     rotateTile(r, c, dir) {
         const cell = this.grid[r][c];
 
