@@ -561,8 +561,9 @@ const PipeLink = {
             this.switchView('packs');
             return;
         }
-        this.generateBoard(pack, level);
         this.switchView('game');
+        this.generateBoard(pack, level);
+        this.resizeCanvas();
     },
 
     resetLevel() {
