@@ -225,8 +225,13 @@ const PipeLink = {
         if (!container) return;
 
         let targetSize = container.clientWidth - 32; // minus padding
+        if (targetSize <= 0) targetSize = Math.min(400, window.innerWidth - 64);
+
         const maxSize = Math.min(500, window.innerHeight * 0.5);
         targetSize = Math.min(targetSize, maxSize);
+
+        // Prevent negative or zero
+        if (targetSize < 50) targetSize = 300;
 
         // To avoid blurry text on high DPI, scale the internal resolution by devicePixelRatio
         const dpr = window.devicePixelRatio || 1;
@@ -891,7 +896,11 @@ const PipeLink = {
         }
 
         if (this.gameState !== 'packs' && this.gameState !== 'levels') {
-            this.drawBoard(timestamp);
+            try {
+                this.drawBoard(timestamp);
+            } catch (e) {
+                console.error("Render error:", e);
+            }
         }
 
         requestAnimationFrame(this.renderLoop.bind(this));
@@ -911,6 +920,8 @@ const PipeLink = {
         const cs = this.cellSize;
         const mg = cs * 0.05; // 5% internal margin per cell
         const inner = cs - (mg * 2);
+
+        if (inner <= 0) return; // Guard against RangeError for negative radius
 
         const lineThickness = inner * 0.15;
         const mid = cs / 2;
