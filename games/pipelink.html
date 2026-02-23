@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, touch-action=none">
+    <title>PipeLink — Circuit Connection Puzzle | PuzzleVault</title>
+    <meta name="description"
+        content="Connect the energy sources to the destinations by rotating tiles in this beautiful circuit board puzzle game. Master the flow of dual sources in PipeLink.">
+    <meta name="theme-color" content="#0F172A">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/games/pipelink">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PipeLink — Circuit Puzzle | PuzzleVault">
+    <meta property="og:description"
+        content="Rotate the tiles to connect the power sources to the batteries. Play PipeLink for free!">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+
+    <!-- Shared Global Styles -->
+    <link rel="stylesheet" href="../css/global.css">
+
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"VideoGame","name":"PipeLink","description":"Rotate circuit tiles to connect power sources to their destinations.","url":"https://puzzlevault.pages.dev/games/pipelink","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    </script>
+    <style>
+        body {
+            overscroll-behavior-y: contain;
+            /* Prevent pull-to-refresh on mobile */
+            background-color: var(--pv-bg-dark);
+            color: white;
+            /* Ensure base text is visible on dark theme */
+        }
+
+        .pl-page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--pv-space-md);
+            display: flex;
+            gap: 24px;
+        }
+
+        .pl-main {
+            flex: 1;
+            width: 100%;
+        }
+
+        .pl-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        @media(min-width: 1024px) {
+            .pl-sidebar {
+                display: block;
+            }
+        }
+
+        /* Top Header */
+        .pl-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+
+        .pl-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--pv-bg-light);
+            /* Title text in dark mode */
+        }
+
+        .pl-icons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .pl-icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            color: var(--pv-text-secondary);
+        }
+
+        .pl-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Screens */
+        .pl-screen {
+            display: none;
+        }
+
+        .pl-screen.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Pack List Screen */
+        .pl-pack-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .pl-pack-card {
+            background: var(--pv-grid-dark);
+            border: 2px solid var(--pv-slate);
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--pv-bg-light);
+        }
+
+        .pl-pack-card:hover {
+            border-color: var(--pv-amber);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
+        }
+
+        .pl-pack-info {
+            flex: 1;
+        }
+
+        .pl-pack-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pl-pack-desc {
+            font-size: 0.85rem;
+            color: var(--pv-text-secondary);
+            /* or a lighter slate if needed */
+        }
+
+        .pl-pack-progress {
+            font-weight: 700;
+            color: var(--pv-emerald);
+            font-size: 0.9rem;
+            background: rgba(5, 150, 105, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        /* Level Select Screen */
+        .pl-top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .pl-back-btn {
+            background: var(--pv-grid-dark);
+            border: 1px solid var(--pv-slate);
+            padding: 8px 16px;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--pv-bg-light);
+            transition: background 0.2s;
+        }
+
+        .pl-back-btn:hover {
+            background: var(--pv-slate);
+        }
+
+        .pl-pack-header-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--pv-bg-light);
+        }
+
+        .pl-level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 12px;
+        }
+
+        .pl-level-btn {
+            background: var(--pv-grid-dark);
+            border: 2px solid var(--pv-slate);
+            border-radius: var(--pv-radius-sm);
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--pv-bg-light);
+        }
+
+        .pl-level-btn:hover:not(.locked) {
+            border-color: var(--pv-amber);
+            background: rgba(217, 119, 6, 0.1);
+        }
+
+        .pl-level-btn.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: rgba(15, 23, 42, 0.5);
+            /* darker bg */
+        }
+
+        .pl-level-num {
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .pl-level-stars {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            letter-spacing: -2px;
+        }
+
+        .pl-star-empty {
+            color: var(--pv-slate);
+        }
+
+        .pl-star-filled {
+            color: #F59E0B;
+            text-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Gameplay Area */
+        .pl-board-container {
+            background: var(--pv-bg-dark);
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--pv-grid-dark);
+        }
+
+        .pl-status-strip {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 16px;
+            font-weight: 700;
+            font-size: 1.1em;
+            color: var(--pv-text-secondary);
+        }
+
+        .pl-status-A {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pl-status-A.active {
+            color: var(--pv-amber);
+            text-shadow: 0 0 10px var(--pv-amber);
+        }
+
+        .pl-status-B {
+            display: none;
+            /* Only show in dual mode */
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pl-status-B.active {
+            color: var(--pv-cyan);
+            text-shadow: 0 0 10px var(--pv-cyan);
+        }
+
+        /* The Canvas Game Board */
+        #pl-canvas {
+            background: var(--pv-grid-dark);
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            /* Prevent default touch actions while drawing/rotating */
+            touch-action: none;
+            max-width: 100%;
+            border: 2px solid var(--pv-slate);
+        }
+
+        /* Controls */
+        .pl-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--pv-grid-dark);
+            border: 1px solid var(--pv-slate);
+            padding: 12px 20px;
+            border-radius: var(--pv-radius);
+            gap: 12px;
+        }
+
+        .pl-btn {
+            background: var(--pv-slate);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--pv-bg-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: filter 0.2s;
+        }
+
+        .pl-btn:hover {
+            filter: brightness(1.2);
+        }
+
+        .pl-moves {
+            color: var(--pv-text-secondary);
+            font-size: 0.9em;
+            font-weight: 700;
+        }
+
+        /* Overrides for Modals in Dark Theme */
+        .pv-modal-content {
+            background: var(--pv-bg-dark) !important;
+            color: var(--pv-bg-light) !important;
+            border: 1px solid var(--pv-slate) !important;
+        }
+
+        .pv-modal-close {
+            color: var(--pv-text-secondary) !important;
+        }
+
+        /* Result Modal */
+        .pl-res-stars {
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            margin: 16px 0;
+        }
+
+        .pl-res-msg {
+            font-size: 1rem;
+            color: var(--pv-text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .pl-score-breakdown {
+            text-align: left;
+            background: var(--pv-grid-dark);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            border: 1px solid var(--pv-slate);
+        }
+
+        .pl-score-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .btn-primary {
+            background: var(--pv-blue);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: var(--pv-grid-dark);
+            border: 1px solid var(--pv-slate);
+            color: var(--pv-bg-light);
+            padding: 12px;
+            border-radius: var(--pv-radius-sm);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--pv-slate);
+        }
+
+        /* Guide text updates */
+        .game-guide {
+            color: var(--pv-text);
+            /* Let global handle contrast outside the main game area if needed? Actually let's make it look fine */
+        }
+
+        /* To avoid too dark reading text in the standard text container in dark mode if body is dark */
+        h2,
+        h3,
+        p,
+        li,
+        summary {
+            color: #F8FAFC;
+        }
+
+        details {
+            border-color: var(--pv-slate) !important;
+            background-color: var(--pv-grid-dark) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <main>
+        <div class="pl-page">
+            <div class="pl-main">
+                <div class="pl-header">
+                    <div class="pl-title">
+                        <span>🔧</span><span>PipeLink</span>
+                    </div>
+                    <div class="pl-icons">
+                        <button class="pl-icon-btn" id="pl-btn-help" aria-label="Help">❓</button>
+                        <button class="pl-icon-btn" id="pl-btn-settings" aria-label="Sound">🔊</button>
+                        <button class="pl-icon-btn" id="pl-btn-stats" aria-label="Stats">📊</button>
+                    </div>
+                </div>
+
+                <!-- VIEW 1: Packs -->
+                <div id="view-packs" class="pl-screen active">
+                    <p style="color:var(--pv-text-secondary); font-size:0.9rem;">Select a circuit board to begin
+                        mapping.</p>
+                    <div class="pl-pack-list" id="pl-pack-list">
+                        <!-- Instantiated by JS -->
+                    </div>
+                </div>
+
+                <!-- VIEW 2: Levels -->
+                <div id="view-levels" class="pl-screen">
+                    <div class="pl-top-nav">
+                        <button class="pl-back-btn" id="pl-back-to-packs">← Boards</button>
+                        <div class="pl-pack-header-title" id="pl-pack-title">Pack 1</div>
+                        <div style="width: 80px;"></div><!-- Balance -->
+                    </div>
+                    <div class="pl-level-grid" id="pl-level-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- VIEW 3: Gameplay -->
+                <div id="view-game" class="pl-screen">
+                    <div class="pl-top-nav" style="margin-bottom: 8px;">
+                        <button class="pl-back-btn" id="pl-back-to-levels">← Levels</button>
+                        <div style="font-weight: 800; color:var(--pv-bg-light);" id="pl-game-level-lbl">4×4 Level 1
+                        </div>
+                    </div>
+
+                    <div class="pl-board-container">
+                        <div class="pl-status-strip">
+                            <div class="pl-status-A" id="pl-status-A">⚡ <span id="pl-conn-lbl-A">OFF</span> 🔋</div>
+                            <div class="pl-status-B" id="pl-status-B">⚡ <span id="pl-conn-lbl-B">OFF</span> 🔋</div>
+                        </div>
+                        <canvas id="pl-canvas" width="400" height="400"></canvas>
+                    </div>
+
+                    <div class="pl-controls">
+                        <div class="pl-moves">Taps: <span id="pl-moves-lbl">0</span></div>
+                        <button class="pl-btn" id="pl-btn-reset">🔄 Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Ad -->
+            <div class="pl-sidebar">
+                <div class="ad-slot" id="ad-sidebar"></div>
+            </div>
+        </div>
+
+        <!-- Help Modal -->
+        <div class="pv-modal" id="pl-help-modal">
+            <div class="pv-modal-backdrop" onclick="document.getElementById('pl-help-modal').classList.remove('open')">
+            </div>
+            <div class="pv-modal-content" style="text-align:left;">
+                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+                <h3 style="margin-bottom:12px; color:white;">How to Play</h3>
+                <p style="font-size:0.9rem; margin-bottom:12px; color:var(--pv-slate);">Create a fully functioning
+                    circuit board by connecting the power source to the battery.</p>
+                <ul
+                    style="font-size:0.85rem; padding-left: 20px; line-height: 1.6; margin-bottom: 16px; color:var(--pv-bg-light);">
+                    <li><strong>Rotate:</strong> Tap any tile to rotate it 90° clockwise. Double-tap to quickly rotate
+                        180°.</li>
+                    <li><strong>Energy Flow:</strong> The line will glow amber when it's actively connected to the
+                        source ⚡. Your goal is to chart the flow all the way to 🔋.</li>
+                    <li><strong>Perfect:</strong> Complete the circuit using every single tile on the grid for a ⭐⭐⭐
+                        rating!</li>
+                    <li><strong>Locks:</strong> Tiles with a 🔒 cannot be rotated. You must build your circuit around
+                        them.</li>
+                </ul>
+                <p style="font-size:0.85rem; font-weight:700; color:var(--pv-cyan)">Dual Source (Advanced):</p>
+                <p style="font-size:0.8rem; color:var(--pv-slate);">In later packs, you must manage two distinct energy
+                    paths (Amber and Cyan) simultaneously. Some tiles like Crosses (╋) can carry both energies
+                    independently!</p>
+            </div>
+        </div>
+
+        <!-- Result Modal -->
+        <div class="pv-modal" id="pl-result-modal">
+            <div class="pv-modal-backdrop"></div>
+            <div class="pv-modal-content">
+                <h2 style="font-size:1.8rem; margin-bottom:4px; color:white;">Circuit Online!</h2>
+                <div class="pl-res-stars" id="pl-res-stars">⭐⭐⭐</div>
+                <div class="pl-res-msg" id="pl-res-msg">Perfect Connection!</div>
+
+                <div class="pl-score-breakdown">
+                    <div class="pl-score-row"><span>Taps Used:</span> <strong id="pl-res-taps">15</strong></div>
+                    <div class="pl-score-row"><span>Tile Utilization:</span> <strong id="pl-res-util"
+                            style="color:var(--pv-emerald)">100%</strong></div>
+                </div>
+
+                <button class="btn-primary" id="pl-btn-next">Next Puzzle</button>
+                <button class="btn-secondary"
+                    onclick="document.getElementById('pl-result-modal').classList.remove('open')">View Board</button>
+                <button class="btn-secondary" id="pl-btn-result-packs">Back to Boards</button>
+            </div>
+        </div>
+
+        <!-- Stats Modal -->
+        <div class="pv-modal" id="pl-stats-modal">
+            <div class="pv-modal-backdrop" onclick="document.getElementById('pl-stats-modal').classList.remove('open')">
+            </div>
+            <div class="pv-modal-content">
+                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+                <h3 style="margin-bottom:12px; font-size: 1.5rem; text-align: center; color:white;">📊 Statistics</h3>
+                <div id="pl-stats-body" style="text-align: left;">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Interstitial Ad Overlay -->
+        <div id="ad-interstitial"
+            style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.9); justify-content:center; align-items:center;">
+            <button class="ad-close-btn" aria-label="Close ad"
+                style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:2rem; cursor:pointer;">✕</button>
+            <div class="ad-slot" style="width:300px;min-height:250px;background:#333;"></div>
+        </div>
+
+        <section class="game-guide pv-container" style="margin-top:40px;">
+            <h2>How to Play PipeLink 🔧</h2>
+            <p>PipeLink is an elegant circuitry puzzle constraint game. Navigate raw energy flowing from a power source
+                directly into its terminal battery by manipulating the direction of the conductive paths.</p>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">🔶 The Basics</h3>
+            <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
+                <li>Tap a circuit panel to rotate it 90 degrees clockwise. You can double-tap quickly to rotate it 180
+                    degrees.</li>
+                <li>Make sure to follow the path emitting from the source ⚡ so you know which panels are actively
+                    receiving power. Active panels will glow brightly!</li>
+                <li>Reach the destination node 🔋 to complete the circuit and clear the level.</li>
+            </ul>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">💯 Utilization for Stars</h3>
+            <p>Every board has a single shortest path to clear, but real masters won't leave loose wires hanging. To
+                earn 3 stars, you must form a circuit that utilizes <strong>every single tile</strong> on the grid. Are
+                there dead ends? Loop them back into the main circuit!</p>
+        </section>
+
+        <section class="pv-faq pv-container">
+            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <details>
+                <summary>What do the locked (🔒) tiles mean?</summary>
+                <p>Locked tiles cannot be rotated whatsoever. They act as permanent anchors in the board. You must
+                    construct the rest of your circuit strategically around these fixed segments.</p>
+            </details>
+            <details>
+                <summary>Why are there two different colors (amber and cyan) in later packs?</summary>
+                <p>That is the Dual Source mode. You'll need to manage two completely separate energy channels
+                    simultaneously. They cannot cross streams directly except when flowing through a Cross (╋) tile,
+                    which isolates the vertical and horizontal voltages.</p>
+            </details>
+        </section>
+
+        <div class="cross-promo pv-container"></div>
+        <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
+    </main>
+
+    <footer id="pv-footer"></footer>
+
+    <!-- Scripts -->
+    <script src="../js/common.js"></script>
+    <script src="../js/adsense.js"></script>
+    <script src="../js/seed.js"></script>
+    <script src="../js/sfx.js"></script>
+    <script src="../js/share.js"></script>
+    <!-- We will link the external logic script once built -->
+    <script src="pipelink-logic.js"></script>
+</body>
+
+</html>
