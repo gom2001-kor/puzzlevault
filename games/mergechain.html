@@ -9,14 +9,14 @@
         content="Drop and merge numbers to reach 2048 in MergeChain! A free browser-based drop physics puzzle with chain reactions and daily challenges.">
     <meta name="theme-color" content="#2563EB">
     <link rel="canonical" href="https://puzzlevault.pages.dev/games/mergechain">
-    <link rel="manifest" href="../manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <meta property="og:type" content="website">
     <meta property="og:title" content="MergeChain — Number Merge Game | PuzzleVault">
     <meta property="og:description" content="Drop, bounce, and merge numbers! Free daily physics puzzle.">
-    <meta property="og:image" content="../images/og-default.png">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
     <meta property="og:url" content="https://puzzlevault.pages.dev/games/mergechain">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="/css/global.css">
     <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"VideoGame","name":"MergeChain","description":"Physics-based number merging puzzle game with chains and combos.","url":"https://puzzlevault.pages.dev/games/mergechain","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
   </script>
@@ -199,7 +199,7 @@
         <div class="mc-page">
             <div class="mc-main">
                 <div class="mc-top-bar">
-                    <div class="mc-title"><span>🔮</span><span>MergeChain</span></div>
+                    <div class="mc-title" id="mc-title"><span>🔮</span><span>MergeChain</span></div>
                     <div class="mc-icons">
                         <button class="mc-icon-btn" id="mc-btn-restart" aria-label="Restart" title="Restart"
                             style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px">Restart</button>
@@ -235,7 +235,7 @@
                 <div id="mc-timer" class="mc-timer"></div>
 
                 <div class="mc-canvas-wrap" id="mc-canvas-wrap">
-                    <canvas id="mc-canvas" width="360" height="600"></canvas>
+                    <canvas id="mc-canvas" width="300" height="500"></canvas>
                     <div class="mc-chain-popup" id="mc-chain-popup"></div>
                 </div>
 
@@ -341,12 +341,12 @@
         </div>
     </div>
 
-    <script src="../js/common.js"></script>
-    <script src="../js/adsense.js"></script>
-    <script src="../js/seed.js"></script>
-    <script src="../js/sfx.js"></script>
-    <script src="../js/share.js"></script>
-    <script src="mergechain-logic.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/mergechain-logic.js"></script>
 </body>
 
 </html>

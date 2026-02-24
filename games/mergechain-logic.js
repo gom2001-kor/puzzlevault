@@ -5,16 +5,16 @@
 
 // Game Constants & Configuration
 const CONSTANTS = {
-    canvasWidth: 360,
-    canvasHeight: 600,
+    canvasWidth: 300,
+    canvasHeight: 500,
     gravity: 0.5,
     bounce: -0.3,
     friction: 0.99,
-    wallBounce: -0.4,
-    cooldownMs: 500, // Time between drops
-    dangerLineY: 100, // 15% from top approx
+    wallBounce: -0.3, // Same as floor per spec
+    cooldownMs: 500,
+    dangerLineY: 75, // 15% of 500
     dangerTimeLimit: 3000,
-    timeAttackLimit: 120, // seconds
+    timeAttackLimit: 120,
 };
 
 // Ball configurations from skills.md
@@ -136,17 +136,9 @@ function setupInput() {
 }
 
 function resizeCanvas() {
-    const wrap = document.getElementById('mc-canvas-wrap');
-    const rect = wrap.getBoundingClientRect();
-
-    // Set internal resolution based on parent container size
-    // Keep the logical width fixed at 360, but scale height to match aspect ratio
+    // Fixed internal resolution per spec (300x500). CSS handles visual scaling.
     M.canvas.width = CONSTANTS.canvasWidth;
-    M.canvas.height = CONSTANTS.canvasWidth * (rect.height / rect.width);
-    CONSTANTS.canvasHeight = M.canvas.height;
-
-    // Position danger line relatively
-    CONSTANTS.dangerLineY = M.canvas.height * 0.15;
+    M.canvas.height = CONSTANTS.canvasHeight;
 }
 
 // --- Game Modes ---
@@ -170,6 +162,7 @@ function startMode(mode) {
     M.isPlaying = true;
     M.inDanger = false;
     M.dangerStartTime = null;
+    M.rawPreviewX = CONSTANTS.canvasWidth / 2; // R3: reset preview position
     document.getElementById('mc-canvas-wrap').classList.remove('danger');
 
     // Seed RNG
@@ -499,7 +492,7 @@ function drawBlock(ctx, x, y, radius, val) {
 
     // Number
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = `800 ${info.size}px var(--pv-font)`;
+    ctx.font = `800 ${info.size}px 'Segoe UI', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -512,18 +505,31 @@ function drawBlock(ctx, x, y, radius, val) {
 
 function render() {
     let ct = M.ctx;
+    const W = CONSTANTS.canvasWidth;
+    const H = CONSTANTS.canvasHeight;
 
     // Background Dark
-    ct.fillStyle = '#1E293B'; // --pv-grid-dark
-    ct.fillRect(0, 0, CONSTANTS.canvasWidth, CONSTANTS.canvasHeight);
+    ct.fillStyle = '#1E293B';
+    ct.fillRect(0, 0, W, H);
+
+    // Subtle grid lines
+    ct.strokeStyle = 'rgba(255,255,255,0.04)';
+    ct.lineWidth = 1;
+    const gridStep = 50;
+    for (let gx = gridStep; gx < W; gx += gridStep) {
+        ct.beginPath(); ct.moveTo(gx, 0); ct.lineTo(gx, H); ct.stroke();
+    }
+    for (let gy = gridStep; gy < H; gy += gridStep) {
+        ct.beginPath(); ct.moveTo(0, gy); ct.lineTo(W, gy); ct.stroke();
+    }
 
     // Danger Line
     ct.beginPath();
     ct.moveTo(0, CONSTANTS.dangerLineY);
-    ct.lineTo(CONSTANTS.canvasWidth, CONSTANTS.dangerLineY);
+    ct.lineTo(W, CONSTANTS.dangerLineY);
     ct.lineWidth = 2;
     ct.setLineDash([8, 8]);
-    ct.strokeStyle = M.inDanger ? '#F43F5E' : '#D97706'; // Red or Amber
+    ct.strokeStyle = M.inDanger ? '#F43F5E' : '#D97706';
     ct.stroke();
     ct.setLineDash([]);
 
@@ -597,9 +603,9 @@ function updateTimerDisplay() {
 
 function toggleSound() {
     if (typeof SFX === 'undefined') return;
-    const isNowEnabled = SFX.toggle();
+    SFX.toggle();
     const btn = document.getElementById('mc-btn-settings');
-    btn.textContent = isNowEnabled ? '🔊' : '🔇';
+    btn.textContent = SFX.enabled ? '🔊' : '🔇';
 }
 
 // --- Game Over & Results ---
