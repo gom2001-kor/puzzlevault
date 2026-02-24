@@ -219,11 +219,12 @@ function dropBall() {
     M.balls.push({
         val: M.nextVal,
         x: M.mouseX,
-        y: info.radius + 10, // Start slightly below top edge
+        y: info.radius + 10,
         vx: 0,
-        vy: 2, // Slight initial downward push
+        vy: 2,
         radius: info.radius,
         merged: false,
+        bornAt: Date.now(), // Track age for danger-check exclusion
         id: Math.random()
     });
 
@@ -307,9 +308,10 @@ function updatePhysics() {
             b.vy += 2;
         }
 
-        // Check danger — any ball whose center is above the danger line
-        // No velocity filter: physics jitter kept |vy| > threshold, preventing game over
-        if (b.y - b.radius < CONSTANTS.dangerLineY) {
+        // Check danger — ball top edge above danger line.
+        // Exclude freshly dropped balls (< 1.5s old) that are still falling through.
+        const ballAge = Date.now() - (b.bornAt || 0);
+        if (b.y - b.radius < CONSTANTS.dangerLineY && ballAge > 1500) {
             dangerFound = true;
         }
     }
@@ -418,6 +420,7 @@ function processMerges(merges) {
             vy: nvy,
             radius: info.radius,
             merged: false,
+            bornAt: Date.now(),
             id: Math.random()
         };
         newBalls.push(newBall);
@@ -656,6 +659,7 @@ function showResult(titleStr) {
     const card = document.getElementById('mc-result-card');
 
     card.innerHTML = `
+        <button class="pv-modal-close" onclick="document.getElementById('mc-result').classList.remove('open')" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--pv-text-secondary)">✕</button>
         <div class="result-icon">💥</div>
         <div class="result-title">${titleStr}</div>
         <div class="result-score">${formatNumber(M.score)}</div>
