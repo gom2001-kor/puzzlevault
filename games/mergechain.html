@@ -203,6 +203,7 @@
                     <div class="mc-icons">
                         <button class="mc-icon-btn" id="mc-btn-restart" aria-label="Restart" title="Restart"
                             style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px">Restart</button>
+                        <button class="mc-icon-btn" id="mc-btn-help" aria-label="Help">❓</button>
                         <button class="mc-icon-btn" id="mc-btn-stats" aria-label="Stats">📊</button>
                         <button class="mc-icon-btn" id="mc-btn-settings" aria-label="Sound">🔊</button>
                     </div>
@@ -308,6 +309,26 @@
         <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
     </main>
     <footer id="pv-footer"></footer>
+
+    <!-- Help Modal -->
+    <div class="pv-modal" id="mc-help-modal">
+        <div class="pv-modal-backdrop" onclick="document.getElementById('mc-help-modal').classList.remove('open')">
+        </div>
+        <div class="pv-modal-content">
+            <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+            <h3 style="margin-bottom:12px">How to Play</h3>
+            <p style="font-size:.9rem;margin-bottom:8px">Drop numbered balls into the field. When two balls of the same
+                number touch, they merge into a larger number!</p>
+            <p style="font-size:.85rem;margin-bottom:8px">Drag horizontally to move the next ball, and release to drop
+                it.</p>
+            <h4 style="margin:12px 0 6px">Chain Reactions</h4>
+            <p style="font-size:.85rem;margin-bottom:8px">Create combos! If a newly merged ball bounces and merges
+                again, you earn a huge score multiplier.</p>
+            <h4 style="margin:12px 0 6px">Danger Line</h4>
+            <p style="font-size:.85rem;color:var(--pv-coral)">If a ball stays above the dashed red line for 3 seconds,
+                it's Game Over!</p>
+        </div>
+    </div>
 
     <!-- Stats Modal -->
     <div class="pv-modal" id="mc-stats-modal">

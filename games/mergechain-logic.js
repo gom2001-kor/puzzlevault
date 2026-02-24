@@ -81,8 +81,15 @@ function initMergeChain() {
 
     // Setup buttons
     document.getElementById('mc-btn-restart').addEventListener('click', () => startMode(M.mode));
+    document.getElementById('mc-btn-help').addEventListener('click', () => {
+        document.getElementById('mc-help-modal').classList.add('open');
+    });
     document.getElementById('mc-btn-settings').addEventListener('click', toggleSound);
     document.getElementById('mc-btn-stats').addEventListener('click', showStats);
+
+    // Canvas sizing
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
     // Input Handling
     setupInput();
@@ -126,6 +133,20 @@ function setupInput() {
     M.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleStart(e); }, { passive: false });
     document.addEventListener('touchmove', (e) => { if (M.isDragging) handleMove(e); }, { passive: false });
     document.addEventListener('touchend', handleEnd);
+}
+
+function resizeCanvas() {
+    const wrap = document.getElementById('mc-canvas-wrap');
+    const rect = wrap.getBoundingClientRect();
+
+    // Set internal resolution based on parent container size
+    // Keep the logical width fixed at 360, but scale height to match aspect ratio
+    M.canvas.width = CONSTANTS.canvasWidth;
+    M.canvas.height = CONSTANTS.canvasWidth * (rect.height / rect.width);
+    CONSTANTS.canvasHeight = M.canvas.height;
+
+    // Position danger line relatively
+    CONSTANTS.dangerLineY = M.canvas.height * 0.15;
 }
 
 // --- Game Modes ---
