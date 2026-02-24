@@ -7,14 +7,48 @@
 const CONSTANTS = {
     canvasWidth: 300,
     canvasHeight: 500,
-    gravity: 0.5,
     bounce: -0.3,
     friction: 0.99,
-    wallBounce: -0.3, // Same as floor per spec
-    cooldownMs: 500,
-    dangerLineY: 75, // 15% of 500
+    wallBounce: -0.3,
+    dangerLineY: 75,
     dangerTimeLimit: 3000,
     timeAttackLimit: 120,
+};
+
+// Difficulty presets
+const DIFFICULTY = {
+    easy: {
+        label: 'Easy',
+        gravity: 0.35,
+        cooldownMs: 600,
+        dropValues: [2, 2, 2, 4],           // 75% 2, 25% 4
+        progressiveRate: 0,                   // No scaling
+        dangerTime: 4000,                     // 4s grace
+    },
+    normal: {
+        label: 'Normal',
+        gravity: 0.5,
+        cooldownMs: 500,
+        dropValues: [2, 2, 4, 4, 4, 8],      // ~33% 2, ~50% 4, ~17% 8
+        progressiveRate: 0.003,               // Mild scaling
+        dangerTime: 3000,
+    },
+    hard: {
+        label: 'Hard',
+        gravity: 0.65,
+        cooldownMs: 400,
+        dropValues: [2, 4, 4, 8, 8, 8],      // More 8s, harder to stack
+        progressiveRate: 0.008,               // Moderate scaling
+        dangerTime: 2500,
+    },
+    expert: {
+        label: 'Expert',
+        gravity: 0.85,
+        cooldownMs: 300,
+        dropValues: [2, 4, 8, 8, 16, 16],    // 16s appear! Huge radii fill fast
+        progressiveRate: 0.015,               // Aggressive scaling
+        dangerTime: 2000,
+    }
 };
 
 // Ball configurations from skills.md
@@ -36,7 +70,8 @@ const BALL_TYPES = {
 
 // State
 let M = {
-    mode: 'classic', // classic, daily, time
+    mode: 'classic',
+    difficulty: 'normal', // easy, normal, hard, expert
     balls: [],
     particles: [],
     nextVal: 2,
@@ -53,12 +88,17 @@ let M = {
 
     // Danger state
     dangerStartTime: null,
-    dangerSafeStart: null, // Grace period: don't reset danger instantly
+    dangerSafeStart: null,
     inDanger: false,
 
     // Time Attack
     timeLeft: CONSTANTS.timeAttackLimit,
     timerInterval: null,
+
+    // Progressive difficulty
+    currentGravity: 0.5,
+    currentCooldown: 500,
+    gameStartTime: 0,
 
     // Random generator
     rng: null,
@@ -67,7 +107,8 @@ let M = {
     canvas: null,
     ctx: null,
     reqId: null,
-    lastFrameTime: 0
+    lastFrameTime: 0,
+    rawPreviewX: CONSTANTS.canvasWidth / 2
 };
 
 // --- Initialization ---
@@ -88,6 +129,16 @@ function initMergeChain() {
     document.getElementById('mc-btn-settings').addEventListener('click', toggleSound);
     document.getElementById('mc-btn-stats').addEventListener('click', showStats);
 
+    // Difficulty selector
+    document.querySelectorAll('#mc-diff .mc-diff-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#mc-diff .mc-diff-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            M.difficulty = btn.dataset.diff;
+            startMode(M.mode);
+        });
+    });
+
     // Canvas sizing
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
@@ -103,7 +154,7 @@ function initMergeChain() {
 
 function setupInput() {
     const handleMove = (e) => {
-        if (!M.isPlaying || Date.now() - M.lastDropTime < CONSTANTS.cooldownMs) return;
+        if (!M.isPlaying || Date.now() - M.lastDropTime < M.currentCooldown) return;
         const rect = M.canvas.getBoundingClientRect();
         let clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
@@ -164,8 +215,15 @@ function startMode(mode) {
     M.inDanger = false;
     M.dangerStartTime = null;
     M.dangerSafeStart = null;
-    M.rawPreviewX = CONSTANTS.canvasWidth / 2; // R3: reset preview position
+    M.rawPreviewX = CONSTANTS.canvasWidth / 2;
+    M.gameStartTime = Date.now();
     document.getElementById('mc-canvas-wrap').classList.remove('danger');
+
+    // Apply difficulty preset
+    const diff = DIFFICULTY[M.difficulty] || DIFFICULTY.normal;
+    M.currentGravity = diff.gravity;
+    M.currentCooldown = diff.cooldownMs;
+    CONSTANTS.dangerTimeLimit = diff.dangerTime;
 
     // Seed RNG
     if (mode === 'daily') {
@@ -198,11 +256,10 @@ function startMode(mode) {
 
 // --- Gameplay Mechanics ---
 function generateNextValue() {
-    // 2 (50%), 4 (35%), 8 (15%)
-    const r = M.rng.next();
-    if (r < 0.5) return 2;
-    if (r < 0.85) return 4;
-    return 8;
+    const diff = DIFFICULTY[M.difficulty] || DIFFICULTY.normal;
+    const pool = diff.dropValues;
+    const idx = Math.floor(M.rng.next() * pool.length);
+    return pool[idx];
 }
 
 function getTypeInfo(val) {
@@ -211,7 +268,7 @@ function getTypeInfo(val) {
 
 function dropBall() {
     const now = Date.now();
-    if (now - M.lastDropTime < CONSTANTS.cooldownMs) return;
+    if (now - M.lastDropTime < M.currentCooldown) return;
 
     M.lastDropTime = now;
 
@@ -269,14 +326,22 @@ function showChainPopup(mult) {
 function updatePhysics() {
     if (!M.isPlaying) return;
 
+    // Progressive difficulty: ramp up gravity and reduce cooldown over time
+    const diff = DIFFICULTY[M.difficulty] || DIFFICULTY.normal;
+    if (diff.progressiveRate > 0) {
+        const elapsed = (Date.now() - M.gameStartTime) / 1000; // seconds
+        M.currentGravity = diff.gravity + elapsed * diff.progressiveRate;
+        M.currentCooldown = Math.max(200, diff.cooldownMs - elapsed * (diff.progressiveRate * 100));
+    }
+
     let dangerFound = false;
 
     // 1. Apply forces & move
     for (let i = 0; i < M.balls.length; i++) {
         let b = M.balls[i];
 
-        // Gravity
-        b.vy += CONSTANTS.gravity;
+        // Gravity (uses current progressive value)
+        b.vy += M.currentGravity;
 
         // Friction / Air resistance
         b.vx *= CONSTANTS.friction;
@@ -548,7 +613,7 @@ function render() {
     ct.setLineDash([]);
 
     // Preview Ball (if cooldown passed)
-    if (M.isPlaying && Date.now() - M.lastDropTime >= CONSTANTS.cooldownMs) {
+    if (M.isPlaying && Date.now() - M.lastDropTime >= M.currentCooldown) {
         let alpha = M.isDragging ? 1.0 : 0.5;
         ct.globalAlpha = alpha;
 

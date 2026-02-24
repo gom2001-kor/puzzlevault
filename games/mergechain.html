@@ -190,6 +190,36 @@
             margin-bottom: 8px;
             display: none;
         }
+
+        .mc-diff-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .mc-diff-btn {
+            background: var(--pv-card-bg);
+            border: 1.5px solid var(--pv-border);
+            border-radius: 100px;
+            padding: 3px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--pv-text-secondary);
+            transition: all .2s;
+        }
+
+        .mc-diff-btn:hover {
+            border-color: var(--pv-blue);
+            color: var(--pv-blue);
+        }
+
+        .mc-diff-btn.active {
+            background: var(--pv-blue);
+            border-color: var(--pv-blue);
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -230,6 +260,13 @@
                         <button class="pv-tab" data-mode="daily">Daily</button>
                         <button class="pv-tab" data-mode="time">Time Attack</button>
                     </div>
+                </div>
+
+                <div class="mc-diff-bar" id="mc-diff">
+                    <button class="mc-diff-btn" data-diff="easy">Easy</button>
+                    <button class="mc-diff-btn active" data-diff="normal">Normal</button>
+                    <button class="mc-diff-btn" data-diff="hard">Hard</button>
+                    <button class="mc-diff-btn" data-diff="expert">Expert</button>
                 </div>
 
                 <div id="mc-timer" class="mc-timer"></div>
@@ -325,8 +362,48 @@
             <p style="font-size:.85rem;margin-bottom:8px">Create combos! If a newly merged ball bounces and merges
                 again, you earn a huge score multiplier.</p>
             <h4 style="margin:12px 0 6px">Danger Line</h4>
-            <p style="font-size:.85rem;color:var(--pv-coral)">If a ball stays above the dashed red line for 3 seconds,
+            <p style="font-size:.85rem;margin-bottom:8px;color:var(--pv-coral)">If a ball stays above the dashed red
+                line for 3 seconds,
                 it's Game Over!</p>
+            <h4 style="margin:12px 0 6px">Difficulty</h4>
+            <table style="font-size:.78rem;width:100%;border-collapse:collapse;margin-bottom:8px">
+                <thead>
+                    <tr style="text-align:left;border-bottom:1px solid var(--pv-border)">
+                        <th style="padding:4px">Level</th>
+                        <th style="padding:4px">Gravity</th>
+                        <th style="padding:4px">Drop Pool</th>
+                        <th style="padding:4px">Scaling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:4px">Easy</td>
+                        <td>Slow</td>
+                        <td>2, 4</td>
+                        <td>None</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px">Normal</td>
+                        <td>Medium</td>
+                        <td>2, 4, 8</td>
+                        <td>Mild</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px">Hard</td>
+                        <td>Fast</td>
+                        <td>4, 8</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px">Expert</td>
+                        <td>Very Fast</td>
+                        <td>4, 8, 16</td>
+                        <td>Aggressive</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size:.78rem;color:var(--pv-text-secondary)">Normal, Hard, and Expert get progressively harder
+                over time — gravity increases and cooldown decreases!</p>
         </div>
     </div>
 
