@@ -53,6 +53,7 @@ let M = {
 
     // Danger state
     dangerStartTime: null,
+    dangerSafeStart: null, // Grace period: don't reset danger instantly
     inDanger: false,
 
     // Time Attack
@@ -162,6 +163,7 @@ function startMode(mode) {
     M.isPlaying = true;
     M.inDanger = false;
     M.dangerStartTime = null;
+    M.dangerSafeStart = null;
     M.rawPreviewX = CONSTANTS.canvasWidth / 2; // R3: reset preview position
     document.getElementById('mc-canvas-wrap').classList.remove('danger');
 
@@ -305,8 +307,9 @@ function updatePhysics() {
             b.vy += 2;
         }
 
-        // Check danger (only for resting balls, not while falling fast)
-        if (b.y - b.radius < CONSTANTS.dangerLineY && Math.abs(b.vy) < 2) {
+        // Check danger — any ball whose center is above the danger line
+        // No velocity filter: physics jitter kept |vy| > threshold, preventing game over
+        if (b.y - b.radius < CONSTANTS.dangerLineY) {
             dangerFound = true;
         }
     }
@@ -451,6 +454,7 @@ function handleDangerState(isDanger) {
     const wrap = document.getElementById('mc-canvas-wrap');
 
     if (isDanger) {
+        M.dangerSafeStart = null; // Reset grace timer
         if (!M.inDanger) {
             M.inDanger = true;
             M.dangerStartTime = Date.now();
@@ -462,10 +466,17 @@ function handleDangerState(isDanger) {
             }
         }
     } else {
+        // Grace period: only clear danger after 500ms of sustained safety.
+        // Physics jitter can briefly push balls below the line; don't reset the 3s timer instantly.
         if (M.inDanger) {
-            M.inDanger = false;
-            M.dangerStartTime = null;
-            wrap.classList.remove('danger');
+            if (!M.dangerSafeStart) {
+                M.dangerSafeStart = Date.now();
+            } else if (Date.now() - M.dangerSafeStart > 500) {
+                M.inDanger = false;
+                M.dangerStartTime = null;
+                M.dangerSafeStart = null;
+                wrap.classList.remove('danger');
+            }
         }
     }
 }
