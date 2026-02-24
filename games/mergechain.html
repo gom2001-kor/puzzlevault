@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MergeChain — Free Online Number Merge Game | PuzzleVault</title>
+    <meta name="description"
+        content="Drop and merge numbers to reach 2048 in MergeChain! A free browser-based drop physics puzzle with chain reactions and daily challenges.">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/games/mergechain">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="MergeChain — Number Merge Game | PuzzleVault">
+    <meta property="og:description" content="Drop, bounce, and merge numbers! Free daily physics puzzle.">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/games/mergechain">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/css/global.css">
+    <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"VideoGame","name":"MergeChain","description":"Physics-based number merging puzzle game with chains and combos.","url":"https://puzzlevault.pages.dev/games/mergechain","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+    <style>
+        .mc-page {
+            display: flex;
+            justify-content: center;
+            gap: var(--pv-space-lg);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 var(--pv-space-md);
+        }
+
+        .mc-main {
+            flex: 1;
+            max-width: 360px;
+            /* Specific to MergeChain 300x500 ratio approx */
+            width: 100%;
+        }
+
+        .mc-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        @media(min-width:1024px) {
+            .mc-sidebar {
+                display: block;
+            }
+
+            .mc-main {
+                max-width: 440px;
+                /* Slightly wider on desktop, canvas handles scaling */
+            }
+        }
+
+        .mc-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+
+        .mc-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .mc-icons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .mc-icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background .2s;
+        }
+
+        .mc-icon-btn:hover {
+            background: var(--pv-grid-bg);
+        }
+
+        .mc-score-bar {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 8px 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--pv-shadow);
+        }
+
+        .mc-score-bar>div {
+            text-align: center;
+        }
+
+        .mc-score-bar .val {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--pv-text);
+        }
+
+        .mc-score-bar .lbl {
+            font-size: .65rem;
+            color: var(--pv-text-secondary);
+            text-transform: uppercase;
+        }
+
+        .mc-mode-tabs {
+            margin-bottom: 12px;
+        }
+
+        .mc-canvas-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/5;
+            background: var(--pv-grid-dark);
+            border-radius: var(--pv-radius);
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            touch-action: none;
+            /* Prevent scrolling while dragging */
+        }
+
+        .mc-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Danger Line Warning Pulse */
+        .mc-canvas-wrap.danger {
+            box-shadow: inset 0 0 20px rgba(244, 63, 94, 0.4);
+            animation: dangerPulse 1s infinite alternate;
+        }
+
+        @keyframes dangerPulse {
+            from {
+                box-shadow: inset 0 0 10px rgba(244, 63, 94, 0.2);
+            }
+
+            to {
+                box-shadow: inset 0 0 30px rgba(244, 63, 94, 0.6);
+            }
+        }
+
+        .mc-chain-popup {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--pv-amber);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, .4);
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0;
+            transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            -webkit-text-stroke: 1px #fff;
+        }
+
+        .mc-chain-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .mc-chain-popup.fadeout {
+            transform: translate(-50%, -70%) scale(.8);
+            opacity: 0;
+        }
+
+        .mc-timer {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--pv-coral);
+            margin-bottom: 8px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+    <main>
+        <div class="mc-page">
+            <div class="mc-main">
+                <div class="mc-top-bar">
+                    <div class="mc-title"><span>🔮</span><span>MergeChain</span></div>
+                    <div class="mc-icons">
+                        <button class="mc-icon-btn" id="mc-btn-restart" aria-label="Restart" title="Restart"
+                            style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px">Restart</button>
+                        <button class="mc-icon-btn" id="mc-btn-stats" aria-label="Stats">📊</button>
+                        <button class="mc-icon-btn" id="mc-btn-settings" aria-label="Sound">🔊</button>
+                    </div>
+                </div>
+
+                <div class="mc-score-bar">
+                    <div>
+                        <div class="val" id="mc-score">0</div>
+                        <div class="lbl">Score</div>
+                    </div>
+                    <div>
+                        <div class="val" id="mc-max" style="color:var(--pv-blue)">2</div>
+                        <div class="lbl">Max Merge</div>
+                    </div>
+                    <div>
+                        <div class="val" id="mc-chain">0</div>
+                        <div class="lbl">Chain</div>
+                    </div>
+                </div>
+
+                <div class="mc-mode-tabs">
+                    <div class="pv-tabs" id="mc-tabs">
+                        <button class="pv-tab active" data-mode="classic">Classic</button>
+                        <button class="pv-tab" data-mode="daily">Daily</button>
+                        <button class="pv-tab" data-mode="time">Time Attack</button>
+                    </div>
+                </div>
+
+                <div id="mc-timer" class="mc-timer"></div>
+
+                <div class="mc-canvas-wrap" id="mc-canvas-wrap">
+                    <canvas id="mc-canvas" width="360" height="600"></canvas>
+                    <div class="mc-chain-popup" id="mc-chain-popup"></div>
+                </div>
+
+                <p style="text-align:center; font-size:0.8rem; color:var(--pv-text-secondary); margin-top:12px;">
+                    Drag horizontally and release to drop!
+                </p>
+            </div>
+            <div class="mc-sidebar">
+                <div class="ad-slot" id="ad-sidebar"></div>
+            </div>
+        </div>
+
+        <!-- Result Overlay -->
+        <div class="result-overlay" id="mc-result">
+            <div class="result-card" id="mc-result-card"></div>
+        </div>
+
+        <div id="ad-interstitial" style="display:none">
+            <button class="ad-close-btn" onclick="AdController.hideInterstitial()" aria-label="Close">✕</button>
+            <div class="ad-slot" style="width:300px;min-height:250px"></div>
+        </div>
+
+        <section class="game-guide pv-container">
+            <h2>How to Play MergeChain</h2>
+            <p>MergeChain is a dynamic, physics-based puzzle where precision meets strategy. Your goal is to drop
+                numbered balls into a vertical field, merging identical numbers to create larger ones and rack up
+                massive scores.</p>
+            <p><strong>Dropping and Merging:</strong> Touch and drag horizontally to position the next ball at the top
+                of the screen. Release your finger or mouse to drop the ball. When two balls with the same number touch,
+                they instantly merge into a single ball with double the value! A 2 touching a 2 becomes a 4; two 4s
+                become an 8, and so on up to 2048 and beyond.</p>
+            <p><strong>Chain Reactions:</strong> The real magic happens when merges trigger a chain reaction. If a newly
+                merged ball bounces into another ball of its new value, they merge again! Building these combo chains
+                multiplies your score significantly.</p>
+            <p><strong>Watch the Danger Line:</strong> As your balls pile up, they will get closer to the top of the
+                field. A dashed red Danger Line marks the upper limit. If any ball remains above this line for more than
+                3 seconds, the game is over! Keep the pile low by continuously creating efficient merges.</p>
+            <p><strong>Game Modes:</strong> Play Classic mode to see how high you can score until the board fills up.
+                Try Daily mode for a seeded sequence of drops that everyone in the world receives—perfect for comparing
+                strategies. Or jump into Time Attack to score as many points as possible within a 2-minute limit.</p>
+        </section>
+
+        <section class="pv-faq pv-container">
+            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <details>
+                <summary>How do the physics affect gameplay?</summary>
+                <p>Balls fall with gravity and bounce off the walls, the floor, and other balls. Larger numbers have
+                    larger radii, taking up more space and bouncing differently. You can use the bouncy physics to
+                    squeeze balls into tight gaps or create chaotic chain reactions!</p>
+            </details>
+            <details>
+                <summary>How is the score calculated?</summary>
+                <p>Every time two balls merge, you earn points equal to the value of the new, larger ball. If the merge
+                    triggers a chain reaction (a merge immediately following another), a chain multiplier is applied to
+                    the score of the subsequent merges.</p>
+            </details>
+            <details>
+                <summary>What happens if a ball crosses the top line?</summary>
+                <p>There is a danger line near the top of the screen. If a ball rests above this line, a 3-second
+                    countdown begins (indicated by a pulsing red border). Merging balls to bring the pile down will stop
+                    the timer, but if 3 seconds pass, it's Game Over.</p>
+            </details>
+            <details>
+                <summary>What numbers will drop next?</summary>
+                <p>The next ball to drop is always visible at the top of the screen. The dropped balls will randomly be
+                    either 2, 4, or 8, keeping the focus on merging them into larger numbers.</p>
+            </details>
+        </section>
+
+        <div class="cross-promo pv-container"></div>
+        <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
+    </main>
+    <footer id="pv-footer"></footer>
+
+    <!-- Stats Modal -->
+    <div class="pv-modal" id="mc-stats-modal">
+        <div class="pv-modal-backdrop" onclick="document.getElementById('mc-stats-modal').classList.remove('open')">
+        </div>
+        <div class="pv-modal-content">
+            <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+            <h3 style="margin-bottom:12px">📊 Statistics</h3>
+            <div id="mc-stats-body"></div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/mergechain-logic.js"></script>
+</body>
+
+</html>
