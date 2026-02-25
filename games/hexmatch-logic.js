@@ -134,30 +134,66 @@ function getQColumn(q) {
 function applyGravity() {
     for (let q = -HEX_RADIUS; q <= HEX_RADIUS; q++) {
         const col = getQColumn(q);
-        // Collect non-empty tiles from bottom up
         const tiles = [];
-        for (const c of col) {
-            const cell = H.grid[Kc(c)];
-            if (cell) tiles.push({ ...cell });
+        const origIndices = [];
+        for (let i = 0; i < col.length; i++) {
+            const cell = H.grid[Kc(col[i])];
+            if (cell) {
+                tiles.push({ ...cell, animOffsetX: 0, animOffsetY: 0 });
+                origIndices.push(i);
+            }
         }
-        // Place tiles at bottom, empty at top
+        const emptyCount = col.length - tiles.length;
         for (let i = col.length - 1; i >= 0; i--) {
-            const tileIdx = i - (col.length - tiles.length);
+            const tileIdx = i - emptyCount;
             if (tileIdx >= 0) {
-                H.grid[Kc(col[i])] = tiles[tileIdx];
+                const origIdx = origIndices[tileIdx];
+                const tile = tiles[tileIdx];
+                if (origIdx !== i) {
+                    const from = hexToPixel(col[origIdx].q, col[origIdx].r);
+                    const to = hexToPixel(col[i].q, col[i].r);
+                    tile.animOffsetX = from.x - to.x;
+                    tile.animOffsetY = from.y - to.y;
+                }
+                H.grid[Kc(col[i])] = tile;
             } else {
                 H.grid[Kc(col[i])] = null;
             }
         }
     }
+    if (typeof SFX !== 'undefined') SFX.play('tap');
 }
 
 function fillEmpty() {
     for (const c of H.validCells) {
         if (!H.grid[Kc(c)]) {
-            H.grid[Kc(c)] = { color: randomColor(), isBomb: false, isRainbow: false };
+            H.grid[Kc(c)] = {
+                color: randomColor(), isBomb: false, isRainbow: false,
+                animOffsetX: 0, animOffsetY: -HEX_SIZE * 3
+            };
         }
     }
+}
+
+// ─── Animation System ───
+function updateAnimations() {
+    const decay = 0.15;
+    let anyActive = false;
+    for (const c of H.validCells) {
+        const g = H.grid[Kc(c)];
+        if (!g) continue;
+        if (g.animOffsetX) {
+            g.animOffsetX *= (1 - decay);
+            if (Math.abs(g.animOffsetX) < 0.3) g.animOffsetX = 0;
+            else anyActive = true;
+        }
+        if (g.animOffsetY) {
+            g.animOffsetY *= (1 - decay);
+            if (Math.abs(g.animOffsetY) < 0.3) g.animOffsetY = 0;
+            else anyActive = true;
+        }
+    }
+    return anyActive;
 }
 
 // ─── Selection Logic ───
@@ -238,22 +274,49 @@ function risingTide() {
             return;
         }
     }
-    // Shift all tiles up (decrease r by 1 within each q-column)
+    // Shift all tiles up (decrease r by 1 within each q-column) with animation
     for (let q = -HEX_RADIUS; q <= HEX_RADIUS; q++) {
         const col = getQColumn(q);
         for (let i = 0; i < col.length - 1; i++) {
-            H.grid[Kc(col[i])] = H.grid[Kc(col[i + 1])];
+            const tile = H.grid[Kc(col[i + 1])];
+            if (tile) {
+                const from = hexToPixel(col[i + 1].q, col[i + 1].r);
+                const to = hexToPixel(col[i].q, col[i].r);
+                tile.animOffsetX = from.x - to.x;
+                tile.animOffsetY = from.y - to.y;
+            }
+            H.grid[Kc(col[i])] = tile;
         }
-        // Bottom cell gets new random tile
+        // Bottom cell gets new random tile with animation from below
         if (col.length > 0) {
-            H.grid[Kc(col[col.length - 1])] = { color: randomColor(), isBomb: false, isRainbow: false };
+            H.grid[Kc(col[col.length - 1])] = {
+                color: randomColor(), isBomb: false, isRainbow: false,
+                animOffsetX: 0, animOffsetY: HEX_SIZE * 2
+            };
         }
     }
-    // Clear bombs that may have shifted
-    H.bombs = H.bombs.filter(b => {
-        const g = H.grid[Kc(b)];
-        return g && g.isBomb;
-    });
+    // Create wave particles at bottom for visual effect
+    for (let q = -HEX_RADIUS; q <= HEX_RADIUS; q++) {
+        const col = getQColumn(q);
+        if (col.length > 0) {
+            const bot = col[col.length - 1];
+            createParticles(bot.q, bot.r, '#0891B2', 3);
+        }
+    }
+    // Update bomb positions: all bombs shifted up by 1 row in their q-column
+    const updatedBombs = [];
+    for (const b of H.bombs) {
+        const col = getQColumn(b.q);
+        const idx = col.findIndex(c => c.q === b.q && c.r === b.r);
+        if (idx > 0) {
+            const newPos = col[idx - 1];
+            const g = H.grid[Kc(newPos)];
+            if (g && g.isBomb) {
+                updatedBombs.push({ q: newPos.q, r: newPos.r, s: newPos.s });
+            }
+        }
+    }
+    H.bombs = updatedBombs;
     if (typeof SFX !== 'undefined') SFX.play('wrong');
 }
 
@@ -309,16 +372,20 @@ function processTurn(selectedCells) {
 
     if (typeof SFX !== 'undefined') SFX.play(count >= 5 ? 'combo' : 'clear');
 
-    // Remove selected tiles (except bomb placement)
+    // Determine bomb placement BEFORE clearing tiles
     const bombTarget = count >= 5;
+    const bombCell = bombTarget ? selectedCells[Math.floor(count / 2)] : null;
+
+    // Remove selected tiles
     for (const c of selectedCells) {
         H.grid[Kc(c)] = null;
         createParticles(c.q, c.r, COLOR_HEX[H.selColor] || '#fff', 4);
     }
 
-    // Place bomb if 5+
-    if (bombTarget) {
-        placeBomb(selectedCells);
+    // Place bomb if 5+ (after clearing, so it occupies the center cell)
+    if (bombTarget && bombCell) {
+        H.grid[Kc(bombCell)] = { color: 'bomb', isBomb: true, isRainbow: false };
+        H.bombs.push({ q: bombCell.q, r: bombCell.r, s: bombCell.s });
     }
 
     // Gravity + fill after delay
@@ -495,8 +562,16 @@ function render() {
     for (const c of H.validCells) {
         const g = H.grid[Kc(c)];
         if (!g) continue;
-        const pos = hexToPixel(c.q, c.r);
+        const basePos = hexToPixel(c.q, c.r);
+        const ox = g.animOffsetX || 0;
+        const oy = g.animOffsetY || 0;
+        const pos = { x: basePos.x + ox, y: basePos.y + oy };
         const isSelected = selSet.has(Kc(c));
+
+        // Scale effect: slight squish during animation
+        const animMag = Math.sqrt(ox * ox + oy * oy);
+        const scale = animMag > 2 ? 0.9 + 0.1 * Math.min(animMag / 50, 1) : 1;
+        const drawSize = (HEX_SIZE - 2) * scale;
 
         let fillColor, lightColor;
         if (g.isBomb) {
@@ -513,12 +588,12 @@ function render() {
 
         // Gradient fill
         const grd = ctx.createRadialGradient(
-            pos.x - HEX_SIZE * 0.2, pos.y - HEX_SIZE * 0.2, HEX_SIZE * 0.1,
-            pos.x, pos.y, HEX_SIZE * 0.9
+            pos.x - drawSize * 0.2, pos.y - drawSize * 0.2, drawSize * 0.1,
+            pos.x, pos.y, drawSize * 0.9
         );
         grd.addColorStop(0, lightColor);
         grd.addColorStop(1, fillColor);
-        drawHex(ctx, pos.x, pos.y, HEX_SIZE - 2, grd, 'rgba(0,0,0,0.15)', 1.5);
+        drawHex(ctx, pos.x, pos.y, drawSize, grd, 'rgba(0,0,0,0.15)', 1.5);
 
         // Selected highlight
         if (isSelected) {
@@ -619,6 +694,7 @@ function render() {
 }
 
 function gameLoop() {
+    updateAnimations();
     render();
     H.reqId = requestAnimationFrame(gameLoop);
 }
