@@ -80,6 +80,7 @@ let M = {
     chain: 0,
     chainTimeout: null,
     isPlaying: false,
+    continueUsed: false,
 
     // Interaction
     isDragging: false,
@@ -212,6 +213,7 @@ function startMode(mode) {
     M.maxMerge = 2;
     M.chain = 0;
     M.isPlaying = true;
+    M.continueUsed = false;
     M.inDanger = false;
     M.dangerStartTime = null;
     M.dangerSafeStart = null;
@@ -719,6 +721,61 @@ function gameOver(reason) {
     }
 }
 
+function continueGame() {
+    // Remove balls above the danger line
+    const removedCount = M.balls.filter(b => b.y - b.radius < CONSTANTS.dangerLineY).length;
+    M.balls = M.balls.filter(b => b.y - b.radius >= CONSTANTS.dangerLineY);
+
+    // Push remaining balls down slightly to create breathing room
+    for (let b of M.balls) {
+        b.vy = Math.min(b.vy, 0); // Stop upward motion
+    }
+
+    // Create particles for visual feedback
+    for (let i = 0; i < 20; i++) {
+        M.particles.push({
+            x: Math.random() * CONSTANTS.canvasWidth,
+            y: CONSTANTS.dangerLineY,
+            vx: (Math.random() - 0.5) * 6,
+            vy: Math.random() * -4 - 1,
+            radius: Math.random() * 3 + 2,
+            color: '#059669',
+            life: 1.0,
+            decay: Math.random() * 0.02 + 0.01
+        });
+    }
+
+    // Mark as used
+    M.continueUsed = true;
+
+    // Reset danger state
+    M.inDanger = false;
+    M.dangerStartTime = null;
+    M.dangerSafeStart = null;
+    document.getElementById('mc-canvas-wrap').classList.remove('danger');
+
+    // Close result overlay
+    document.getElementById('mc-result').classList.remove('open');
+
+    // Resume game
+    M.isPlaying = true;
+    M.lastDropTime = Date.now(); // Brief cooldown after continue
+
+    if (typeof SFX !== 'undefined') SFX.play('clear');
+
+    // Restart Time Attack timer if applicable
+    if (M.mode === 'time' && M.timeLeft > 0) {
+        M.timerInterval = setInterval(() => {
+            M.timeLeft--;
+            updateTimerDisplay();
+            if (M.timeLeft <= 0) gameOver('Time\'s Up!');
+        }, 1000);
+    }
+
+    M.lastFrameTime = performance.now();
+    gameLoop(M.lastFrameTime);
+}
+
 function showResult(titleStr) {
     const overlay = document.getElementById('mc-result');
     const card = document.getElementById('mc-result-card');
@@ -740,6 +797,12 @@ function showResult(titleStr) {
             </div>
         </div>
         
+        ${!M.continueUsed ? `<div id="ad-reward" style="text-align:center;margin-bottom:12px">
+            <button class="pv-btn" onclick="continueGame()" style="background:var(--pv-emerald);color:#fff;width:100%;padding:12px;font-size:1rem;font-weight:700;border-radius:var(--pv-radius);border:none;cursor:pointer">
+                🎬 Watch Ad to Continue
+            </button>
+            <p style="font-size:.7rem;color:var(--pv-text-secondary);margin-top:4px">Removes balls above danger line (1 use)</p>
+        </div>` : ''}
         <div class="result-actions">
             <button class="pv-btn pv-btn-primary" onclick="shareResultMC()">📤 Share</button>
             <button class="pv-btn pv-btn-secondary" onclick="document.getElementById('mc-result').classList.remove('open'); startMode(M.mode)">🔄 Play Again</button>
@@ -751,7 +814,8 @@ function showResult(titleStr) {
 
 function shareResultMC() {
     let modeText = M.mode === 'daily' ? `Daily #${getDailyNumber()}` : (M.mode === 'time' ? 'Time Attack' : 'Classic');
-    let text = `🔮 MergeChain — ${modeText}
+    let continueFlag = M.continueUsed ? ' 🔄' : '';
+    let text = `🔮 MergeChain — ${modeText}${continueFlag}
 Score: ${formatNumber(M.score)}
 Max Merge: ${M.maxMerge}
 puzzlevault.pages.dev/games/mergechain`;
