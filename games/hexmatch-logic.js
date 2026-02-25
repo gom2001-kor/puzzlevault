@@ -165,8 +165,14 @@ function applyGravity() {
 }
 
 function fillEmpty() {
+    // Leave the topmost cell of each q-column empty (breathing room for Rising Tide)
+    const topCells = new Set();
+    for (let q = -HEX_RADIUS; q <= HEX_RADIUS; q++) {
+        const col = getQColumn(q);
+        if (col.length > 0) topCells.add(Kc(col[0]));
+    }
     for (const c of H.validCells) {
-        if (!H.grid[Kc(c)]) {
+        if (!H.grid[Kc(c)] && !topCells.has(Kc(c))) {
             H.grid[Kc(c)] = {
                 color: randomColor(), isBomb: false, isRainbow: false,
                 animOffsetX: 0, animOffsetY: -HEX_SIZE * 3
