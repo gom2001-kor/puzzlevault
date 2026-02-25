@@ -362,6 +362,74 @@ function showScorePopup(q, r, pts) {
     scorePopups.push({ x: pos.x, y: pos.y, text: '+' + pts, life: 1.0 });
 }
 
+// ─── Match Availability Check ───
+function hasValidMatch() {
+    // Check if any group of 3+ adjacent same-color tiles exists
+    const visited = new Set();
+    for (const c of H.validCells) {
+        const g = H.grid[Kc(c)];
+        if (!g || g.isBomb) continue;
+        const color = g.isRainbow ? null : g.color;
+        const key = Kc(c);
+        if (visited.has(key)) continue;
+
+        // BFS flood fill for this color
+        const queue = [c];
+        const group = [c];
+        const seen = new Set([key]);
+        while (queue.length > 0) {
+            const cur = queue.shift();
+            const neighbors = getNeighbors(cur.q, cur.r);
+            for (const n of neighbors) {
+                const nk = Kc(n);
+                if (seen.has(nk)) continue;
+                const ng = H.grid[nk];
+                if (!ng || ng.isBomb) continue;
+                // Rainbow matches any, same color matches
+                if (ng.isRainbow || (color && ng.color === color) || (!color && !ng.isBomb)) {
+                    seen.add(nk);
+                    queue.push(n);
+                    group.push(n);
+                }
+            }
+        }
+        if (group.length >= 3) return true;
+        for (const gc of group) visited.add(Kc(gc));
+    }
+    return false;
+}
+
+function shuffleBoard() {
+    // Randomize colors of all non-bomb, non-rainbow tiles
+    for (const c of H.validCells) {
+        const g = H.grid[Kc(c)];
+        if (g && !g.isBomb && !g.isRainbow) {
+            g.color = randomColor();
+            g.animOffsetX = (Math.random() - 0.5) * 40;
+            g.animOffsetY = (Math.random() - 0.5) * 40;
+        }
+    }
+    // Hide the shuffle overlay
+    document.getElementById('hx-shuffle').classList.remove('open');
+    H.state = GameState.IDLE;
+    if (typeof SFX !== 'undefined') SFX.play('clear');
+    createParticles(0, 0, '#7C3AED', 15);
+
+    // Check again after shuffle (extremely rare but possible)
+    setTimeout(() => {
+        if (!hasValidMatch() && H.state !== GameState.GAMEOVER) {
+            showShufflePrompt();
+        }
+    }, 400);
+}
+
+function showShufflePrompt() {
+    H.state = GameState.ANIMATING;
+    const overlay = document.getElementById('hx-shuffle');
+    overlay.classList.add('open');
+    if (typeof SFX !== 'undefined') SFX.play('wrong');
+}
+
 // ─── Turn Processing ───
 function processTurn(selectedCells) {
     H.state = GameState.ANIMATING;
@@ -416,7 +484,12 @@ function processTurn(selectedCells) {
 
         updateUI();
         if (H.state !== GameState.GAMEOVER) {
-            H.state = GameState.IDLE;
+            // Check if any valid matches remain
+            if (!hasValidMatch()) {
+                showShufflePrompt();
+            } else {
+                H.state = GameState.IDLE;
+            }
         }
     }, 350);
 }

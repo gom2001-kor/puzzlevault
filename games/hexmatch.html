@@ -179,6 +179,21 @@
             </div>
         </div>
 
+        <!-- Shuffle Overlay (No Matches) -->
+        <div class="result-overlay" id="hx-shuffle">
+            <div class="result-card" style="position:relative;text-align:center;padding:32px 24px">
+                <div style="font-size:2.5rem;margin-bottom:12px">🔀</div>
+                <div style="font-size:1.3rem;font-weight:800;margin-bottom:8px">No Matches!</div>
+                <p style="font-size:.9rem;color:var(--pv-text-secondary);margin-bottom:20px">
+                    There are no more possible matches on the board.</p>
+                <button class="pv-btn" onclick="shuffleBoard()"
+                    style="background:var(--pv-violet);color:#fff;width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:var(--pv-radius);border:none;cursor:pointer">
+                    🎬 Watch Ad to Shuffle
+                </button>
+                <p style="font-size:.7rem;color:var(--pv-text-secondary);margin-top:6px">Randomizes all tile colors</p>
+            </div>
+        </div>
+
         <!-- Result Overlay -->
         <div class="result-overlay" id="hx-result">
             <div class="result-card" id="hx-result-card" style="position:relative"></div>
@@ -306,6 +321,9 @@
             <h4 style="margin:12px 0 6px">🎬 Continue (Reward Ad)</h4>
             <p style="font-size:.85rem;margin-bottom:8px">On Game Over, watch an ad to clear top rows
                 and keep playing. Available once per game.</p>
+            <h4 style="margin:12px 0 6px">🔀 Shuffle (Reward Ad)</h4>
+            <p style="font-size:.85rem;margin-bottom:8px">When no matches are available, watch an ad
+                to shuffle all tile colors and keep playing!</p>
         </div>
     </div>
 
