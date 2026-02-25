@@ -48,6 +48,8 @@ let H = {
     tideWarning: false,
     rainbowTimer: 0,    // frames for rainbow animation
     continueUsed: false,
+    hintCells: [],      // [{q,r,s}] cells to highlight
+    hintTimer: 0,       // frames remaining for hint glow
     rng: null
 };
 
@@ -418,25 +420,71 @@ function shuffleBoard() {
             g.animOffsetY = (Math.random() - 0.5) * 40;
         }
     }
-    // Hide the shuffle overlay
     document.getElementById('hx-shuffle').classList.remove('open');
-    H.state = GameState.IDLE;
     if (typeof SFX !== 'undefined') SFX.play('clear');
     createParticles(0, 0, '#7C3AED', 15);
 
-    // Check again after shuffle (extremely rare but possible)
-    setTimeout(() => {
-        if (!hasValidMatch() && H.state !== GameState.GAMEOVER) {
-            showShufflePrompt();
+    // Verify matches exist after shuffle, retry if needed
+    if (!hasValidMatch()) {
+        // Re-shuffle immediately (don't show prompt, just fix it)
+        for (const c of H.validCells) {
+            const g = H.grid[Kc(c)];
+            if (g && !g.isBomb && !g.isRainbow) {
+                g.color = randomColor();
+            }
         }
-    }, 400);
+    }
+    H.state = GameState.IDLE;
 }
 
 function showShufflePrompt() {
     H.state = GameState.ANIMATING;
-    const overlay = document.getElementById('hx-shuffle');
-    overlay.classList.add('open');
+    document.getElementById('hx-shuffle').classList.add('open');
     if (typeof SFX !== 'undefined') SFX.play('wrong');
+}
+
+// ─── Hint System ───
+function findHint() {
+    // Find first group of 3+ adjacent same-color tiles
+    for (const color of COLORS) {
+        for (const c of H.validCells) {
+            const g = H.grid[Kc(c)];
+            if (!g || g.isBomb) continue;
+            if (g.color !== color && !g.isRainbow) continue;
+
+            const queue = [c];
+            const group = [c];
+            const seen = new Set([Kc(c)]);
+            while (queue.length > 0) {
+                const cur = queue.shift();
+                for (const n of getNeighbors(cur.q, cur.r)) {
+                    const nk = Kc(n);
+                    if (seen.has(nk)) continue;
+                    const ng = H.grid[nk];
+                    if (!ng || ng.isBomb) continue;
+                    if (ng.color === color || ng.isRainbow) {
+                        seen.add(nk);
+                        queue.push(n);
+                        group.push(n);
+                    }
+                }
+            }
+            if (group.length >= 3) return group;
+        }
+    }
+    return null;
+}
+
+function showHint() {
+    if (H.state !== GameState.IDLE) return;
+    const hint = findHint();
+    if (hint) {
+        H.hintCells = hint;
+        H.hintTimer = 120; // ~2 seconds at 60fps
+        if (typeof SFX !== 'undefined') SFX.play('correct');
+    } else {
+        showShufflePrompt();
+    }
 }
 
 // ─── Turn Processing ───
@@ -521,6 +569,10 @@ function setupInput() {
     const onDown = (e) => {
         e.preventDefault();
         if (H.state === GameState.GAMEOVER) return;
+
+        // Clear hint on any interaction
+        H.hintCells = [];
+        H.hintTimer = 0;
 
         const hex = getHexFromEvent(e);
         if (!hex) return;
@@ -689,6 +741,12 @@ function render() {
             drawHex(ctx, pos.x, pos.y, HEX_SIZE - 1, null, glowColor, 3);
         }
 
+        // Hint highlight (pulsing golden glow)
+        if (H.hintTimer > 0 && H.hintCells.some(hc => hc.q === c.q && hc.r === c.r)) {
+            const pulse = 0.35 + 0.25 * Math.sin(H.hintTimer * 0.15);
+            drawHex(ctx, pos.x, pos.y, HEX_SIZE + 2, null, `rgba(253,224,71,${pulse})`, 3.5);
+        }
+
         // Bomb icon
         if (g.isBomb) {
             ctx.fillStyle = '#fff';
@@ -783,6 +841,11 @@ function render() {
 
 function gameLoop() {
     updateAnimations();
+    // Hint timer countdown
+    if (H.hintTimer > 0) {
+        H.hintTimer--;
+        if (H.hintTimer <= 0) H.hintCells = [];
+    }
     render();
     H.reqId = requestAnimationFrame(gameLoop);
 }
@@ -908,6 +971,8 @@ function startGame() {
     H.bombs = [];
     H.tideWarning = false;
     H.continueUsed = false;
+    H.hintCells = [];
+    H.hintTimer = 0;
     H.state = GameState.IDLE;
     H.bestScore = parseInt(localStorage.getItem('pv_hexmatch_best') || '0');
 
@@ -936,6 +1001,10 @@ function initHexMatch() {
     });
     document.getElementById('hx-btn-settings').addEventListener('click', toggleSound);
     document.getElementById('hx-btn-stats').addEventListener('click', showStats);
+
+    // Hint button
+    const hintBtn = document.getElementById('hx-btn-hint');
+    if (hintBtn) hintBtn.addEventListener('click', showHint);
 
     // Initial sound icon
     if (typeof SFX !== 'undefined') {
