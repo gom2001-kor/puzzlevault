@@ -263,7 +263,12 @@ function triggerBomb(bq, br) {
         applyGravity();
         fillEmpty();
         updateUI();
-        H.state = GameState.IDLE;
+        // Check if any valid matches remain after bomb explosion
+        if (!hasValidMatch() && H.state !== GameState.GAMEOVER) {
+            showShufflePrompt();
+        } else {
+            H.state = GameState.IDLE;
+        }
     }, 300);
 }
 
@@ -364,38 +369,42 @@ function showScorePopup(q, r, pts) {
 
 // ─── Match Availability Check ───
 function hasValidMatch() {
-    // Check if any group of 3+ adjacent same-color tiles exists
-    const visited = new Set();
-    for (const c of H.validCells) {
-        const g = H.grid[Kc(c)];
-        if (!g || g.isBomb) continue;
-        const color = g.isRainbow ? null : g.color;
-        const key = Kc(c);
-        if (visited.has(key)) continue;
+    // For each color, check if 3+ adjacent tiles of that color exist
+    // Rainbow tiles act as wildcards (match any color)
+    for (const color of COLORS) {
+        const visited = new Set();
+        for (const c of H.validCells) {
+            const g = H.grid[Kc(c)];
+            if (!g || g.isBomb) continue;
+            // Only start from this color or rainbow
+            if (g.color !== color && !g.isRainbow) continue;
+            const key = Kc(c);
+            if (visited.has(key)) continue;
 
-        // BFS flood fill for this color
-        const queue = [c];
-        const group = [c];
-        const seen = new Set([key]);
-        while (queue.length > 0) {
-            const cur = queue.shift();
-            const neighbors = getNeighbors(cur.q, cur.r);
-            for (const n of neighbors) {
-                const nk = Kc(n);
-                if (seen.has(nk)) continue;
-                const ng = H.grid[nk];
-                if (!ng || ng.isBomb) continue;
-                // Rainbow matches any, same color matches
-                if (ng.isRainbow || (color && ng.color === color) || (!color && !ng.isBomb)) {
-                    seen.add(nk);
-                    queue.push(n);
-                    group.push(n);
+            // BFS: find connected group of this color (+ rainbow wildcards)
+            const queue = [c];
+            const group = [key];
+            const seen = new Set([key]);
+            while (queue.length > 0) {
+                const cur = queue.shift();
+                for (const n of getNeighbors(cur.q, cur.r)) {
+                    const nk = Kc(n);
+                    if (seen.has(nk)) continue;
+                    const ng = H.grid[nk];
+                    if (!ng || ng.isBomb) continue;
+                    if (ng.color === color || ng.isRainbow) {
+                        seen.add(nk);
+                        queue.push(n);
+                        group.push(nk);
+                    }
                 }
             }
+            if (group.length >= 3) return true;
+            for (const gk of group) visited.add(gk);
         }
-        if (group.length >= 3) return true;
-        for (const gc of group) visited.add(Kc(gc));
     }
+    // Also check if there are any bombs to tap
+    if (H.bombs.length > 0) return true;
     return false;
 }
 
