@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexMatch — Free Online Hexagonal Puzzle Game | PuzzleVault</title>
+    <meta name="description"
+        content="Match colors on a hexagonal grid in HexMatch! Connect 3+ same-color tiles, trigger Hex Bombs, and survive the Rising Tide. Free browser puzzle game.">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/games/hexmatch">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="HexMatch — Hexagonal Color Matching Game | PuzzleVault">
+    <meta property="og:description"
+        content="Match colors on a hex grid! Free daily puzzle with Hex Bombs and Rising Tide.">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/games/hexmatch">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/css/global.css">
+    <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"VideoGame","name":"HexMatch","description":"Hexagonal color matching puzzle game with Hex Bombs and Rising Tide mechanics.","url":"https://puzzlevault.pages.dev/games/hexmatch","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+    <style>
+        .hx-page {
+            display: flex;
+            justify-content: center;
+            gap: var(--pv-space-lg);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 var(--pv-space-md);
+        }
+
+        .hx-main {
+            flex: 1;
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .hx-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        @media(min-width:1024px) {
+            .hx-sidebar {
+                display: block;
+            }
+
+            .hx-main {
+                max-width: 460px;
+            }
+        }
+
+        .hx-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+
+        .hx-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .hx-icons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .hx-icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background .2s;
+        }
+
+        .hx-icon-btn:hover {
+            background: var(--pv-grid-bg);
+        }
+
+        .hx-score-bar {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 8px 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--pv-shadow);
+        }
+
+        .hx-score-bar>div {
+            text-align: center;
+        }
+
+        .hx-score-bar .val {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--pv-text);
+        }
+
+        .hx-score-bar .lbl {
+            font-size: .65rem;
+            color: var(--pv-text-secondary);
+            text-transform: uppercase;
+        }
+
+        .hx-canvas-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 400/440;
+            background: var(--pv-bg-dark);
+            border-radius: var(--pv-radius);
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .hx-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+    <main>
+        <div class="hx-page">
+            <div class="hx-main">
+                <div class="hx-top-bar">
+                    <div class="hx-title"><span>⬡</span><span>HexMatch</span></div>
+                    <div class="hx-icons">
+                        <button class="hx-icon-btn" id="hx-btn-restart" aria-label="Restart"
+                            style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px">Restart</button>
+                        <button class="hx-icon-btn" id="hx-btn-help" aria-label="Help">❓</button>
+                        <button class="hx-icon-btn" id="hx-btn-stats" aria-label="Stats">📊</button>
+                        <button class="hx-icon-btn" id="hx-btn-settings" aria-label="Sound">🔊</button>
+                    </div>
+                </div>
+
+                <div class="hx-score-bar">
+                    <div>
+                        <div class="val" id="hx-score">0</div>
+                        <div class="lbl">Score</div>
+                    </div>
+                    <div>
+                        <div class="val" id="hx-best" style="color:var(--pv-blue)">0</div>
+                        <div class="lbl">Best</div>
+                    </div>
+                    <div>
+                        <div class="val" id="hx-turn">0</div>
+                        <div class="lbl">Turn</div>
+                    </div>
+                </div>
+
+                <div class="hx-canvas-wrap" id="hx-canvas-wrap">
+                    <canvas id="hx-canvas" width="400" height="440"></canvas>
+                </div>
+
+                <p style="text-align:center; font-size:0.8rem; color:var(--pv-text-secondary); margin-top:12px;">
+                    Drag to connect 3+ same-color hexes!
+                </p>
+            </div>
+            <div class="hx-sidebar">
+                <div class="ad-slot" id="ad-sidebar"></div>
+            </div>
+        </div>
+
+        <!-- Result Overlay -->
+        <div class="result-overlay" id="hx-result">
+            <div class="result-card" id="hx-result-card" style="position:relative"></div>
+        </div>
+
+        <div id="ad-interstitial" style="display:none">
+            <button class="ad-close-btn" onclick="AdController.hideInterstitial()" aria-label="Close">✕</button>
+            <div class="ad-slot" style="width:300px;min-height:250px"></div>
+        </div>
+
+        <section class="game-guide pv-container">
+            <h2>How to Play HexMatch</h2>
+            <p>HexMatch is a fast-paced color matching puzzle set on a beautiful hexagonal grid. Your goal is to
+                connect groups of same-colored hexagonal tiles and clear them from the board before the Rising Tide
+                pushes everything to the top!</p>
+            <p><strong>Making Matches:</strong> Touch and drag across adjacent hexagonal tiles of the same color to
+                build a selection chain. You need at least 3 connected tiles to make a match. Release your finger or
+                mouse to clear the selected tiles and score points. Longer chains earn exponentially more points!</p>
+            <p><strong>Hex Bombs:</strong> Connect 5 or more tiles in a single chain and the center tile transforms
+                into a powerful Hex Bomb 💣. On your next turn, tap the bomb to detonate it, destroying all tiles
+                within a 2-ring radius — up to 19 tiles in a massive explosion! Each destroyed tile scores 20 bonus
+                points.</p>
+            <p><strong>Rising Tide:</strong> Every 8 turns, a new row of random tiles rises from the bottom,
+                pushing all existing tiles upward. If any tile gets pushed off the top of the grid, the game is over!
+                Plan your moves carefully and watch for the warning that appears one turn before the tide rises.</p>
+            <p><strong>Rainbow Tiles:</strong> Every 8 turns, a special ⭐ Rainbow tile appears. This magical tile
+                matches any color, making it perfect for extending your chains and creating Hex Bombs!</p>
+        </section>
+
+        <section class="pv-faq pv-container">
+            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <details>
+                <summary>How do I make a match?</summary>
+                <p>Touch and drag across 3 or more adjacent hexagonal tiles of the same color. The tiles must be
+                    neighbors — each hex has up to 6 adjacent tiles. Release to clear them. You can also backtrack
+                    by dragging back over previously selected tiles.</p>
+            </details>
+            <details>
+                <summary>What is the Hex Bomb and how do I use it?</summary>
+                <p>When you connect 5 or more tiles, the middle tile of your chain becomes a Hex Bomb (💣). On your
+                    next turn, simply tap the bomb to trigger a massive explosion that clears all tiles within 2
+                    rings around it. This is great for clearing congested areas!</p>
+            </details>
+            <details>
+                <summary>How does the Rising Tide work?</summary>
+                <p>Every 8 turns, a new row of tiles pushes up from the bottom. All existing tiles shift up by one
+                    row. You'll see a warning ("Rising Tide in 1 turn!") and a golden highlight on the bottom row
+                    the turn before it happens. If any tile gets pushed off the grid, it's Game Over!</p>
+            </details>
+            <details>
+                <summary>What is the Rainbow tile?</summary>
+                <p>The Rainbow tile (⭐) appears every 8 turns in a random position. It matches any color, so you
+                    can include it in any chain you're building. Use it strategically to create longer chains or
+                    reach the 5-tile threshold for a Hex Bomb!</p>
+            </details>
+            <details>
+                <summary>How is the score calculated?</summary>
+                <p>Scoring depends on chain length: 3 tiles = 30 pts, 4 = 60, 5 = 120 (+ bomb!), 6 = 300, 7+ = 600.
+                    Bomb explosions earn 20 points per tile destroyed. Focus on building longer chains and using bombs
+                    for the highest scores!</p>
+            </details>
+        </section>
+
+        <div class="cross-promo pv-container"></div>
+        <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
+    </main>
+    <footer id="pv-footer"></footer>
+
+    <!-- Help Modal -->
+    <div class="pv-modal" id="hx-help-modal">
+        <div class="pv-modal-backdrop" onclick="document.getElementById('hx-help-modal').classList.remove('open')">
+        </div>
+        <div class="pv-modal-content">
+            <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+            <h3 style="margin-bottom:12px">How to Play</h3>
+            <p style="font-size:.9rem;margin-bottom:8px">Connect 3+ same-color hexagonal tiles by dragging across
+                them. Release to clear and score!</p>
+            <h4 style="margin:12px 0 6px">💣 Hex Bomb</h4>
+            <p style="font-size:.85rem;margin-bottom:8px">Connect 5+ tiles → center becomes a bomb. Tap it next
+                turn to explode a 2-ring radius!</p>
+            <h4 style="margin:12px 0 6px">🌊 Rising Tide</h4>
+            <p style="font-size:.85rem;margin-bottom:8px;color:var(--pv-coral)">Every 8 turns, tiles rise from
+                below. If pushed off the top → Game Over!</p>
+            <h4 style="margin:12px 0 6px">⭐ Rainbow</h4>
+            <p style="font-size:.85rem;margin-bottom:8px">Appears every 8 turns. Matches any color!</p>
+            <h4 style="margin:12px 0 6px">Scoring</h4>
+            <table style="font-size:.78rem;width:100%;border-collapse:collapse">
+                <thead>
+                    <tr style="text-align:left;border-bottom:1px solid var(--pv-border)">
+                        <th style="padding:4px">Chain</th>
+                        <th style="padding:4px">Points</th>
+                        <th style="padding:4px">Bonus</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:4px">3 tiles</td>
+                        <td>30</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px">4 tiles</td>
+                        <td>60</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px">5 tiles</td>
+                        <td>120</td>
+                        <td>💣 Bomb</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px">6 tiles</td>
+                        <td>300</td>
+                        <td>💣 Bomb</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px">7+ tiles</td>
+                        <td>600</td>
+                        <td>💣 Bomb</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size:.78rem;color:var(--pv-text-secondary);margin-top:8px">
+                Bomb explosion: 20 pts × destroyed tiles</p>
+            <h4 style="margin:12px 0 6px">🎬 Continue (Reward Ad)</h4>
+            <p style="font-size:.85rem;margin-bottom:8px">On Game Over, watch an ad to clear top rows
+                and keep playing. Available once per game.</p>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="pv-modal" id="hx-stats-modal">
+        <div class="pv-modal-backdrop" onclick="document.getElementById('hx-stats-modal').classList.remove('open')">
+        </div>
+        <div class="pv-modal-content">
+            <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+            <h3 style="margin-bottom:12px">📊 Statistics</h3>
+            <div id="hx-stats-body"></div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/hexmatch-logic.js"></script>
+</body>
+
+</html>
