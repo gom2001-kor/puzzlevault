@@ -4,30 +4,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact — PuzzleVault</title>
-    <meta name="description"
-        content="Get in touch with the PuzzleVault team. We'd love to hear your feedback and suggestions.">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/contact.html">
+    <title>Contact Us | PuzzleVault</title>
+    <meta name="description" content="Contact the PuzzleVault team for support, feedback, or business inquiries.">
     <link rel="stylesheet" href="/css/global.css">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/contact.html">
+    <meta name="theme-color" content="#2563EB">
+    <style>
+        .pv-support-page {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: 60vh;
+            color: var(--pv-text);
+            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .pv-support-page h1 {
+            color: var(--pv-blue);
+            margin-bottom: 24px;
+            font-size: 2.5rem;
+        }
+
+        .pv-support-page p {
+            margin-bottom: 24px;
+            font-size: 1.1rem;
+            color: var(--pv-text-secondary);
+        }
+
+        .contact-card {
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 32px;
+            box-shadow: var(--pv-shadow-lg);
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--pv-text);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px 16px;
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius-sm);
+            font-family: inherit;
+            font-size: 1rem;
+            background: var(--pv-bg-light);
+            color: var(--pv-text);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--pv-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 160px;
+        }
+
+        .submit-btn {
+            background: var(--pv-blue);
+            color: #ffffff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: var(--pv-radius-sm);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            align-self: flex-start;
+        }
+
+        .submit-btn:hover {
+            background: var(--pv-emerald);
+        }
+
+        @media (prefers-color-scheme: dark) {
+
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                background: var(--pv-grid-dark);
+                border-color: var(--pv-slate);
+            }
+        }
+    </style>
 </head>
 
 <body>
     <header id="pv-header"></header>
-    <main class="pv-container pv-section">
-        <h1>Contact Us</h1>
-        <p class="mt-md">Have feedback, found a bug, or want to suggest a new game? We'd love to hear from you!</p>
 
-        <div class="pv-card mt-lg" style="max-width: 500px;">
-            <h3 class="mb-md">Get in Touch</h3>
-            <p>📧 <strong>Email:</strong> hello@puzzlevault.pages.dev</p>
-            <p class="mt-md">🐛 <strong>Bug Reports:</strong> Please include the game name, your browser, and steps to
-                reproduce the issue.</p>
-            <p class="mt-md">💡 <strong>Suggestions:</strong> We're always looking for ways to improve. Share your
-                ideas!</p>
+    <main class="pv-support-page">
+        <h1>Contact Us</h1>
+        <p>Found a bug? Have a suggestion? Or just want to say hi? We'd love to hear from you. This form serves as a
+            placeholder for our official feedback channel!</p>
+
+        <div class="contact-card">
+            <form class="contact-form"
+                onsubmit="event.preventDefault(); alert('Message submitted successfully! (This is a static placeholder)');">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select id="subject" name="subject" required>
+                        <option value="bug">Report a Bug</option>
+                        <option value="feedback">Game Feedback & Suggestions</option>
+                        <option value="business">Business Inquiry</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="How can we help you?" required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
         </div>
     </main>
+
     <footer id="pv-footer"></footer>
+
     <script src="/js/common.js"></script>
 </body>
 
