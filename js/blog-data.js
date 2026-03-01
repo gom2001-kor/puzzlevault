@@ -36,6 +36,24 @@ const BLOG_POSTS = [
         category: 'tips',
         tags: ['daily', 'numvault', 'gridsmash', 'colorflow', 'streak'],
         readTime: 5
+    },
+    {
+        slug: 'welcome-to-puzzlevault',
+        title: 'Welcome to PuzzleVault — 10 Free Brain Games',
+        description: 'Introducing PuzzleVault: 10 unique, free browser-based puzzle games. From number deduction to hexagonal matching, discover your next brain challenge.',
+        date: '2026-02-15',
+        category: 'updates',
+        tags: ['launch', 'all-games'],
+        readTime: 3
+    },
+    {
+        slug: 'numvault-tips-and-strategy',
+        title: 'How to Master Number Puzzles: Tips for NumVault',
+        description: 'Master NumVault with these proven number deduction strategies. Learn systematic elimination, first-guess tactics, and how to solve any code in 6 tries or fewer.',
+        date: '2026-02-28',
+        category: 'strategy',
+        tags: ['numvault', 'tips', 'strategy'],
+        readTime: 4
     }
 ];
 

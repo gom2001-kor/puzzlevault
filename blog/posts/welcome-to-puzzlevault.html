@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to PuzzleVault — 10 Free Brain Games | PuzzleVault Blog</title>
+    <meta name="description"
+        content="Introducing PuzzleVault: 10 unique, free browser-based puzzle games. From number deduction to hexagonal matching, discover your next brain challenge.">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Welcome to PuzzleVault — 10 Free Brain Games | PuzzleVault Blog">
+    <meta property="og:description"
+        content="Introducing PuzzleVault: 10 unique, free browser-based puzzle games for everyone.">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Welcome to PuzzleVault — 10 Free Brain Games">
+    <meta name="twitter:description"
+        content="Introducing PuzzleVault: 10 unique, free browser-based puzzle games for everyone.">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Welcome to PuzzleVault — 10 Free Brain Games",
+        "description": "Introducing PuzzleVault: 10 unique, free browser-based puzzle games. From number deduction to hexagonal matching, discover your next brain challenge.",
+        "datePublished": "2026-02-15",
+        "dateModified": "2026-02-15",
+        "author": { "@type": "Organization", "name": "PuzzleVault" },
+        "publisher": { "@type": "Organization", "name": "PuzzleVault" },
+        "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html"
+    }
+    </script>
+
+    <style>
+        .blog-post-header {
+            max-width: 700px;
+            margin: 40px auto 0;
+            padding: 0 20px
+        }
+
+        .blog-post-category {
+            display: inline-block;
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--pv-blue);
+            background: rgba(37, 99, 235, .08);
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin-bottom: 16px
+        }
+
+        .blog-post-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 12px;
+            color: var(--pv-text)
+        }
+
+        .blog-post-meta {
+            font-size: .85rem;
+            color: var(--pv-text-secondary);
+            margin-bottom: 32px
+        }
+
+        .blog-content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 20px;
+            color: var(--pv-text);
+            font-size: 1.05rem;
+            line-height: 1.8
+        }
+
+        .blog-content p {
+            margin-bottom: 20px
+        }
+
+        .blog-content h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--pv-text)
+        }
+
+        .blog-content ul {
+            margin-bottom: 20px;
+            padding-left: 28px
+        }
+
+        .blog-content li {
+            margin-bottom: 8px
+        }
+
+        .blog-content a {
+            color: var(--pv-blue);
+            text-decoration: none;
+            font-weight: 500
+        }
+
+        .blog-content a:hover {
+            text-decoration: underline
+        }
+
+        .blog-content strong {
+            font-weight: 700;
+            color: var(--pv-text)
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 24px 0
+        }
+
+        .game-card-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: all .2s ease
+        }
+
+        .game-card-link:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--pv-shadow-lg);
+            border-color: var(--pv-blue)
+        }
+
+        .game-card-link .emoji {
+            font-size: 2rem
+        }
+
+        .game-card-link .info {
+            flex: 1
+        }
+
+        .game-card-link .name {
+            font-weight: 700;
+            font-size: .95rem;
+            color: var(--pv-text)
+        }
+
+        .game-card-link .desc {
+            font-size: .78rem;
+            color: var(--pv-text-secondary);
+            margin-top: 2px
+        }
+
+        .blog-related {
+            max-width: 700px;
+            margin: 48px auto;
+            padding: 0 20px
+        }
+
+        .blog-related h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px
+        }
+
+        .related-games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px
+        }
+
+        .related-game-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: all .2s ease
+        }
+
+        .related-game-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--pv-shadow-lg);
+            border-color: var(--pv-blue)
+        }
+
+        .related-game-icon {
+            font-size: 2rem
+        }
+
+        .related-game-info {
+            flex: 1
+        }
+
+        .related-game-name {
+            font-weight: 700;
+            font-size: .95rem
+        }
+
+        .related-game-tagline {
+            font-size: .75rem;
+            color: var(--pv-text-secondary)
+        }
+
+        .related-posts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px
+        }
+
+        @media(min-width:600px) {
+            .related-posts-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        .related-post-card {
+            display: block;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: all .2s ease
+        }
+
+        .related-post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--pv-shadow-lg);
+            border-color: var(--pv-blue)
+        }
+
+        .related-post-title {
+            font-weight: 700;
+            font-size: .95rem;
+            margin-bottom: 4px;
+            color: var(--pv-text)
+        }
+
+        .related-post-desc {
+            font-size: .8rem;
+            color: var(--pv-text-secondary);
+            line-height: 1.4
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 32px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--pv-blue);
+            text-decoration: none
+        }
+
+        .back-link:hover {
+            text-decoration: underline
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <div class="blog-post-header">
+        <span class="blog-post-category">Updates</span>
+        <h1>Welcome to PuzzleVault — 10 Free Brain Games</h1>
+        <div class="blog-post-meta">February 15, 2026 · 3 min read</div>
+    </div>
+
+    <article class="blog-content">
+        <p>We're thrilled to officially welcome you to <strong>PuzzleVault</strong> — a collection of 10 unique,
+            completely free puzzle games that run directly in your browser. No downloads required, no accounts to
+            create, no subscriptions to worry about. Just pure puzzle-solving fun.</p>
+
+        <p>PuzzleVault was built on a simple idea: everyone deserves access to high-quality brain training games
+            without barriers. Whether you're a casual player looking for a five-minute break or a serious puzzle
+            enthusiast chasing perfect scores, there's something here for you.</p>
+
+        <h2>Meet the Games</h2>
+
+        <p>Each game features its own unique mechanic that you won't find anywhere else. Here's a quick tour of
+            all 10 games in the vault:</p>
+
+        <div class="game-grid">
+            <a href="/games/numvault.html" class="game-card-link">
+                <span class="emoji">🔢</span>
+                <div class="info">
+                    <div class="name">NumVault</div>
+                    <div class="desc">Crack the hidden number code through logical deduction</div>
+                </div>
+            </a>
+            <a href="/games/gridsmash.html" class="game-card-link">
+                <span class="emoji">🧱</span>
+                <div class="info">
+                    <div class="name">GridSmash</div>
+                    <div class="desc">Place polyomino blocks to clear lines on a 10×10 grid</div>
+                </div>
+            </a>
+            <a href="/games/patternpop.html" class="game-card-link">
+                <span class="emoji">🎨</span>
+                <div class="info">
+                    <div class="name">PatternPop</div>
+                    <div class="desc">Memorize and reproduce color patterns that grow each round</div>
+                </div>
+            </a>
+            <a href="/games/sortstack.html" class="game-card-link">
+                <span class="emoji">🧪</span>
+                <div class="info">
+                    <div class="name">SortStack</div>
+                    <div class="desc">Pour colored segments between tubes until each tube is sorted</div>
+                </div>
+            </a>
+            <a href="/games/quickcalc.html" class="game-card-link">
+                <span class="emoji">⚡</span>
+                <div class="info">
+                    <div class="name">QuickCalc</div>
+                    <div class="desc">Solve math equations against the clock — speed matters!</div>
+                </div>
+            </a>
+            <a href="/games/tileturn.html" class="game-card-link">
+                <span class="emoji">💡</span>
+                <div class="info">
+                    <div class="name">TileTurn</div>
+                    <div class="desc">Toggle tiles to turn them all the same color</div>
+                </div>
+            </a>
+            <a href="/games/colorflow.html" class="game-card-link">
+                <span class="emoji">🌈</span>
+                <div class="info">
+                    <div class="name">ColorFlow</div>
+                    <div class="desc">Connect colored dots with non-overlapping paths</div>
+                </div>
+            </a>
+            <a href="/games/pipelink.html" class="game-card-link">
+                <span class="emoji">🔌</span>
+                <div class="info">
+                    <div class="name">PipeLink</div>
+                    <div class="desc">Rotate circuit pieces to connect all nodes on the board</div>
+                </div>
+            </a>
+            <a href="/games/mergechain.html" class="game-card-link">
+                <span class="emoji">🔮</span>
+                <div class="info">
+                    <div class="name">MergeChain</div>
+                    <div class="desc">Drop numbered balls and merge matching numbers</div>
+                </div>
+            </a>
+            <a href="/games/hexmatch.html" class="game-card-link">
+                <span class="emoji">⬡</span>
+                <div class="info">
+                    <div class="name">HexMatch</div>
+                    <div class="desc">Match colors on a hexagonal grid with bombs and rising tide</div>
+                </div>
+            </a>
+        </div>
+
+        <h2>Daily Challenges for Everyone</h2>
+
+        <p>Every game features a <strong>Daily Challenge</strong> mode. Each day, a new puzzle is generated from a
+            global seed — meaning every player worldwide gets the exact same puzzle. Complete your daily challenge,
+            share your results, and see how your strategy compares to others.</p>
+
+        <p>Daily challenges reset at midnight UTC, and your streak is tracked automatically. Can you keep a 30-day
+            streak alive?</p>
+
+        <h2>Built for the Modern Web</h2>
+
+        <p>PuzzleVault is a fully static Progressive Web App (PWA). All games are built with vanilla HTML5 Canvas
+            and JavaScript — no heavy frameworks, no app store installations. Games load instantly, work offline,
+            and your progress is saved locally on your device. Add PuzzleVault to your home screen and it works
+            just like a native app.</p>
+
+        <p>We believe puzzle games should be <strong>accessible, free, and beautiful</strong>. That's the promise of
+            PuzzleVault. Pick a game, challenge yourself, and enjoy the vault.</p>
+    </article>
+
+    <div class="ad-slot" id="ad-mid" style="max-width: 700px; margin: 32px auto;"></div>
+
+    <section class="blog-related">
+        <h2>🎮 Try These Games</h2>
+        <div class="related-games-grid" id="related-games"></div>
+    </section>
+
+    <section class="blog-related">
+        <h2>📖 Read More</h2>
+        <div class="related-posts-grid" id="related-posts"></div>
+        <a href="/blog/" class="back-link">← Back to Blog</a>
+    </section>
+
+    <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
+
+    <footer id="pv-footer"></footer>
+
+    <script src="/js/blog-data.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+        const POST_SLUG = 'welcome-to-puzzlevault';
+        document.addEventListener('DOMContentLoaded', () => {
+            const post = BLOG_POSTS.find(p => p.slug === POST_SLUG);
+            if (post) {
+                const gc = document.getElementById('related-games');
+                getRelatedGames(post.tags).forEach(g => {
+                    const c = document.createElement('a');
+                    c.className = 'related-game-card';
+                    c.href = g.path;
+                    c.innerHTML = `<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;
+                    gc.appendChild(c);
+                });
+            }
+            const rpc = document.getElementById('related-posts');
+            getRelatedPosts(POST_SLUG, 3).forEach(rp => {
+                const c = document.createElement('a');
+                c.className = 'related-post-card';
+                c.href = `/blog/posts/${rp.slug}.html`;
+                c.innerHTML = `<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;
+                rpc.appendChild(c);
+            });
+        });
+    </script>
+</body>
+
+</html>
