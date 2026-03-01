@@ -425,6 +425,53 @@ function initPage() {
             SFX.init();
         }
     }, { once: true });
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            // Listen for update available
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                if (newWorker) {
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+                            // New version installed, handled by SW_UPDATED message
+                        }
+                    });
+                }
+            });
+        });
+
+        // Listen for SW update notification
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data && event.data.type === 'SW_UPDATED') {
+                // Show subtle update banner
+                const banner = document.createElement('div');
+                banner.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--pv-blue,#2563EB);color:#fff;padding:12px 24px;border-radius:12px;font-size:0.9rem;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);cursor:pointer;display:flex;align-items:center;gap:8px';
+                banner.innerHTML = '🔄 New version available — <u>Refresh</u>';
+                banner.onclick = () => location.reload();
+                document.body.appendChild(banner);
+                setTimeout(() => banner.remove(), 15000);
+            }
+        });
+    }
+
+    // Offline: hide ad slots gracefully
+    if (!navigator.onLine) {
+        document.querySelectorAll('.ad-slot, #ad-sidebar, #ad-bottom, #ad-interstitial').forEach(el => {
+            el.style.display = 'none';
+        });
+    }
+    window.addEventListener('offline', () => {
+        document.querySelectorAll('.ad-slot, #ad-sidebar, #ad-bottom, #ad-interstitial').forEach(el => {
+            el.style.display = 'none';
+        });
+    });
+    window.addEventListener('online', () => {
+        document.querySelectorAll('.ad-slot, #ad-sidebar, #ad-bottom').forEach(el => {
+            el.style.display = '';
+        });
+    });
 }
 
 // Auto-init on DOM ready

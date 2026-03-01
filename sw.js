@@ -3,7 +3,8 @@
    Cache game HTML/CSS/JS for offline play
    =================================================== */
 
-const CACHE_NAME = 'puzzlevault-v1';
+const CACHE_VERSION = 2;
+const CACHE_NAME = 'puzzlevault-v' + CACHE_VERSION;
 const ASSETS = [
     '/',
     '/index.html',
@@ -42,7 +43,7 @@ const ASSETS = [
     '/games/hexmatch-logic.js',
 ];
 
-// Install: cache core assets
+// Install: precache all core assets
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
@@ -50,26 +51,42 @@ self.addEventListener('install', event => {
     self.skipWaiting();
 });
 
-// Activate: clean old caches
+// Activate: clean old caches + notify clients of update
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(keys =>
             Promise.all(
                 keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
             )
-        )
+        ).then(() => {
+            // Notify all clients that a new version is available
+            self.clients.matchAll().then(clients => {
+                clients.forEach(client => {
+                    client.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION });
+                });
+            });
+        })
     );
     self.clients.claim();
 });
 
-// Fetch: cache-first for assets, network-first for pages
+// Fetch strategy
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
     // Skip non-GET and external requests
     if (event.request.method !== 'GET' || url.origin !== location.origin) return;
 
-    // CSS/JS: cache-first
+    // Ad-related requests: network-first, don't cache
+    if (url.hostname.includes('googlesyndication') ||
+        url.hostname.includes('doubleclick') ||
+        url.hostname.includes('googleads') ||
+        url.pathname.includes('/adsense')) {
+        event.respondWith(fetch(event.request).catch(() => new Response('', { status: 503 })));
+        return;
+    }
+
+    // CSS/JS: cache-first (game assets)
     if (url.pathname.match(/\.(css|js)$/)) {
         event.respondWith(
             caches.match(event.request).then(cached =>
@@ -83,7 +100,7 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // HTML: network-first with cache fallback
+    // HTML: network-first with cache fallback (offline support)
     event.respondWith(
         fetch(event.request)
             .then(response => {
