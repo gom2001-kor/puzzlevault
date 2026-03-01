@@ -3,31 +3,31 @@
   <!-- General Pages -->
   <url>
     <loc>https://puzzlevault.pages.dev/</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/about.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/privacy.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/terms.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/contact.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -35,76 +35,70 @@
   <!-- Game Pages -->
   <url>
     <loc>https://puzzlevault.pages.dev/games/numvault.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/gridsmash.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/patternpop.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/sortstack.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/quickcalc.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/tileturn.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/colorflow.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/pipelink.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/mergechain.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://puzzlevault.pages.dev/games/hexmatch.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Blog -->
   <url>
-    <loc>https://puzzlevault.pages.dev/blog/index.html</loc>
-    <lastmod>2026-02-27</lastmod>
+    <loc>https://puzzlevault.pages.dev/blog/</loc>
+    <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://puzzlevault.pages.dev/blog/posts/how-to-improve-memory-with-puzzle-games.html</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
   </url>
 </urlset>
