@@ -18,9 +18,10 @@ const PipeLink = {
     sources: [], // [{r, c, type:'A'}, {r, c, type:'B'}]
     dests: [],   // [{r, c, type:'A'}, {r, c, type:'B'}]
     moves: 0,
+    hintsUsed: 0,
     packId: 1,
     levelId: 1,
-    gameState: 'menu', // menu, playing, clear
+    gameState: 'menu',
     dualMode: false,
 
     // Animation state
@@ -112,6 +113,9 @@ const PipeLink = {
         this.bindEvents();
         this.resizeCanvas();
         this.renderPackList();
+
+        if (typeof renderCrossPromo === 'function') renderCrossPromo('pipelink');
+        if (typeof HintManager !== 'undefined') HintManager.init('pipelink');
 
         // Start animation loop
         requestAnimationFrame(this.renderLoop.bind(this));
@@ -600,15 +604,16 @@ const PipeLink = {
             const card = document.createElement('div');
             card.className = 'pl-pack-card';
 
-            // Calc size based on rule
-            const bSize = Math.min(10, 3 + i);
+            // SKILL.md pack grids: 4,5,6,5(dual),6(dual+lock)
+            const packSizes = [4, 5, 6, 5, 6];
+            const bSize = packSizes[i - 1] || 5;
             let desc = `${bSize}×${bSize} Grid`;
             if (i >= 4) desc += ' • Dual Source';
             if (i >= 5) desc += ' • Locked Tiles';
 
             // Progress tracking
             const cleared = parseInt(localStorage.getItem(this.STORAGE_PREFIX + `pack${i}_cleared`) || 0);
-            const total = 20; // 20 levels per pack
+            const total = 25; // 25 levels per pack per SKILL.md
             const pct = Math.floor((cleared / total) * 100);
 
             card.innerHTML = `
@@ -664,7 +669,7 @@ const PipeLink = {
     },
 
     loadLevel(pack, level) {
-        if (level > 20) {
+        if (level > 25) {
             // Pack complete!
             this.renderPackList();
             this.switchView('packs');
@@ -691,40 +696,48 @@ const PipeLink = {
     useHint() {
         if (this.gameState !== 'playing') return;
 
-        // Find tiles that are not at their target rotation and are not locked
-        let wrongTiles = [];
-        for (let r = 0; r < this.size; r++) {
-            for (let c = 0; c < this.size; c++) {
-                if (!this.grid[r][c].locked && this.grid[r][c].rot !== this.grid[r][c].targetRot) {
-                    // Check if solving this would actually change connectivity (Crosses rotating 180 don't matter, but targetRot forces exact matches which is fine for hints)
-                    wrongTiles.push({ r, c });
+        const doHint = () => {
+            this.hintsUsed++;
+            // Find tiles that are not at their target rotation and are not locked
+            let wrongTiles = [];
+            for (let r = 0; r < this.size; r++) {
+                for (let c = 0; c < this.size; c++) {
+                    if (!this.grid[r][c].locked && this.grid[r][c].rot !== this.grid[r][c].targetRot) {
+                        wrongTiles.push({ r, c });
+                    }
                 }
             }
+
+            if (wrongTiles.length === 0) return;
+
+            // Pick a random wrong tile
+            const rando = wrongTiles[Math.floor(Math.random() * wrongTiles.length)];
+            const cell = this.grid[rando.r][rando.c];
+
+            // Animate the fix (flash gold first per SKILL.md)
+            this.animations.push({
+                r: rando.r, c: rando.c,
+                type: 'rotate',
+                startRot: cell.rot,
+                endRot: cell.targetRot,
+                progress: 0,
+                duration: 300
+            });
+
+            cell.rot = cell.targetRot;
+            cell.locked = true;
+
+            if (SFX) SFX.play('hint');
+
+            this.updateConnectionLogic();
+            this.updateUI();
+        };
+
+        if (typeof HintManager !== 'undefined') {
+            HintManager.requestHint(doHint);
+        } else {
+            doHint();
         }
-
-        if (wrongTiles.length === 0) return; // Everything is technically correct.
-
-        // Pick a random wrong tile
-        const rando = wrongTiles[Math.floor(Math.random() * wrongTiles.length)];
-        const cell = this.grid[rando.r][rando.c];
-
-        // Animate the fix
-        this.animations.push({
-            r: rando.r, c: rando.c,
-            type: 'rotate',
-            startRot: cell.rot,
-            endRot: cell.targetRot,
-            progress: 0,
-            duration: 300 // slightly slower for emphasis
-        });
-
-        cell.rot = cell.targetRot;
-        cell.locked = true; // Lock the hinted tile as an anchor to help the player
-
-        if (SFX) SFX.play('correct');
-
-        this.updateConnectionLogic();
-        this.updateUI();
     },
 
     rotateTile(r, c, dir) {
@@ -905,28 +918,39 @@ const PipeLink = {
         setTimeout(() => {
             if (SFX) SFX.play('clear');
 
-            // Calculate Stars based on utilization
-            let utilized = 0;
-            let total = this.size * this.size;
-
+            // Count optimal rotations
+            let optimalRotations = 0;
             for (let r = 0; r < this.size; r++) {
                 for (let c = 0; c < this.size; c++) {
-                    if (this.grid[r][c].colorA || this.grid[r][c].colorB) utilized++;
+                    const cell = this.grid[r][c];
+                    if (!cell.locked && cell.type !== 0 && cell.type !== 4) {
+                        optimalRotations++; // at least 1 rotation expected
+                    }
                 }
             }
-            const utilPct = Math.round((utilized / total) * 100);
 
+            // Stars based on rotation efficiency
             let stars = 1;
-            if (utilPct >= 80) stars = 2;
-            if (utilPct === 100) stars = 3;
+            if (this.moves <= optimalRotations * 1.5) stars = 3;
+            else if (this.moves <= optimalRotations * 2) stars = 2;
+
+            // Scoring per SKILL.md: 400 base + rotation efficiency + ×1.2 no-hint + ×1.5 dual
+            let score = 400;
+            if (this.moves <= optimalRotations * 1.5) {
+                score += optimalRotations * 30;
+            } else {
+                score += Math.max(0, (optimalRotations * 3 - this.moves) * 10);
+            }
+            if (this.hintsUsed === 0) score = Math.round(score * 1.2);
+            if (this.dualMode) score = Math.round(score * 1.5);
 
             let hc = '';
             for (let i = 0; i < 3; i++) hc += i < stars ? '⭐' : '★';
 
             this.ui.resStars.textContent = hc;
-            this.ui.resMsg.textContent = stars === 3 ? "Perfect Circuit!" : "Sub-Optimal Flow!";
+            this.ui.resMsg.textContent = stars === 3 ? `Perfect Circuit! Score: ${score}` : `Circuit Complete! Score: ${score}`;
             this.ui.resTaps.textContent = this.moves;
-            this.ui.resUtil.textContent = `${utilPct}%`;
+            this.ui.resUtil.textContent = stars === 3 ? 'Optimal' : 'Sub-Optimal';
             this.ui.resUtil.style.color = stars === 3 ? 'var(--pv-emerald)' : 'var(--pv-amber)';
 
             // Save progress
@@ -940,10 +964,23 @@ const PipeLink = {
                 localStorage.setItem(this.STORAGE_PREFIX + `p${this.packId}_l${this.levelId}_stars`, stars);
             }
 
+            // Render mini cross-promo
+            const promoContainer = document.getElementById('pl-mini-promo');
+            if (promoContainer && typeof renderMiniCrossPromo === 'function') {
+                renderMiniCrossPromo('pipelink', promoContainer);
+            }
+
             document.getElementById('pl-result-modal').classList.add('open');
 
-            // Ad integration
-            if (typeof AdController !== 'undefined') AdController.showInterstitial();
+            // Ad refresh
+            if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
+
+            // Show interstitial after 2s delay
+            setTimeout(() => {
+                if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+                    AdController.showInterstitial();
+                }
+            }, 2000);
 
             // Add Share Button logic if not already present
             let btnShare = document.getElementById('pl-btn-share-res');
@@ -953,43 +990,35 @@ const PipeLink = {
                 btnShare.className = 'btn-primary';
                 btnShare.style.background = 'var(--pv-violet)';
                 btnShare.textContent = '📤 Share';
-
-                // insert before the Next button
                 const btnNext = document.getElementById('pl-btn-next');
                 btnNext.parentNode.insertBefore(btnShare, btnNext);
             }
 
             btnShare.onclick = () => {
-                this.shareResult(stars, this.moves, utilPct);
+                this.shareResultSKILL(stars, this.moves, optimalRotations);
             };
 
         }, 500);
     },
 
-    shareResult(stars, moves, util) {
-        // Build emoji grid
-        let gridStr = '';
-        for (let r = 0; r < this.size; r++) {
-            for (let c = 0; c < this.size; c++) {
-                let cell = this.grid[r][c];
-                if (cell.type === 5) gridStr += '⚡';
-                else if (cell.type === 6) gridStr += '🔋';
-                else if (cell.colorA) gridStr += '🟧';
-                else if (cell.colorB) gridStr += '🟦';
-                else gridStr += '⬛';
-            }
-            gridStr += '\n';
-        }
-
+    shareResultSKILL(stars, moves, optimalRot) {
         let starStr = '';
         for (let i = 0; i < 3; i++) starStr += i < stars ? '⭐' : '★';
 
-        const title = this.dualMode ? 'Dual Core' : 'Circuit';
-        const text = `🔧 PipeLink - Pack ${this.packId} Level ${this.levelId}\n${title} (${this.size}x${this.size})\n\n${gridStr}\n${starStr} | ${moves} Taps | ${util}% Util\npuzzlevault.pages.dev/games/pipelink`;
+        let text = `🔧 PipeLink Pack ${this.packId} Level ${this.levelId}\n`;
+        text += `✅ Solved! ⚡→💡\n`;
+        text += `Rotations: ${moves} (optimal: ${optimalRot})\n`;
+        text += 'puzzlevault.pages.dev/pipelink';
 
         if (typeof shareResult === 'function') {
             shareResult(text);
         }
+    },
+
+    // Keep legacy share for backward compat
+    shareResult(stars, moves, util) {
+        const text = `🔧 PipeLink Pack ${this.packId} Level ${this.levelId}\n✅ Solved! ⚡→💡\nRotations: ${moves}\npuzzlevault.pages.dev/pipelink`;
+        if (typeof shareResult === 'function') shareResult(text);
     },
 
     showStats() {
@@ -1000,14 +1029,14 @@ const PipeLink = {
         for (let p = 1; p <= 5; p++) {
             let clr = parseInt(localStorage.getItem(this.STORAGE_PREFIX + `pack${p}_cleared`) || 0);
             totalCleared += clr;
-            for (let l = 1; l <= 20; l++) {
+            for (let l = 1; l <= 25; l++) {
                 totalStars += parseInt(localStorage.getItem(this.STORAGE_PREFIX + `p${p}_l${l}_stars`) || 0);
             }
         }
 
         const html = `
             <div style="margin-bottom:12px; font-size:1.1rem;">
-                <span style="color:var(--pv-slate)">Levels Cleared:</span> <strong style="color:var(--pv-bg-light)">${totalCleared}/100</strong>
+                <span style="color:var(--pv-slate)">Levels Cleared:</span> <strong style="color:var(--pv-bg-light)">${totalCleared}/125</strong>
             </div>
             <div style="margin-bottom:12px; font-size:1.1rem;">
                 <span style="color:var(--pv-slate)">Total Stars:</span> <strong style="color:#F59E0B">${totalStars}</strong>

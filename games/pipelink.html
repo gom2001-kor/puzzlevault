@@ -18,7 +18,7 @@
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
 
     <!-- Shared Global Styles -->
-    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="/css/global.css">
 
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"VideoGame","name":"PipeLink","description":"Rotate circuit tiles to connect power sources to their destinations.","url":"https://puzzlevault.pages.dev/games/pipelink","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
@@ -504,7 +504,9 @@
                     <div class="pl-controls">
                         <div class="pl-moves">Taps: <span id="pl-moves-lbl">0</span></div>
                         <div style="display:flex; gap:8px;">
-                            <button class="pl-btn" id="pl-btn-hint" aria-label="Hint">💡 Hint</button>
+                            <button class="pl-btn" id="pl-btn-hint" aria-label="Hint">💡 Hint <span
+                                    class="hint-sublabel"
+                                    style="font-size:0.75em;color:var(--pv-text-secondary)">(Ad)</span></button>
                             <button class="pl-btn" id="pl-btn-reset">🔄 Reset</button>
                         </div>
                     </div>
@@ -553,15 +555,16 @@
                 <div class="pl-res-msg" id="pl-res-msg">Perfect Connection!</div>
 
                 <div class="pl-score-breakdown">
-                    <div class="pl-score-row"><span>Taps Used:</span> <strong id="pl-res-taps">15</strong></div>
-                    <div class="pl-score-row"><span>Tile Utilization:</span> <strong id="pl-res-util"
-                            style="color:var(--pv-emerald)">100%</strong></div>
+                    <div class="pl-score-row"><span>Rotations:</span> <strong id="pl-res-taps">15</strong></div>
+                    <div class="pl-score-row"><span>Efficiency:</span> <strong id="pl-res-util"
+                            style="color:var(--pv-emerald)">Optimal</strong></div>
                 </div>
 
                 <button class="btn-primary" id="pl-btn-next">Next Puzzle</button>
                 <button class="btn-secondary"
                     onclick="document.getElementById('pl-result-modal').classList.remove('open')">View Board</button>
                 <button class="btn-secondary" id="pl-btn-result-packs">Back to Boards</button>
+                <div id="pl-mini-promo" style="margin-top:12px"></div>
             </div>
         </div>
 
@@ -588,36 +591,47 @@
 
         <section class="game-guide pv-container" style="margin-top:40px;">
             <h2>How to Play PipeLink 🔧</h2>
-            <p>PipeLink is an elegant circuitry puzzle constraint game. Navigate raw energy flowing from a power source
-                directly into its terminal battery by manipulating the direction of the conductive paths.</p>
+            <p>PipeLink is a circuit connection puzzle. Rotate pipe tiles to create a path
+                from ⚡ Source to 💡 Target. Pipe types: straight(━), corner(┗), T-junction(┣),
+                cross(╋), end cap(╸).</p>
 
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">🔶 The Basics</h3>
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">🔧 Circuit Board Theme</h3>
             <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
-                <li>Tap a circuit panel to rotate it 90 degrees clockwise. You can double-tap quickly to rotate it 180
-                    degrees.</li>
-                <li>Make sure to follow the path emitting from the source ⚡ so you know which panels are actively
-                    receiving power. Active panels will glow brightly!</li>
-                <li>Reach the destination node 🔋 to complete the circuit and clear the level.</li>
+                <li>Tap any tile to rotate it 90° clockwise (smooth 200ms animation).</li>
+                <li>Connected pipes glow with energy flow animation (pulse from Source to Target).</li>
+                <li>Disconnected pipes are gray; connected ones glow blue.</li>
             </ul>
 
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">💯 Utilization for Stars</h3>
-            <p>Every board has a single shortest path to clear, but real masters won't leave loose wires hanging. To
-                earn 3 stars, you must form a circuit that utilizes <strong>every single tile</strong> on the grid. Are
-                there dead ends? Loop them back into the main circuit!</p>
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">⭐ Scoring</h3>
+            <p><strong>400 base</strong> + rotation efficiency bonus (solve ≤ optimal×1.5).
+                No-hint bonus: <strong>×1.2</strong>. Dual Source bonus: <strong>×1.5</strong>.</p>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">💡 Hints</h3>
+            <p>The 💡 Hint button rotates one pipe to its correct orientation (flashes gold first).
+                First hint per session is FREE; subsequent hints require a reward ad.</p>
         </section>
 
         <section class="pv-faq pv-container">
             <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
             <details>
-                <summary>What do the locked (🔒) tiles mean?</summary>
-                <p>Locked tiles cannot be rotated whatsoever. They act as permanent anchors in the board. You must
-                    construct the rest of your circuit strategically around these fixed segments.</p>
+                <summary>What do locked (🔒) tiles mean?</summary>
+                <p>Locked tiles (Pack 5+) cannot be rotated. You must solve the circuit around
+                    these fixed constraints.</p>
             </details>
             <details>
-                <summary>Why are there two different colors (amber and cyan) in later packs?</summary>
-                <p>That is the Dual Source mode. You'll need to manage two completely separate energy channels
-                    simultaneously. They cannot cross streams directly except when flowing through a Cross (╋) tile,
-                    which isolates the vertical and horizontal voltages.</p>
+                <summary>What is Dual Source mode?</summary>
+                <p>From Pack 4+, two Source-Target pairs (A→A and B→B) must both connect
+                    simultaneously. Cross (╋) tiles can carry both energy paths independently.</p>
+            </details>
+            <details>
+                <summary>How many levels are there?</summary>
+                <p>5 packs with 25 levels each = 125 levels total. Grid sizes: 4×4, 5×5, 6×6,
+                    5×5 (dual), 6×6 (dual + locked).</p>
+            </details>
+            <details>
+                <summary>Does using hints affect scoring?</summary>
+                <p>Yes! Completing without hints earns a ×1.2 score multiplier. First hint is
+                    free, subsequent ones require a reward ad.</p>
             </details>
         </section>
 
@@ -628,13 +642,12 @@
     <footer id="pv-footer"></footer>
 
     <!-- Scripts -->
-    <script src="../js/common.js"></script>
-    <script src="../js/adsense.js"></script>
-    <script src="../js/seed.js"></script>
-    <script src="../js/sfx.js"></script>
-    <script src="../js/share.js"></script>
-    <!-- We will link the external logic script once built -->
-    <script src="pipelink-logic.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/pipelink-logic.js"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 
