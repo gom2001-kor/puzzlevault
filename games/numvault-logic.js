@@ -5,10 +5,10 @@
 
 /* === DIFFICULTY CONFIGS === */
 const DIFFICULTIES = {
-    easy: { digits: 4, maxAttempts: 8, allowDuplicates: false, label: 'Easy', multiplier: 1.0 },
-    normal: { digits: 4, maxAttempts: 6, allowDuplicates: true, label: 'Normal', multiplier: 1.5 },
-    hard: { digits: 5, maxAttempts: 8, allowDuplicates: true, label: 'Hard', multiplier: 2.0 },
-    expert: { digits: 6, maxAttempts: 10, allowDuplicates: true, label: 'Expert', multiplier: 3.0 },
+    easy: { digits: 3, maxAttempts: 8, allowDuplicates: false, label: 'Easy', multiplier: 1.0 },
+    medium: { digits: 4, maxAttempts: 6, allowDuplicates: false, label: 'Medium', multiplier: 1.5 },
+    hard: { digits: 4, maxAttempts: 6, allowDuplicates: true, label: 'Hard', multiplier: 2.0 },
+    expert: { digits: 5, maxAttempts: 8, allowDuplicates: true, label: 'Expert', multiplier: 3.0 },
 };
 
 /* === GAME STATE === */
@@ -16,8 +16,8 @@ let G = {};
 function resetState() {
     G = {
         mode: 'daily', // daily | free | speed
-        difficulty: { ...DIFFICULTIES.normal },
-        diffKey: 'normal',
+        difficulty: { ...DIFFICULTIES.medium },
+        diffKey: 'medium',
         code: [],
         guesses: [],
         feedback: [],
@@ -101,12 +101,13 @@ function updateTracker(guess, feedback) {
 function calcScore() {
     const used = G.guesses.length;
     const max = G.difficulty.maxAttempts;
-    const mult = G.difficulty.multiplier;
     const elapsed = (G.endTime - G.startTime) / 1000;
-    const base = (max - used + 1) * 100 * mult;
-    const timeBonus = Math.max(0, 300 - elapsed) * 2;
-    const hintPenalty = G.hintsUsed * 50;
-    return Math.max(0, Math.round(base + timeBonus - hintPenalty));
+    let score = 1000 * (max - used + 1);
+    // Speed bonus: under 30 seconds → ×1.5
+    if (elapsed < 30) score = Math.round(score * 1.5);
+    // No-hint bonus: ×1.2
+    if (G.hintsUsed === 0) score = Math.round(score * 1.2);
+    return Math.max(0, score);
 }
 
 /* === LOCAL STORAGE HELPERS === */
@@ -326,7 +327,7 @@ function animateWave(rowIdx) {
 
 /* === HINT SYSTEM === */
 function useHint() {
-    if (G.hintsUsed >= G.maxHints || G.gameState !== 'playing') return;
+    if (G.gameState !== 'playing') return;
     // Find unconfirmed positions
     const unconfirmed = [];
     for (let i = 0; i < G.code.length; i++) {
@@ -337,17 +338,22 @@ function useHint() {
         if (!isConfirmed) unconfirmed.push(i);
     }
     if (unconfirmed.length === 0) return;
-    // Reward ad placeholder
-    AdController.showRewardAd(() => {
+
+    const revealHint = () => {
         G.hintsUsed++;
         const pos = unconfirmed[Math.floor(Math.random() * unconfirmed.length)];
-        // Fill in the hint digit
-        while (G.currentInput.length < pos) G.currentInput.push(G.currentInput.length < G.code.length ? -1 : 0);
-        G.currentInput[pos] = G.code[pos];
-        showToast(`💡 Hint: Position ${pos + 1} is ${G.code[pos]}`);
+        showToast(`💡 Position ${pos + 1} is the digit ${G.code[pos]}`);
+        SFX.play('hint');
         renderGrid();
         updateHintBtn();
-    });
+    };
+
+    // Use HintManager: first hint free, then reward ad
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(revealHint);
+    } else {
+        revealHint();
+    }
 }
 
 /* === GAME END === */
@@ -391,9 +397,6 @@ function onGameEnd(won) {
     }
     saveStats(won);
     updateStats('numvault', score);
-
-    // Show interstitial occasionally
-    if (G.mode !== 'daily') AdController.showInterstitial();
 
     setTimeout(() => showResult(won, score), won ? 1200 : 600);
 }
@@ -442,8 +445,20 @@ function showResult(won, score) {
       <button class="pv-btn pv-btn-primary" onclick="shareNV()">📤 Share</button>
       <button class="pv-btn pv-btn-secondary" onclick="playAgain()">🔄 Play Again</button>
     </div>
+    <div id="nv-mini-promo"></div>
   `;
+    // Render mini cross-promo icons inside result modal
+    if (typeof renderMiniCrossPromo === 'function') {
+        renderMiniCrossPromo('numvault', document.getElementById('nv-mini-promo'));
+    }
     overlay.classList.add('open');
+
+    // Show interstitial after 2s delay if applicable
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 /* === SHARE === */
@@ -454,24 +469,21 @@ function shareNV() {
     const isDaily = G.mode === 'daily';
     const isSpeed = G.mode === 'speed';
 
-    let text = `🔢 NumVault${isDaily ? ' Daily #' + dayNum : ''} ${won ? '🔓' : '🔒'}\n`;
+    let text = `🔢 NumVault${isDaily ? ' Daily #' + dayNum : ''}\n`;
     if (!isSpeed) {
-        text += `Difficulty: ${G.difficulty.label} (${G.difficulty.digits}-digit)\n\n`;
         G.feedback.forEach(row => {
             text += row.map(f => f === 'green' ? '🟢' : f === 'yellow' ? '🟡' : '⚫').join('') + '\n';
         });
-        text += `\n${won ? attempts : 'X'}/${G.difficulty.maxAttempts}`;
-        const elapsed = ((G.endTime - G.startTime) / 1000);
-        const mins = Math.floor(elapsed / 60);
-        const secs = Math.floor(elapsed % 60);
-        text += ` ⏱ ${mins}:${secs.toString().padStart(2, '0')}`;
-        const streak = parseInt(localStorage.getItem('pv_numvault_streak') || '0');
-        if (streak > 0) text += ` 🔥${streak}`;
-        if (G.hintsUsed > 0) text += ' 💡';
+        text += `${won ? attempts : 'X'}/${G.difficulty.maxAttempts}`;
+        if (G.hintsUsed === 0 && won) {
+            text += ' ⭐ No hints!';
+        } else if (G.hintsUsed > 0) {
+            text += ' 💡';
+        }
     } else {
         text += `Speed Mode\nSolved: ${G.speedSolved} | Score: ${formatNumber(G.speedScore)}\n`;
     }
-    text += '\npuzzlevault.pages.dev/games/numvault';
+    text += '\npuzzlevault.pages.dev/numvault';
     shareResult(text);
 }
 
@@ -489,13 +501,13 @@ function playAgain() {
 function startGame(mode, diffKey) {
     resetState();
     G.mode = mode;
-    G.diffKey = diffKey || 'normal';
-    const diff = DIFFICULTIES[G.diffKey] || DIFFICULTIES.normal;
+    G.diffKey = diffKey || 'medium';
+    const diff = DIFFICULTIES[G.diffKey] || DIFFICULTIES.medium;
     G.difficulty = { ...diff };
 
     if (mode === 'daily') {
-        G.difficulty = { ...DIFFICULTIES.normal };
-        G.diffKey = 'normal';
+        G.difficulty = { ...DIFFICULTIES.medium };
+        G.diffKey = 'medium';
         G.maxHints = 1;
         const seed = getDailySeed('numvault');
         G.code = generateCode(G.difficulty, seed);
@@ -669,8 +681,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Cross promo
+    // Cross promo — directly below game controls
     if (typeof renderCrossPromo === 'function') renderCrossPromo('numvault');
+
+    // Initialize HintManager
+    if (typeof HintManager !== 'undefined') HintManager.init('numvault');
 
     // Check URL params for mode
     const params = new URLSearchParams(window.location.search);
