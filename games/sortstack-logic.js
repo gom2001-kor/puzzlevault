@@ -27,14 +27,15 @@ const STACK_DRAW_BG = '#F1F5F9'; // inner
 const STACK_Y_BASE = 250;
 
 let state = {
-    mode: 'free', // 'free' or 'daily'
+    mode: 'free', // 'free', 'daily', or 'relaxed'
     difficulty: 'Easy',
-    colorsCount: 4,
+    colorsCount: 3,
     stacks: [],
     locked: [], // boolean 
     history: [], // { fromStack, toStack }
     movesLimit: Infinity,
     movesMade: 0,
+    hintsUsed: 0,
     startTime: 0,
     timerInterval: null,
 
@@ -54,11 +55,11 @@ const gameArea = document.getElementById('ss-game-area');
 
 function getDiffConfig(diff) {
     switch (diff) {
-        case 'Easy': return { colors: 4, moves: Infinity };
-        case 'Medium': return { colors: 6, moves: Infinity };
-        case 'Hard': return { colors: 8, moves: 40 };
-        case 'Expert': return { colors: 10, moves: 50 };
-        default: return { colors: 4, moves: Infinity };
+        case 'Easy': return { colors: 3, tubes: 5, moves: Infinity };
+        case 'Medium': return { colors: 5, tubes: 7, moves: 50 };
+        case 'Hard': return { colors: 7, tubes: 9, moves: 40 };
+        case 'Expert': return { colors: 10, tubes: 12, moves: 35 };
+        default: return { colors: 3, tubes: 5, moves: Infinity };
     }
 }
 
@@ -72,6 +73,7 @@ function initGame(mode, difficulty) {
     state.animations = [];
     state.particles = [];
     state.movesMade = 0;
+    state.hintsUsed = 0;
 
     if (mode === 'daily') {
         const seedStr = getDailySeed(GAME_ID).toString();
@@ -81,13 +83,15 @@ function initGame(mode, difficulty) {
         else if (day % 4 === 2) state.difficulty = 'Medium';
         else if (day % 4 === 3) state.difficulty = 'Hard';
         else state.difficulty = 'Expert';
+    } else if (mode === 'relaxed') {
+        state.difficulty = difficulty || 'Easy';
     } else {
         state.difficulty = difficulty || 'Easy';
     }
 
     const config = getDiffConfig(state.difficulty);
     state.colorsCount = config.colors;
-    state.movesLimit = config.moves;
+    state.movesLimit = (mode === 'relaxed') ? Infinity : config.moves;
 
     generatePuzzle();
     updateCanvasSize();
@@ -99,6 +103,8 @@ function initGame(mode, difficulty) {
 
 function generatePuzzle() {
     let numColors = state.colorsCount;
+    const config = getDiffConfig(state.difficulty);
+    const totalTubes = config.tubes || (numColors + 2);
     state.stacks = [];
     state.locked = [];
 
@@ -106,10 +112,11 @@ function generatePuzzle() {
         state.stacks.push([i, i, i, i]);
         state.locked.push(false);
     }
-    state.stacks.push([]);
-    state.locked.push(false);
-    state.stacks.push([]);
-    state.locked.push(false);
+    // Add empty tubes to reach total tube count
+    while (state.stacks.length < totalTubes) {
+        state.stacks.push([]);
+        state.locked.push(false);
+    }
 
     let moves = numColors * 40;
     let attempts = 0;
@@ -614,8 +621,18 @@ function winGame() {
 
     localStorage.setItem(`pv_${GAME_ID}_stats`, JSON.stringify(stats));
 
+    // Calculate score: 500 base + move efficiency + no-hint bonus
+    let score = 500;
+    if (state.movesLimit !== Infinity) {
+        score += Math.max(0, (state.movesLimit - state.movesMade) * 20);
+    }
+    if (state.hintsUsed === 0) {
+        score = Math.round(score * 1.3);
+    }
+    if (typeof updateStats === 'function') updateStats(GAME_ID, score);
+
     // Render result card
-    renderResultCard(true, timeTaken);
+    renderResultCard(true, timeTaken, score);
 }
 
 function loseGame() {
@@ -628,7 +645,7 @@ function loseGame() {
     stats.played++;
     localStorage.setItem(`pv_${GAME_ID}_stats`, JSON.stringify(stats));
 
-    renderResultCard(false, 0);
+    renderResultCard(false, 0, 0);
 }
 
 function updateUI() {
@@ -651,7 +668,7 @@ function updateUI() {
     }
 }
 
-function renderResultCard(isWin, timeSeconds) {
+function renderResultCard(isWin, timeSeconds, score) {
     const el = document.getElementById('ss-result-card');
     const overlay = document.getElementById('ss-result');
     if (!el || !overlay) return;
@@ -660,12 +677,14 @@ function renderResultCard(isWin, timeSeconds) {
     if (isWin) {
         const min = Math.floor(timeSeconds / 60);
         const sec = (timeSeconds % 60).toString().padStart(2, '0');
-        let shareText = `📚 SortStack ${state.mode === 'daily' ? 'Daily ' + new Date().toISOString().slice(0, 10) : state.difficulty}\nMoves: ${state.movesMade}\nTime: ${min}:${sec}\nhttps://puzzlevault.pages.dev/games/sortstack`;
+        const underLimit = state.movesLimit !== Infinity && state.movesMade < state.movesLimit;
+        const stars = underLimit ? '⭐⭐⭐' : (state.hintsUsed === 0 ? '⭐⭐' : '⭐');
 
         html = `
             <button class="pv-modal-close" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--pv-text-secondary);" onclick="dismissResult()">✕</button>
             <div class="ss-result-title">🧩 Sort Complete!</div>
             <div class="ss-result-subtitle">${state.mode === 'daily' ? 'Daily Challenge' : state.difficulty + ' Mode'}</div>
+            <div style="font-size:1.5rem;margin:8px 0">${stars}</div>
             <div class="ss-result-stats">
                 <div class="ss-stat-item">
                     <div class="ss-stat-val">${state.movesMade}</div>
@@ -675,9 +694,16 @@ function renderResultCard(isWin, timeSeconds) {
                     <div class="ss-stat-val">${min}:${sec}</div>
                     <div class="ss-stat-lbl">Time</div>
                 </div>
+                <div class="ss-stat-item">
+                    <div class="ss-stat-val">${formatNumber(score)}</div>
+                    <div class="ss-stat-lbl">Score</div>
+                </div>
             </div>
-            <button class="ss-result-btn ss-btn-primary" onclick="shareResult('${encodeURIComponent(shareText)}')">📤 Share Result</button>
-            <button class="ss-result-btn ss-btn-secondary" onclick="restartPlay()">🔄 Play Again</button>
+            <div class="result-actions">
+                <button class="pv-btn pv-btn-primary" onclick="shareSS()">📤 Share</button>
+                <button class="pv-btn pv-btn-secondary" onclick="restartPlay()">🔄 Play Again</button>
+            </div>
+            <div id="ss-mini-promo"></div>
         `;
     } else {
         html = `
@@ -685,21 +711,34 @@ function renderResultCard(isWin, timeSeconds) {
             <div class="ss-result-title">Out of Moves!</div>
             <div class="ss-result-subtitle">${state.difficulty} Mode</div>
             <p style="margin-bottom: 24px; color: var(--pv-text-secondary); font-size: 0.9rem;">You've hit the move limit.</p>
-            <button class="ss-result-btn ss-btn-primary" onclick="restartPlay()">🔄 Try Again</button>
+            <div class="result-actions">
+                <button class="pv-btn pv-btn-primary" onclick="restartPlay()">🔄 Try Again</button>
+            </div>
+            <div id="ss-mini-promo"></div>
         `;
     }
 
     el.innerHTML = html;
     overlay.classList.add('show');
 
-    if (window.AdController) {
-        AdController.showInterstitial();
+    // Render mini cross-promo inside result modal
+    if (typeof renderMiniCrossPromo === 'function') {
+        const promoContainer = document.getElementById('ss-mini-promo');
+        if (promoContainer) renderMiniCrossPromo(GAME_ID, promoContainer);
     }
+
+    // Show interstitial after 2s delay
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 window.dismissResult = function () {
     const overlay = document.getElementById('ss-result');
     if (overlay) overlay.classList.remove('show');
+    if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
 }
 
 window.restartPlay = function () {
@@ -708,8 +747,9 @@ window.restartPlay = function () {
     if (window.AdController) AdController.hideInterstitial();
 
     if (state.mode === 'daily') {
-        // Can't restart daily if solved, but allowed if testing
         initGame('daily');
+    } else if (state.mode === 'relaxed') {
+        initGame('relaxed', state.difficulty);
     } else {
         initGame('free', state.difficulty);
     }
@@ -730,6 +770,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('ss-daily-tag').style.display = 'inline-block';
                 document.getElementById('ss-daily-tag').textContent = 'Daily';
                 initGame('daily');
+            } else if (mode === 'relaxed') {
+                document.getElementById('ss-diff-select').style.display = 'none';
+                document.getElementById('ss-game-container').style.display = 'block';
+                document.getElementById('ss-daily-tag').style.display = 'inline-block';
+                document.getElementById('ss-daily-tag').textContent = 'Relaxed';
+                initGame('relaxed', 'Easy');
             } else {
                 document.getElementById('ss-diff-select').style.display = 'flex';
                 document.getElementById('ss-game-container').style.display = 'none';
@@ -791,22 +837,73 @@ document.addEventListener('DOMContentLoaded', () => {
     initGame('daily');
 
     if (typeof renderCrossPromo === 'function') renderCrossPromo(GAME_ID);
+    if (typeof HintManager !== 'undefined') HintManager.init(GAME_ID);
 });
+
+/* === SHARE === */
+window.shareSS = function () {
+    const dayNum = getDailyNumber();
+    const isDaily = state.mode === 'daily';
+    const underLimit = state.movesLimit !== Infinity && state.movesMade < state.movesLimit;
+    const stars = underLimit ? '⭐⭐⭐ (under limit!)' : '';
+    let text = `📚 SortStack${isDaily ? ' Daily #' + dayNum : ''}\n`;
+    text += `✅ Solved in ${state.movesMade} moves\n`;
+    if (stars) text += `${stars}\n`;
+    text += 'puzzlevault.pages.dev/sortstack';
+    shareResult(text);
+};
+
+/* === HINT SYSTEM === */
+window.useSortStackHint = function () {
+    if (state.isGameOver) return;
+    if (state.animations.some(a => a.type === 'arc')) return;
+
+    const revealHint = () => {
+        state.hintsUsed++;
+        // Find a valid move: source tube with blocks -> destination with matching top or empty
+        for (let i = 0; i < state.stacks.length; i++) {
+            if (state.locked[i] || state.stacks[i].length === 0) continue;
+            const topColor = state.stacks[i][state.stacks[i].length - 1];
+            for (let j = 0; j < state.stacks.length; j++) {
+                if (i === j || state.locked[j]) continue;
+                if (state.stacks[j].length >= STACK_CAP_SIZE) continue;
+                if (state.stacks[j].length === 0 || state.stacks[j][state.stacks[j].length - 1] === topColor) {
+                    // Found valid move: highlight source and destination
+                    showToast(`💡 Move from tube ${i + 1} → tube ${j + 1}`);
+                    SFX.play('hint');
+                    // Brief visual highlight via selection
+                    state.selectedStack = i;
+                    setTimeout(() => {
+                        state.selectedStack = -1;
+                    }, 1500);
+                    return;
+                }
+            }
+        }
+        showToast('💡 No moves available!');
+    };
+
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(revealHint);
+    } else {
+        revealHint();
+    }
+};
 
 function renderDiffSelect() {
     const cont = document.getElementById('ss-diff-select');
     cont.innerHTML = `
         <button class="ss-diff-btn" onclick="startFreePlay('Easy')">
-            <strong>Easy</strong><span>4 colors (Unlimited moves)</span>
+            <strong>Easy</strong><span>3 colors · 5 tubes (Unlimited moves)</span>
         </button>
         <button class="ss-diff-btn" onclick="startFreePlay('Medium')">
-            <strong>Medium</strong><span>6 colors (Unlimited moves)</span>
+            <strong>Medium</strong><span>5 colors · 7 tubes (50 moves)</span>
         </button>
         <button class="ss-diff-btn" onclick="startFreePlay('Hard')">
-            <strong>Hard</strong><span>8 colors (40 moves limit)</span>
+            <strong>Hard</strong><span>7 colors · 9 tubes (40 moves)</span>
         </button>
         <button class="ss-diff-btn" onclick="startFreePlay('Expert')">
-            <strong>Expert</strong><span>10 colors (50 moves limit)</span>
+            <strong>Expert</strong><span>10 colors · 12 tubes (35 moves)</span>
         </button>
     `;
 }

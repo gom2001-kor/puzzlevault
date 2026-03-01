@@ -376,6 +376,8 @@
                         <span class="ss-daily-tag" id="ss-daily-tag" style="display:none"></span>
                     </div>
                     <div class="ss-icons">
+                        <button class="hint-btn" onclick="useSortStackHint()" aria-label="Hint" title="Hint">💡 Hint
+                            <span class="hint-sublabel">(Ad)</span></button>
                         <button class="ss-icon-btn" id="ss-btn-help" aria-label="Help">❓</button>
                         <button class="ss-icon-btn" id="ss-btn-stats" aria-label="Stats">📊</button>
                         <button class="ss-icon-btn" id="ss-btn-settings" aria-label="Sound">🔊</button>
@@ -384,8 +386,9 @@
 
                 <div class="ss-mode-tabs">
                     <div class="pv-tabs" id="ss-tabs">
+                        <button class="pv-tab" data-mode="free">Classic</button>
                         <button class="pv-tab active" data-mode="daily">Daily</button>
-                        <button class="pv-tab" data-mode="free">Free Play</button>
+                        <button class="pv-tab" data-mode="relaxed">Relaxed</button>
                     </div>
                 </div>
 
@@ -437,9 +440,13 @@
                 end of the line! This gives you progressively more workspace as you solve the puzzle.</p>
             <p><strong>Undo Freely:</strong> Made a mistake? Don't worry! You can use the Undo button as many times as
                 you like without penalties or ads. Experimentation is part of the fun.</p>
-            <p><strong>Move Limits:</strong> While Easy and Medium modes let you play casually with unlimited moves,
-                Hard and Expert difficulties test your efficiency by imposing a strict move limit. Plan your sorts
-                carefully!</p>
+            <p><strong>Hint System:</strong> Stuck? Use the 💡 Hint button to see the optimal next move. Your first hint
+                each session is free; subsequent hints require watching a reward ad. Hints do not count as a penalty —
+                but completing without hints earns a ×1.3 score bonus!</p>
+            <p><strong>Scoring:</strong> Clear a level for 500 base points. On levels with move limits, earn bonus
+                points for efficiency: (move_limit − moves_used) × 20. Complete without hints for a ×1.3 multiplier.</p>
+            <p><strong>Move Limits:</strong> Easy mode has unlimited moves. Medium has 50, Hard has 40, and Expert
+                has only 35. Plan your sorts carefully!</p>
         </section>
 
         <section class="pv-faq pv-container">
@@ -457,9 +464,10 @@
             </details>
             <details>
                 <summary>What are the different difficulty levels?</summary>
-                <p>SortStack offers four difficulties in Free Play: Easy (4 colors), Medium (6 colors), Hard (8 colors
-                    with a 40-move limit), and Expert (10 colors with a 50-move limit). Daily Challenge uses a
-                    pre-selected difficulty that changes every day.</p>
+                <p>SortStack offers four difficulties in Classic mode: Easy (3 colors, 5 tubes, unlimited moves),
+                    Medium (5 colors, 7 tubes, 50 moves), Hard (7 colors, 9 tubes, 40 moves), and Expert (10 colors,
+                    12 tubes, 35 moves). Relaxed mode removes move limits entirely. Daily Challenge uses a pre-selected
+                    difficulty that changes every day.</p>
             </details>
             <details>
                 <summary>Are all puzzles solvable?</summary>
