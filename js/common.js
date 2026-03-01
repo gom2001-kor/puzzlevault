@@ -318,6 +318,7 @@ function updateStreak(gameId) {
  */
 function renderMiniCrossPromo(currentGameId, container) {
     if (!container) return;
+    container.innerHTML = ''; // Prevent duplicate stacking on repeated calls
     const promoIds = CROSS_PROMO_MAP[currentGameId];
     if (!promoIds) return;
 

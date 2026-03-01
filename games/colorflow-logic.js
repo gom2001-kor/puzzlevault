@@ -740,7 +740,7 @@ window.useColorFlowHint = function () {
 
     const revealHint = () => {
         state.hintsUsed++;
-        // Find a disconnected color and highlight 3-4 cells of a path suggestion
+        // Find a disconnected color
         let hintColor = null;
         for (const p of state.puzzlePairs) {
             if (!isColorConnected(p[4])) {
@@ -753,24 +753,58 @@ window.useColorFlowHint = function () {
             return;
         }
 
-        // Highlight the two endpoints and 1-2 adjacent cells
         const pair = state.puzzlePairs.find(p => p[4] === hintColor);
         const startIdx = getIdx(pair[0], pair[1]);
         const endIdx = getIdx(pair[2], pair[3]);
-        const hintCells = [startIdx];
 
-        // BFS-like: find 2-3 cells from start toward end
-        const [sr, sc] = [pair[0], pair[1]];
-        const [er, ec] = [pair[2], pair[3]];
-        let cr = sr, cc = sc;
-        for (let step = 0; step < 3; step++) {
-            if (cr === er && cc === ec) break;
-            if (Math.abs(er - cr) >= Math.abs(ec - cc)) {
-                cr += (er > cr) ? 1 : -1;
-            } else {
-                cc += (ec > cc) ? 1 : -1;
+        // Determine where to start searching from:
+        // If path already partially drawn, start from the tip of the path
+        const currentPath = state.paths[hintColor] || [];
+        const searchFrom = currentPath.length > 0 ? currentPath[currentPath.length - 1] : startIdx;
+
+        // BFS to find shortest path from searchFrom to endIdx through empty cells
+        const visited = new Set();
+        visited.add(searchFrom);
+        const queue = [[searchFrom, [searchFrom]]];
+        let foundPath = null;
+
+        while (queue.length > 0) {
+            const [curr, path] = queue.shift();
+            if (curr === endIdx) {
+                foundPath = path;
+                break;
             }
-            hintCells.push(getIdx(cr, cc));
+
+            const [cr, cc] = getRC(curr);
+            const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+            for (const [dr, dc] of dirs) {
+                const nr = cr + dr;
+                const nc = cc + dc;
+                if (nr < 0 || nr >= state.size || nc < 0 || nc >= state.size) continue;
+                const nIdx = getIdx(nr, nc);
+                if (visited.has(nIdx)) continue;
+
+                const content = state.boardContent[nIdx];
+                // Can pass through: empty cells, target endpoint marker, own path cells
+                const isTarget = (nIdx === endIdx);
+                const isEmpty = (content.type === 'empty');
+                const isOwnPath = (content.type === 'path' && content.color === hintColor);
+                if (!isEmpty && !isTarget && !isOwnPath) continue;
+
+                visited.add(nIdx);
+                queue.push([nIdx, [...path, nIdx]]);
+            }
+        }
+
+        // Select cells to highlight (3-4 cells from the found path)
+        let hintCells = [];
+        if (foundPath && foundPath.length > 1) {
+            // Show 3-4 cells from the path (skip searchFrom if it's already placed)
+            const skipFirst = currentPath.length > 0 ? 1 : 0;
+            hintCells = foundPath.slice(skipFirst, skipFirst + 4);
+        } else {
+            // Fallback: just highlight the two endpoints
+            hintCells = [startIdx, endIdx];
         }
 
         // Highlight with golden pulse
@@ -786,7 +820,7 @@ window.useColorFlowHint = function () {
             }
         });
         SFX.play('hint');
-        showToast('💡 Try connecting this path!');
+        showToast('💡 Follow the highlighted path!');
     };
 
     if (typeof HintManager !== 'undefined') {
