@@ -50,6 +50,9 @@ let H = {
     continueUsed: false,
     hintCells: [],      // [{q,r,s}] cells to highlight
     hintTimer: 0,       // frames remaining for hint glow
+    hintsUsed: 0,
+    bombsUsed: 0,
+    bestChain: 0,
     rng: null
 };
 
@@ -258,6 +261,7 @@ function triggerBomb(bq, br) {
     // Score
     const pts = destroyed.length * 20;
     H.score += pts;
+    H.bombsUsed++;
     showScorePopup(bq, br, pts);
     if (typeof SFX !== 'undefined') SFX.play('combo');
     // Gravity + fill
@@ -469,7 +473,7 @@ function findHint() {
                     }
                 }
             }
-            if (group.length >= 3) return group;
+            if (group.length >= 4) return group;
         }
     }
     return null;
@@ -477,13 +481,23 @@ function findHint() {
 
 function showHint() {
     if (H.state !== GameState.IDLE) return;
-    const hint = findHint();
-    if (hint) {
-        H.hintCells = hint;
-        H.hintTimer = 120; // ~2 seconds at 60fps
-        if (typeof SFX !== 'undefined') SFX.play('correct');
+
+    const doHint = () => {
+        H.hintsUsed++;
+        const hint = findHint();
+        if (hint) {
+            H.hintCells = hint;
+            H.hintTimer = 120;
+            if (typeof SFX !== 'undefined') SFX.play('hint');
+        } else {
+            showShufflePrompt();
+        }
+    };
+
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(doHint);
     } else {
-        showShufflePrompt();
+        doHint();
     }
 }
 
@@ -497,6 +511,7 @@ function processTurn(selectedCells) {
     if (count >= 7) pts = 600;
     else pts = SCORE_TABLE[count] || 30;
     H.score += pts;
+    H.bestChain = Math.max(H.bestChain, count);
 
     const midCell = selectedCells[Math.floor(count / 2)];
     showScorePopup(midCell.q, midCell.r, pts);
@@ -878,9 +893,23 @@ function gameOver() {
 
     showResult();
 
-    if (typeof AdController !== 'undefined') {
-        setTimeout(() => AdController.showInterstitial(), 800);
-    }
+    // Render mini cross-promo in result card
+    setTimeout(() => {
+        const promoContainer = document.getElementById('hx-mini-promo');
+        if (promoContainer && typeof renderMiniCrossPromo === 'function') {
+            renderMiniCrossPromo('hexmatch', promoContainer);
+        }
+    }, 100);
+
+    // Ad refresh
+    if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
+
+    // Show interstitial after 2s delay
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 function continueGame() {
@@ -929,13 +958,17 @@ function showResult() {
             <button class="pv-btn pv-btn-primary" onclick="shareResultHX()">📤 Share</button>
             <button class="pv-btn pv-btn-secondary" onclick="document.getElementById('hx-result').classList.remove('open'); startGame()">🔄 Play Again</button>
         </div>
+        <div id="hx-mini-promo" style="margin-top:12px"></div>
     `;
     overlay.classList.add('open');
 }
 
 function shareResultHX() {
-    let flag = H.continueUsed ? ' 🔄' : '';
-    let text = `⬡ HexMatch${flag}\nScore: ${formatNumber(H.score)}\nTurns: ${H.turn}\npuzzlevault.pages.dev/games/hexmatch`;
+    let text = `⬡ HexMatch\n`;
+    text += `Score: ${formatNumber(H.score)}\n`;
+    if (H.bombsUsed > 0) text += `💣×${H.bombsUsed} Bombs used\n`;
+    text += `Best chain: ${H.bestChain}\n`;
+    text += 'puzzlevault.pages.dev/hexmatch';
     if (typeof shareResult === 'function') shareResult(text);
     else navigator.clipboard.writeText(text).then(() => alert('Copied!'));
 }
@@ -975,6 +1008,9 @@ function startGame() {
     H.hintTimer = 0;
     H.state = GameState.IDLE;
     H.bestScore = parseInt(localStorage.getItem('pv_hexmatch_best') || '0');
+    H.hintsUsed = 0;
+    H.bombsUsed = 0;
+    H.bestChain = 0;
 
     // Track games played
     const played = parseInt(localStorage.getItem('pv_hexmatch_played') || '0');
@@ -1012,6 +1048,9 @@ function initHexMatch() {
     }
 
     startGame();
+
+    if (typeof renderCrossPromo === 'function') renderCrossPromo('hexmatch');
+    if (typeof HintManager !== 'undefined') HintManager.init('hexmatch');
 }
 
 // Boot
