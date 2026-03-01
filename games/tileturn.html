@@ -551,8 +551,10 @@
 
         <!-- Result Modal (Level Complete) -->
         <div class="pv-modal" id="tt-result-modal">
-            <div class="pv-modal-backdrop"></div>
+            <div class="pv-modal-backdrop"
+                onclick="document.getElementById('tt-result-modal').classList.remove('open')"></div>
             <div class="pv-modal-content">
+                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
                 <h2 style="font-size:1.8rem; margin-bottom:8px;">Level Cleared!</h2>
                 <div class="tt-res-stars" id="tt-res-stars">⭐⭐⭐</div>
                 <div class="tt-res-msg" id="tt-res-msg">Perfect! Solved in minimum moves.</div>

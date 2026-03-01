@@ -548,8 +548,10 @@
 
         <!-- Result Modal -->
         <div class="pv-modal" id="pl-result-modal">
-            <div class="pv-modal-backdrop"></div>
+            <div class="pv-modal-backdrop"
+                onclick="document.getElementById('pl-result-modal').classList.remove('open')"></div>
             <div class="pv-modal-content">
+                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
                 <h2 style="font-size:1.8rem; margin-bottom:4px; color:white;">Circuit Online!</h2>
                 <div class="pl-res-stars" id="pl-res-stars">⭐⭐⭐</div>
                 <div class="pl-res-msg" id="pl-res-msg">Perfect Connection!</div>

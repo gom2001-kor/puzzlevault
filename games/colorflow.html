@@ -714,8 +714,10 @@
 
         <!-- Result Modal -->
         <div class="pv-modal" id="cf-result-modal">
-            <div class="pv-modal-backdrop"></div>
+            <div class="pv-modal-backdrop"
+                onclick="document.getElementById('cf-result-modal').classList.remove('open')"></div>
             <div class="pv-modal-content">
+                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
                 <h2 style="font-size:1.8rem; margin-bottom:4px;">Circuit Complete!</h2>
                 <div class="cf-res-stars" id="cf-res-stars">⭐⭐⭐</div>
                 <div class="cf-res-msg" id="cf-res-msg">Perfect Coverage!</div>
