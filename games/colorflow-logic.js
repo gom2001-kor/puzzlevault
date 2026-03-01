@@ -223,6 +223,12 @@ function buildBoardDOM() {
     const gap = 2; // match css
     const cellSize = Math.floor((containerWidth - (gap * (state.size - 1))) / state.size);
 
+    // Remove old listeners to prevent duplicates on level transitions
+    grid.removeEventListener('pointerdown', handlePointerDown);
+    grid.removeEventListener('pointermove', handlePointerMove);
+    grid.removeEventListener('pointerup', handlePointerUp);
+    grid.removeEventListener('pointercancel', handlePointerUp);
+
     // Bind pointer events on the grid wrapper for smoother continuous drawing
     grid.addEventListener('pointerdown', handlePointerDown);
     grid.addEventListener('pointermove', handlePointerMove);
@@ -354,24 +360,11 @@ function handlePointerDown(e) {
     if (content.type === 'marker') {
         const col = content.color;
 
-        saveSnapshot();
-
-        // If already connected, tapping the marker again breaks the path according to prompt instructions
-        if (isColorConnected(col)) {
-            clearPath(col);
-            SFX.play('tap');
-            return;
-        }
-
-        // Start drawing from this marker
+        // Set drag start state — don't clear path immediately.
+        // Path will only be cleared once user actually drags to a new cell (in handlePointerMove).
         state.activeColor = col;
         state.isDragging = true;
-
-        // Reset existing path if starting from a marker that has a path
-        clearPath(col);
-
-        // Initialize path
-        state.paths[col].push(idx);
+        state._pendingClear = true; // Flag: clear on first move
         state.lastDrawnIdx = idx;
         SFX.play('tap');
     }
@@ -386,9 +379,6 @@ function handlePointerMove(e) {
 
     const col = state.activeColor;
 
-    // Stop drawing if path is already completed
-    if (isColorConnected(col)) return;
-
     // Check adjacency (Manhattan limit = 1)
     const [lr, lc] = getRC(state.lastDrawnIdx);
     const [cr, cc] = getRC(idx);
@@ -397,6 +387,17 @@ function handlePointerMove(e) {
         // Did we jump or move diagonally?
         return;
     }
+
+    // Deferred clear: only clear the old path once user actually drags to a new cell
+    if (state._pendingClear) {
+        saveSnapshot();
+        clearPath(col);
+        state.paths[col].push(state.lastDrawnIdx);
+        state._pendingClear = false;
+    }
+
+    // Stop drawing if path is already completed
+    if (isColorConnected(col)) return;
 
     const targetContent = state.boardContent[idx];
 
@@ -461,6 +462,8 @@ function handlePointerMove(e) {
 
 function handlePointerUp(e) {
     if (state.isDragging) {
+        // If user just tapped a marker without dragging, don't clear the path
+        state._pendingClear = false;
         state.isDragging = false;
         state.activeColor = null;
         state.lastDrawnIdx = -1;
