@@ -226,12 +226,14 @@
         <div class="pp-page">
             <div class="pp-main">
                 <div class="pp-top-bar">
-                    <div class="pp-title"><span>🎯</span><span>PatternPop</span><span class="pp-daily-tag"
+                    <div class="pp-title"><span>🧠</span><span>PatternPop</span><span class="pp-daily-tag"
                             id="pp-daily-tag" style="display:none"></span></div>
                     <div class="pp-icons">
                         <button class="pp-icon-btn" id="pp-btn-restart"
                             style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px"
                             aria-label="Restart">Restart</button>
+                        <button class="hint-btn" onclick="usePatternPopHint()" aria-label="Hint" title="Hint">💡 Hint
+                            <span class="hint-sublabel">(Ad)</span></button>
                         <button class="pp-icon-btn" id="pp-btn-sound" aria-label="Sound">🔊</button>
                     </div>
                 </div>
@@ -250,8 +252,10 @@
                     </div>
                 </div>
                 <div class="pv-tabs" id="pp-tabs" style="margin-bottom:12px">
-                    <button class="pv-tab active" data-mode="endless">Endless</button>
+                    <button class="pv-tab active" data-mode="classic">Classic</button>
                     <button class="pv-tab" data-mode="daily">Daily</button>
+                    <button class="pv-tab" data-mode="endless">Endless</button>
+                    <button class="pv-tab" data-mode="speed">Speed</button>
                 </div>
                 <div class="pp-phase-banner" id="pp-phase">MEMORIZE</div>
                 <div class="pp-canvas-wrap">
@@ -298,16 +302,16 @@
             <p>The game starts easy with a small 3×3 grid and just a few highlighted cells. As you progress, the grid
                 expands to 4×4, 5×5, and eventually 6×6, and more cells light up each round. You'll need sharp focus and
                 a keen eye to keep up.</p>
-            <p>Starting from Round 10, PatternPop introduces its unique Decoy Flash mechanic. During the memorize phase,
-                extra cells flash briefly in a lighter shade. These decoys are designed to trick your memory — tap one
-                during recall and you'll lose a life! The key is to notice the shorter flash duration and lighter color
-                of decoys compared to real targets.</p>
-            <p>You start with 3 lives (hearts). Each wrong tap costs one life. When all lives are gone, the game ends.
-                Score points for each correct tap, with bonus multipliers for completing rounds quickly and accurately.
-                The further you go, the higher your score climbs.</p>
-            <p>Strategic tip: focus on the spatial relationships between highlighted cells rather than individual
-                positions. Group them into shapes or patterns in your mind. When decoys start appearing, pay extra
-                attention to how long each cell stays lit — real targets shine longer and brighter!</p>
+            <p>Starting from Round 5, PatternPop introduces its unique Decoy Flash mechanic. During the memorize phase,
+                1-2 extra cells flash briefly with a red tint. These decoys are designed to trick your memory — tap one
+                during recall and you'll lose a life! The key is to spot the red-tinted border on decoy flashes vs the
+                blue real targets.</p>
+            <p>Score 100 points per correct sequence, multiplied by the sequence length. Complete a round with less than
+                0.5 seconds per tap and no mistakes for a Perfect Round (×2 bonus). Your longest streak is tracked
+                across
+                games.</p>
+            <p>Choose from 4 modes: Classic (3 lives, increasing difficulty), Daily (seeded sequence, one attempt),
+                Endless (no lives, see how far you get), or Speed (tiles flash faster each round).</p>
         </section>
         <section class="pv-faq pv-container">
             <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
@@ -318,26 +322,27 @@
             </details>
             <details>
                 <summary>What are decoy flashes?</summary>
-                <p>Starting from Round 10, extra cells flash briefly during the memorize phase in a lighter blue color.
-                    These "decoys" only appear for 0.3 seconds — much shorter than real target cells. If you tap a decoy
-                    position during recall, you'll lose a life!</p>
+                <p>Starting from Round 5, 1-2 extra cells flash briefly during the memorize phase with a red tint.
+                    These "decoys" must be ignored — only remember the blue flashes! If you tap a decoy during recall,
+                    you'll lose a life. Decoy count increases with difficulty.</p>
             </details>
             <details>
                 <summary>How is the score calculated?</summary>
-                <p>You earn points for each correctly recalled cell. Bonus points are awarded for completing a round
-                    without mistakes (perfect round bonus) and for speed. Higher rounds give more points per cell due to
-                    increasing difficulty.</p>
+                <p>Each correct sequence earns 100 × sequence_length points. Complete a round with less than 0.5s per
+                    tap and no mistakes to get a Perfect Round (×2 bonus). Your longest streak is tracked across all
+                    games.</p>
             </details>
             <details>
                 <summary>Can I get more lives?</summary>
-                <p>You can watch a reward ad to gain +1 life and restart the current round. This can only be used once
-                    per game, so save it for when you really need it!</p>
+                <p>Use the 💡 Hint button to replay the pattern at 50% slower speed. Your first hint each session
+                    is free; subsequent hints require watching a reward ad. The hint does not add to the sequence or
+                    change difficulty.</p>
             </details>
             <details>
                 <summary>What's the difference between Daily and Endless modes?</summary>
-                <p>Daily mode uses a seed-based pattern sequence, so everyone gets the same puzzle each day — great for
-                    comparing scores with friends. Endless mode generates random patterns each time for unlimited
-                    practice.</p>
+                <p>Classic: 3 lives, increasing difficulty. Daily: seeded sequence everyone shares, one attempt per day.
+                    Endless: no lives limit, see how far you can go. Speed: tiles flash faster each round, testing your
+                    reaction time.</p>
             </details>
         </section>
         <div class="cross-promo pv-container"></div>

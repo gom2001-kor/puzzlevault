@@ -49,10 +49,10 @@ function getTargetCount(round) {
     return Math.min(Math.floor(round * 0.8 + 2), 18);
 }
 
-/* === DECOY COUNT (round 10+) === */
+/* === DECOY COUNT (round 5+) === */
 function getDecoyCount(round) {
-    if (round < 10) return 0;
-    return Math.min(Math.floor((round - 9) * 0.6 + 1), 8);
+    if (round < 5) return 0;
+    return Math.min(Math.floor((round - 4) * 0.5 + 1), 4);
 }
 
 /* === MEMORIZE TIME === */
@@ -123,8 +123,8 @@ function drawGrid() {
                 fillColor = '#2563EB';
                 borderColor = '#1D4ED8';
             } else if (state === 'decoy') {
-                fillColor = '#60A5FA';
-                borderColor = '#3B82F6';
+                fillColor = '#FCA5A5'; // red tint for decoys
+                borderColor = '#F43F5E';
             } else if (state === 'correct') {
                 fillColor = '#059669';
                 borderColor = '#047857';
@@ -189,7 +189,11 @@ function updateUI() {
     document.getElementById('pp-round').textContent = G.round;
     document.getElementById('pp-score').textContent = formatNumber(G.score);
     let hearts = '';
-    for (let i = 0; i < G.maxLives; i++) hearts += i < G.lives ? '❤️' : '🖤';
+    if (G.maxLives > 0 && G.maxLives < 10) {
+        for (let i = 0; i < G.maxLives; i++) hearts += i < G.lives ? '❤️' : '🖤';
+    } else if (G.mode === 'endless') {
+        hearts = '♾️';
+    }
     document.getElementById('pp-lives').textContent = hearts;
 }
 
@@ -368,16 +372,17 @@ function endRound(success) {
     drawGrid();
 
     if (success) {
-        // Calculate score
+        // Calculate score: 100 × sequence_length
         const elapsed = (Date.now() - G.roundStartTime) / 1000;
-        const basePoints = G.targets.length * 10 * (1 + (G.round - 1) * 0.15);
-        const perfectBonus = G.tappedWrong === 0 ? 50 * G.round : 0;
-        const speedBonus = Math.max(0, (5 - elapsed) * 10);
-        const roundScore = Math.round(basePoints + perfectBonus + speedBonus);
+        const avgTapTime = elapsed / G.targets.length;
+        const basePoints = 100 * G.targets.length;
+        // Perfect round bonus: < 0.5s per tap = ×2
+        const perfectMult = (avgTapTime < 0.5 && G.tappedWrong === 0) ? 2 : 1;
+        const roundScore = Math.round(basePoints * perfectMult);
         G.score += roundScore;
         G.decoysDodged += G.decoys.length;
 
-        showToast(`+${formatNumber(roundScore)} pts${G.tappedWrong === 0 ? ' ✨ Perfect!' : ''}`);
+        showToast(`+${formatNumber(roundScore)} pts${perfectMult > 1 ? ' ✨ Perfect!' : ''}`);
 
         // Save best
         if (G.round > G.bestRound) {
@@ -422,8 +427,6 @@ function endGame() {
 
 /* === GAME OVER POPUP === */
 function showGameOver() {
-    if (G.mode !== 'daily') AdController.showInterstitial();
-
     const statsEl = document.getElementById('pp-go-stats');
     statsEl.innerHTML = `
       <div style="text-align:center"><div style="font-size:1.4rem;font-weight:800">${G.round}</div><div style="font-size:.65rem;color:var(--pv-text-secondary)">ROUND</div></div>
@@ -437,27 +440,51 @@ function showGameOver() {
     document.getElementById('pp-go-title').style.color = 'var(--pv-coral)';
     document.getElementById('pp-go-sub').textContent = 'No lives remaining!';
 
+    // Mini cross-promo inside result modal
     const popup = document.getElementById('pp-gameover');
+    let promoDiv = popup.querySelector('.mini-cross-promo');
+    if (promoDiv) promoDiv.remove();
+    if (typeof renderMiniCrossPromo === 'function') {
+        renderMiniCrossPromo('patternpop', statsEl.parentElement);
+    }
+
     popup.style.display = 'flex';
     popup.classList.add('open');
+
+    // Show interstitial after 2s delay
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 function closeGameOver() {
     const popup = document.getElementById('pp-gameover');
     popup.classList.remove('open');
     popup.style.display = 'none';
+    if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
 }
 
 /* === SHARE === */
 function sharePP() {
     const dayNum = getDailyNumber();
     const isDaily = G.mode === 'daily';
-    let text = `🎯 PatternPop${isDaily ? ' Daily #' + dayNum : ''}\n`;
-    text += `Round ${G.round} · ${formatNumber(G.score)} pts\n`;
-    text += `Best: Round ${G.bestRound}\n`;
-    if (G.decoysDodged > 0) text += `Decoys dodged: ${G.decoysDodged} 🛡️\n`;
-    // Emoji summary of last few rounds
-    text += '\npuzzlevault.pages.dev/games/patternpop';
+    let text = `🧠 PatternPop${isDaily ? ' Daily #' + dayNum : ''}\n`;
+    text += `Level ${G.round} 🔥\n`;
+    text += `Longest streak: ${G.bestRound}\n`;
+    // Emoji grid showing progress (filled squares up to round)
+    const maxCols = 5;
+    const totalCells = Math.min(G.round, 25);
+    for (let i = 0; i < totalCells; i++) {
+        text += '🟦';
+        if ((i + 1) % maxCols === 0 && i < totalCells - 1) text += '\n';
+    }
+    const remaining = maxCols - (totalCells % maxCols);
+    if (remaining < maxCols) {
+        for (let i = 0; i < remaining; i++) text += '⬜';
+    }
+    text += '\npuzzlevault.pages.dev/patternpop';
     shareResult(text);
 }
 
@@ -473,9 +500,26 @@ function switchMode(mode) {
 
     if (mode === 'daily') {
         G.rng = new SeededRandom(getDailySeed('patternpop'));
+        G.lives = 3;
+        G.maxLives = 3;
         const tag = document.getElementById('pp-daily-tag');
         tag.style.display = 'inline';
         tag.textContent = 'Daily #' + getDailyNumber();
+    } else if (mode === 'classic') {
+        G.rng = null;
+        G.lives = 3;
+        G.maxLives = 3;
+        document.getElementById('pp-daily-tag').style.display = 'none';
+    } else if (mode === 'endless') {
+        G.rng = null;
+        G.lives = 999;
+        G.maxLives = 0; // hide hearts
+        document.getElementById('pp-daily-tag').style.display = 'none';
+    } else if (mode === 'speed') {
+        G.rng = null;
+        G.lives = 1;
+        G.maxLives = 1;
+        document.getElementById('pp-daily-tag').style.display = 'none';
     } else {
         G.rng = null;
         document.getElementById('pp-daily-tag').style.display = 'none';
@@ -528,5 +572,57 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cross promo
     if (typeof renderCrossPromo === 'function') renderCrossPromo('patternpop');
 
-    switchMode('endless');
+    // Initialize HintManager
+    if (typeof HintManager !== 'undefined') HintManager.init('patternpop');
+
+    switchMode('classic');
 });
+
+/* === HINT SYSTEM: Replay pattern at 50% slower speed === */
+function usePatternPopHint() {
+    if (G.phase !== 'recall') return;
+
+    const replayHint = () => {
+        G.phase = 'memorize'; // Briefly switch to show pattern
+        setPhaseBanner('memorize');
+
+        // Show targets at 50% slower (1.5× normal mem time)
+        G.targets.forEach(t => {
+            G.cellStates[t.r][t.c] = 'target';
+        });
+        drawGrid();
+        SFX.play('hint');
+
+        const slowTime = getMemorizeTime(G.round) * 1.5 * 1000;
+
+        // Show decoys if applicable
+        if (G.decoys.length > 0) {
+            const decoyDelay = slowTime * 0.4;
+            setTimeout(() => {
+                if (G.phase !== 'memorize') return;
+                G.decoys.forEach(d => {
+                    G.cellStates[d.r][d.c] = 'decoy';
+                });
+                drawGrid();
+                setTimeout(() => {
+                    if (G.phase !== 'memorize') return;
+                    G.decoys.forEach(d => {
+                        G.cellStates[d.r][d.c] = null;
+                    });
+                    drawGrid();
+                }, 450); // slower decoy display
+            }, decoyDelay);
+        }
+
+        setTimeout(() => {
+            if (G.phase !== 'memorize') return;
+            startRecallPhase();
+        }, slowTime);
+    };
+
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(replayHint);
+    } else {
+        replayHint();
+    }
+}
