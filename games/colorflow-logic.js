@@ -1,15 +1,12 @@
 const GAME_ID = 'colorflow';
 
-// Standard 8 packs
+// 5 packs per SKILL.md
 const PACKS = [
-    { id: 1, size: 5, levels: 30, desc: "5×5 Beginner" },
-    { id: 2, size: 6, levels: 30, desc: "6×6 Simple" },
-    { id: 3, size: 7, levels: 30, desc: "7×7 Intermediate" },
-    { id: 4, size: 8, levels: 30, desc: "8×8 Advanced" },
-    { id: 5, size: 9, levels: 30, desc: "9×9 Expert" },
-    { id: 6, size: 10, levels: 30, desc: "10×10 Master" },
-    { id: 7, size: 12, levels: 30, desc: "12×12 Grandmaster" },
-    { id: 8, size: 14, levels: 30, desc: "14×14 Insane" }
+    { id: 1, size: 5, levels: 30, pairs: [4, 5], desc: "5×5 Beginner" },
+    { id: 2, size: 6, levels: 30, pairs: [5, 6], desc: "6×6 Simple" },
+    { id: 3, size: 7, levels: 30, pairs: [6, 8], desc: "7×7 Intermediate" },
+    { id: 4, size: 8, levels: 30, pairs: [8, 10], desc: "8×8 Advanced" },
+    { id: 5, size: 9, levels: 30, pairs: [10, 12], desc: "9×9 Expert" }
 ];
 
 let state = {
@@ -18,9 +15,9 @@ let state = {
     size: 5,
     isPlaying: false,
 
-    puzzlePairs: [], // [{r1, c1, r2, c2, color}]
-    boardContent: [], // 1D array of {type: 'empty'|'marker'|'path', color: int, pathConnections: []}
-    paths: {}, // Map of color -> array of grid indices
+    puzzlePairs: [],
+    boardContent: [],
+    paths: {},
 
     colorsPresent: 0,
     coverage: 0,
@@ -29,13 +26,16 @@ let state = {
     activeColor: null,
     isDragging: false,
     lastDrawnIdx: -1,
-    history: []
+    history: [],
+    hintsUsed: 0,
+    startTime: 0
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     initUIEvents();
     renderPacks();
     if (typeof renderCrossPromo === 'function') renderCrossPromo(GAME_ID);
+    if (typeof HintManager !== 'undefined') HintManager.init(GAME_ID);
 
     const soundBtn = document.getElementById('cf-btn-settings');
     if (soundBtn) soundBtn.textContent = localStorage.getItem('pv_sound') === 'off' ? '🔇' : '🔊';
@@ -185,6 +185,8 @@ function startLevel(packId, levelIdx) {
     state.isDragging = false;
     state.lastDrawnIdx = -1;
     state.history = [];
+    state.hintsUsed = 0;
+    state.startTime = Date.now();
 
     // Load puzzle
     const puzzle = getLevelData(state.size, levelIdx);
@@ -622,21 +624,19 @@ function checkWinState() {
     if (state.coverage === 100) stars = 3;
     else if (state.coverage >= 80) stars = 2;
 
-    // Calculate Score & Flow Bonus
-    let baseScore = state.coverage * 10;
-    let flowBonus = 0;
+    // Calculate Score per SKILL.md: 200 base + coverage%×5 + speed bonus + no-hint ×1.3
+    let baseScore = 200;
+    let coverageBonus = Math.round(state.coverage * 5);
+    let elapsed = Math.round((Date.now() - state.startTime) / 1000);
+    let timeLimit = state.size * state.size * 3; // generous time limit
+    let speedBonus = Math.max(0, (timeLimit - elapsed) * 2);
+    let totalScore = baseScore + coverageBonus + speedBonus;
 
-    state.puzzlePairs.forEach(p => {
-        const color = p[4];
-        const distM = getManhattanDist(p[0], p[1], p[2], p[3]);
-        const actualPathLen = state.paths[color].length - 1; // path array includes both markers
+    // Flow Bonus: 100% coverage = 2× score
+    if (state.coverage === 100) totalScore *= 2;
 
-        if (actualPathLen <= distM * 1.5) {
-            flowBonus += 50;
-        }
-    });
-
-    let totalScore = baseScore + flowBonus;
+    // No-hint bonus: ×1.3
+    if (state.hintsUsed === 0) totalScore = Math.round(totalScore * 1.3);
 
     // Save
     const progress = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_progress`)) || {};
@@ -648,20 +648,34 @@ function checkWinState() {
     }
 
     // Modal
-    document.getElementById('cf-res-cov-score').textContent = baseScore;
-    document.getElementById('cf-res-eff-score').textContent = `+${flowBonus}`;
+    document.getElementById('cf-res-cov-score').textContent = `${coverageBonus}`;
+    document.getElementById('cf-res-eff-score').textContent = `+${speedBonus}`;
     document.getElementById('cf-res-total').textContent = totalScore;
 
     let sHtml = '';
-    if (stars === 3) { sHtml = '⭐⭐⭐'; document.getElementById('cf-res-msg').textContent = 'Perfect Coverage!'; }
-    else if (stars === 2) { sHtml = '⭐⭐<span class="cf-star-empty">★</span>'; document.getElementById('cf-res-msg').textContent = 'Great! Try to cover more cells.'; }
-    else { sHtml = '⭐<span class="cf-star-empty">★★</span>'; document.getElementById('cf-res-msg').textContent = 'Cleared! Focus on full grid coverage next time.'; }
+    if (stars === 3) { sHtml = '⭐⭐⭐'; document.getElementById('cf-res-msg').textContent = `Perfect Coverage! Score: ${totalScore}`; }
+    else if (stars === 2) { sHtml = '⭐⭐<span class="cf-star-empty">★</span>'; document.getElementById('cf-res-msg').textContent = `Great! ${state.coverage}% coverage. Score: ${totalScore}`; }
+    else { sHtml = '⭐<span class="cf-star-empty">★★</span>'; document.getElementById('cf-res-msg').textContent = `Cleared! ${state.coverage}% coverage. Score: ${totalScore}`; }
 
     document.getElementById('cf-res-stars').innerHTML = sHtml;
 
+    // Render mini cross-promo
+    const promoContainer = document.getElementById('cf-mini-promo');
+    if (promoContainer && typeof renderMiniCrossPromo === 'function') {
+        renderMiniCrossPromo(GAME_ID, promoContainer);
+    }
+
     document.getElementById('cf-result-modal').classList.add('open');
 
-    if (state.levelIdx % 10 === 0 && window.AdController) AdController.showInterstitial();
+    // Ad refresh
+    if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
+
+    // Show interstitial after 2s delay
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 // ---------------------------
@@ -702,3 +716,79 @@ function showStatsModal() {
 
     document.getElementById('cf-stats-modal').classList.add('open');
 }
+
+/* === SHARE === */
+window.shareCF = function () {
+    let text = `🎨 ColorFlow Pack ${state.packId} Level ${state.levelIdx}\n`;
+    const stars = state.coverage === 100 ? '⭐⭐⭐' : state.coverage >= 80 ? '⭐⭐' : '⭐';
+    text += `${stars} ${state.coverage}% Coverage!\n`;
+    const elapsed = Math.round((Date.now() - state.startTime) / 1000);
+    const mins = Math.floor(elapsed / 60);
+    const secs = elapsed % 60;
+    text += `Time: ${mins}:${String(secs).padStart(2, '0')}`;
+    if (state.hintsUsed === 0) text += ' | No hints';
+    text += '\npuzzlevault.pages.dev/colorflow';
+    if (typeof shareResult === 'function') shareResult(text);
+};
+
+/* === HINT SYSTEM === */
+window.useColorFlowHint = function () {
+    if (!state.isPlaying) return;
+
+    const revealHint = () => {
+        state.hintsUsed++;
+        // Find a disconnected color and highlight 3-4 cells of a path suggestion
+        let hintColor = null;
+        for (const p of state.puzzlePairs) {
+            if (!isColorConnected(p[4])) {
+                hintColor = p[4];
+                break;
+            }
+        }
+        if (hintColor === null) {
+            showToast('🎉 All pairs connected!');
+            return;
+        }
+
+        // Highlight the two endpoints and 1-2 adjacent cells
+        const pair = state.puzzlePairs.find(p => p[4] === hintColor);
+        const startIdx = getIdx(pair[0], pair[1]);
+        const endIdx = getIdx(pair[2], pair[3]);
+        const hintCells = [startIdx];
+
+        // BFS-like: find 2-3 cells from start toward end
+        const [sr, sc] = [pair[0], pair[1]];
+        const [er, ec] = [pair[2], pair[3]];
+        let cr = sr, cc = sc;
+        for (let step = 0; step < 3; step++) {
+            if (cr === er && cc === ec) break;
+            if (Math.abs(er - cr) >= Math.abs(ec - cc)) {
+                cr += (er > cr) ? 1 : -1;
+            } else {
+                cc += (ec > cc) ? 1 : -1;
+            }
+            hintCells.push(getIdx(cr, cc));
+        }
+
+        // Highlight with golden pulse
+        hintCells.forEach(idx => {
+            const cell = document.getElementById(`cf-cell-${idx}`);
+            if (cell) {
+                cell.style.boxShadow = '0 0 10px 3px #D97706';
+                cell.style.border = '2px solid #D97706';
+                setTimeout(() => {
+                    cell.style.boxShadow = '';
+                    cell.style.border = '';
+                }, 2500);
+            }
+        });
+        SFX.play('hint');
+        showToast('💡 Try connecting this path!');
+    };
+
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(revealHint);
+    } else {
+        revealHint();
+    }
+};

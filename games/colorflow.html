@@ -16,7 +16,7 @@
     <meta property="og:description"
         content="Draw vibrant paths to connect diamonds across hundreds of logical puzzles. Can you achieve 100% flow coverage?">
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
-    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="/css/global.css">
 
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"VideoGame","name":"ColorFlow","description":"Connect pairs of diamond markers with colored energy paths while aiming for maximum grid coverage.","url":"https://puzzlevault.pages.dev/games/colorflow","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
@@ -622,6 +622,8 @@
                         <span>🎨</span><span>ColorFlow</span>
                     </div>
                     <div class="cf-icons">
+                        <button class="hint-btn" onclick="useColorFlowHint()" aria-label="Hint" title="Hint">💡 Hint
+                            <span class="hint-sublabel">(Ad)</span></button>
                         <button class="cf-icon-btn" id="cf-btn-help" aria-label="Help">❓</button>
                         <button class="cf-icon-btn" id="cf-btn-settings" aria-label="Sound">🔊</button>
                         <button class="cf-icon-btn" id="cf-btn-stats" aria-label="Stats">📊</button>
@@ -719,19 +721,21 @@
                 <div class="cf-res-msg" id="cf-res-msg">Perfect Coverage!</div>
 
                 <div class="cf-score-breakdown">
-                    <div class="cf-score-row"><span>Coverage Score:</span> <strong id="cf-res-cov-score">1000</strong>
+                    <div class="cf-score-row"><span>Coverage Bonus:</span> <strong id="cf-res-cov-score">500</strong>
                     </div>
-                    <div class="cf-score-row"><span style="color:var(--pv-amber)">Flow Efficiency Bonus:</span> <strong
-                            id="cf-res-eff-score">+150</strong></div>
+                    <div class="cf-score-row"><span style="color:var(--pv-amber)">Speed Bonus:</span> <strong
+                            id="cf-res-eff-score">+100</strong></div>
                     <hr style="border:0; border-top:1px solid var(--pv-border); margin: 8px 0;">
-                    <div class="cf-score-row" style="font-size: 1.1rem;"><span>Total Points:</span> <strong
-                            id="cf-res-total" style="color:var(--pv-emerald)">1150</strong></div>
+                    <div class="cf-score-row" style="font-size: 1.1rem;"><span>Total:</span> <strong id="cf-res-total"
+                            style="color:var(--pv-emerald)">1300</strong></div>
                 </div>
 
                 <button class="btn-primary" id="cf-btn-next">Next Puzzle</button>
+                <button class="btn-secondary" onclick="shareCF()">📤 Share</button>
                 <button class="btn-secondary"
                     onclick="document.getElementById('cf-result-modal').classList.remove('open')">View Board</button>
                 <button class="btn-secondary" id="cf-btn-result-packs">Back to Packs</button>
+                <div id="cf-mini-promo" style="margin-top:12px"></div>
             </div>
         </div>
 
@@ -756,36 +760,55 @@
         <!-- Cross Promo & Footer Area -->
         <section class="game-guide pv-container" style="margin-top:40px;">
             <h2>How to Play ColorFlow 🎨</h2>
-            <p>ColorFlow is an elegant pathing logic puzzle. Match up identically colored diamond markers with sweeping
-                energetic paths without leaving any tile uncolored.</p>
+            <p>ColorFlow is a path connection puzzle. Connect matching colored dot pairs by drawing paths across
+                the grid. Paths cannot cross or overlap!</p>
 
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">🔶 The Rules</h3>
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">🎯 Drawing Paths</h3>
             <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
-                <li>Drag from any diamond marker to begin charting a path. Use lateral horizontal or vertical moves
-                    only.</li>
-                <li>Connect the path to the other diamond of the exact same color to secure the connection. The line
-                    will illuminate vividly when securely locked.</li>
-                <li>You cannot intersect lines. If you draw over a different color's path, you will sever it!</li>
+                <li>Touch/click a colored dot and drag to draw a path.</li>
+                <li>Connect to the matching dot of the same color.</li>
+                <li>Drawing over another color's path overwrites it.</li>
+                <li>Tap a dot with a completed path to clear that color.</li>
             </ul>
 
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">💯 Perfect 100% Coverage</h3>
-            <p>Connecting the nodes isn't enough for mastery. To unlock all 3 Stars, you must maneuver your paths in
-                such a way that **every single tile on the grid is occupied by a color gradient**. Watch the Coverage
-                meter closely!</p>
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">⭐ Star Ratings & Flow Bonus</h3>
+            <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
+                <li>⭐: Solved but coverage < 80%</li>
+                <li>⭐⭐: Solved with coverage ≥ 80%</li>
+                <li>⭐⭐⭐: Solved with <strong>100% coverage</strong> (all cells filled)</li>
+                <li><strong>Flow Bonus:</strong> 100% coverage = <strong>2× score</strong>!</li>
+            </ul>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">💯 Scoring</h3>
+            <p><strong>200 base</strong> + coverage%×5 + speed bonus. No-hint bonus: <strong>×1.3</strong>.
+                Full coverage doubles your entire score!</p>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">💡 Hints</h3>
+            <p>Use the 💡 Hint button to reveal 3-4 cells of the correct path for one color pair.
+                First hint per session is FREE; subsequent hints require a reward ad.</p>
         </section>
 
         <section class="pv-faq pv-container">
             <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
             <details>
                 <summary>How do I erase a line?</summary>
-                <p>You can trace backwards to precisely shorten a line. To delete an entire completely drawn path
-                    instantly, just tap either of its starting or ending diamond markers.</p>
+                <p>Trace backwards to shorten it, or tap either starting/ending dot of a completed path
+                    to clear that entire color's path instantly.</p>
             </details>
             <details>
-                <summary>What is the 'Flow Eff. Bonus' in the results screen?</summary>
-                <p>The Flow Efficiency Bonus rewards players who can achieve 100% board coverage while also connecting
-                    pairs with incredibly direct, short paths. If a path length is within 1.5x of the absolute shortest
-                    mathematical distance (Manhattan distance), you'll earn +50 points per path.</p>
+                <summary>What is the Flow Bonus?</summary>
+                <p>When you achieve 100% coverage (every cell filled), your entire score is doubled!
+                    This is the ultimate reward for perfect solutions.</p>
+            </details>
+            <details>
+                <summary>How many levels are there?</summary>
+                <p>5 packs with 30 levels each = 150 levels total. Grid sizes range from 5×5 to 9×9
+                    with increasing numbers of color pairs.</p>
+            </details>
+            <details>
+                <summary>Does using hints affect my score?</summary>
+                <p>Yes! If you complete a level without using any hints, you earn a ×1.3 score multiplier.
+                    The first hint per session is free, subsequent hints require watching a reward ad.</p>
             </details>
         </section>
 
@@ -797,13 +820,13 @@
     <footer id="pv-footer"></footer>
 
     <!-- Scripts -->
-    <script src="../js/common.js?v=2"></script>
-    <script src="../js/adsense.js?v=2"></script>
-    <script src="../js/seed.js?v=2"></script>
-    <script src="../js/sfx.js?v=2"></script>
-    <script src="../js/share.js?v=2"></script>
-    <script src="./colorflow-levels.js?v=2"></script>
-    <script src="./colorflow-logic.js?v=2"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/colorflow-levels.js"></script>
+    <script src="/games/colorflow-logic.js"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 
