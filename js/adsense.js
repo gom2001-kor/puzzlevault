@@ -64,5 +64,37 @@ const AdController = {
             showToast('Reward granted!');
             onReward();
         }
+    },
+
+    /**
+     * Check if a reward ad is loaded and ready to show.
+     * In production, this checks the ad SDK's ready state.
+     * @returns {boolean}
+     */
+    isRewardAdAvailable() {
+        // Placeholder: always available
+        // In production, check actual ad SDK
+        return true;
+    },
+
+    /** Timestamp of last bottom ad refresh */
+    _lastBottomRefresh: 0,
+
+    /**
+     * Refresh the #ad-bottom slot.
+     * Includes a 60-second cooldown to comply with AdSense policy.
+     * Call when user transitions between packs/levels or returns to menu.
+     */
+    refreshBottomAd() {
+        const now = Date.now();
+        if (now - this._lastBottomRefresh < 60000) return; // 60s cooldown
+        this._lastBottomRefresh = now;
+
+        const el = document.getElementById('ad-bottom');
+        if (!el) return;
+
+        // Placeholder: in production, call googletag or adsbygoogle.push
+        // For now, just reset the slot
+        el.innerHTML = '';
     }
 };

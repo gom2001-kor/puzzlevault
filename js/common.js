@@ -310,6 +310,106 @@ function updateStreak(gameId) {
     return { current: streak, isNew };
 }
 
+/* --- Mini Cross-Promo (inside Result Modal) --- */
+/**
+ * Render small cross-promo icons (emoji + name) inside a Result Modal.
+ * @param {string} currentGameId — e.g. 'numvault'
+ * @param {HTMLElement} container — The container element to render into
+ */
+function renderMiniCrossPromo(currentGameId, container) {
+    if (!container) return;
+    const promoIds = CROSS_PROMO_MAP[currentGameId];
+    if (!promoIds) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'mini-cross-promo';
+
+    promoIds.forEach(id => {
+        const game = PV_GAMES[id];
+        if (!game) return;
+        const a = document.createElement('a');
+        a.className = 'mini-cross-promo-item';
+        a.href = game.path;
+        a.innerHTML = `<span class="mini-cross-promo-icon">${game.emoji}</span>${game.name}`;
+        wrap.appendChild(a);
+    });
+
+    container.appendChild(wrap);
+}
+
+/* --- Hint Manager --- */
+/**
+ * HintManager — Manages hint system with first-free + reward ad flow.
+ * Usage:
+ *   HintManager.init('numvault');
+ *   HintManager.requestHint(() => { revealHintLogic(); });
+ */
+const HintManager = {
+    gameId: '',
+
+    /**
+     * Initialize hint system for a game.
+     * @param {string} gameId
+     */
+    init(gameId) {
+        this.gameId = gameId;
+    },
+
+    /**
+     * Check if the session's first free hint is still available.
+     * @returns {boolean}
+     */
+    isFirstHintFree() {
+        return !sessionStorage.getItem(`pv_${this.gameId}_freeHintUsed`);
+    },
+
+    /**
+     * Mark the free hint as consumed for this session.
+     */
+    markFreeHintUsed() {
+        sessionStorage.setItem(`pv_${this.gameId}_freeHintUsed`, '1');
+    },
+
+    /**
+     * Request a hint. If first hint is free, execute callback directly.
+     * Otherwise, trigger a reward ad and call callback on completion.
+     * @param {Function} hintCallback — The function that reveals the hint
+     */
+    requestHint(hintCallback) {
+        if (typeof SFX !== 'undefined') SFX.play('hint');
+
+        if (this.isFirstHintFree()) {
+            this.markFreeHintUsed();
+            if (typeof hintCallback === 'function') hintCallback();
+        } else {
+            // Require reward ad
+            if (typeof AdController !== 'undefined') {
+                AdController.showRewardAd(hintCallback);
+            } else if (typeof hintCallback === 'function') {
+                hintCallback();
+            }
+        }
+    },
+
+    /**
+     * Create and append a 💡 Hint button with proper styling.
+     * @param {HTMLElement} container — Container to append the button into
+     * @param {Function} hintCallback — The function that reveals the hint
+     * @returns {HTMLButtonElement} The created button element
+     */
+    renderHintButton(container, hintCallback) {
+        const btn = document.createElement('button');
+        btn.className = 'hint-btn';
+        btn.id = 'hint-btn';
+        btn.innerHTML = '💡 Hint <span class="hint-sublabel">(Ad)</span>';
+        btn.addEventListener('click', () => {
+            this.requestHint(hintCallback);
+        });
+        if (container) container.appendChild(btn);
+        return btn;
+    }
+};
+
 /* --- Page Initialization --- */
 /**
  * Initialize common page elements.

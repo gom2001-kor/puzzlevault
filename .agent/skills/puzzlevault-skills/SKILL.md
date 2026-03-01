@@ -2,514 +2,476 @@
 
 > This file contains the complete design specification for each of the 10 PuzzleVault games.
 > Antigravity should reference this file when building any game.
-> Each game section includes: rules, unique mechanics, visual specs, scoring, modes, and share format.
+> Each game section includes: rules, unique mechanics, visual specs, scoring, modes, hint system, and share format.
 
 ---
 
-## Shared Systems
-
-### Daily Seed (seed.js)
-```javascript
-function getDailySeed(gameId) {
-  const today = new Date();
-  const dateStr = today.toISOString().slice(0, 10);
-  const combined = gameId + ':' + dateStr;
-  let hash = 0;
-  for (let i = 0; i < combined.length; i++) {
-    hash = ((hash << 5) - hash) + combined.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
-class SeededRandom {
-  constructor(seed) {
-    this.state = seed % 2147483647;
-    if (this.state <= 0) this.state += 2147483646;
-  }
-  next() {
-    this.state = (this.state * 16807) % 2147483647;
-    return (this.state - 1) / 2147483646;
-  }
-  nextInt(min, max) {
-    return Math.floor(this.next() * (max - min + 1)) + min;
-  }
-  shuffle(arr) {
-    const copy = [...arr];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = this.nextInt(0, i);
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-  }
-}
-```
-
-### Sound Effects (sfx.js)
-```javascript
-const SFX = {
-  ctx: null,
-  enabled: true,
-  init() {
-    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    this.enabled = localStorage.getItem('pv_sound') !== 'off';
-  },
-  play(type) {
-    if (!this.enabled) return;
-    if (!this.ctx) this.init();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    const sounds = {
-      tap:      { freq: 600,  dur: 0.08, wave: 'sine' },
-      correct:  { freq: 880,  dur: 0.15, wave: 'sine' },
-      wrong:    { freq: 200,  dur: 0.3,  wave: 'square' },
-      clear:    { freq: 1200, dur: 0.2,  wave: 'sine' },
-      combo:    { freq: 1600, dur: 0.3,  wave: 'triangle' },
-      gameover: { freq: 150,  dur: 0.5,  wave: 'sawtooth' },
-      win:      { freq: 1000, dur: 0.4,  wave: 'sine' },
-    };
-    const s = sounds[type] || sounds.tap;
-    osc.type = s.wave;
-    osc.frequency.value = s.freq;
-    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + s.dur);
-    osc.start();
-    osc.stop(this.ctx.currentTime + s.dur);
-  },
-  toggle() {
-    this.enabled = !this.enabled;
-    localStorage.setItem('pv_sound', this.enabled ? 'on' : 'off');
-  }
-};
-```
-
-### Ad Controller (adsense.js)
-```javascript
-const AdController = {
-  gamesPlayed: parseInt(sessionStorage.getItem('pv_games_played') || '0'),
-  FIRST_AD_AFTER: 3,
-  AD_FREQUENCY: 3,
-  shouldShowInterstitial() {
-    this.gamesPlayed++;
-    sessionStorage.setItem('pv_games_played', this.gamesPlayed);
-    if (this.gamesPlayed <= this.FIRST_AD_AFTER) return false;
-    return (this.gamesPlayed - this.FIRST_AD_AFTER) % this.AD_FREQUENCY === 0;
-  },
-  showInterstitial() {
-    if (!this.shouldShowInterstitial()) return;
-    const el = document.getElementById('ad-interstitial');
-    if (el) el.style.display = 'flex';
-  },
-  hideInterstitial() {
-    const el = document.getElementById('ad-interstitial');
-    if (el) el.style.display = 'none';
-  }
-};
-```
-
-### Share (share.js)
-```javascript
-function shareResult(text) {
-  if (navigator.share) {
-    navigator.share({ text }).catch(() => copyToClipboard(text));
-  } else {
-    copyToClipboard(text);
-  }
-}
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('Copied to clipboard!');
-  });
-}
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.className = 'pv-toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.classList.add('show'), 10);
-  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2000);
-}
-```
-
----
-
-## Game 1: 🔢 NumVault — Number Deduction Puzzle
+## Game 1: 🔢 NumVault — Number Deduction
 
 ### Rules
-- Player guesses a hidden N-digit code within limited attempts.
-- Each guess receives per-digit feedback:
-  - 🟢 (--pv-emerald): correct digit, correct position
-  - 🟡 (--pv-amber): correct digit, wrong position
-  - ⚫ (--pv-slate): digit not in code
-- Feedback priority: assign 🟢 first, then 🟡 for remaining matches (no double-counting).
-- Example: Code 1234, Guess 1335 → 🟢⚫🟢⚫ (pos 3's digit 3 matches code exactly → 🟢; pos 2's digit 3 has no remaining 3 in code since it was already matched at pos 3 → ⚫).
+- Secret code: N digits (0-9). Player guesses the code.
+- After each guess, feedback per digit:
+  - 🟢 Green: correct digit, correct position
+  - 🟡 Yellow: digit exists in code, wrong position
+  - ⚫ Gray: digit not in code
+- Feedback algorithm: process greens first (exact matches consume that code digit), then yellows (remaining digits only).
+- Example: Code 1234, Guess 1335 → 🟢⚫🟢⚫ (pos1: 1=1 🟢, pos2: 3 not in remaining [2,4] ⚫, pos3: 3=3 🟢, pos4: 5 not in code ⚫)
 
 ### Difficulty Levels
-| Level | Digits | Attempts | Duplicates |
-|-------|--------|----------|------------|
-| Easy | 4 | 8 | No |
-| Normal | 4 | 6 | Yes |
-| Hard | 5 | 8 | Yes |
-| Expert | 6 | 10 | Yes |
+| Level | Digits | Max Attempts | Duplicates |
+|-------|--------|-------------|------------|
+| Easy | 3 | 8 | No |
+| Medium | 4 | 6 | No |
+| Hard | 4 | 6 | Yes |
+| Expert | 5 | 8 | Yes |
 
 ### UNIQUE Mechanic: Number Tracker
-- Display 0-9 tracker below the grid showing each digit's known state.
-- States: ⬜ unused → 🟡 included → 🟢 confirmed → ⚫ excluded.
-- Priority: 🟢 > 🟡 > ⚫ > ⬜ (once confirmed 🟢, never downgrade).
-- This is NOT in Wordle. It's a NumVault-exclusive feature.
+- Below the guess grid: display digits 0-9
+- Each digit color-coded: unused (gray), confirmed-in-code (green), confirmed-position (bright green), excluded (dark/strikethrough)
+- Auto-updates after each guess
+- Helps player track elimination logic
 
 ### UNIQUE Mechanic: Speed Mode
-- 60-second timer. Solve as many codes as possible.
-- Correct answer → +15 seconds bonus.
-- Score = codes solved × difficulty multiplier.
+- Optional toggle: 60-second timer
+- Fewer guesses = bonus multiplier
+- Daily leaderboard for speed
+
+### Hint System
+- 💡 Hint reveals ONE digit's correct position (e.g., "Position 3 is the digit 7")
+- First hint per session: FREE
+- Subsequent hints: reward ad required
+- Hint does NOT consume a guess attempt
+
+### UI Layout
+- Top: "🔢 NumVault" + Daily #N + ⚙️📊❓ icons
+- Guess grid: N columns × max_attempts rows
+- Number Tracker: 0-9 below grid
+- Numpad: 0-9 + Backspace + Enter + 💡 Hint
+- Physical keyboard support: 0-9, Backspace, Enter
 
 ### Input
-- On-screen numpad (0-9) + Backspace + Enter + Hint button.
-- Also accepts physical keyboard number keys.
+- Numpad buttons (touch) + physical keyboard (desktop)
+- Tap digit → fills next empty cell in current row
+- Backspace → removes last entered digit
+- Enter → submits guess (only if all digits filled)
 
-### Scoring (Free Play & Speed Mode)
-```
-base = (maxAttempts - usedAttempts + 1) × 100 × difficultyMultiplier
-timeBonus = max(0, 300 - seconds) × 2
-hintPenalty = -50 per hint
-Multipliers: Easy=1.0, Normal=1.5, Hard=2.0, Expert=3.0
-```
-
-### Hint (Reward Ad)
-- Reveals one unconfirmed digit's correct position.
-- Daily: max 1 hint. Free Play: max 2 hints.
-- Hint used → 💡 shown in share text.
+### Scoring
+- Base: 1000 × (max_attempts - guesses_used + 1)
+- Speed bonus: if under 30 seconds, ×1.5
+- No-hint bonus: if solved without hints, ×1.2
 
 ### Modes
-1. **Daily Challenge**: 1 puzzle/day (UTC midnight), seed-based, streak tracking.
-2. **Free Play**: unlimited, difficulty selectable, ads every 3 games.
-3. **Speed Mode**: 60s timer, continuous puzzles.
+1. Classic: choose difficulty, unlimited replays
+2. Daily: Medium difficulty, seeded, one attempt per day
+3. Speed: 60-second timer, any difficulty
 
 ### Share Format
 ```
-🔢 NumVault Daily #247 🔓
-Difficulty: Normal (4-digit)
-
-🟢⚫🟡⚫
-🟢🟡⚫🟡
+🔢 NumVault Daily #47
+🟢🟡⚫⚫
+🟢🟢⚫🟡
 🟢🟢🟢🟢
-
-3/6 ⏱ 1:23 🔥12
-puzzlevault.pages.dev/games/numvault
+3/6 ⭐ No hints!
+puzzlevault.pages.dev/numvault
 ```
-
-### Result Screen
-- 🔓 Vault Cracked! (win) or 🔒 Vault Sealed (lose)
-- Show: code, attempts, time, difficulty
-- Distribution bar chart (personal history from localStorage)
-- Streak display
-- [📤 Share] [🔄 Play Again]
 
 ---
 
-## Game 2: 🧱 GridSmash — Block Placement Puzzle
+## Game 2: 🧱 GridSmash — Block Placement
 
 ### Rules
-- 10×10 grid. Each turn: 3 block pieces given.
-- Drag pieces onto grid. All 3 must be placed before new 3 appear.
-- Complete row or column → line clears (disappears).
-- Multiple simultaneous clears = combo.
-- No space for any remaining piece → game over.
-
-### Block Pieces (20 types, 1-5 cells)
-- 1-cell: dot (1 type)
-- 2-cell: horizontal, vertical (2 types)
-- 3-cell: horizontal, vertical, L-shapes ×4 rotations (6 types)
-- 4-cell: 2×2 square, T-shapes ×4 rotations, S-shape, Z-shape (7 types)
-- 5-cell: horizontal, vertical, plus(+), U-shape (4 types)
-- Visual: rounded corners (4px radius), pastel PV colors, inner shadow.
-- Colors per turn: 3 pieces get 3 different colors from --pv-p-* palette.
+- 10×10 grid (NOT 8×8, to differentiate from similar games)
+- Receive 3 random pieces per turn (polyomino shapes: 1×1 to 5×1, L-shapes, T-shapes, squares)
+- Drag pieces onto grid. Must fit without overlapping.
+- Full row OR full column → cleared with animation + points.
+- Can't place any of the 3 pieces → game over.
 
 ### UNIQUE Mechanic: Special Blocks (3 types)
-Appear from turn 16 onward, 20% chance per turn (1 of 3 pieces may be special).
+| Block | Emoji | Appearance | Effect |
+|-------|-------|-----------|--------|
+| Crystal | 💎 | Sparkle overlay | When part of a cleared line, also clears the entire 3×3 area around it |
+| Ice | 🧊 | Frosted texture | Requires 2 line clears to remove (first clear cracks it, second removes) |
+| Wild | ⭐ | Gold glow | 1×1 piece that can be placed anywhere, even on occupied cells (overwrites) |
 
-**💎 Crystal Block**
-- Visual: translucent blue + diamond sparkle animation.
-- Effect: on placement, destroys all existing blocks in 3×3 area around it.
-- Scoring: destroyed cells × 10 (no line clear bonus).
-
-**🧊 Frost Block**
-- Visual: white border + frost pattern.
-- Effect: on placement, freezes 2 random empty cells on the grid.
-- Frozen cells: treated as occupied, require 2 line clears to remove.
-- Strategy: immediate benefit + future obstacle (risk-reward tradeoff).
-
-**⭐ Wild Block**
-- Visual: gold 1×1 cell + star icon.
-- Effect: place on any single empty cell (can be placed before other pieces).
-- Strategy: fill the last gap to complete a line.
+- Special blocks appear randomly from turn 10+
+- Probability: 15% Crystal, 10% Ice, 5% Wild per piece set
 
 ### UNIQUE Mechanic: Shatter Zone
-- Every 10 turns: bottom 2 rows become "Shatter Zone" (gold highlight, pulse animation).
-- Line clears in Zone → score ×3.
-- Zone lasts 5 turns. If not cleared, Zone expires and 50% of empty cells in those rows fill with random blocks.
-- Display: "Zone: X turns left" counter.
+- Every 10 turns: bottom 2 rows glow gold (Shatter Zone active for 3 turns)
+- Lines cleared within Shatter Zone = 3× score multiplier
+- If Shatter Zone expires without clearing those rows: random blocks fill 3 cells in those rows (penalty)
+
+### Visual Style
+- Pieces: pastel PV colors with rounded corners (border-radius: 4px)
+- Grid: light gray lines on white background (dark mode: dark gray on near-black)
+- Minimal, clean aesthetic (NOT neon, NOT blocky sharp edges)
+- Clear animation: line flashes white → tiles shrink → disappear
+
+### Hint System
+- 💡 Hint highlights the optimal placement zone for the current piece (shows a ghost outline)
+- First hint per session: FREE
+- Subsequent hints: reward ad required
 
 ### Scoring
-```
-Placement: cells placed × 1
-Line clear: 100 × lines cleared
-Shatter Zone: line clear score × 3
-Combo (simultaneous): 1 line=100, 2=300, 3=600, 4=1200, 5+=2500
-Streak combo (consecutive turns with clears): 2=×1.5, 3=×2.0, 4+=×3.0
-Crystal: destroyed cells × 10
-```
-
-### Interaction
-- Drag: touch/click piece → drag over grid → semi-transparent preview.
-- Valid position: preview in piece color. Invalid: preview in red.
-- Release: place if valid, return to dock if invalid.
-- Wild block: separate "Wild" slot, placeable before other pieces.
-- Line clear animation: white flash (0.15s) → scale-to-zero (0.3s) → text popup → score countup.
+- Per cell placed: 10 points
+- Line clear: 100 × number of lines cleared simultaneously
+- Combo: consecutive turns with clears → multiplier (×1, ×1.5, ×2, ×3, ×5)
+- Shatter Zone clear: 3× multiplier on top of other bonuses
+- Crystal bonus: +200 per Crystal block explosion
+- Perfect clear (empty board): 5000 bonus
 
 ### Modes
-1. **Classic**: play until game over, track high score.
-2. **Daily Challenge**: seed-based same block sequence, 3-minute limit.
-3. **Zen Mode**: no timer, no score, no Shatter Zone, no ads (retention tool).
-4. **Sprint 40**: clear 40 lines, track fastest time.
-
-### Reward Ad: Undo
-- On game over: "Watch ad to undo last move?" → reverses last placement.
-- 1 use per game. Share text shows 🔄 if used.
+1. Classic: until game over, high score chase
+2. Daily: seeded piece sequence, compare scores
+3. Zen: no game over, pieces always fit (relaxation mode)
 
 ### Share Format
 ```
-🧱 GridSmash
-Score: 12,847
-Lines: 47 | Combo: x4 | Shatter: x5
-🏆 Top 8%
-puzzlevault.pages.dev/games/gridsmash
+🧱 GridSmash Daily #47
+Score: 12,450 🏆
+Lines: 23 | Combo: ×5
+💎×2 🧊×1 ⭐×1
+puzzlevault.pages.dev/gridsmash
 ```
-
-### Percentile Table (hardcoded estimates)
-Top 1%: 30000+, Top 5%: 20000+, Top 10%: 15000+, Top 25%: 8000+, Top 50%: 4000+
 
 ---
 
-## Game 3: 🧠 PatternPop — Pattern Memory
+## Game 3: 🧠 PatternPop — Memory Pattern
 
 ### Rules
-- Grid shows N highlighted cells briefly → player taps from memory.
-- All correct → next round (N+1 cells).
-- Wrong tap → lose 1 life (3 total). 0 lives → game over.
-
-### Difficulty Curve
-| Rounds | Grid | Cells | Display Time | Decoys |
-|--------|------|-------|-------------|--------|
-| 1-3 | 3×3 | 2-4 | 2.0s | 0 |
-| 4-6 | 3×3 | 4-5 | 2.0s | 0 |
-| 7-9 | 4×4 | 4-6 | 1.5s | 0 |
-| 10-14 | 4×4 | 6-8 | 1.2s | 1 |
-| 15-19 | 5×5 | 7-10 | 1.0s | 2 |
-| 20-29 | 5×5 | 10+ | 0.8s | 3 |
-| 30+ | 6×6 | 12+ | 0.8s | 3 |
+- Grid of tiles (starts 3×3, grows to 6×6).
+- Flash sequence: N tiles light up in order.
+- Player must tap them in the same order.
+- Correct → next round adds 1 more tile to sequence.
+- Wrong → game over (or lose a life in lives mode).
 
 ### UNIQUE Mechanic: Decoy Flash
-- From round 10: during memorization phase, extra cells flash briefly (0.3s) alongside real targets (1.2s+).
-- Decoy color: --pv-blue lighter variant (#60A5FA) vs real: --pv-blue (#2563EB).
-- Decoy duration: 0.3s (real cells show for full display time).
-- Player must distinguish real from fake based on duration and color intensity.
-- Bonus: +30 points per decoy correctly ignored.
+- From level 5+: during the flash sequence, 1-2 "decoy" tiles flash in a DIFFERENT color (red tint vs normal blue)
+- Player must ignore decoys and only remember the real (blue) flashes
+- Decoy count increases with difficulty
 
-### Colors
-- Grid background: --pv-grid-bg (#E2E8F0)
-- Target highlight: --pv-blue (#2563EB)
-- Decoy flash: #60A5FA (lighter blue)
-- Correct tap: --pv-emerald (#059669)
-- Wrong tap: --pv-coral (#F43F5E)
+### Hint System
+- 💡 Hint replays the pattern one more time at 50% slower speed
+- First hint per session: FREE
+- Subsequent hints: reward ad required
+- Hint does NOT add to the sequence or change difficulty
+
+### Visual
+- Tiles: PV pastel colors, rounded squares
+- Flash: tile brightens + subtle scale animation (1.0 → 1.1 → 1.0)
+- Decoy flash: same brightness but with red-tinted border
+- Wrong tap: tile shakes + turns red briefly
 
 ### Scoring
-```
-roundScore = cellsMemorized × 50 × (1 + roundNumber / 10)
-perfectBonus = +100 (no lives lost this round)
-decoyBonus = +30 per decoy dodged
-```
+- Per correct sequence: 100 × sequence_length
+- Perfect round (no hesitation, < 0.5s per tap): ×2 bonus
+- Longest streak tracked
 
-### Reward Ad: Extra Life
-- When all lives lost: "Watch ad for +1 life?" → restart current round.
-- 1 use per game.
+### Modes
+1. Classic: 3 lives, increasing difficulty
+2. Daily: seeded sequence, one attempt
+3. Endless: no lives, see how far you get
+4. Speed: tiles flash faster each round
+
+### Share Format
+```
+🧠 PatternPop Daily #47
+Level 14 🔥
+Longest streak: 14
+⬜⬜🟦🟦🟦
+⬜🟦🟦🟦🟦
+🟦🟦🟦🟦🟦
+puzzlevault.pages.dev/patternpop
+```
 
 ---
 
-## Game 4: 📚 SortStack — Color Sorting
+## Game 4: 📚 SortStack — Color Sort
 
 ### Rules
-- Stacks (rectangular drawers), each holds max 4 square blocks.
-- 2 empty stacks provided as workspace.
-- Only top block can move. Can only place on same-color top or empty stack.
-- Stack of 4 same-color blocks → locked (🔒) + sparkle animation.
-- All colors sorted → level clear.
+- N tubes/stacks, each partially filled with colored segments.
+- Pour top color from one tube to another (only if top colors match or target is empty).
+- Goal: sort so each tube contains only one color.
+- Move limit: varies by difficulty (Easy: unlimited, Hard: limited moves)
 
 ### UNIQUE Mechanic: Lock Stack
-- When a stack completes (4 same color), it locks AND 1 new empty stack appears.
-- Progressive expansion gives more workspace as you solve.
+- When a tube is completely sorted (all same color, full), it "locks" with a ✅ icon
+- Locked tube cannot be poured from or to
+- Locking a tube adds 1 new empty tube as reward (helps with harder puzzles)
 
-### UNIQUE Mechanic: Move Limit
-- Hard/Expert: maximum N moves allowed (shown as counter).
-- Forces optimal solution finding.
+### UNIQUE Mechanic: Move Limit (Hard/Expert)
+| Difficulty | Tubes | Colors | Empty | Move Limit |
+|-----------|-------|--------|-------|------------|
+| Easy | 5 | 3 | 2 | Unlimited |
+| Medium | 7 | 5 | 2 | 50 |
+| Hard | 9 | 7 | 2 | 40 |
+| Expert | 12 | 10 | 2 | 35 |
 
-### Difficulty
-| Level | Colors | Stacks | Empty | Move Limit |
-|-------|--------|--------|-------|-----------|
-| Easy | 4 | 4+2 | 2 | ∞ |
-| Medium | 6 | 6+2 | 2 | ∞ |
-| Hard | 8 | 8+2 | 2 | 40 |
-| Expert | 10 | 10+2 | 2 | 50 |
+### Hint System
+- 💡 Hint shows the optimal next move (source tube glows → arrow → destination tube glows)
+- First hint per session: FREE
+- Subsequent hints: reward ad required
+- Undo remains FREE and unlimited
 
-### Visual Style
-- NOT test tubes + round balls (that's the common Ball Sort look).
-- USE rectangular "drawers" + square blocks with rounded corners.
-- Block colors: PV primary palette (--pv-coral through --pv-slate).
-- Undo button: unlimited undos (free, no ad required).
+### Visual
+- Tubes: vertical rounded rectangles, PV colors
+- Pour animation: color segments slide up from source, arc over, slide down into target
+- Lock animation: tube shrinks slightly + ✅ checkmark + sparkle
+
+### Scoring
+- Level clear: 500 base
+- Move efficiency: bonus = max(0, (move_limit - moves_used) × 20)
+- No-hint bonus: ×1.3
+
+### Modes
+1. Classic: progressive levels, increasing difficulty
+2. Daily: one puzzle per day, seeded
+3. Relaxed: no move limit, no timer
+
+### Share Format
+```
+📚 SortStack Daily #47
+✅ Solved in 28 moves
+⭐⭐⭐ (under limit!)
+puzzlevault.pages.dev/sortstack
+```
 
 ---
 
-## Game 5: ⚡ QuickCalc — Speed Math Arcade
+## Game 5: ⚡ QuickCalc — Mental Math
 
 ### Rules
-- 30-second starting timer. Multiple-choice (4 options).
-- Correct → +2s + points. Wrong → -3s + screen shake.
-- Timer reaches 0 → game over.
+- Flash a math equation, player types the answer.
+- Correct → next question (harder). Wrong → lose a life (3 lives).
+- Timer: starts at 10 seconds, decreases as difficulty rises.
+- Operations: +, -, ×, ÷ (division always results in integers)
 
-### Difficulty Auto-Scaling
-| Questions | Type | Example |
-|-----------|------|---------|
-| 1-5 | Single + single | 3+5=? |
-| 6-10 | Double + single | 17+6=? |
-| 11-14 | Double ± double | 34-18=? |
-| 15-19 | Operator Roulette | 7 ? 3 = 21 |
-| 20-24 | Double × single | 13×4=? |
-| 25-29 | Mixed operations | 23+17×2=? |
-| 30+ | Triple-digit + Roulette | Complex |
+### Difficulty Progression
+| Phase | Numbers | Operations | Timer |
+|-------|---------|-----------|-------|
+| 1-5 | 1-20 | +, - | 10s |
+| 6-10 | 1-50 | +, -, × | 8s |
+| 11-15 | 1-100 | +, -, ×, ÷ | 6s |
+| 16+ | 1-200 | all + 2-step | 5s |
 
 ### UNIQUE Mechanic: Operator Roulette
-- From question 15: format changes to "A ? B = C".
-- 4 choices: +, -, ×, ÷. Player picks the correct operator.
-- Reverse thinking challenge unique to QuickCalc.
+- From question 8+: sometimes the OPERATOR is hidden instead of the answer
+- Display: "7 ? 3 = 21" → player must identify "×"
+- From question 15+: sometimes TWO operators hidden: "5 ? 3 ? 2 = 11" → "+, ×" or "×, +"
 
-### Wrong Answer Generation
-- 1 near answer (correct ± 1~3)
-- 1 medium answer (correct ± 5~15)
-- 1 far answer (random)
-- Shuffled positions each time.
+### Hint System
+- 💡 Hint extends timer by 5 seconds (this is always FREE, no ad required)
+- For Operator Roulette questions: hint narrows operators to 2 choices (requires ad after first free use)
 
-### Combo
-- 3 streak → +3s per correct. 5 streak → +4s. 10 streak → +5s.
-- Wrong answer resets streak.
+### Visual
+- Large equation display (centered, big font)
+- Timer: circular countdown ring around the equation
+- Correct: green flash + satisfying sound
+- Wrong: red shake + number shows correct answer briefly
+- Numpad: 0-9 + minus + submit (touch-optimized)
+
+### Scoring
+- Correct answer: 100 × current_phase
+- Speed bonus: remaining_seconds × 10
+- Streak bonus: consecutive correct × 50
+- Operator Roulette correct: 2× points
+
+### Modes
+1. Classic: 3 lives, increasing difficulty
+2. Daily: seeded sequence, one attempt, score comparison
+3. Time Attack: 2 minutes, answer as many as possible
+4. Blitz: 30 seconds, rapid fire
+
+### Share Format
+```
+⚡ QuickCalc Daily #47
+Score: 3,250
+22 correct | 🔥 12 streak
+puzzlevault.pages.dev/quickcalc
+```
 
 ---
 
-## Game 6: 🔄 TileTurn — Tile Flip Puzzle
+## Game 6: 🔄 TileTurn — Lights Puzzle
 
-### Rules (Classic)
-- N×N grid, tiles are ON (--pv-cream #FDE68A with glow) or OFF (--pv-grid-dark #1E293B).
-- Tap a tile → it + adjacent 4 (up/down/left/right) toggle.
-- Goal: all tiles ON.
+### Rules
+- Grid of tiles, each ON (lit, colored) or OFF (dark).
+- Tap a tile → it toggles, AND all orthogonally adjacent tiles toggle.
+- Goal: turn ALL tiles ON (or all OFF, depending on puzzle).
+- Level-based: pre-designed puzzles in packs.
 
 ### UNIQUE Mechanic: Cascade Mode
-- Tap effect propagates 2 levels deep:
-  - Level 1: tapped cell + 4 adjacent (5 cells)
-  - Level 2: each Level 1 cell's 4 adjacent also toggle (up to 13 cells total)
-- Requires deeper strategic thinking.
+- From Pack 4+: toggling a tile triggers a 2-step cascade
+- Step 1: target + adjacent tiles toggle (normal)
+- Step 2: after 300ms delay, tiles that were turned ON in step 1 also toggle THEIR adjacent tiles
+- Creates chain reactions that require deeper planning
 
 ### UNIQUE Mechanic: Spectrum Mode
-- 3-color cycle instead of ON/OFF: coral(#F43F5E) → amber(#D97706) → blue(#2563EB) → coral...
-- Tap: target + adjacent advance to next color.
-- Goal: all tiles same color.
-
-### Puzzle Generation
-- Reverse method: start from solved state (all ON), apply K random taps → guaranteed solvable.
-- K determines difficulty.
+- From Pack 6+: tiles have 3 states instead of 2 (OFF → Blue → Green → OFF)
+- Each tap advances the tile and its neighbors by one state
+- Goal: get all tiles to Green state
 
 ### Level Packs
-| Pack | Mode | Grid | Levels | Min Taps |
-|------|------|------|--------|---------|
-| 1 | Classic | 3×3 | 20 | 1-5 |
-| 2 | Classic | 4×4 | 30 | 3-8 |
-| 3 | Classic | 5×5 | 40 | 5-12 |
-| 4 | Cascade | 4×4 | 30 | 3-8 |
-| 5 | Cascade | 5×5 | 40 | 5-10 |
-| 6 | Spectrum | 4×4 | 30 | 4-10 |
-| 7 | Spectrum | 5×5 | 40 | 6-14 |
+| Pack | Grid | Mechanic | Levels |
+|------|------|----------|--------|
+| 1 | 3×3 | Basic | 20 |
+| 2 | 4×4 | Basic | 20 |
+| 3 | 5×5 | Basic | 20 |
+| 4 | 4×4 | Cascade | 20 |
+| 5 | 5×5 | Cascade | 20 |
+| 6 | 4×4 | Spectrum | 20 |
+| 7 | 5×5 | Spectrum | 20 |
 
-### Stars
-- ⭐⭐⭐: minimum taps. ⭐⭐: minimum +1~2. ⭐: more.
-- Visual: tap ripple animation spreading to affected tiles.
+### Hint System
+- 💡 Hint highlights which tile to flip next (shows a pulsing golden border on the optimal tile)
+- First hint per session: FREE
+- Subsequent hints: reward ad required
+
+### Visual
+- ON tile: PV blue with soft glow
+- OFF tile: dark slate
+- Spectrum: OFF=slate, Blue=PV blue, Green=PV emerald
+- Toggle animation: flip effect (rotateX) with color transition
+- Cascade: ripple wave effect radiating outward
+
+### Scoring
+- Level clear: 300 base
+- Move efficiency: bonus if solved in minimum possible moves
+- No-hint bonus: ×1.2
+- Pack clear bonus: 2000
+
+### Modes
+1. Campaign: sequential packs
+2. Daily: random puzzle, one attempt
+3. Free Play: any unlocked level
+
+### Share Format
+```
+🔄 TileTurn Daily #47
+✅ Solved in 8 moves (min: 6)
+⬜🟦⬜
+🟦🟦🟦
+⬜🟦⬜
+puzzlevault.pages.dev/tileturn
+```
 
 ---
 
-## Game 7: 🎨 ColorFlow — Color Path Connection
+## Game 7: 🎨 ColorFlow — Path Connection
 
 ### Rules
-- N×N grid with pairs of same-color diamond markers (◆, NOT circles).
-- Connect each pair with a horizontal/vertical path.
-- Paths cannot overlap.
-- All empty cells filled = ⭐⭐⭐ Perfect.
-
-### UNIQUE Visual Style (NOT Flow Free)
-- Background: light (--pv-bg-light), NOT black.
-- Markers: diamond shape (◆), NOT circles (●).
-- Paths: gradient-filled cells (75% cell size), NOT thick solid lines.
-- On connection complete: light particle animation flowing along path.
+- Square grid (sizes: 5×5, 6×6, 7×7, 8×8, 9×9).
+- Pairs of same-colored dots placed on grid.
+- Draw a path connecting each pair. Paths cannot cross or overlap.
+- Goal: connect ALL pairs AND fill every empty cell.
 
 ### UNIQUE Mechanic: Flow Bonus
-- If path length ≤ 1.5× shortest possible distance → efficiency bonus.
-- Real-time "Coverage: X%" display during play.
-
-### Colors (PV palette, NOT Flow Free colors)
-- 5×5: coral, blue, emerald, amber, violet
-- 7×7: +pink, orange
-- 9×9: +cyan, lime
-- 10+: +indigo(#6366F1), teal(#14B8A6)
-
-### Puzzle Data
-- Initial: hardcoded JSON puzzles per grid size.
-- 5×5: 50, 6×6: 50, 7×7: 50, 8×8: 40, 9×9: 30, 10×10: 20, 12×12: 10, 14×14: 5
-- Daily: seed selects from puzzle set.
+- If ALL cells filled (100% coverage): ⭐⭐⭐ rating + 2× score
+- Coverage display: percentage shown during play ("Coverage: 87%")
+- Star ratings:
+  - ⭐: solved but coverage < 80%
+  - ⭐⭐: solved with coverage ≥ 80%
+  - ⭐⭐⭐: solved with 100% coverage
 
 ### Level Packs
-Pack 1-8: Starter(5×5) through Insane(14×14), 30 levels each.
-Ad: interstitial every 10 levels.
+| Pack | Grid | Pairs | Levels |
+|------|------|-------|--------|
+| 1 | 5×5 | 4-5 | 30 |
+| 2 | 6×6 | 5-6 | 30 |
+| 3 | 7×7 | 6-8 | 30 |
+| 4 | 8×8 | 8-10 | 30 |
+| 5 | 9×9 | 10-12 | 30 |
 
-### Stars
-⭐: all pairs connected, coverage < 80%. ⭐⭐: all pairs connected, coverage ≥ 80%. ⭐⭐⭐: Perfect (100% coverage, all cells filled).
+### Hint System
+- 💡 Hint shows one correct path segment (3-4 cells of the correct path for one color pair)
+- First hint per session: FREE
+- Subsequent hints: reward ad required
+
+### Path Drawing
+- Touch/mouse drag from dot → path follows finger
+- Drag over existing path → overwrites it
+- Lift finger → path stays
+- Tap dot with completed path → clears that color's path
+
+### Visual
+- Dots: large circles with PV colors (coral, blue, emerald, amber, violet, cyan, pink, lime)
+- Paths: rounded rectangles filling cells, same color as dots
+- Empty cells: light gray
+- 100% coverage: golden border glow around grid
+
+### Scoring
+- Level clear: 200 base
+- Coverage bonus: coverage% × 5
+- Speed bonus: (time_limit - time_used) × 2
+- No-hint bonus: ×1.3
+
+### Share Format
+```
+🎨 ColorFlow Pack 2 Level 14
+⭐⭐⭐ 100% Coverage!
+Time: 0:42 | No hints
+puzzlevault.pages.dev/colorflow
+```
 
 ---
 
-## Game 8: 🔧 PipeLink — Circuit Connection Puzzle
-
-### Theme: Circuit Board (NOT industrial pipes)
-- Background: dark board (--pv-bg-dark).
-- Tiles: dark gray cells (--pv-grid-dark).
-- Connected path: amber energy line (--pv-amber) + pulse animation.
-- Unconnected: gray lines (--pv-slate).
-- Source: ⚡ (amber). Destination: 🔋 (emerald).
-- On full connection: energy pulse travels source → destination.
+## Game 8: 🔧 PipeLink — Circuit Connection
 
 ### Rules
-- N×N grid (4×4 to 10×10) with pre-placed tile pieces.
-- Tap tile → rotate 90° clockwise (0.2s animation).
-- Double-tap → 180° rotation.
-- Connect source(⚡) to destination(🔋) = clear.
-- All tiles used in path = Perfect.
+- Grid with Source node(s) (⚡) and Target node(s) (💡).
+- Grid filled with pipe tiles that can be ROTATED (tap to rotate 90°).
+- Goal: rotate pipes so energy flows from Source to Target.
+- Pipe types: straight(━), corner(┗), T-junction(┣), cross(╋), end cap(╸)
 
-### Tile Types
-Straight(━┃), L-bend(┗┛┓┏), T-junction(┣┫┳┻), Cross(╋).
+### UNIQUE Mechanic: Circuit Board Theme
+- NOT traditional plumbing. Visual theme is circuit board / electronics.
+- Pipes look like PCB traces (thin green/blue lines on dark background)
+- Source = ⚡ battery icon, Target = 💡 LED icon
+- Connected pipes glow with energy flow animation (pulse traveling along path)
 
-### UNIQUE Mechanic: Dual Source
-- From Pack 4+: 2 sources (⚡A amber, ⚡B cyan) + 2 destinations (🔋A, 🔋B).
-- Both A→A and B→B must connect. Paths can share cross(╋) tiles.
+### UNIQUE Mechanic: Dual Source (from Pack 4+)
+- Two Source-Target pairs on same grid (A→A and B→B)
+- Both must connect simultaneously
+- Paths can share cross(╋) tiles
 
 ### UNIQUE Mechanic: Locked Tiles
-- From Pack 5+: some tiles marked 🔒 → cannot rotate.
-- Must solve around fixed constraints.
+- From Pack 5+: some tiles marked 🔒 → cannot rotate
+- Must solve around fixed constraints
+
+### Level Packs
+| Pack | Grid | Sources | Locked | Levels |
+|------|------|---------|--------|--------|
+| 1 | 4×4 | 1 | No | 25 |
+| 2 | 5×5 | 1 | No | 25 |
+| 3 | 6×6 | 1 | No | 25 |
+| 4 | 5×5 | 2 (Dual) | No | 25 |
+| 5 | 6×6 | 2 (Dual) | Yes | 25 |
+
+### Hint System
+- 💡 Hint rotates one pipe to its correct orientation (the pipe flashes gold before rotating)
+- First hint per session: FREE
+- Subsequent hints: reward ad required
+
+### Visual
+- Background: dark PCB green (#064E3B)
+- Pipes: thin traces, disconnected=gray, connected=glowing blue
+- Source: yellow ⚡ icon with pulse, Target: white 💡 icon
+- Rotation animation: smooth 90° turn (200ms)
+- Connection complete: energy pulse animation flows from Source to Target
+
+### Scoring
+- Level clear: 400 base
+- Rotation efficiency: bonus if total rotations ≤ optimal × 1.5
+- No-hint bonus: ×1.2
+- Dual Source bonus: ×1.5
+
+### Share Format
+```
+🔧 PipeLink Pack 3 Level 12
+✅ Solved! ⚡→💡
+Rotations: 18 (optimal: 14)
+puzzlevault.pages.dev/pipelink
+```
 
 ---
 
@@ -542,11 +504,25 @@ Straight(━┃), L-bend(┗┛┓┏), T-junction(┣┫┳┻), Cross(╋).
 - Circle collision: distance < sum of radii.
 - NEVER use fruit images. Numbers displayed on balls.
 
+### Hint System
+- 💡 Hint shows the optimal drop column (a ghost ball appears at the recommended position)
+- First hint per session: FREE
+- Subsequent hints: reward ad required
+
 ### Scoring
 Merge score = resulting number value. Chain bonus: × chain count.
 
 ### Modes
 1. Classic: until game over. 2. Daily: seed-based same sequence. 3. Time Attack: 2 minutes.
+
+### Share Format
+```
+🔮 MergeChain Daily #47
+Highest: 256 🏆
+Score: 8,430
+Chain: ×4
+puzzlevault.pages.dev/mergechain
+```
 
 ---
 
@@ -568,6 +544,11 @@ Merge score = resulting number value. Chain bonus: × chain count.
 - Creates time pressure without a literal timer.
 - Different from other puzzle games' pressure mechanics.
 
+### Hint System
+- 💡 Hint highlights a valid 4+ chain on the board (matching tiles glow with golden outline)
+- First hint per session: FREE
+- Subsequent hints: reward ad required
+
 ### Scoring
 3 tiles=30, 4=60, 5=120+bomb, 6=300, 7+=600.
 Bomb explosion: cells × 20.
@@ -580,3 +561,12 @@ Each hex has up to 6 neighbors (↖↗→↘↙←). Use offset or cube coordina
 
 ### Colors
 PV palette: coral, blue, emerald, amber, violet, cyan.
+
+### Share Format
+```
+⬡ HexMatch Daily #47
+Score: 4,280
+💣×2 Bombs used
+Best chain: 7
+puzzlevault.pages.dev/hexmatch
+```

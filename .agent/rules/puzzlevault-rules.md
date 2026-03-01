@@ -4,29 +4,25 @@ trigger: always_on
 
 # PuzzleVault — Antigravity Project Rules
 
-## Project Overview
-You are building "PuzzleVault", a free browser-based puzzle game site with 10 games. All games run 100% client-side. The site is monetized via Google AdSense with interstitial ads between games and reward ads for hints. Every game must be copyright-safe with original visual design and at least one unique mechanic not found in the reference games.
+> These rules apply to EVERY file you create in this project.
+> Read and follow ALL rules before writing any code.
 
-## Tech Stack (Strict)
-- Pure HTML + CSS + JavaScript only. NO React, NO Vue, NO Angular, NO build tools, NO npm.
-- HTML5 Canvas API for all game rendering.
-- Web Audio API for sound effects (no audio files).
-- localStorage for scores, settings, streaks.
-- requestAnimationFrame() for 60fps game loops.
-- Each game is a standalone .html file.
-- Shared styles: /css/global.css
-- Shared scripts: /js/common.js, /js/adsense.js, /js/seed.js, /js/sfx.js, /js/share.js, /js/blog-data.js
-- NO external libraries. NO CDN imports. Everything is vanilla JS.
-- Hosting: Cloudflare Pages (static files, zero server cost)
+## Project Overview
+PuzzleVault is a browser-based puzzle game platform with 10 games.
+- Domain: https://puzzlevault.pages.dev
+- Stack: Vanilla JS + HTML5 Canvas (NO frameworks, NO React, NO build tools)
+- Hosting: Cloudflare Pages (static files, Direct Upload)
+- Revenue: Google AdSense (banner + interstitial + reward ads)
+- Audience: Global (all games are language-independent)
 
 ## Folder Structure
 ```
 puzzlevault/
 ├── index.html                    (main landing page)
 ├── about.html, privacy.html, terms.html, contact.html
-├── sitemap.xml, robots.txt, manifest.json, sw.js
+├── sitemap.xml, robots.txt, manifest.json, _redirects
 ├── css/
-│   └── global.css                (design system + shared styles)
+│   └── global.css                (design system + all shared styles)
 ├── js/
 │   ├── common.js                 (header, footer, nav, stats, cross-promo)
 │   ├── adsense.js                (ad controller logic)
@@ -49,24 +45,23 @@ puzzlevault/
 │   ├── index.html                (blog listing page)
 │   └── posts/                    (individual post .html files)
 └── images/
-    ├── og-default.png            (1200×630, Open Graph)
-    └── icons/                    (PWA icons)
+    ├── og-default.png            (1200×630 social sharing image)
+    └── icons/                    (PWA icons: 192px, 512px)
 ```
 
-## Copyright Safety Rules (CRITICAL)
-These rules must NEVER be violated:
-1. NEVER use trademarked game names in code, comments, or UI: Tetris, Wordle, Candy Crush, Flow Free, Simon, Block Blast, Suika, Lights Out, Pipe Dream, Pipe Mania, Ball Sort.
-2. NEVER copy visual design from existing games: color schemes, block shapes, grid dimensions, UI layouts, or animation styles.
-3. ALWAYS use the PuzzleVault color palette defined below.
-4. NEVER use tetromino-specific shapes (T, S, Z, L, J pieces are fine as part of a larger set, but never as the exclusive piece set).
-5. NEVER use fruit imagery for merging games.
-6. Each game MUST implement its unique mechanic (defined in skills.md).
+## Copyright & Originality
+1. Game rules/mechanics: Public domain concepts only (decades-old puzzle principles)
+2. Visual design: 100% original — NEVER copy existing games' colors, shapes, UI layouts
+3. Names/branding: NO registered trademarks (Tetris, Wordle, Candy, Blast, Flow, Simon, etc.)
+4. Code: 100% original — NEVER reference/decompile other game source code
+5. Unique mechanics: Each game MUST implement its unique mechanic (defined in skills.md)
+6. Design system: ALWAYS use PuzzleVault color palette (defined below)
 
 ## Design System — PuzzleVault Palette
 CSS variables (defined in global.css):
 ```css
 :root {
-  /* Primary game colors (NEVER use Wordle/BlockBlast/FlowFree colors) */
+  /* Primary game colors */
   --pv-blue: #2563EB;
   --pv-coral: #F43F5E;
   --pv-emerald: #059669;
@@ -119,13 +114,41 @@ CSS variables (defined in global.css):
 - Ad placements per game page:
   - #ad-sidebar: 300×250 to the right of game (desktop only, hidden on mobile)
   - #ad-interstitial: full-screen overlay (shown after game over, controlled by AdController)
-  - #ad-bottom: 728×90 below game guide section
-  - #ad-reward: reward ad button inside game UI ("Watch ad for hint/undo")
+  - #ad-bottom: 728×90 below cross-promotion section
+  - #ad-reward: reward ad button inside game UI ("💡 Hint — Watch ad")
 - AdController logic (in adsense.js):
   - First 3 games: NO interstitial ads (onboarding protection)
   - After that: 1 interstitial every 3 games
-  - Reward ads: always available, voluntary (user-initiated)
+  - Reward ads: always available, voluntary (user-initiated), for hints only
+  - Ad refresh: when user transitions between packs/levels or returns to menu, call refreshBottomAd() to reload #ad-bottom slot (max 1 refresh per 60 seconds to comply with AdSense policy)
 - Landing page: 1 ad slot (728×90 between games grid and stats)
+
+## Mobile Anchor Ad Safe Area
+- CRITICAL: All game pages MUST include bottom safe area for mobile anchor ads
+- In global.css, add: `.game-controls { padding-bottom: 80px; }` on mobile
+- This prevents game control buttons from being hidden behind AdSense auto anchor ads
+- Also add: `body { padding-bottom: env(safe-area-inset-bottom, 0); }` for iOS notch devices
+
+## Hint System (Reward Ad Integration)
+Every game that has solvable puzzles MUST include a 💡 Hint button:
+- Button location: in the game controls area, visually distinct (amber/gold color)
+- Button text: "💡 Hint" with small "(Ad)" label
+- Behavior: user taps → reward ad plays → hint is revealed
+- Hint is FREE for the first use per game session (no ad required)
+- After first free hint, each subsequent hint requires watching a reward ad
+- Hint types per game (defined in skills.md for each game):
+  - NumVault: reveal one digit's correct position
+  - GridSmash: highlight optimal placement zone
+  - PatternPop: replay the pattern one more time (slower)
+  - SortStack: show the optimal next move
+  - QuickCalc: extend timer by 5 seconds (no ad needed, just bonus)
+  - TileTurn: highlight which tile to flip next
+  - ColorFlow: show one correct path segment
+  - PipeLink: rotate one pipe to correct orientation
+  - MergeChain: show optimal drop column
+  - HexMatch: highlight a valid 4+ chain
+- Undo remains FREE and unlimited (undo is not a hint)
+- Reset remains FREE and unlimited
 
 ## Game Page Template (Every Game Page)
 Every game .html file MUST include these sections in order:
@@ -133,16 +156,35 @@ Every game .html file MUST include these sections in order:
 2. Header with nav (rendered by common.js)
 3. Game title bar: emoji + name + settings/stats icons
 4. Game canvas area (centered, responsive)
-5. Game controls below canvas (game-specific)
-6. `<div class="ad-slot" id="ad-sidebar">` — Desktop sidebar ad
-7. Result overlay (hidden by default, shown on game over/clear)
-8. `<div class="ad-slot" id="ad-interstitial">` — Interstitial container
-9. Game guide section: H2 "How to Play [GameName]", 200-300 words
-10. FAQ section: 3-5 questions using `<details><summary>` accordion
-11. Cross-promotion: "Try Another Puzzle" — 3 game cards (rendered by common.js)
+5. Game controls below canvas: score, buttons, 💡 Hint button
+6. Cross-promotion: "Try Another Puzzle" — 3 game cards (rendered by common.js) — placed DIRECTLY below game controls for maximum visibility
+7. `<div class="ad-slot" id="ad-sidebar">` — Desktop sidebar ad (right of game)
+8. Result overlay (hidden by default, shown on game over/clear) — MUST include mini cross-promo icons inside the modal
+9. `<div class="ad-slot" id="ad-interstitial">` — Interstitial container
+10. Game guide section: H2 "How to Play [GameName]", 200-300 words
+11. FAQ section: 3-5 questions using `<details><summary>` accordion
 12. `<div class="ad-slot" id="ad-bottom">` — Bottom ad
 13. Footer (rendered by common.js)
 14. Scripts: common.js, adsense.js, seed.js, sfx.js, share.js, then inline `<script>` for game logic
+
+## Cross-Promotion Placement Rules
+- PRIMARY placement: directly below game controls, ABOVE the game guide section
+  - This is where mobile users' eyes naturally go after playing
+  - 3 game cards in a horizontal row, scrollable on mobile
+- SECONDARY placement: inside Result Modal (game over / level clear popup)
+  - Show 3 small game icons at the bottom of the modal
+  - Format: emoji + name, tappable, links to the other game
+- Cross-promotion map (defined in common.js):
+  - NumVault → GridSmash, PatternPop, QuickCalc
+  - GridSmash → HexMatch, MergeChain, NumVault
+  - ColorFlow → PipeLink, TileTurn, SortStack
+  - MergeChain → GridSmash, HexMatch, NumVault
+  - PatternPop → NumVault, QuickCalc, TileTurn
+  - TileTurn → ColorFlow, PipeLink, PatternPop
+  - PipeLink → ColorFlow, TileTurn, SortStack
+  - SortStack → ColorFlow, PipeLink, TileTurn
+  - QuickCalc → PatternPop, NumVault, MergeChain
+  - HexMatch → GridSmash, MergeChain, SortStack
 
 ## Daily Challenge System
 - All games with Daily mode use getDailySeed(gameId) from seed.js
@@ -161,7 +203,7 @@ Every game .html file MUST include these sections in order:
 
 ## Sound Effects (sfx.js)
 - Web Audio API oscillator-based (no audio files)
-- Sound types: tap, correct, wrong, clear, combo, gameover, win
+- Sound types: tap, correct, wrong, clear, combo, gameover, win, hint
 - Volume: 0.3 (not too loud)
 - Mute toggle in settings, saved to localStorage: `pv_sound`
 - Initialize AudioContext on first user interaction (browser policy)
@@ -170,28 +212,16 @@ Every game .html file MUST include these sections in order:
 - All keys prefixed with `pv_`
 - Format: `pv_{gameId}_{dataType}`
 - Examples: pv_numvault_best, pv_gridsmash_daily_2026-02-18, pv_sound, pv_theme
+- Hint tracking: `pv_{gameId}_freeHintUsed` (boolean, per session via sessionStorage)
 
 ## SEO Requirements (Every Page)
 - Unique `<title>`: "[GameName] — Free Online Puzzle Game | PuzzleVault"
 - Unique `<meta name="description">` (150-160 chars)
-- `<link rel="canonical" href="https://puzzlevault.pages.dev/games/[name]">`
+- `<link rel="canonical" href="https://puzzlevault.pages.dev/games/[name].html">`
 - `<html lang="en">`
 - Schema.org JSON-LD: VideoGame type
 - Open Graph + Twitter Card meta tags
 - Semantic HTML: proper heading hierarchy
-
-## Cross-Promotion Map
-Defined in common.js. After each game, show 3 recommendations:
-- NumVault → GridSmash, PatternPop, QuickCalc
-- GridSmash → HexMatch, MergeChain, NumVault
-- ColorFlow → PipeLink, TileTurn, SortStack
-- MergeChain → GridSmash, HexMatch, NumVault
-- PatternPop → NumVault, QuickCalc, TileTurn
-- TileTurn → ColorFlow, PipeLink, PatternPop
-- PipeLink → ColorFlow, TileTurn, SortStack
-- SortStack → ColorFlow, PipeLink, TileTurn
-- QuickCalc → PatternPop, NumVault, MergeChain
-- HexMatch → GridSmash, MergeChain, SortStack
 
 ## Code Quality
 - Semantic HTML5 elements (header, nav, main, section, footer)
@@ -212,48 +242,16 @@ PuzzleVault includes a blog for SEO traffic and user engagement.
 - Location: /blog/index.html (listing), /blog/posts/*.html (individual posts)
 - Each post is a standalone .html file (no markdown engine, no build tools)
 - Blog listing page: card grid of posts sorted by date (newest first)
-- Post data stored in /js/blog-data.js as a JSON array:
-  ```javascript
-  const BLOG_POSTS = [
-    {
-      slug: 'how-to-improve-memory-with-puzzle-games',
-      title: 'How to Improve Memory with Puzzle Games',
-      description: 'Science-backed tips on using puzzles to boost your brain power.',
-      date: '2026-03-01',
-      category: 'tips',
-      tags: ['memory', 'brain', 'patternpop'],
-      readTime: 5
-    },
-    // ... more posts
-  ];
-  ```
+- Post data stored in /js/blog-data.js as a JSON array
 - Categories: tips, strategy, updates, science
-- Blog post page template:
-  1. Header (via common.js)
-  2. Post title + date + category badge + read time
-  3. Post body (HTML content, manually written)
-  4. `<div class="ad-slot" id="ad-mid">` — Mid-content ad
-  5. Related games section: 2-3 game cards (based on post tags matching game IDs)
-  6. Related posts: 2-3 other posts from same category
-  7. `<div class="ad-slot" id="ad-bottom">` — Bottom ad
-  8. Footer (via common.js)
-- Blog post ad slots: 2 (mid-content, bottom)
-- Internal linking: every post must link to at least 2 relevant PuzzleVault games
-- Adding a new post:
-  1. Create /blog/posts/[slug].html using the post template
-  2. Add entry to BLOG_POSTS array in blog-data.js
-  3. Blog listing page auto-updates (reads from blog-data.js)
+- Blog post template includes: header, post title/date/category, post body, related games section, ad slot, cross-promo, footer
+- Each post gets unique title, meta description, canonical URL, BlogPosting JSON-LD
 
 ## Blog Content Rules
-- Each post: 600-1000 words, natural keyword integration
-- Internal links: 2-4 per post, linking to relevant PuzzleVault games
-- Topics that drive traffic:
-  - "How to" guides (e.g., "How to Get Better at Number Puzzles")
-  - Strategy tips for specific games (e.g., "5 GridSmash Strategies for Higher Scores")
-  - Brain science / cognitive benefits of puzzles
-  - Update announcements (new games, features)
-- SEO: Each post has unique title tag, meta description, OG tags, canonical URL
-- Schema.org: BlogPosting JSON-LD per post
+- Minimum 500 words per post, maximum 1500 words
+- Include 1-2 internal links to game pages per post
+- Include "Play Now" CTA buttons linking to related games
+- Each post has a "Related Games" section at the bottom showing 2-3 game cards
 
 ## Language
 - All UI text and content in English

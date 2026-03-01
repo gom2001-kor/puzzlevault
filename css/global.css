@@ -3,7 +3,9 @@
    =================================================== */
 
 /* --- CSS Reset & Box Sizing --- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -23,12 +25,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font: inherit;
 }
 
@@ -37,7 +46,8 @@ a {
   text-decoration: none;
 }
 
-ul, ol {
+ul,
+ol {
   list-style: none;
 }
 
@@ -118,15 +128,31 @@ body {
   background-color: var(--pv-bg-light);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   line-height: 1.2;
   font-weight: 700;
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1.125rem; }
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+h4 {
+  font-size: 1.125rem;
+}
 
 p {
   color: var(--pv-text-secondary);
@@ -628,6 +654,87 @@ p {
   padding: var(--pv-space-md) 0;
 }
 
+/* Mobile safe area for AdSense anchor ads */
+@media (max-width: 768px) {
+  .game-controls {
+    padding-bottom: 80px;
+  }
+}
+
+/* iOS notch safe area */
+body {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* --- Hint Button --- */
+.hint-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--pv-amber), var(--pv-orange));
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--pv-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.hint-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+.hint-btn:active {
+  transform: scale(0.97);
+}
+
+.hint-btn .hint-sublabel {
+  font-size: 0.65rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.hint-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- Mini Cross-Promo (inside Result Modal) --- */
+.mini-cross-promo {
+  display: flex;
+  justify-content: center;
+  gap: var(--pv-space-md);
+  margin-top: var(--pv-space-md);
+  padding-top: var(--pv-space-md);
+  border-top: 1px solid var(--pv-border);
+}
+
+.mini-cross-promo-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: var(--pv-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.mini-cross-promo-item:hover {
+  color: var(--pv-blue);
+}
+
+.mini-cross-promo-icon {
+  font-size: 1.2rem;
+}
+
 .game-stats-bar {
   display: flex;
   justify-content: space-around;
@@ -950,20 +1057,47 @@ p {
 }
 
 /* --- Utilities --- */
-.text-center { text-align: center; }
-.text-left { text-align: left; }
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
 .flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.gap-sm { gap: var(--pv-space-sm); }
-.gap-md { gap: var(--pv-space-md); }
-.mt-md { margin-top: var(--pv-space-md); }
-.mt-lg { margin-top: var(--pv-space-lg); }
-.mb-md { margin-bottom: var(--pv-space-md); }
-.mb-lg { margin-bottom: var(--pv-space-lg); }
-.hidden { display: none !important; }
+
+.gap-sm {
+  gap: var(--pv-space-sm);
+}
+
+.gap-md {
+  gap: var(--pv-space-md);
+}
+
+.mt-md {
+  margin-top: var(--pv-space-md);
+}
+
+.mt-lg {
+  margin-top: var(--pv-space-lg);
+}
+
+.mb-md {
+  margin-bottom: var(--pv-space-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--pv-space-lg);
+}
+
+.hidden {
+  display: none !important;
+}
 
 /* Streak badge */
 .pv-streak {
@@ -1073,8 +1207,13 @@ p {
 
 /* --- Animations --- */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
@@ -1082,6 +1221,7 @@ p {
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -1093,6 +1233,7 @@ p {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1100,8 +1241,15 @@ p {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 @keyframes ripple {
@@ -1112,19 +1260,52 @@ p {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-  20%, 40%, 60%, 80% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 @keyframes sparkle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.95); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
 }
 
 @keyframes countUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideDown {
@@ -1132,6 +1313,7 @@ p {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1139,8 +1321,22 @@ p {
 }
 
 /* Animation utility classes */
-.anim-fade-in { animation: fadeIn 0.3s ease; }
-.anim-scale-in { animation: scaleIn 0.3s ease; }
-.anim-slide-up { animation: slideUp 0.3s ease; }
-.anim-pulse { animation: pulse 1.5s ease infinite; }
-.anim-shake { animation: shake 0.5s ease; }
+.anim-fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+.anim-scale-in {
+  animation: scaleIn 0.3s ease;
+}
+
+.anim-slide-up {
+  animation: slideUp 0.3s ease;
+}
+
+.anim-pulse {
+  animation: pulse 1.5s ease infinite;
+}
+
+.anim-shake {
+  animation: shake 0.5s ease;
+}

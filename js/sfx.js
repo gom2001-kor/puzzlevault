@@ -38,6 +38,7 @@ const SFX = {
             combo: { freq: 1600, dur: 0.3, wave: 'triangle' },
             gameover: { freq: 150, dur: 0.5, wave: 'sawtooth' },
             win: { freq: 1000, dur: 0.4, wave: 'sine' },
+            hint: { freq: 700, dur: 0.25, wave: 'triangle' },
         };
 
         const s = sounds[type] || sounds.tap;
