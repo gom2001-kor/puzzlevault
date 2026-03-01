@@ -989,8 +989,6 @@ const PipeLink = {
 
         if (typeof shareResult === 'function') {
             shareResult(text);
-        } else {
-            console.log(text);
         }
     },
 

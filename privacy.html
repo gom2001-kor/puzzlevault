@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/global.css">
     <link rel="canonical" href="https://puzzlevault.pages.dev/privacy.html">
     <meta name="theme-color" content="#2563EB">
+    <link rel="manifest" href="/manifest.json">
     <style>
         .pv-support-page {
             max-width: 800px;
@@ -80,7 +81,8 @@
         <p>PuzzleVault uses your browser's native <code>localStorage</code> to save your game progress, high scores,
             streaks, and settings (such as sound preferences). This data is stored entirely on your device and is
             <strong>never transmitted to any external servers</strong>. Please note that if you clear your browser data
-            or use an incognito window, your game progress will be reset or lost.</p>
+            or use an incognito window, your game progress will be reset or lost.
+        </p>
 
         <h2>3. Third-Party Advertising (Google AdSense)</h2>
         <p>To keep PuzzleVault 100% free, we use third-party advertising partners like Google AdSense to display ads.
@@ -112,6 +114,7 @@
     <footer id="pv-footer"></footer>
 
     <script src="/js/common.js"></script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 
 </html>
