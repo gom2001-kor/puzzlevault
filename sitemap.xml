@@ -94,11 +94,28 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- Blog -->
   <url>
     <loc>https://puzzlevault.pages.dev/blog/</loc>
     <lastmod>2026-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/posts/5-tips-to-boost-your-brain-with-puzzles.html</loc>
+    <lastmod>2026-03-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/posts/gridsmash-beginner-strategy-guide.html</loc>
+    <lastmod>2026-02-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/posts/daily-challenge-streak-tips.html</loc>
+    <lastmod>2026-02-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>

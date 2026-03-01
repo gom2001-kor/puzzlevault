@@ -4,35 +4,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog — PuzzleVault</title>
+    <title>PuzzleVault Blog — Puzzle Tips, Strategies & Brain Science</title>
     <meta name="description"
         content="Tips, strategies, and brain science — the PuzzleVault blog helps you become a better puzzle solver.">
     <meta name="theme-color" content="#2563EB">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="manifest" href="/manifest.json">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PuzzleVault Blog — Puzzle Tips, Strategies & Brain Science">
+    <meta property="og:description"
+        content="Tips, strategies, and brain science — the PuzzleVault blog helps you become a better puzzle solver.">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/">
+
+    <style>
+        .blog-page-header {
+            text-align: center;
+            padding: 40px 0 16px;
+        }
+
+        .blog-page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .blog-page-header p {
+            color: var(--pv-text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .pv-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 24px auto;
+            max-width: 500px;
+        }
+
+        .pv-tab {
+            padding: 8px 18px;
+            border: 1px solid var(--pv-border);
+            border-radius: 100px;
+            background: var(--pv-card-bg);
+            color: var(--pv-text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pv-tab:hover {
+            border-color: var(--pv-blue);
+            color: var(--pv-blue);
+        }
+
+        .pv-tab.active {
+            background: var(--pv-blue);
+            color: #fff;
+            border-color: var(--pv-blue);
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 600px) {
+            .blog-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .blog-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .blog-card {
+            display: flex;
+            flex-direction: column;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 24px 20px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s ease;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--pv-shadow-lg);
+            border-color: var(--pv-blue);
+        }
+
+        .blog-card-category {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--pv-blue);
+            background: rgba(37, 99, 235, 0.08);
+            padding: 4px 10px;
+            border-radius: 100px;
+            margin-bottom: 12px;
+            align-self: flex-start;
+        }
+
+        .blog-card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            color: var(--pv-text);
+        }
+
+        .blog-card-desc {
+            font-size: 0.85rem;
+            color: var(--pv-text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .blog-card-meta {
+            font-size: 0.75rem;
+            color: var(--pv-text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .blog-card-read {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--pv-blue);
+            margin-top: auto;
+        }
+
+        .blog-card:hover .blog-card-read {
+            text-decoration: underline;
+        }
+
+        .load-more-wrap {
+            text-align: center;
+            margin: 32px 0;
+        }
+
+        .load-more-btn {
+            padding: 12px 32px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: var(--pv-card-bg);
+            color: var(--pv-blue);
+            border: 2px solid var(--pv-blue);
+            border-radius: var(--pv-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .load-more-btn:hover {
+            background: var(--pv-blue);
+            color: #fff;
+        }
+
+        .blog-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--pv-text-secondary);
+        }
+    </style>
 </head>
 
 <body>
     <header id="pv-header"></header>
 
-    <main class="pv-container pv-section">
-        <h1 class="text-center">📝 PuzzleVault Blog</h1>
-        <p class="text-center mt-md" style="max-width: 500px; margin-left: auto; margin-right: auto;">
-            Tips, strategies, brain science, and updates to help you become a better puzzle solver.
-        </p>
+    <main class="pv-container">
+        <div class="blog-page-header">
+            <h1>📝 PuzzleVault Blog</h1>
+            <p>Tips, strategies, brain science, and updates to help you become a better puzzle solver.</p>
+        </div>
 
         <!-- Category filter tabs -->
-        <div class="pv-tabs mt-lg" style="max-width: 400px; margin-left: auto; margin-right: auto;" id="blog-tabs">
+        <div class="pv-tabs" id="blog-tabs">
             <button class="pv-tab active" data-category="">All</button>
             <button class="pv-tab" data-category="tips">Tips</button>
             <button class="pv-tab" data-category="strategy">Strategy</button>
-            <button class="pv-tab" data-category="science">Science</button>
             <button class="pv-tab" data-category="updates">Updates</button>
+            <button class="pv-tab" data-category="science">Science</button>
         </div>
 
         <!-- Blog posts grid -->
-        <div class="blog-grid mt-lg" id="blog-grid"></div>
+        <div class="blog-grid" id="blog-grid"></div>
+
+        <!-- Load More -->
+        <div class="load-more-wrap" id="load-more-wrap" style="display: none;">
+            <button class="load-more-btn" id="load-more-btn">Load More</button>
+        </div>
     </main>
 
     <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
@@ -42,34 +224,46 @@
     <script src="/js/blog-data.js"></script>
     <script src="/js/common.js"></script>
     <script>
-        function renderBlogGrid(category) {
+        const POSTS_PER_PAGE = 9;
+        let currentCategory = '';
+        let visibleCount = POSTS_PER_PAGE;
+
+        function renderBlogGrid() {
             const grid = document.getElementById('blog-grid');
+            const loadMoreWrap = document.getElementById('load-more-wrap');
             if (!grid) return;
 
-            const posts = getBlogPosts(undefined, category || undefined);
+            const allPosts = getBlogPosts(undefined, currentCategory || undefined);
+            const postsToShow = allPosts.slice(0, visibleCount);
+
             grid.innerHTML = '';
 
-            if (posts.length === 0) {
-                grid.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">No posts found.</p>';
+            if (allPosts.length === 0) {
+                grid.innerHTML = '<p class="blog-empty">No posts found in this category yet.</p>';
+                loadMoreWrap.style.display = 'none';
                 return;
             }
 
-            posts.forEach(post => {
+            postsToShow.forEach(post => {
                 const card = document.createElement('a');
                 card.className = 'blog-card';
                 card.href = `/blog/posts/${post.slug}.html`;
                 card.innerHTML = `
-          <span class="blog-card-category">${post.category}</span>
-          <h3 class="blog-card-title">${post.title}</h3>
-          <p class="blog-card-desc">${post.description}</p>
-          <span class="blog-card-meta">${post.date} · ${post.readTime} min read</span>
-        `;
+                    <span class="blog-card-category">${post.category}</span>
+                    <h3 class="blog-card-title">${post.title}</h3>
+                    <p class="blog-card-desc">${post.description}</p>
+                    <span class="blog-card-meta">${post.date} · ${post.readTime} min read</span>
+                    <span class="blog-card-read">Read →</span>
+                `;
                 grid.appendChild(card);
             });
+
+            // Show/hide Load More
+            loadMoreWrap.style.display = visibleCount < allPosts.length ? 'block' : 'none';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderBlogGrid('');
+            renderBlogGrid();
 
             // Tab filtering
             document.getElementById('blog-tabs').addEventListener('click', e => {
@@ -79,7 +273,15 @@
                 document.querySelectorAll('#blog-tabs .pv-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
 
-                renderBlogGrid(tab.dataset.category);
+                currentCategory = tab.dataset.category;
+                visibleCount = POSTS_PER_PAGE;
+                renderBlogGrid();
+            });
+
+            // Load More
+            document.getElementById('load-more-btn').addEventListener('click', () => {
+                visibleCount += POSTS_PER_PAGE;
+                renderBlogGrid();
             });
         });
     </script>

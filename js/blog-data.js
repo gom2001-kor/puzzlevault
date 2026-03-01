@@ -1,58 +1,41 @@
 /* ===================================================
    PuzzleVault — Blog Post Registry (blog-data.js)
+   ===================================================
+   How to add a new blog post:
+   1. Create /blog/posts/[slug].html (copy from /blog/posts/_template.html)
+   2. Write post content inside <article class="blog-content">
+   3. Add entry to BLOG_POSTS array below
+   4. Update sitemap.xml with new URL
+   That's it — the blog listing page auto-updates.
    =================================================== */
 
-/**
- * Blog post data. Adding a new post:
- * 1. Add entry to BLOG_POSTS below
- * 2. Create /blog/posts/[slug].html using the post template
- * 3. Blog listing page auto-updates
- */
 const BLOG_POSTS = [
     {
-        slug: 'how-to-improve-memory-with-puzzle-games',
-        title: 'How to Improve Memory with Puzzle Games',
-        description: 'Science-backed tips on using puzzles to boost your brain power and sharpen your memory.',
+        slug: '5-tips-to-boost-your-brain-with-puzzles',
+        title: '5 Science-Backed Ways Puzzle Games Boost Your Brain',
+        description: 'Discover how daily puzzle play strengthens memory, sharpens focus, and builds cognitive resilience — backed by real research.',
         date: '2026-03-01',
         category: 'science',
-        tags: ['memory', 'brain', 'patternpop'],
+        tags: ['memory', 'patternpop', 'numvault', 'brain'],
         readTime: 5
     },
     {
-        slug: '5-gridsmash-strategies-for-higher-scores',
-        title: '5 GridSmash Strategies for Higher Scores',
-        description: 'Master the art of block placement with these expert strategies for maximizing combos.',
+        slug: 'gridsmash-beginner-strategy-guide',
+        title: "GridSmash Beginner's Guide: Score 10,000+ Every Time",
+        description: 'Master block placement, dominate the Shatter Zone, and use special blocks like a pro with these proven GridSmash strategies.',
         date: '2026-02-25',
         category: 'strategy',
         tags: ['gridsmash', 'strategy', 'tips'],
-        readTime: 4
-    },
-    {
-        slug: 'the-cognitive-benefits-of-daily-puzzles',
-        title: 'The Cognitive Benefits of Daily Puzzles',
-        description: 'Research shows that daily puzzle solving improves problem-solving skills and mental agility.',
-        date: '2026-02-20',
-        category: 'science',
-        tags: ['brain', 'daily', 'numvault', 'quickcalc'],
-        readTime: 6
-    },
-    {
-        slug: 'beginners-guide-to-number-deduction',
-        title: "Beginner's Guide to Number Deduction",
-        description: 'Learn the basics of logical deduction to crack the code faster in number puzzles.',
-        date: '2026-02-15',
-        category: 'tips',
-        tags: ['numvault', 'beginner', 'strategy'],
         readTime: 5
     },
     {
-        slug: 'welcome-to-puzzlevault',
-        title: 'Welcome to PuzzleVault!',
-        description: 'Introducing PuzzleVault — 10 free browser-based puzzle games to challenge your mind every day.',
-        date: '2026-02-10',
-        category: 'updates',
-        tags: ['announcement', 'launch'],
-        readTime: 3
+        slug: 'daily-challenge-streak-tips',
+        title: 'How to Build a 30-Day Daily Challenge Streak',
+        description: 'Practical tips and game-specific strategies to build an unbreakable daily puzzle habit and keep your streak alive.',
+        date: '2026-02-20',
+        category: 'tips',
+        tags: ['daily', 'numvault', 'gridsmash', 'colorflow', 'streak'],
+        readTime: 5
     }
 ];
 
@@ -103,4 +86,21 @@ function getRelatedPosts(currentSlug, count = 3) {
     scored.sort((a, b) => b.score - a.score || new Date(b.date) - new Date(a.date));
 
     return scored.slice(0, count);
+}
+
+/**
+ * Get related game cards for tags that match game IDs.
+ * Tags like 'numvault', 'gridsmash' map to PV_GAMES entries.
+ * @param {string[]} tags — Tag array from a blog post
+ * @returns {Array<{id: string, emoji: string, name: string, tagline: string, path: string}>}
+ */
+function getRelatedGames(tags) {
+    if (typeof PV_GAMES === 'undefined') return [];
+    const games = [];
+    tags.forEach(tag => {
+        if (PV_GAMES[tag] && !games.find(g => g.id === tag)) {
+            games.push({ id: tag, ...PV_GAMES[tag] });
+        }
+    });
+    return games;
 }
