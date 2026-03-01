@@ -1,7 +1,7 @@
 const GAME_ID = 'quickcalc';
 
 let state = {
-    mode: 'daily', // 'daily' or 'free'
+    mode: 'classic', // 'classic', 'daily', 'timeattack', 'blitz'
     isPlaying: false,
     timeLeft: 0,
     startTime: 0,
@@ -11,24 +11,41 @@ let state = {
     maxCombo: 0,
     correctCount: 0,
     wrongCount: 0,
+    lives: 3,
+    maxLives: 3,
+    hintsUsed: 0,
 
     currentProblem: null,
 
     timerRAF: null,
     lastTick: 0,
 
-    rng: null // Will substitute Math.random for daily seeded mode
+    rng: null
 };
 
-// Config
-const INIT_TIME = 30000; // ms
-const MAX_TIME = 60000; // soft cap visual indication, though practically unbound
-const TIME_BONUS_BASE = 2000;
-const TIME_PENALTY = 3000;
+// Config per mode
+function getModeConfig(mode) {
+    switch (mode) {
+        case 'classic': return { lives: 3, timePerQ: 10000, totalTime: Infinity };
+        case 'daily': return { lives: 3, timePerQ: 10000, totalTime: Infinity };
+        case 'timeattack': return { lives: Infinity, timePerQ: Infinity, totalTime: 120000 }; // 2 min
+        case 'blitz': return { lives: Infinity, timePerQ: Infinity, totalTime: 30000 }; // 30s
+        default: return { lives: 3, timePerQ: 10000, totalTime: Infinity };
+    }
+}
+
+// Per-question timer based on difficulty phase (SKILL.md)
+function getQuestionTimer(qNum) {
+    if (qNum <= 5) return 10000;
+    if (qNum <= 10) return 8000;
+    if (qNum <= 15) return 6000;
+    return 5000;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     initUIEvents();
     if (typeof renderCrossPromo === 'function') renderCrossPromo(GAME_ID);
+    if (typeof HintManager !== 'undefined') HintManager.init(GAME_ID);
 
     const soundBtn = document.getElementById('qc-btn-settings');
     if (soundBtn) soundBtn.textContent = localStorage.getItem('pv_sound') === 'off' ? '🔇' : '🔊';
@@ -72,19 +89,29 @@ function initUIEvents() {
 function startGame() {
     document.getElementById('qc-start-screen').style.display = 'none';
 
+    const config = getModeConfig(state.mode);
     state.isPlaying = true;
-    state.timeLeft = INIT_TIME;
     state.questionNum = 1;
     state.score = 0;
     state.combo = 0;
     state.maxCombo = 0;
     state.correctCount = 0;
     state.wrongCount = 0;
+    state.hintsUsed = 0;
+    state.lives = config.lives;
+    state.maxLives = config.lives;
 
     if (state.mode === 'daily') {
         state.rng = new SeededRandom(getDailySeed(GAME_ID));
     } else {
-        state.rng = null; // use Math.random
+        state.rng = null;
+    }
+
+    // Set timer based on mode
+    if (state.mode === 'timeattack' || state.mode === 'blitz') {
+        state.timeLeft = config.totalTime;
+    } else {
+        state.timeLeft = getQuestionTimer(1);
     }
 
     updateStatusUI();
@@ -119,16 +146,16 @@ function generateProblem(qNum) {
     let pType, isRoulette = false;
     let label = "";
 
-    // Difficulty scaling based on skills.md
-    if (qNum <= 5) { pType = 'single'; label = "Addition"; }
-    else if (qNum <= 10) { pType = 'dbl_sgl'; label = "Double + Single"; }
-    else if (qNum <= 14) { pType = 'dbl_dbl'; label = "Double ± Double"; }
-    else if (qNum <= 19) { isRoulette = true; label = "Operator Roulette"; }
-    else if (qNum <= 24) { pType = 'dbl_mul'; label = "Double × Single"; }
-    else if (qNum <= 29) { pType = 'mixed'; label = "Mixed Ops"; }
+    // Difficulty scaling based on SKILL.md phases
+    if (qNum <= 5) { pType = 'phase1'; label = "Phase 1"; }
+    else if (qNum <= 10) { pType = 'phase2'; label = "Phase 2"; }
+    else if (qNum <= 15) {
+        if (qNum >= 8 && randomFloat() < 0.3) { isRoulette = true; label = "Operator Roulette"; }
+        else { pType = 'phase3'; label = "Phase 3"; }
+    }
     else {
-        if (randomFloat() < 0.3) { isRoulette = true; label = "Expert Roulette"; }
-        else { pType = 'hard'; label = "Expert Math"; }
+        if (qNum >= 15 && randomFloat() < 0.4) { isRoulette = true; label = "Expert Roulette"; }
+        else { pType = 'phase4'; label = "Phase 4"; }
     }
 
     let display, answer;
@@ -156,28 +183,61 @@ function generateProblem(qNum) {
         let A, B, C;
         let opNum = randomInt(1, 3); // 1:+, 2:-, 3:x  (We skip division mostly to avoid decimals unless forced)
 
-        if (pType === 'single') {
-            A = randomInt(3, 9); B = randomInt(3, 9);
-            opNum = 1; label = "Addition";
-        } else if (pType === 'dbl_sgl') {
-            A = randomInt(11, 49); B = randomInt(3, 9);
-            opNum = randomInt(1, 2); label = opNum === 1 ? "Addition" : "Subtraction";
-        } else if (pType === 'dbl_dbl') {
-            A = randomInt(20, 99); B = randomInt(11, 49);
-            if (opNum === 3) opNum = randomInt(1, 2);
+        if (pType === 'phase1') {
+            // 1-20, +/-
+            A = randomInt(1, 20); B = randomInt(1, 20);
+            opNum = randomInt(1, 2);
             label = opNum === 1 ? "Addition" : "Subtraction";
-        } else if (pType === 'dbl_mul') {
-            opNum = 3; label = "Multiplication";
-            A = randomInt(11, 19); B = randomInt(3, 9);
-        } else if (pType === 'mixed' || pType === 'hard') {
-            // Can be slightly bigger
+        } else if (pType === 'phase2') {
+            // 1-50, +/-/×
+            A = randomInt(1, 50); B = randomInt(1, 20);
             opNum = randomInt(1, 3);
-            if (opNum === 1 || opNum === 2) {
-                A = randomInt(50, 199); B = randomInt(20, 99);
-            } else {
-                A = randomInt(12, 25); B = randomInt(5, 12);
+            if (opNum === 3) { A = randomInt(2, 12); B = randomInt(2, 12); }
+            label = opNum === 1 ? "Addition" : opNum === 2 ? "Subtraction" : "Multiplication";
+        } else if (pType === 'phase3') {
+            // 1-100, all ops
+            opNum = randomInt(1, 4);
+            if (opNum === 4) {
+                // Division: ensure integer result
+                B = randomInt(2, 12); C = randomInt(2, 12); A = B * C;
+                display = `${A} ÷ ${B}`;
+                answer = C;
+                choices.push(answer);
+                choices.push(answer + randomInt(1, 3));
+                choices.push(answer - randomInt(1, 3));
+                let far = answer + randomInt(5, 15);
+                while (choices.includes(far)) far++;
+                choices.push(far);
+                shuffle(choices);
+                return { display, answer, choices, label: "Division", isOperator: false };
             }
-            label = (opNum === 1) ? "Hard Addition" : (opNum === 2) ? "Hard Subtraction" : "Multiplication";
+            if (opNum === 3) { A = randomInt(5, 20); B = randomInt(2, 12); }
+            else { A = randomInt(20, 100); B = randomInt(10, 50); }
+            label = opNum === 1 ? "Addition" : opNum === 2 ? "Subtraction" : "Multiplication";
+        } else if (pType === 'phase4') {
+            // 1-200, all + 2-step
+            if (randomFloat() < 0.3) {
+                // 2-step: A op1 B op2 C
+                let a = randomInt(10, 50), b = randomInt(2, 10), c = randomInt(1, 10);
+                let op1 = randomInt(1, 2), op2 = randomInt(1, 3);
+                let r1 = op1 === 1 ? a + b : a - b;
+                let r2 = op2 === 1 ? r1 + c : op2 === 2 ? r1 - c : r1 * c;
+                let ops = ['+', '-', '×'];
+                display = `${a} ${ops[op1 - 1]} ${b} ${ops[op2 - 1]} ${c}`;
+                answer = r2;
+                choices.push(answer);
+                choices.push(answer + randomInt(1, 5));
+                choices.push(answer - randomInt(1, 5));
+                let far = answer + randomInt(10, 30);
+                while (choices.includes(far)) far++;
+                choices.push(far);
+                shuffle(choices);
+                return { display, answer, choices, label: "2-Step", isOperator: false };
+            }
+            opNum = randomInt(1, 3);
+            if (opNum === 3) { A = randomInt(10, 30); B = randomInt(5, 15); }
+            else { A = randomInt(50, 200); B = randomInt(20, 100); }
+            label = opNum === 1 ? "Hard Addition" : opNum === 2 ? "Hard Subtraction" : "Multiplication";
         }
 
         switch (opNum) {
@@ -262,12 +322,30 @@ function updateStatusUI() {
         comboEl.classList.remove('active');
     }
 
+    // Lives display for classic/daily
+    const livesEl = document.getElementById('qc-lives-display');
+    if (livesEl) {
+        if (state.mode === 'classic' || state.mode === 'daily') {
+            let hearts = '';
+            for (let i = 0; i < state.maxLives; i++) hearts += i < state.lives ? '❤️' : '🖤';
+            livesEl.textContent = hearts;
+            livesEl.style.display = '';
+        } else {
+            livesEl.style.display = 'none';
+        }
+    }
+
     updateTimerBarDOM();
 }
 
 function updateTimerBarDOM(snap = false) {
     const bar = document.getElementById('qc-timer-bar');
-    let perc = (state.timeLeft / INIT_TIME) * 100;
+    // Calculate percentage based on mode
+    let maxTime;
+    if (state.mode === 'timeattack') maxTime = 120000;
+    else if (state.mode === 'blitz') maxTime = 30000;
+    else maxTime = getQuestionTimer(state.questionNum);
+    let perc = (state.timeLeft / maxTime) * 100;
 
     // clamp for visual
     if (perc > 100) perc = 100;
@@ -325,27 +403,30 @@ function handleChoiceTap(idx) {
         state.combo++;
         if (state.combo > state.maxCombo) state.maxCombo = state.combo;
 
-        // Calculate points and time bonus
-        let timeBonus = TIME_BONUS_BASE;
-        if (state.combo >= 10) timeBonus += 3000;
-        else if (state.combo >= 5) timeBonus += 2000;
-        else if (state.combo >= 3) timeBonus += 1000;
+        // Calculate score per SKILL.md: 100 × phase + speed bonus + streak + roulette ×2
+        const phase = state.questionNum <= 5 ? 1 : state.questionNum <= 10 ? 2 : state.questionNum <= 15 ? 3 : 4;
+        let points = 100 * phase;
+        // Speed bonus: remaining seconds × 10
+        if (state.mode === 'classic' || state.mode === 'daily') {
+            points += Math.round((state.timeLeft / 1000) * 10);
+        }
+        // Streak bonus: consecutive correct × 50
+        points += state.combo * 50;
+        // Operator Roulette: ×2
+        if (state.currentProblem.isOperator) points *= 2;
 
-        let pointBonus = 100 + (state.combo * 10);
-        state.score += pointBonus;
+        state.score += points;
 
-        state.timeLeft += timeBonus;
-        // optionally cap the time so it doesn't grow infinitely large to keep visual bar responsive
-        // Let's cap at INIT_TIME * 1.5 but allow points
-        if (state.timeLeft > INIT_TIME * 1.5) state.timeLeft = INIT_TIME * 1.5;
+        createFloatingText(cx, cy, `+${points}`);
 
-        let bonusSecs = (timeBonus / 1000).toFixed(1);
-        createFloatingText(cx, cy, `+${bonusSecs}s`);
+        // For classic/daily: reset question timer for next question
+        if (state.mode === 'classic' || state.mode === 'daily') {
+            state.timeLeft = getQuestionTimer(state.questionNum + 1);
+        }
 
         updateTimerBarDOM(true);
         updateStatusUI();
 
-        // small delay before next for feedback pulse
         setTimeout(() => {
             if (!state.isPlaying) return;
             state.questionNum++;
@@ -359,23 +440,33 @@ function handleChoiceTap(idx) {
 
         state.wrongCount++;
         state.combo = 0;
-        state.timeLeft -= TIME_PENALTY;
-        if (state.timeLeft < 0) state.timeLeft = 0;
 
-        createFloatingText(cx, cy, `-3.0s`, true);
+        // Classic/Daily: lose a life
+        if (state.mode === 'classic' || state.mode === 'daily') {
+            state.lives--;
+            createFloatingText(cx, cy, `❤️ -1`, true);
+            if (state.lives <= 0) {
+                state.timeLeft = 0;
+                gameOver();
+                return;
+            }
+            // Reset timer for same question
+            state.timeLeft = getQuestionTimer(state.questionNum);
+        } else {
+            // Time attack/blitz: time penalty
+            state.timeLeft -= 3000;
+            if (state.timeLeft < 0) state.timeLeft = 0;
+            createFloatingText(cx, cy, `-3.0s`, true);
+        }
 
         const cont = document.getElementById('qc-container');
         cont.classList.remove('shake');
-        void cont.offsetWidth; // trigger reflow
+        void cont.offsetWidth;
         cont.classList.add('shake');
         setTimeout(() => cont.classList.remove('shake'), 400);
 
         updateTimerBarDOM(true);
         updateStatusUI();
-
-        // Optionally show correct answer or just proceed
-        // By rules: we reset combo, deduct time, and don't necessarily skip the problem.
-        // Let's just deduct time and let them try again.
     }
 }
 
@@ -442,8 +533,8 @@ https://puzzlevault.pages.dev/games/quickcalc`;
         <div class="qc-result-subtitle">Final Score: <span style="color:var(--pv-emerald); font-weight:800; font-size:1.2rem;">${state.score}</span></div>
         <div class="qc-result-stats">
             <div class="qc-stat-item">
-                <div class="qc-stat-val">${state.questionNum - 1}</div>
-                <div class="qc-stat-lbl">Questions</div>
+                <div class="qc-stat-val">${state.correctCount}</div>
+                <div class="qc-stat-lbl">Correct</div>
             </div>
             <div class="qc-stat-item">
                 <div class="qc-stat-val">${acc}%</div>
@@ -454,16 +545,32 @@ https://puzzlevault.pages.dev/games/quickcalc`;
                 <div class="qc-stat-lbl">Max Combo</div>
             </div>
         </div>
-        <button class="qc-btn-primary" onclick="shareResult('${encodeURIComponent(shareText)}')">📤 Share Result</button>
-        <button class="qc-btn-secondary" onclick="resetToStart()">🔄 Play Again</button>
+        <div class="result-actions">
+            <button class="pv-btn pv-btn-primary" onclick="shareQC()">📤 Share</button>
+            <button class="pv-btn pv-btn-secondary" onclick="resetToStart()">🔄 Play Again</button>
+        </div>
+        <div id="qc-mini-promo"></div>
     `;
 
     overlay.classList.add('show');
-    if (window.AdController) AdController.showInterstitial();
+
+    // Mini cross-promo inside result modal
+    if (typeof renderMiniCrossPromo === 'function') {
+        const promoContainer = document.getElementById('qc-mini-promo');
+        if (promoContainer) renderMiniCrossPromo(GAME_ID, promoContainer);
+    }
+
+    // Show interstitial after 2s delay
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 window.dismissResult = function () {
     document.getElementById('qc-result').classList.remove('show');
+    if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
 }
 
 window.resetToStart = function () {
@@ -493,3 +600,60 @@ function showStatsModal() {
     document.getElementById('qc-stats-body').innerHTML = html;
     document.getElementById('qc-stats-modal').classList.add('open');
 }
+
+/* === SHARE === */
+window.shareQC = function () {
+    const dayNum = getDailyNumber();
+    const isDaily = state.mode === 'daily';
+    let text = `⚡ QuickCalc${isDaily ? ' Daily #' + dayNum : ''}\n`;
+    text += `Score: ${formatNumber(state.score)}\n`;
+    text += `${state.correctCount} correct | 🔥 ${state.maxCombo} streak\n`;
+    text += 'puzzlevault.pages.dev/quickcalc';
+    shareResult(text);
+};
+
+/* === HINT SYSTEM === */
+// Timer extension: always FREE (+5s)
+window.useTimerHint = function () {
+    if (!state.isPlaying) return;
+    state.timeLeft += 5000;
+    SFX.play('hint');
+    showToast('⏰ +5 seconds!');
+    updateTimerBarDOM(true);
+};
+
+// Operator hint: narrows to 2 choices (HintManager)
+window.useOperatorHint = function () {
+    if (!state.isPlaying || !state.currentProblem || !state.currentProblem.isOperator) {
+        showToast('💡 Only available for Operator Roulette!');
+        return;
+    }
+
+    const revealHint = () => {
+        state.hintsUsed++;
+        const answer = state.currentProblem.answer;
+        const allOps = ['+', '-', '×', '÷'];
+        const wrongOps = allOps.filter(o => o !== answer);
+        // Keep answer + 1 random wrong
+        const keptWrong = wrongOps[randomInt(0, wrongOps.length - 1)];
+        const narrowed = [answer, keptWrong];
+        shuffle(narrowed);
+
+        // Disable 2 wrong buttons
+        for (let i = 0; i < 4; i++) {
+            const btn = document.getElementById(`qc-btn-${i}`);
+            if (!narrowed.includes(state.currentProblem.choices[i])) {
+                btn.disabled = true;
+                btn.style.opacity = '0.3';
+            }
+        }
+        SFX.play('hint');
+        showToast('💡 Narrowed to 2 choices!');
+    };
+
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(revealHint);
+    } else {
+        revealHint();
+    }
+};

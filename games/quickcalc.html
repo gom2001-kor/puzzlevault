@@ -15,7 +15,7 @@
     <meta property="og:description"
         content="How fast can you calculate? Race against the clock in this speed math arcade game!">
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
-    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="/css/global.css">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"VideoGame","name":"QuickCalc","description":"A speed math arcade game testing quick mental calculation.","url":"https://puzzlevault.pages.dev/games/quickcalc","genre":"Arcade, Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
     </script>
@@ -499,6 +499,10 @@
                         <span class="qc-daily-tag" id="qc-daily-tag">Daily</span>
                     </div>
                     <div class="qc-icons">
+                        <button class="hint-btn" onclick="useTimerHint()" aria-label="Timer Hint" title="+5s Timer"
+                            style="font-size:0.75rem">⏰ +5s</button>
+                        <button class="hint-btn" onclick="useOperatorHint()" aria-label="Operator Hint"
+                            title="Narrow Operators">💡 Hint <span class="hint-sublabel">(Ad)</span></button>
                         <button class="qc-icon-btn" id="qc-btn-help" aria-label="Help">❓</button>
                         <button class="qc-icon-btn" id="qc-btn-stats" aria-label="Stats">📊</button>
                         <button class="qc-icon-btn" id="qc-btn-settings" aria-label="Sound">🔊</button>
@@ -507,8 +511,10 @@
 
                 <div class="qc-mode-tabs">
                     <div class="pv-tabs" id="qc-tabs">
-                        <button class="pv-tab active" data-mode="daily">Daily</button>
-                        <button class="pv-tab" data-mode="free">Free Play</button>
+                        <button class="pv-tab active" data-mode="classic">Classic</button>
+                        <button class="pv-tab" data-mode="daily">Daily</button>
+                        <button class="pv-tab" data-mode="timeattack">Time Attack</button>
+                        <button class="pv-tab" data-mode="blitz">Blitz</button>
                     </div>
                 </div>
 
@@ -532,7 +538,11 @@
                             <span class="qc-question-num" id="qc-q-info">#1 · Addition</span>
                             <span class="qc-combo" id="qc-combo-display">🔥 Combo x3</span>
                         </div>
-                        <div class="qc-score" id="qc-score-display">0</div>
+                        <div style="text-align:right">
+                            <div id="qc-lives-display" style="font-size:1.2rem;letter-spacing:2px;margin-bottom:2px">
+                                ❤️❤️❤️</div>
+                            <div class="qc-score" id="qc-score-display">0</div>
+                        </div>
                     </div>
 
                     <div class="qc-problem-area" id="qc-problem-area">
@@ -568,52 +578,61 @@
         <!-- HTML documentation below -->
         <section class="game-guide pv-container">
             <h2>How to Play QuickCalc ⚡</h2>
-            <p>QuickCalc is a fast-paced math puzzle game that tests your calculation speed and reflexes. Solve as many
-                equations as you can within the 30-second time limit!</p>
+            <p>QuickCalc is a fast-paced mental math game that tests your calculation speed and accuracy. Answer
+                equations correctly before the timer runs out!</p>
 
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">⏱️ Time & Score</h3>
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">🎯 Difficulty Phases</h3>
             <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
-                <li><strong>Start:</strong> The game begins with a base time of <strong>30.0 seconds</strong>.</li>
-                <li><strong>Correct (✅):</strong> You earn points and gain <strong>+2 seconds</strong>!</li>
-                <li><strong>Wrong (❌):</strong> Mistakes are costly. You lose <strong>-3 seconds</strong> and the screen
-                    shakes violently.</li>
-                <li>If the timer bar drains completely to 0, it's game over!</li>
+                <li><strong>Phase 1 (Q1-5):</strong> Numbers 1-20, +/- only, 10s timer</li>
+                <li><strong>Phase 2 (Q6-10):</strong> Numbers 1-50, +/-/×, 8s timer</li>
+                <li><strong>Phase 3 (Q11-15):</strong> Numbers 1-100, all ops including ÷, 6s timer</li>
+                <li><strong>Phase 4 (Q16+):</strong> Numbers 1-200, 2-step equations, 5s timer</li>
             </ul>
 
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">🔥 Combo Bonus System</h3>
-            <p>Consecutive correct answers strengthen your time bonus.<br>
-                <strong>3-streak: +3 seconds</strong> per correct answer<br>
-                <strong>5-streak: +4 seconds</strong> per correct answer<br>
-                <strong>10-streak: +5 seconds</strong> per correct answer<br>
-                However, a single wrong answer resets your combo back to 0. Accuracy is just as important as speed!
-            </p>
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">🎰 Operator Roulette</h3>
+            <p>From question 8+, sometimes the <strong>operator</strong> is hidden instead of the answer!
+                Display: "7 ? 3 = 21" — you must identify "×".
+                From question 15+, sometimes <strong>two operators</strong> are hidden for an even bigger challenge.
+                Operator Roulette answers earn <strong>×2 points</strong>!</p>
 
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">🎯 Stages & Operator Roulette</h3>
-            <p>As you answer correctly, the equations become smarter and more complex (Dynamic Difficulty Scaling).
-                <br>After passing question 15, you enter the <strong>Operator Roulette</strong> mode. Instead of
-                numbers, you must choose the correct <strong>operator (+, -, ×, ÷)</strong> that makes the equation
-                true. Prepare to think in reverse!
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">💯 Scoring</h3>
+            <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
+                <li>Correct answer: <strong>100 × current phase</strong></li>
+                <li>Speed bonus: <strong>remaining seconds × 10</strong></li>
+                <li>Streak bonus: <strong>consecutive correct × 50</strong></li>
+                <li>Operator Roulette: <strong>×2 points</strong></li>
+            </ul>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">💡 Hints</h3>
+            <p><strong>⏰ Timer Extension:</strong> Always FREE — adds +5s to your timer.
+                <strong>💡 Operator Hint:</strong> Narrows Operator Roulette to 2 choices. First use free,
+                then requires reward ad.
             </p>
         </section>
 
         <section class="pv-faq pv-container">
             <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
             <details>
-                <summary>Is there a maximum limit to the timer?</summary>
-                <p>No, there is no hard cap. By building combos and answering correctly, you can accumulate time well
-                    beyond the initial 30 seconds, potentially lasting for minutes.</p>
+                <summary>What are the different game modes?</summary>
+                <p><strong>Classic:</strong> 3 lives, increasing difficulty. Wrong answers cost a life.
+                    <strong>Daily:</strong> Seeded sequence, one attempt per day, compete with everyone.
+                    <strong>Time Attack:</strong> 2 minutes, answer as many as possible, wrong = -3s penalty.
+                    <strong>Blitz:</strong> 30 seconds of rapid fire, maximum pressure!
+                </p>
+            </details>
+            <details>
+                <summary>How does the scoring work?</summary>
+                <p>Each correct answer earns 100 × phase (1-4) points, plus a speed bonus (remaining seconds × 10)
+                    and a streak bonus (consecutive correct × 50). Operator Roulette answers earn ×2 points!</p>
+            </details>
+            <details>
+                <summary>What is Operator Roulette?</summary>
+                <p>From question 8+, sometimes the operator is hidden: "7 ? 3 = 21" — you must identify "×".
+                    From Q15+, two operators may be hidden. Use the 💡 hint to narrow down to 2 choices.</p>
             </details>
             <details>
                 <summary>Are the wrong answers generated randomly?</summary>
-                <p>No! The wrong answers are carefully formulated to trick you: there is usually <strong>one near miss
-                        (±1 to 3)</strong>, <strong>one medium miss (about 10 off)</strong>, and one random number. You
-                    can't just guess blindly!</p>
-            </details>
-            <details>
-                <summary>What is the difference between Daily Mode and Free Play?</summary>
-                <p>Daily Mode uses a universal seed, meaning everyone in the world gets the exact same sequence of
-                    problems for that day. It's the perfect way to fairly compete with friends. Free Play generates
-                    completely random problems every time you start.</p>
+                <p>No! There's one near miss (±1-3), one medium miss (±5-15), and one far miss. Careful!</p>
             </details>
         </section>
 
@@ -657,12 +676,12 @@
     </div>
 
     <!-- Scripts -->
-    <script src="../js/common.js"></script>
-    <script src="../js/adsense.js"></script>
-    <script src="../js/seed.js"></script>
-    <script src="../js/sfx.js"></script>
-    <script src="../js/share.js"></script>
-    <script src="./quickcalc-logic.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/quickcalc-logic.js"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 
