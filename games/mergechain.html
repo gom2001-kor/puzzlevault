@@ -233,6 +233,9 @@
                     <div class="mc-icons">
                         <button class="mc-icon-btn" id="mc-btn-restart" aria-label="Restart" title="Restart"
                             style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px">Restart</button>
+                        <button class="mc-icon-btn" onclick="useMergeChainHint()" aria-label="Hint" title="Hint"
+                            style="color:var(--pv-amber);font-weight:700;font-size:.85rem">💡 Hint <span
+                                style="font-size:.7em;color:var(--pv-text-secondary)">(Ad)</span></button>
                         <button class="mc-icon-btn" id="mc-btn-help" aria-label="Help">❓</button>
                         <button class="mc-icon-btn" id="mc-btn-stats" aria-label="Stats">📊</button>
                         <button class="mc-icon-btn" id="mc-btn-settings" aria-label="Sound">🔊</button>
@@ -313,6 +316,8 @@
             <p><strong>Game Modes:</strong> Play Classic mode to see how high you can score until the board fills up.
                 Try Daily mode for a seeded sequence of drops that everyone in the world receives—perfect for comparing
                 strategies. Or jump into Time Attack to score as many points as possible within a 2-minute limit.</p>
+            <p><strong>💡 Hints:</strong> Use the Hint button to see a ghost ball showing the optimal drop column.
+                First hint per session is FREE; subsequent hints require a reward ad.</p>
         </section>
 
         <section class="pv-faq pv-container">
@@ -339,6 +344,12 @@
                 <summary>What numbers will drop next?</summary>
                 <p>The next ball to drop is always visible at the top of the screen. The dropped balls will randomly be
                     either 2, 4, or 8, keeping the focus on merging them into larger numbers.</p>
+            </details>
+            <details>
+                <summary>How does the Hint system work?</summary>
+                <p>The 💡 Hint button shows a ghost ball at the optimal drop column. The first hint per
+                    session is free. Subsequent hints require watching a reward ad. Hints don't affect scoring
+                    since MergeChain uses merge-based scoring rather than efficiency bonuses.</p>
             </details>
         </section>
 

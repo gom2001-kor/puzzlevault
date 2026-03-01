@@ -81,6 +81,7 @@ let M = {
     chainTimeout: null,
     isPlaying: false,
     continueUsed: false,
+    hintsUsed: 0,
 
     // Interaction
     isDragging: false,
@@ -151,6 +152,9 @@ function initMergeChain() {
     const urlParams = new URLSearchParams(window.location.search);
     const m = urlParams.get('mode') || 'classic';
     switchMode(m);
+
+    if (typeof renderCrossPromo === 'function') renderCrossPromo('mergechain');
+    if (typeof HintManager !== 'undefined') HintManager.init('mergechain');
 }
 
 function setupInput() {
@@ -219,6 +223,7 @@ function startMode(mode) {
     M.dangerSafeStart = null;
     M.rawPreviewX = CONSTANTS.canvasWidth / 2;
     M.gameStartTime = Date.now();
+    M.hintsUsed = 0;
     document.getElementById('mc-canvas-wrap').classList.remove('danger');
 
     // Apply difficulty preset
@@ -716,9 +721,23 @@ function gameOver(reason) {
 
     showResult(reason);
 
-    if (typeof AdController !== 'undefined') {
-        setTimeout(() => AdController.showInterstitial(), 800);
-    }
+    // Render mini cross-promo in result card
+    setTimeout(() => {
+        const promoContainer = document.getElementById('mc-mini-promo');
+        if (promoContainer && typeof renderMiniCrossPromo === 'function') {
+            renderMiniCrossPromo('mergechain', promoContainer);
+        }
+    }, 100);
+
+    // Ad refresh
+    if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
+
+    // Show interstitial after 2s delay
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 function continueGame() {
@@ -807,6 +826,7 @@ function showResult(titleStr) {
             <button class="pv-btn pv-btn-primary" onclick="shareResultMC()">📤 Share</button>
             <button class="pv-btn pv-btn-secondary" onclick="document.getElementById('mc-result').classList.remove('open'); startMode(M.mode)">🔄 Play Again</button>
         </div>
+        <div id="mc-mini-promo" style="margin-top:12px"></div>
     `;
 
     overlay.classList.add('open');
@@ -814,14 +834,75 @@ function showResult(titleStr) {
 
 function shareResultMC() {
     let modeText = M.mode === 'daily' ? `Daily #${getDailyNumber()}` : (M.mode === 'time' ? 'Time Attack' : 'Classic');
-    let continueFlag = M.continueUsed ? ' 🔄' : '';
-    let text = `🔮 MergeChain — ${modeText}${continueFlag}
-Score: ${formatNumber(M.score)}
-Max Merge: ${M.maxMerge}
-puzzlevault.pages.dev/games/mergechain`;
+    let text = `🔮 MergeChain ${modeText}\n`;
+    text += `Highest: ${M.maxMerge} 🏆\n`;
+    text += `Score: ${formatNumber(M.score)}\n`;
+    if (M.chain > 0) text += `Chain: ×${M.chain}\n`;
+    text += 'puzzlevault.pages.dev/mergechain';
 
     if (typeof shareResult === 'function') shareResult(text);
     else navigator.clipboard.writeText(text).then(() => alert('Copied!'));
+}
+
+/* === HINT SYSTEM === */
+function useMergeChainHint() {
+    if (!M.isPlaying) return;
+
+    const doHint = () => {
+        M.hintsUsed++;
+        // Show ghost ball at optimal column
+        // Find the column where dropping would likely merge
+        let bestX = CONSTANTS.canvasWidth / 2;
+        let bestScore = -1;
+
+        for (let testX = 30; testX < CONSTANTS.canvasWidth - 30; testX += 20) {
+            let score = 0;
+            for (const b of M.balls) {
+                if (b.val === M.nextVal) {
+                    const dist = Math.abs(b.x - testX);
+                    if (dist < b.radius * 3) {
+                        score += (b.radius * 3 - dist);
+                    }
+                }
+            }
+            if (score > bestScore) {
+                bestScore = score;
+                bestX = testX;
+            }
+        }
+
+        // Draw ghost ball overlay for 2.5 seconds
+        const ghostDuration = 2500;
+        const ghostStart = Date.now();
+        const ghostVal = M.nextVal;
+        const ghostInfo = getTypeInfo(ghostVal);
+
+        function drawGhost() {
+            if (Date.now() - ghostStart > ghostDuration || !M.isPlaying) return;
+            const ct = M.ctx;
+            const alpha = 0.4 + Math.sin((Date.now() - ghostStart) * 0.006) * 0.2;
+            ct.globalAlpha = alpha;
+            drawBlock(ct, bestX, ghostInfo.radius + 10, ghostInfo.radius, ghostVal);
+            // Golden ring
+            ct.beginPath();
+            ct.arc(bestX, ghostInfo.radius + 10, ghostInfo.radius + 4, 0, Math.PI * 2);
+            ct.strokeStyle = '#D97706';
+            ct.lineWidth = 3;
+            ct.stroke();
+            ct.globalAlpha = 1.0;
+            requestAnimationFrame(drawGhost);
+        }
+        requestAnimationFrame(drawGhost);
+
+        if (typeof SFX !== 'undefined') SFX.play('hint');
+        if (typeof showToast === 'function') showToast('💡 Try dropping here!');
+    };
+
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(doHint);
+    } else {
+        doHint();
+    }
 }
 
 function showStats() {
