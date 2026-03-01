@@ -342,9 +342,48 @@ function useHint() {
     const revealHint = () => {
         G.hintsUsed++;
         const pos = unconfirmed[Math.floor(Math.random() * unconfirmed.length)];
-        showToast(`💡 Position ${pos + 1} is the digit ${G.code[pos]}`);
+        const digit = G.code[pos];
+
+        // Update tracker to mark digit as included
+        if (G.tracker[digit] === 'unused') {
+            G.tracker[digit] = 'included';
+        }
+        renderTracker();
+
+        // Flash the revealed digit on tracker
+        const tCell = document.getElementById('nv-t-' + digit);
+        if (tCell) {
+            tCell.style.transition = 'none';
+            tCell.style.boxShadow = '0 0 12px 4px var(--pv-amber, #D97706)';
+            tCell.style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                tCell.style.transition = 'all 0.5s ease';
+                tCell.style.boxShadow = '';
+                tCell.style.transform = '';
+            }, 1200);
+        }
+
+        // Flash the input row position with the revealed digit
+        const inputRow = G.guesses.length;
+        const cell = document.getElementById(`nv-c-${inputRow}-${pos}`);
+        if (cell) {
+            cell.textContent = digit;
+            cell.style.transition = 'none';
+            cell.style.background = 'var(--pv-amber, #D97706)';
+            cell.style.color = '#fff';
+            cell.style.fontWeight = '800';
+            setTimeout(() => {
+                cell.style.transition = 'all 1s ease';
+                cell.style.background = '';
+                cell.style.color = '';
+                cell.style.fontWeight = '';
+                // Restore original cell content
+                renderGrid();
+            }, 2500);
+        }
+
+        showToast(`💡 Position ${pos + 1} is the digit ${digit}`);
         SFX.play('hint');
-        renderGrid();
         updateHintBtn();
     };
 

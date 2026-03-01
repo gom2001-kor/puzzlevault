@@ -298,6 +298,28 @@ function render(time) {
     for (let a of arcs) {
         drawBlock(a.cx, a.cy, a.color, true);
     }
+    // Draw hint destination glow
+    let hintAnims = state.animations.filter(a => a.type === 'hintDest');
+    for (const ha of hintAnims) {
+        const hx = getStackX(ha.stackIdx);
+        const hy = STACK_Y_BASE - STACK_HEIGHT;
+        const pulse = 0.4 + Math.sin(Date.now() * 0.008) * 0.3;
+        ctx.save();
+        ctx.strokeStyle = `rgba(217, 119, 6, ${pulse})`;
+        ctx.lineWidth = 4;
+        ctx.setLineDash([8, 6]);
+        ctx.strokeRect(hx - TUBE_WIDTH / 2 - 6, hy - 6, TUBE_WIDTH + 12, STACK_HEIGHT + 12);
+        ctx.setLineDash([]);
+        // Arrow pointing down
+        ctx.fillStyle = `rgba(217, 119, 6, ${pulse})`;
+        ctx.beginPath();
+        ctx.moveTo(hx - 10, hy - 18);
+        ctx.lineTo(hx + 10, hy - 18);
+        ctx.lineTo(hx, hy - 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
 
     // Draw particles (sparkles)
     for (let p of state.particles) {
@@ -871,10 +893,22 @@ window.useSortStackHint = function () {
                     // Found valid move: highlight source and destination
                     showToast(`💡 Move from tube ${i + 1} → tube ${j + 1}`);
                     SFX.play('hint');
-                    // Brief visual highlight via selection
+
+                    // Highlight source tube via selection
                     state.selectedStack = i;
+
+                    // Pulse destination tube with amber flash animation
+                    state.animations.push({
+                        type: 'hintDest',
+                        stackIdx: j,
+                        progress: 0,
+                        elapsed: 0,
+                        duration: 1500
+                    });
+
                     setTimeout(() => {
                         state.selectedStack = -1;
+                        state.animations = state.animations.filter(a => a.type !== 'hintDest');
                     }, 1500);
                     return;
                 }
