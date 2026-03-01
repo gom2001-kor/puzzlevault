@@ -46,6 +46,8 @@ function resetState() {
         dragPiece: null, dragIdx: -1, dragOffset: { x: 0, y: 0 },
         dragGridPos: null, dragValid: false,
         undoState: null, undoUsed: false,
+        hintsUsed: 0,
+        specialCounts: { crystal: 0, ice: 0, wild: 0 },
         // Daily/Sprint
         rng: null, timerValue: 180, timerInterval: null,
         sprintLines: 0, sprintStartTime: 0,
@@ -78,6 +80,7 @@ function initGame() {
         }
     };
     if (typeof renderCrossPromo === 'function') renderCrossPromo('gridsmash');
+    if (typeof HintManager !== 'undefined') HintManager.init('gridsmash');
     switchMode('classic');
 }
 
@@ -140,21 +143,35 @@ function spawnPieces() {
     const colors = shuffleArr([...PASTEL_COLORS]).slice(0, 3);
     let hasSpecial = false;
     for (let i = 0; i < 3; i++) {
-        // Special block chance from turn 16
-        if (!hasSpecial && G.turn >= 16 && randFloat() < 0.2 && G.mode !== 'zen') {
-            const type = randInt(0, 2); // 0=crystal, 1=frost, 2=wild
-            if (type === 2) {
+        // Special blocks from turn 10+ (SKILL.md: 15% Crystal, 10% Ice, 5% Wild)
+        if (!hasSpecial && G.turn >= 10 && G.mode !== 'zen') {
+            const roll = randFloat();
+            if (roll < 0.05) {
+                // Wild (5%)
                 G.wildPiece = { cells: [[0, 0]], special: 'wild' };
                 G.wildUsed = false;
+                G.specialCounts.wild++;
                 document.getElementById('gs-wild-slot').style.display = '';
                 renderWild();
                 G.pieces.push(getRandomPiece());
-            } else {
+                hasSpecial = true;
+            } else if (roll < 0.15) {
+                // Ice (10%)
                 const p = getRandomPiece();
-                p.special = type === 0 ? 'crystal' : 'frost';
+                p.special = 'frost';
                 G.pieces.push(p);
+                G.specialCounts.ice++;
+                hasSpecial = true;
+            } else if (roll < 0.30) {
+                // Crystal (15%)
+                const p = getRandomPiece();
+                p.special = 'crystal';
+                G.pieces.push(p);
+                G.specialCounts.crystal++;
+                hasSpecial = true;
+            } else {
+                G.pieces.push(getRandomPiece());
             }
-            hasSpecial = true;
         } else {
             G.pieces.push(getRandomPiece());
         }
@@ -461,13 +478,13 @@ function placePiece(piece, row, col, idx) {
         G.grid[row + dr][col + dc] = { color };
         cellsPlaced++;
     });
-    G.score += cellsPlaced;
+    G.score += cellsPlaced * 10; // 10 points per cell placed
     SFX.play('tap');
 
     // Special block effects
     if (piece.special === 'crystal') {
         const destroyed = destroyCrystal(row, col, piece.cells);
-        G.score += destroyed * 10;
+        G.score += 200; // +200 per Crystal explosion
         SFX.play('combo');
     }
     if (piece.special === 'frost') {
@@ -556,11 +573,11 @@ function checkLineClears() {
     G.linesCleared += totalLines;
     if (totalLines > G.bestCombo) G.bestCombo = totalLines;
 
-    // Combo score
-    const comboScore = [0, 100, 300, 600, 1200, 2500];
-    let lineScore = comboScore[Math.min(totalLines, 5)] || 2500;
-    // Streak multiplier
-    const streakMult = G.comboStreak >= 4 ? 3 : G.comboStreak >= 3 ? 2 : G.comboStreak >= 2 ? 1.5 : 1;
+    // Line clear score: 100 × lines cleared simultaneously
+    let lineScore = 100 * totalLines;
+    // Combo streak multiplier (consecutive turns with clears): ×1, ×1.5, ×2, ×3, ×5
+    const streakMults = [1, 1, 1.5, 2, 3, 5];
+    const streakMult = streakMults[Math.min(G.comboStreak, 5)] || 5;
     lineScore = Math.round(lineScore * streakMult);
     // Shatter Zone multiplier
     let inZone = false;
@@ -591,6 +608,19 @@ function checkLineClears() {
             G.grid[r][c] = null;
         }
     });
+
+    // Perfect clear bonus (empty board)
+    let isEmpty = true;
+    for (let r = 0; r < GRID_SIZE && isEmpty; r++) {
+        for (let c = 0; c < GRID_SIZE && isEmpty; c++) {
+            if (G.grid[r][c]) isEmpty = false;
+        }
+    }
+    if (isEmpty) {
+        G.score += 5000;
+        showComboPopup(0, 0, false);
+        showToast('🌟 Perfect Clear! +5000');
+    }
 
     // Sprint check
     if (G.mode === 'sprint') {
@@ -628,7 +658,7 @@ function nextTurn() {
             updateZoneBar();
         }
         if (G.turn % 10 === 0 && !G.shatterZone) {
-            G.shatterZone = { active: true, rowStart: GRID_SIZE - 2, turnsLeft: 5 };
+            G.shatterZone = { active: true, rowStart: GRID_SIZE - 2, turnsLeft: 3 };
             updateZoneBar();
         }
     }
@@ -644,17 +674,17 @@ function nextTurn() {
 }
 
 function expireShatterZone() {
+    // Penalty: fill 3 random cells in shatter zone rows
+    const emptyCells = [];
     for (let r = G.shatterZone.rowStart; r < GRID_SIZE; r++) {
-        const emptyCells = [];
         for (let c = 0; c < GRID_SIZE; c++) {
-            if (!G.grid[r][c]) emptyCells.push(c);
+            if (!G.grid[r][c]) emptyCells.push([r, c]);
         }
-        const toFill = Math.floor(emptyCells.length * 0.5);
-        const shuffled = shuffleArr(emptyCells).slice(0, toFill);
-        shuffled.forEach(c => {
-            G.grid[r][c] = { color: PASTEL_COLORS[randInt(0, PASTEL_COLORS.length - 1)] };
-        });
     }
+    const toFill = shuffleArr(emptyCells).slice(0, 3);
+    toFill.forEach(([r, c]) => {
+        G.grid[r][c] = { color: PASTEL_COLORS[randInt(0, PASTEL_COLORS.length - 1)] };
+    });
 }
 
 function updateZoneBar() {
@@ -718,7 +748,6 @@ function getPercentile(score) {
 
 /* === GAME OVER POPUP === */
 function showGameOver() {
-    if (G.mode !== 'daily' && G.mode !== 'zen') AdController.showInterstitial();
     const pct = getPercentile(G.score);
     const isSprint = G.mode === 'sprint' && G.gameState === 'won';
     const elapsed = isSprint ? ((Date.now() - G.sprintStartTime) / 1000).toFixed(1) + 's' : '';
@@ -746,14 +775,30 @@ function showGameOver() {
         titleEl.style.color = 'var(--pv-coral)';
         subEl.textContent = G.mode === 'daily' ? 'Time\'s up!' : 'No more moves available!';
     }
+    // Mini cross-promo inside result modal
+    let promoDiv = popup.querySelector('.mini-cross-promo');
+    if (promoDiv) promoDiv.remove();
+    if (typeof renderMiniCrossPromo === 'function') {
+        const container = statsEl.parentElement;
+        renderMiniCrossPromo('gridsmash', container);
+    }
     popup.style.display = 'flex';
     popup.classList.add('open');
+
+    // Show interstitial after 2s delay
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && G.mode !== 'zen' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 function closeGameOver() {
     const popup = document.getElementById('gs-gameover');
     popup.classList.remove('open');
     popup.style.display = 'none';
+    // Refresh bottom ad on returning to menu
+    if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
 }
 
 /* === RESULT SCREEN (kept for share) === */
@@ -763,13 +808,60 @@ function showResult(score, pct) {
 
 /* === SHARE === */
 function shareGS() {
-    const pct = getPercentile(G.score);
     let text = `🧱 GridSmash${G.mode === 'daily' ? ' Daily #' + getDailyNumber() : ''}\n`;
-    text += `Score: ${formatNumber(G.score)}\n`;
-    text += `Lines: ${G.linesCleared} | Combo: ×${G.bestCombo}`;
-    if (G.shatterZone) text += ' | Shatter: ✓';
-    text += `\n🏆 Top ${pct}%\npuzzlevault.pages.dev/games/gridsmash`;
+    text += `Score: ${formatNumber(G.score)} 🏆\n`;
+    text += `Lines: ${G.linesCleared} | Combo: ×${G.bestCombo}\n`;
+    // Special block counts
+    const specials = [];
+    if (G.specialCounts.crystal > 0) specials.push(`💎×${G.specialCounts.crystal}`);
+    if (G.specialCounts.ice > 0) specials.push(`🧊×${G.specialCounts.ice}`);
+    if (G.specialCounts.wild > 0) specials.push(`⭐×${G.specialCounts.wild}`);
+    if (specials.length > 0) text += specials.join(' ') + '\n';
+    text += 'puzzlevault.pages.dev/gridsmash';
     shareResult(text);
+}
+
+/* === HINT SYSTEM === */
+function useGridSmashHint() {
+    if (G.gameState !== 'playing') return;
+    // Find the first unplaced piece and show optimal placement
+    const revealHint = () => {
+        G.hintsUsed++;
+        for (let i = 0; i < G.pieces.length; i++) {
+            if (G.piecesPlaced[i]) continue;
+            const piece = G.pieces[i];
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    if (canPlace(piece, r, c)) {
+                        // Show ghost outline at this position
+                        G.dragPiece = piece;
+                        G.dragIdx = i;
+                        G.dragGridPos = { row: r, col: c };
+                        G.dragValid = true;
+                        drawGrid();
+                        showToast(`💡 Try placing piece ${i + 1} here`);
+                        SFX.play('hint');
+                        // Clear hint preview after 2 seconds
+                        setTimeout(() => {
+                            if (G.dragPiece === piece) {
+                                G.dragPiece = null;
+                                G.dragIdx = -1;
+                                G.dragGridPos = null;
+                                G.dragValid = false;
+                                drawGrid();
+                            }
+                        }, 2000);
+                        return;
+                    }
+                }
+            }
+        }
+    };
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(revealHint);
+    } else {
+        revealHint();
+    }
 }
 
 /* === UPDATE UI === */
