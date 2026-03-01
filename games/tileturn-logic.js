@@ -2,25 +2,26 @@ const GAME_ID = 'tileturn';
 
 // Level Packs Configuration
 const PACKS = [
-    { id: 1, name: "Starter", desc: "Classic Mod, 3×3 Grid", mode: "classic", size: 3, levels: 20, tapRange: [1, 5] },
-    { id: 2, name: "Apprentice", desc: "Classic Mod, 4×4 Grid", mode: "classic", size: 4, levels: 30, tapRange: [3, 8] },
-    { id: 3, name: "Master", desc: "Classic Mod, 5×5 Grid", mode: "classic", size: 5, levels: 40, tapRange: [5, 12] },
-    { id: 4, name: "Ripple", desc: "Cascade Mod, 4×4 Grid", mode: "cascade", size: 4, levels: 30, tapRange: [3, 8] },
-    { id: 5, name: "Tsunami", desc: "Cascade Mod, 5×5 Grid", mode: "cascade", size: 5, levels: 40, tapRange: [5, 10] },
-    { id: 6, name: "Colors", desc: "Spectrum Mod, 4×4 Grid", mode: "spectrum", size: 4, levels: 30, tapRange: [4, 10] },
-    { id: 7, name: "Prism", desc: "Spectrum Mod, 5×5 Grid", mode: "spectrum", size: 5, levels: 40, tapRange: [6, 14] }
+    { id: 1, name: "Starter", desc: "Basic, 3×3 Grid", mode: "classic", size: 3, levels: 20, tapRange: [1, 5] },
+    { id: 2, name: "Apprentice", desc: "Basic, 4×4 Grid", mode: "classic", size: 4, levels: 20, tapRange: [3, 8] },
+    { id: 3, name: "Master", desc: "Basic, 5×5 Grid", mode: "classic", size: 5, levels: 20, tapRange: [5, 12] },
+    { id: 4, name: "Ripple", desc: "Cascade, 4×4 Grid", mode: "cascade", size: 4, levels: 20, tapRange: [3, 8] },
+    { id: 5, name: "Tsunami", desc: "Cascade, 5×5 Grid", mode: "cascade", size: 5, levels: 20, tapRange: [5, 10] },
+    { id: 6, name: "Colors", desc: "Spectrum, 4×4 Grid", mode: "spectrum", size: 4, levels: 20, tapRange: [4, 10] },
+    { id: 7, name: "Prism", desc: "Spectrum, 5×5 Grid", mode: "spectrum", size: 5, levels: 20, tapRange: [6, 14] }
 ];
 
 let state = {
     currentPackId: null,
     currentLevel: null,
-    mode: "classic", // classic, cascade, spectrum
+    mode: "classic",
     size: 3,
     minMoves: 0,
 
-    board: [], // 1D array of states. Classic/Cascade: 0=OFF, 1=ON. Spectrum: 0,1,2.
+    board: [],
     moves: 0,
-    history: [], // For undo functionality
+    hintsUsed: 0,
+    history: [],
 
     isPlaying: false
 };
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initUIEvents();
     renderPacks();
     if (typeof renderCrossPromo === 'function') renderCrossPromo(GAME_ID);
+    if (typeof HintManager !== 'undefined') HintManager.init(GAME_ID);
 
     const soundBtn = document.getElementById('tt-btn-settings');
     if (soundBtn) soundBtn.textContent = localStorage.getItem('pv_sound') === 'off' ? '🔇' : '🔊';
@@ -314,6 +316,7 @@ function startLevel(packId, levelIdx) {
     state.mode = pack.mode;
     state.size = pack.size;
     state.moves = 0;
+    state.hintsUsed = 0;
     state.history = [];
     state.isPlaying = true;
 
@@ -422,41 +425,87 @@ function handleTileTap(idx) {
 
     state.moves++;
     updateMoveCounter();
-    SFX.play('combo'); // Light click sound
+    SFX.play('combo');
 
-    // Apply Logic
-    applyTapLogic(state.board, idx, state.size, state.mode, false);
+    if (state.mode === 'cascade') {
+        // Cascade: 2-step with 300ms delay per SKILL.md
+        // Step 1: normal toggle (target + adjacent)
+        const step1Before = [...state.board];
+        applyTapLogic(state.board, idx, state.size, 'classic', false); // apply as classic first
 
-    // Animate and refresh (with staggered start times for ripple effect)
-    const affectedIndices = getAffectedIndices(idx, state.size, state.mode);
-
-    // Calculate distance for ripple staggering
-    const tr = Math.floor(idx / state.size);
-    const tc = idx % state.size;
-
-    affectedIndices.forEach(aIdx => {
-        const ar = Math.floor(aIdx / state.size);
-        const ac = aIdx % state.size;
-        const dist = Math.abs(ar - tr) + Math.abs(ac - tc);
-
-        const delay = dist * 50; // 50ms per step
-
-        setTimeout(() => {
+        // Animate step 1
+        const step1Affected = getAffectedIndices(idx, state.size, 'classic');
+        step1Affected.forEach(aIdx => {
             const tile = document.getElementById(`tt-tile-${aIdx}`);
             if (tile) {
                 applyTileStateCSS(tile, state.board[aIdx], state.mode);
                 tile.classList.remove('anim-ripple');
-                void tile.offsetWidth; // Reflow
+                void tile.offsetWidth;
                 tile.classList.add('anim-ripple');
             }
-        }, delay);
-    });
+        });
 
-    // Check Win Condition after the longest ripple has triggered
-    const maxDist = state.mode === 'cascade' ? 4 : 2;
-    setTimeout(() => {
-        checkWinCondition();
-    }, maxDist * 50 + 100);
+        // Determine which tiles were turned ON in step 1
+        const turnedOnInStep1 = [];
+        for (let i = 0; i < state.board.length; i++) {
+            if (step1Before[i] === 0 && state.board[i] === 1) turnedOnInStep1.push(i);
+        }
+
+        // Step 2: after 300ms, tiles turned ON toggle THEIR adjacent
+        if (turnedOnInStep1.length > 0) {
+            setTimeout(() => {
+                turnedOnInStep1.forEach(tIdx => {
+                    const tr2 = Math.floor(tIdx / state.size);
+                    const tc2 = tIdx % state.size;
+                    const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+                    dirs.forEach(([dr, dc]) => {
+                        const nr = tr2 + dr, nc = tc2 + dc;
+                        if (nr >= 0 && nr < state.size && nc >= 0 && nc < state.size) {
+                            const ni = nr * state.size + nc;
+                            state.board[ni] = 1 - state.board[ni];
+                            const tile = document.getElementById(`tt-tile-${ni}`);
+                            if (tile) {
+                                applyTileStateCSS(tile, state.board[ni], state.mode);
+                                tile.classList.remove('anim-ripple');
+                                void tile.offsetWidth;
+                                tile.classList.add('anim-ripple');
+                            }
+                        }
+                    });
+                });
+                setTimeout(() => checkWinCondition(), 150);
+            }, 300);
+        } else {
+            setTimeout(() => checkWinCondition(), 150);
+        }
+    } else {
+        // Classic/Spectrum: normal toggle
+        applyTapLogic(state.board, idx, state.size, state.mode, false);
+
+        const affectedIndices = getAffectedIndices(idx, state.size, state.mode);
+        const tr = Math.floor(idx / state.size);
+        const tc = idx % state.size;
+
+        affectedIndices.forEach(aIdx => {
+            const ar = Math.floor(aIdx / state.size);
+            const ac = aIdx % state.size;
+            const dist = Math.abs(ar - tr) + Math.abs(ac - tc);
+            const delay = dist * 50;
+
+            setTimeout(() => {
+                const tile = document.getElementById(`tt-tile-${aIdx}`);
+                if (tile) {
+                    applyTileStateCSS(tile, state.board[aIdx], state.mode);
+                    tile.classList.remove('anim-ripple');
+                    void tile.offsetWidth;
+                    tile.classList.add('anim-ripple');
+                }
+            }, delay);
+        });
+
+        const maxDist = 2;
+        setTimeout(() => checkWinCondition(), maxDist * 50 + 100);
+    }
 }
 
 function checkWinCondition() {
@@ -464,12 +513,10 @@ function checkWinCondition() {
 
     let isWin = false;
     if (state.mode === 'classic' || state.mode === 'cascade') {
-        // All ON (1)
         isWin = state.board.every(val => val === 1);
     } else if (state.mode === 'spectrum') {
-        // All same color (doesn't matter which color, just unified)
-        const first = state.board[0];
-        isWin = state.board.every(val => val === first);
+        // SKILL.md: Goal is all tiles to Green (2)
+        isWin = state.board.every(val => val === 2);
     }
 
     if (isWin) {
@@ -486,16 +533,32 @@ function handleWin() {
     if (state.moves <= state.minMoves) stars = 3;
     else if (state.moves <= state.minMoves + 2) stars = 2;
 
-    // Save progress
+    // Calculate Score per SKILL.md: 300 base + efficiency + no-hint ×1.2 + pack clear 2000
+    let score = 300;
+    if (state.moves <= state.minMoves) {
+        score += (state.minMoves) * 50; // efficiency bonus for minimum moves
+    } else {
+        score += Math.max(0, (state.minMoves * 2 - state.moves) * 20);
+    }
+    if (state.hintsUsed === 0) score = Math.round(score * 1.2);
+
+    // Check pack clear
     const progress = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_progress`)) || {};
     if (!progress[state.currentPackId]) progress[state.currentPackId] = {};
 
-    // Only overwrite if better stars
     const currentStars = progress[state.currentPackId][state.currentLevel] || 0;
     if (stars > currentStars) {
         progress[state.currentPackId][state.currentLevel] = stars;
         localStorage.setItem(`pv_${GAME_ID}_progress`, JSON.stringify(progress));
     }
+
+    // Check if entire pack is now complete for pack clear bonus
+    const pack = PACKS.find(p => p.id === state.currentPackId);
+    let packComplete = true;
+    for (let i = 1; i <= pack.levels; i++) {
+        if (!progress[state.currentPackId][i]) { packComplete = false; break; }
+    }
+    if (packComplete) score += 2000;
 
     // Display Result Overlay
     const modal = document.getElementById('tt-result-modal');
@@ -507,19 +570,30 @@ function handleWin() {
 
     document.getElementById('tt-res-stars').innerHTML = starHtml;
 
-    let msg = '';
-    if (stars === 3) msg = 'Perfect! Solved in minimum moves.';
-    else if (stars === 2) msg = 'Great job! But it can be solved in fewer moves.';
-    else msg = 'Cleared! Try using less moves next time.';
+    let msg = `Score: ${score}`;
+    if (stars === 3) msg += ' — Perfect! Minimum moves.';
+    else if (stars === 2) msg += ' — Great! Close to minimum.';
+    else msg += ' — Cleared! Try fewer moves.';
 
     document.getElementById('tt-res-msg').textContent = msg;
 
+    // Render mini cross-promo
+    const promoContainer = document.getElementById('tt-mini-promo');
+    if (promoContainer && typeof renderMiniCrossPromo === 'function') {
+        renderMiniCrossPromo(GAME_ID, promoContainer);
+    }
+
     modal.classList.add('open');
 
-    // Check Interstitial
-    if (state.currentLevel % 10 === 0 && window.AdController) {
-        AdController.showInterstitial();
-    }
+    // Ad refresh when completing levels
+    if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
+
+    // Show interstitial after 2s delay
+    setTimeout(() => {
+        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+            AdController.showInterstitial();
+        }
+    }, 2000);
 }
 
 // ---------------------------
@@ -560,3 +634,67 @@ function showStatsModal() {
 
     document.getElementById('tt-stats-modal').classList.add('open');
 }
+
+/* === SHARE === */
+window.shareTT = function () {
+    const size = state.size;
+    let grid = '';
+    for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+            const val = state.board[r * size + c];
+            if (state.mode === 'spectrum') {
+                grid += val === 2 ? '🟩' : val === 1 ? '🟦' : '⬜';
+            } else {
+                grid += val === 1 ? '🟦' : '⬜';
+            }
+        }
+        grid += '\n';
+    }
+    let text = `🔄 TileTurn Pack ${state.currentPackId} Lvl ${state.currentLevel}\n`;
+    text += `✅ Solved in ${state.moves} moves (min: ${state.minMoves})\n`;
+    text += grid;
+    text += 'puzzlevault.pages.dev/tileturn';
+    if (typeof shareResult === 'function') shareResult(text);
+};
+
+/* === HINT SYSTEM === */
+window.useTileTurnHint = function () {
+    if (!state.isPlaying) return;
+
+    const revealHint = () => {
+        state.hintsUsed++;
+        // Find optimal tile: try each cell and see which gets us closer to win
+        const targetVal = (state.mode === 'spectrum') ? 2 : 1;
+        let bestIdx = 0;
+        let bestScore = -1;
+
+        for (let i = 0; i < state.board.length; i++) {
+            const testBoard = [...state.board];
+            applyTapLogic(testBoard, i, state.size, state.mode, false);
+            let matches = testBoard.filter(v => v === targetVal).length;
+            if (matches > bestScore) {
+                bestScore = matches;
+                bestIdx = i;
+            }
+        }
+
+        // Highlight the best tile with golden pulse
+        const tile = document.getElementById(`tt-tile-${bestIdx}`);
+        if (tile) {
+            tile.style.boxShadow = '0 0 12px 4px #D97706';
+            tile.style.border = '3px solid #D97706';
+            SFX.play('hint');
+            setTimeout(() => {
+                tile.style.boxShadow = '';
+                tile.style.border = '';
+            }, 2000);
+        }
+        showToast('💡 Try this tile!');
+    };
+
+    if (typeof HintManager !== 'undefined') {
+        HintManager.requestHint(revealHint);
+    } else {
+        revealHint();
+    }
+};

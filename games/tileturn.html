@@ -15,7 +15,7 @@
     <meta property="og:description"
         content="Can you flip them all? Challenge your brain with 3 modes and hundreds of levels.">
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
-    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="/css/global.css">
 
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"VideoGame","name":"TileTurn","description":"A logic puzzle game where players flip tiles to reach the target state across 3 unique modes.","url":"https://puzzlevault.pages.dev/games/tileturn","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
@@ -339,17 +339,19 @@
             box-shadow: 0 0 15px rgba(253, 230, 138, 0.4);
         }
 
-        /* Spectrum Mode states */
+        /* Spectrum Mode states per SKILL.md: OFF=slate, Blue=PV blue, Green=PV emerald */
         .tt-tile.spec-0 {
-            background: var(--pv-coral);
+            background: var(--pv-slate);
         }
 
         .tt-tile.spec-1 {
-            background: var(--pv-amber);
+            background: var(--pv-blue);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
         }
 
         .tt-tile.spec-2 {
-            background: var(--pv-blue);
+            background: var(--pv-emerald);
+            box-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
         }
 
         /* Controls */
@@ -460,6 +462,8 @@
                         <span>🔄</span><span>TileTurn</span>
                     </div>
                     <div class="tt-icons">
+                        <button class="hint-btn" onclick="useTileTurnHint()" aria-label="Hint" title="Hint">💡 Hint
+                            <span class="hint-sublabel">(Ad)</span></button>
                         <button class="tt-icon-btn" id="tt-btn-help" aria-label="Help">❓</button>
                         <button class="tt-icon-btn" id="tt-btn-settings" aria-label="Sound">🔊</button>
                         <button class="tt-icon-btn" id="tt-btn-stats" aria-label="Stats">📊</button>
@@ -533,10 +537,11 @@
                 <ul style="font-size:0.85rem; padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
                     <li><strong>Classic:</strong> Tap a tile to toggle it and its 4 adjacent neighbors (ON/OFF). Goal:
                         Turn ALL tiles ON (glowing).</li>
-                    <li><strong>Cascade:</strong> Toggle effects propagate 2 levels deep (up to 13 cells at once). Think
-                        carefully!</li>
-                    <li><strong>Spectrum:</strong> Instead of ON/OFF, tiles cycle through 3 colors (Coral &rarr; Amber
-                        &rarr; Blue). Goal: Make all tiles the SAME color.</li>
+                    <li><strong>Cascade Mode:</strong> 2-step chain reaction. Step 1: target + adjacent toggle.
+                        After 300ms, tiles turned ON in step 1 also toggle their neighbors. Requires deeper
+                        planning!</li>
+                    <li><strong>Spectrum Mode:</strong> Tiles have 3 states: OFF (dark) → Blue → Green.
+                        Tapping advances tiles by one state. Goal: all tiles to Green.</li>
                 </ul>
                 <p style="font-size:0.85rem; font-weight:700">Star Ratings:</p>
                 <p style="font-size:0.8rem; color:var(--pv-text-secondary);">Finish in the minimum required moves for
@@ -554,11 +559,13 @@
 
                 <div class="tt-modal-btns">
                     <button class="btn-primary" id="tt-btn-next-level">Next Level</button>
+                    <button class="btn-secondary" onclick="shareTT()">📤 Share</button>
                     <button class="btn-secondary"
                         onclick="document.getElementById('tt-result-modal').classList.remove('open')">View
                         Board</button>
                     <button class="btn-secondary" id="tt-btn-result-levels">Back to Levels</button>
                 </div>
+                <div id="tt-mini-promo" style="margin-top:12px"></div>
             </div>
         </div>
 
@@ -595,10 +602,14 @@
                     vibrant colors for the target and its neighbors.</li>
             </ul>
 
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">⭐ Earning Stars</h3>
-            <p>Every level has an optimally calculated "Minimum Moves" threshold. You are fully capable of making
-                mistakes and trying again using the unlimited <strong>Undo</strong> button! To earn 3 Stars, complete
-                the level in the exact minimum number of moves.</p>
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">⭐ Scoring</h3>
+            <p><strong>300 base points</strong> per level. Move efficiency bonus for solving in minimum moves.
+                Completing without hints earns a <strong>×1.2 multiplier</strong>.
+                Clearing an entire pack awards <strong>2000 bonus points</strong>!</p>
+
+            <h3 style="margin-top: 16px; margin-bottom: 8px;">💡 Hints</h3>
+            <p>Use the 💡 Hint button to highlight the optimal tile to flip (golden pulse). First hint per session
+                is FREE; subsequent hints require a reward ad. Completing without hints earns a score bonus!</p>
         </section>
 
         <section class="pv-faq pv-container">
@@ -617,8 +628,19 @@
             </details>
             <details>
                 <summary>Do I have to unlock earlier packs to play later ones?</summary>
-                <p>No, all 7 packs and their varied modes are unlocked from the start. However, within a specific pack,
-                    you must complete the levels in numerical order to unlock the next one.</p>
+                <p>No, all 7 packs (140 levels total) are unlocked from the start. Within a pack, you must
+                    complete levels sequentially.</p>
+            </details>
+            <details>
+                <summary>How does the Cascade mode work?</summary>
+                <p>Cascade is a 2-step chain reaction. Step 1: tap toggles the target + adjacent tiles normally.
+                    After a 300ms delay, Step 2: tiles turned ON in Step 1 also toggle THEIR adjacent tiles.
+                    This creates ripple effects that require deeper planning.</p>
+            </details>
+            <details>
+                <summary>What's Spectrum mode goal?</summary>
+                <p>In Spectrum mode, tiles cycle through 3 states: OFF (dark) → Blue → Green. Tapping
+                    advances the target and its neighbors by one state. The goal is to get ALL tiles to Green.</p>
             </details>
         </section>
 
@@ -630,12 +652,12 @@
     <footer id="pv-footer"></footer>
 
     <!-- Scripts -->
-    <script src="../js/common.js?v=3"></script>
-    <script src="../js/adsense.js?v=3"></script>
-    <script src="../js/seed.js?v=3"></script>
-    <script src="../js/sfx.js?v=3"></script>
-    <script src="../js/share.js?v=3"></script>
-    <script src="./tileturn-logic.js?v=3"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/adsense.js"></script>
+    <script src="/js/seed.js"></script>
+    <script src="/js/sfx.js"></script>
+    <script src="/js/share.js"></script>
+    <script src="/games/tileturn-logic.js"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 
