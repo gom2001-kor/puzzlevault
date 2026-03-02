@@ -23,6 +23,7 @@ const PipeLink = {
     levelId: 1,
     gameState: 'menu',
     dualMode: false,
+    isAutoSolving: false,
 
     // Animation state
     animations: [],
@@ -214,13 +215,29 @@ const PipeLink = {
         });
         document.getElementById('pl-btn-hint').addEventListener('click', () => {
             if (window.AdController) {
-                AdController.showReward(() => {
+                AdController.showRewardAd(() => {
                     this.useHint();
                 });
             } else {
                 this.useHint();
             }
         });
+
+        const btnHintRestart = document.getElementById('pl-btn-hint-restart');
+        if (btnHintRestart) {
+            btnHintRestart.addEventListener('click', () => {
+                if (typeof AdController !== 'undefined') {
+                    // PipeLink AdController usually implements showRewardAd
+                    AdController.showRewardAd(() => {
+                        document.getElementById('pl-hint-restart-modal').classList.remove('open');
+                        this.resetLevel();
+                    });
+                } else {
+                    document.getElementById('pl-hint-restart-modal').classList.remove('open');
+                    this.resetLevel();
+                }
+            });
+        }
 
         // Modals & Extras
         document.getElementById('pl-btn-help').addEventListener('click', () => {
@@ -411,6 +428,7 @@ const PipeLink = {
         this.initialGridState = JSON.stringify(this.grid);
         this.moves = 0;
         this.gameState = 'playing';
+        this.isAutoSolving = false;
 
         this.updateConnectionLogic();
         this.updateUI();
@@ -685,6 +703,7 @@ const PipeLink = {
         this.grid = JSON.parse(this.initialGridState);
         this.moves = 0;
         this.gameState = 'playing';
+        this.isAutoSolving = false;
         this.updateConnectionLogic();
         this.updateUI();
         this.drawBoard();
@@ -694,43 +713,58 @@ const PipeLink = {
      * Interaction
      */
     useHint() {
-        if (this.gameState !== 'playing') return;
+        if (this.gameState !== 'playing' || this.isAutoSolving) return;
 
         const doHint = () => {
-            this.hintsUsed++;
-            // Find tiles that are not at their target rotation and are not locked
-            let wrongTiles = [];
-            for (let r = 0; r < this.size; r++) {
-                for (let c = 0; c < this.size; c++) {
-                    if (!this.grid[r][c].locked && this.grid[r][c].rot !== this.grid[r][c].targetRot) {
-                        wrongTiles.push({ r, c });
+            if (this.hintsUsed === 0) this.hintsUsed++;
+            this.isAutoSolving = true;
+
+            const solveNext = () => {
+                if (this.gameState !== 'playing' || !this.isAutoSolving) return;
+
+                // Find tiles that are not at their target rotation and are not locked
+                let wrongTiles = [];
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        if (!this.grid[r][c].locked && this.grid[r][c].rot !== this.grid[r][c].targetRot) {
+                            wrongTiles.push({ r, c });
+                        }
                     }
                 }
-            }
 
-            if (wrongTiles.length === 0) return;
+                if (wrongTiles.length === 0) {
+                    this.updateConnectionLogic();
+                    return;
+                }
 
-            // Pick a random wrong tile
-            const rando = wrongTiles[Math.floor(Math.random() * wrongTiles.length)];
-            const cell = this.grid[rando.r][rando.c];
+                // Pick a random wrong tile
+                const rando = wrongTiles[Math.floor(Math.random() * wrongTiles.length)];
+                const cell = this.grid[rando.r][rando.c];
 
-            // Animate the fix (flash gold first per SKILL.md)
-            this.animations.push({
-                r: rando.r, c: rando.c,
-                type: 'rotate',
-                startRot: cell.rot,
-                endRot: cell.targetRot,
-                progress: 0,
-                duration: 300
-            });
+                // Animate the fix (flash gold first per SKILL.md)
+                this.animations.push({
+                    r: rando.r, c: rando.c,
+                    type: 'rotate',
+                    startRot: cell.rot,
+                    endRot: cell.targetRot,
+                    progress: 0,
+                    duration: 250
+                });
 
-            cell.rot = cell.targetRot;
-            cell.locked = true;
+                cell.rot = cell.targetRot;
+                cell.locked = true;
 
-            if (SFX) SFX.play('hint');
+                if (SFX) SFX.play('hint');
 
-            this.updateConnectionLogic();
-            this.updateUI();
+                this.updateConnectionLogic();
+                this.updateUI();
+
+                if (this.gameState === 'playing') {
+                    setTimeout(solveNext, 350);
+                }
+            };
+
+            solveNext();
         };
 
         if (typeof HintManager !== 'undefined') {
@@ -741,6 +775,7 @@ const PipeLink = {
     },
 
     rotateTile(r, c, dir) {
+        if (this.isAutoSolving) return;
         const cell = this.grid[r][c];
 
         // Start rotation animation
@@ -917,6 +952,11 @@ const PipeLink = {
         this.gameState = 'clear';
         setTimeout(() => {
             if (SFX) SFX.play('clear');
+
+            if (this.isAutoSolving) {
+                document.getElementById('pl-hint-restart-modal').classList.add('open');
+                return;
+            }
 
             // Count optimal rotations
             let optimalRotations = 0;
