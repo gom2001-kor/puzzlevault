@@ -194,6 +194,11 @@ function startLevel(packId, levelIdx) {
     state.puzzlePairs = puzzle.pairs;
     state.colorsPresent = state.puzzlePairs.length;
 
+    // Force loaded solution over any corrupted stored state
+    if (puzzle.solution) {
+        state.perfectPaths = puzzle.solution;
+    }
+
     // Place markers
     state.puzzlePairs.forEach(p => {
         let idx1 = p[0] * state.size + p[1];
@@ -750,7 +755,7 @@ const HINT_COLOR_MAP = {
     9: 'var(--pv-lime)'
 };
 
-const HINT_NUM_CIRCLES = ['①', '②', '③', '④', '⑤'];
+const HINT_NUM_CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
 
 window.useColorFlowHint = function () {
     if (!state.isPlaying) return;
@@ -1000,8 +1005,7 @@ window.useColorFlowHint = function () {
         // Clear previous hints
         document.querySelectorAll('.cf-hint-overlay, .cf-hint-arrow').forEach(el => el.remove());
 
-        // HINT_NUM_CIRCLES extends up to 10 for larger boards
-        const HINT_NUM_CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
+        // HINT_NUM_CIRCLES extends up to 10 for larger boards (Using Global Array directly)
         const numSequenceCount = Math.min(hintCells.length, HINT_NUM_CIRCLES.length);
 
         const cssColor = HINT_COLOR_MAP[hintColor] || 'var(--pv-amber)';
