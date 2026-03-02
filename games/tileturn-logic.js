@@ -23,7 +23,8 @@ let state = {
     hintsUsed: 0,
     history: [],
 
-    isPlaying: false
+    isPlaying: false,
+    isAutoSolving: false
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -75,6 +76,21 @@ function initUIEvents() {
         renderLevels(state.currentPackId);
         switchView('levels');
     });
+
+    const btnHintRestart = document.getElementById('tt-btn-hint-restart');
+    if (btnHintRestart) {
+        btnHintRestart.addEventListener('click', () => {
+            if (typeof AdController !== 'undefined') {
+                AdController.showRewardAd(() => {
+                    document.getElementById('tt-hint-restart-modal').classList.remove('open');
+                    resetLevel();
+                });
+            } else {
+                document.getElementById('tt-hint-restart-modal').classList.remove('open');
+                resetLevel();
+            }
+        });
+    }
 }
 
 function switchView(viewName) {
@@ -319,6 +335,7 @@ function startLevel(packId, levelIdx) {
     state.hintsUsed = 0;
     state.history = [];
     state.isPlaying = true;
+    state.isAutoSolving = false;
 
     // Generate puzzle
     const setup = generatePuzzle(pack, levelIdx);
@@ -335,7 +352,7 @@ function startLevel(packId, levelIdx) {
 }
 
 function resetLevel() {
-    if (!state.isPlaying) return;
+    if (state.currentPackId === null) return;
     SFX.play('tap');
 
     // Jump to the very first history state if it exists, or restart
@@ -343,6 +360,8 @@ function resetLevel() {
         state.board = [...state.history[0].board];
         state.history = [];
         state.moves = 0;
+        state.isPlaying = true;
+        state.isAutoSolving = false;
         updateMoveCounter();
         refreshBoardDOM();
     } else {
@@ -415,7 +434,7 @@ function updateMoveCounter() {
 }
 
 function handleTileTap(idx) {
-    if (!state.isPlaying) return;
+    if (!state.isPlaying || state.isAutoSolving) return;
 
     // Save history
     state.history.push({
@@ -527,6 +546,11 @@ function checkWinCondition() {
 function handleWin() {
     state.isPlaying = false;
     SFX.play('win');
+
+    if (state.isAutoSolving) {
+        document.getElementById('tt-hint-restart-modal').classList.add('open');
+        return;
+    }
 
     // Calculate Stars
     let stars = 1;
@@ -659,37 +683,59 @@ window.shareTT = function () {
 
 /* === HINT SYSTEM === */
 window.useTileTurnHint = function () {
-    if (!state.isPlaying) return;
+    if (!state.isPlaying || state.isAutoSolving) return;
 
     const revealHint = () => {
-        state.hintsUsed++;
-        // Find optimal tile: try each cell and see which gets us closer to win
-        const targetVal = (state.mode === 'spectrum') ? 2 : 1;
-        let bestIdx = 0;
-        let bestScore = -1;
+        if (state.hintsUsed === 0) state.hintsUsed++;
+        state.isAutoSolving = true;
 
-        for (let i = 0; i < state.board.length; i++) {
-            const testBoard = [...state.board];
-            applyTapLogic(testBoard, i, state.size, state.mode, false);
-            let matches = testBoard.filter(v => v === targetVal).length;
-            if (matches > bestScore) {
-                bestScore = matches;
-                bestIdx = i;
+        const solveNext = () => {
+            if (!state.isPlaying || !state.isAutoSolving) return;
+
+            // Find optimal tile: try each cell and see which gets us closer to win
+            const targetVal = (state.mode === 'spectrum') ? 2 : 1;
+            let bestIdx = 0;
+            let bestScore = -1;
+
+            for (let i = 0; i < state.board.length; i++) {
+                const testBoard = [...state.board];
+                applyTapLogic(testBoard, i, state.size, state.mode, false);
+                let matches = testBoard.filter(v => v === targetVal).length;
+                if (matches > bestScore) {
+                    bestScore = matches;
+                    bestIdx = i;
+                }
             }
-        }
 
-        // Highlight the best tile with golden pulse
-        const tile = document.getElementById(`tt-tile-${bestIdx}`);
-        if (tile) {
-            tile.style.boxShadow = '0 0 12px 4px #D97706';
-            tile.style.border = '3px solid #D97706';
-            SFX.play('hint');
-            setTimeout(() => {
-                tile.style.boxShadow = '';
-                tile.style.border = '';
-            }, 2000);
-        }
-        showToast('💡 Try this tile!');
+            // Highlight the best tile with golden pulse
+            const tile = document.getElementById(`tt-tile-${bestIdx}`);
+            if (tile) {
+                tile.style.boxShadow = '0 0 12px 4px #D97706';
+                tile.style.border = '3px solid #D97706';
+                SFX.play('hint');
+                setTimeout(() => {
+                    if (tile) {
+                        tile.style.boxShadow = '';
+                        tile.style.border = '';
+                    }
+                }, 400); // Shorter duration for continuous hinting
+            }
+
+            // Programmatically "tap" the tile to trigger cascading/spectrum logic natively
+            // Temporarily disable isAutoSolving so handleTileTap accepts the input
+            state.isAutoSolving = false;
+            handleTileTap(bestIdx);
+            state.isAutoSolving = true;
+
+            // If game is still playing, schedule next hint
+            if (state.isPlaying) {
+                // Cascade needs a bit more time for its 2-step animation
+                const delay = state.mode === 'cascade' ? 800 : 500;
+                setTimeout(solveNext, delay);
+            }
+        };
+
+        solveNext();
     };
 
     if (typeof HintManager !== 'undefined') {
