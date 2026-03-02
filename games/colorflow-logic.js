@@ -735,17 +735,41 @@ window.shareCF = function () {
 };
 
 /* === HINT SYSTEM === */
+
+// Color index to CSS color mapping for hint overlays
+const HINT_COLOR_MAP = {
+    1: 'var(--pv-coral)',
+    2: 'var(--pv-blue)',
+    3: 'var(--pv-emerald)',
+    4: 'var(--pv-amber)',
+    5: 'var(--pv-violet)',
+    6: 'var(--pv-pink)',
+    7: 'var(--pv-orange)',
+    8: 'var(--pv-cyan)',
+    9: 'var(--pv-lime)'
+};
+
+const HINT_NUM_CIRCLES = ['①', '②', '③', '④', '⑤'];
+
 window.useColorFlowHint = function () {
     if (!state.isPlaying) return;
 
     const revealHint = () => {
         state.hintsUsed++;
-        // Find a disconnected color
+
+        // Remove any existing hint overlays
+        document.querySelectorAll('.cf-hint-overlay, .cf-hint-arrow').forEach(el => el.remove());
+
+        // Find a disconnected color (prefer one with least progress)
         let hintColor = null;
+        let bestScore = Infinity;
         for (const p of state.puzzlePairs) {
             if (!isColorConnected(p[4])) {
-                hintColor = p[4];
-                break;
+                const pathLen = (state.paths[p[4]] || []).length;
+                if (pathLen < bestScore) {
+                    bestScore = pathLen;
+                    hintColor = p[4];
+                }
             }
         }
         if (hintColor === null) {
@@ -757,12 +781,12 @@ window.useColorFlowHint = function () {
         const startIdx = getIdx(pair[0], pair[1]);
         const endIdx = getIdx(pair[2], pair[3]);
 
-        // Determine where to start searching from:
-        // If path already partially drawn, start from the tip of the path
+        // Determine search starting point
         const currentPath = state.paths[hintColor] || [];
         const searchFrom = currentPath.length > 0 ? currentPath[currentPath.length - 1] : startIdx;
 
-        // BFS to find shortest path from searchFrom to endIdx through empty cells
+        // BFS: can pass through empty, own path, AND other color paths (since game allows overwriting)
+        // Only block on other color markers (endpoints)
         const visited = new Set();
         visited.add(searchFrom);
         const queue = [[searchFrom, [searchFrom]]];
@@ -785,42 +809,118 @@ window.useColorFlowHint = function () {
                 if (visited.has(nIdx)) continue;
 
                 const content = state.boardContent[nIdx];
-                // Can pass through: empty cells, target endpoint marker, own path cells
                 const isTarget = (nIdx === endIdx);
                 const isEmpty = (content.type === 'empty');
                 const isOwnPath = (content.type === 'path' && content.color === hintColor);
-                if (!isEmpty && !isTarget && !isOwnPath) continue;
+                const isOtherPath = (content.type === 'path' && content.color !== hintColor);
+                // Block only on other color markers (can't draw through someone else's endpoint)
+                const isOtherMarker = (content.type === 'marker' && content.color !== hintColor);
+                if (isOtherMarker) continue;
+                if (!isEmpty && !isTarget && !isOwnPath && !isOtherPath) continue;
 
                 visited.add(nIdx);
                 queue.push([nIdx, [...path, nIdx]]);
             }
         }
 
-        // Select cells to highlight (3-4 cells from the found path)
+        // Select 3-4 hint cells from the found path
         let hintCells = [];
         if (foundPath && foundPath.length > 1) {
-            // Show 3-4 cells from the path (skip searchFrom if it's already placed)
             const skipFirst = currentPath.length > 0 ? 1 : 0;
-            hintCells = foundPath.slice(skipFirst, skipFirst + 4);
-        } else {
-            // Fallback: just highlight the two endpoints
+            const maxShow = Math.min(4, foundPath.length - skipFirst);
+            hintCells = foundPath.slice(skipFirst, skipFirst + maxShow);
+        }
+
+        // Fallback: if BFS fails completely, try reverse direction
+        if (hintCells.length === 0) {
+            const visited2 = new Set();
+            visited2.add(endIdx);
+            const queue2 = [[endIdx, [endIdx]]];
+            let foundPath2 = null;
+
+            while (queue2.length > 0) {
+                const [curr, path] = queue2.shift();
+                if (curr === searchFrom) {
+                    foundPath2 = path.reverse();
+                    break;
+                }
+                const [cr, cc] = getRC(curr);
+                const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+                for (const [dr, dc] of dirs) {
+                    const nr = cr + dr;
+                    const nc = cc + dc;
+                    if (nr < 0 || nr >= state.size || nc < 0 || nc >= state.size) continue;
+                    const nIdx = getIdx(nr, nc);
+                    if (visited2.has(nIdx)) continue;
+                    const content = state.boardContent[nIdx];
+                    const isOtherMarker = (content.type === 'marker' && content.color !== hintColor);
+                    if (isOtherMarker && nIdx !== searchFrom) continue;
+                    visited2.add(nIdx);
+                    queue2.push([nIdx, [...path, nIdx]]);
+                }
+            }
+            if (foundPath2 && foundPath2.length > 1) {
+                const skipFirst = currentPath.length > 0 ? 1 : 0;
+                hintCells = foundPath2.slice(skipFirst, skipFirst + 4);
+            }
+        }
+
+        // Ultimate fallback: show the two endpoints with a message
+        if (hintCells.length === 0) {
             hintCells = [startIdx, endIdx];
         }
 
-        // Highlight with golden pulse
-        hintCells.forEach(idx => {
+        // Get CSS color for this hint color
+        const cssColor = HINT_COLOR_MAP[hintColor] || 'var(--pv-amber)';
+
+        // Render hint overlays with numbered circles and directional arrows
+        hintCells.forEach((idx, i) => {
             const cell = document.getElementById(`cf-cell-${idx}`);
-            if (cell) {
-                cell.style.boxShadow = '0 0 10px 3px #D97706';
-                cell.style.border = '2px solid #D97706';
-                setTimeout(() => {
-                    cell.style.boxShadow = '';
-                    cell.style.border = '';
-                }, 2500);
+            if (!cell) return;
+
+            // Create overlay with number
+            const overlay = document.createElement('div');
+            overlay.className = 'cf-hint-overlay';
+            overlay.style.backgroundColor = `color-mix(in srgb, ${cssColor} 50%, transparent)`;
+            overlay.textContent = HINT_NUM_CIRCLES[i] || '';
+            overlay.style.animationDelay = `${i * 0.15}s`;
+            cell.appendChild(overlay);
+
+            // Add directional arrow to next cell
+            if (i < hintCells.length - 1) {
+                const nextIdx = hintCells[i + 1];
+                const [cr, cc] = getRC(idx);
+                const [nr, nc] = getRC(nextIdx);
+                const dr = nr - cr;
+                const dc = nc - cc;
+
+                let arrowChar = '';
+                let arrowClass = '';
+                if (dc === 1) { arrowChar = '→'; arrowClass = 'arrow-r'; }
+                else if (dc === -1) { arrowChar = '←'; arrowClass = 'arrow-l'; }
+                else if (dr === 1) { arrowChar = '↓'; arrowClass = 'arrow-d'; }
+                else if (dr === -1) { arrowChar = '↑'; arrowClass = 'arrow-u'; }
+
+                if (arrowChar) {
+                    const arrow = document.createElement('div');
+                    arrow.className = `cf-hint-arrow ${arrowClass}`;
+                    arrow.textContent = arrowChar;
+                    cell.appendChild(arrow);
+                }
             }
         });
+
+        // Auto-remove after 3.5 seconds
+        setTimeout(() => {
+            document.querySelectorAll('.cf-hint-overlay, .cf-hint-arrow').forEach(el => el.remove());
+        }, 3500);
+
         SFX.play('hint');
-        showToast('💡 Follow the highlighted path!');
+
+        // Show the color name in the toast
+        const colorNames = { 1: 'Red', 2: 'Blue', 3: 'Green', 4: 'Orange', 5: 'Purple', 6: 'Pink', 7: 'Orange', 8: 'Cyan', 9: 'Lime' };
+        const colorName = colorNames[hintColor] || '';
+        showToast(`💡 ${colorName} path: follow ①→② sequence!`);
     };
 
     if (typeof HintManager !== 'undefined') {
