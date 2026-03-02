@@ -308,7 +308,7 @@ function render(time) {
         ctx.strokeStyle = `rgba(217, 119, 6, ${pulse})`;
         ctx.lineWidth = 4;
         ctx.setLineDash([8, 6]);
-        ctx.strokeRect(hx - TUBE_WIDTH / 2 - 6, hy - 6, TUBE_WIDTH + 12, STACK_HEIGHT + 12);
+        ctx.strokeRect(hx - STACK_WIDTH / 2 - 6, hy - 6, STACK_WIDTH + 12, STACK_HEIGHT + 12);
         ctx.setLineDash([]);
         // Arrow pointing down
         ctx.fillStyle = `rgba(217, 119, 6, ${pulse})`;
