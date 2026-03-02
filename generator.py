@@ -59,7 +59,49 @@ def generate_level(size, num_pairs):
                     sr, sc = starts[i]
                     er, ec = heads[i]
                     pairs.append([sr, sc, er, ec, i + 1])
-                return {"size": size, "pairs": pairs}
+                    
+                # Extract the perfect solution from the fully populated board
+                # The board[][] contains integers 1..N. We reconstruct path per color.
+                # However, the generation process is a random walk, so we need to trace the path
+                # from start to end by following contiguous cells of the same color.
+                solution = {}
+                for i in range(num_pairs):
+                    color = i + 1
+                    sr, sc = starts[i]
+                    er, ec = heads[i]
+                    start_idx = sr * size + sc
+                    end_idx = er * size + ec
+                    
+                    path = []
+                    curr_r, curr_c = sr, sc
+                    visited = set()
+                    
+                    # Trace the contiguous blocks of the same color
+                    while True:
+                        idx = curr_r * size + curr_c
+                        path.append(idx)
+                        visited.add(idx)
+                        
+                        if curr_r == er and curr_c == ec:
+                            break
+                            
+                        # Find next neighbor of same color
+                        moved = False
+                        for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)]:
+                            nr, nc = curr_r + dr, curr_c + dc
+                            if 0 <= nr < size and 0 <= nc < size:
+                                n_idx = nr * size + nc
+                                if board[nr][nc] == color and n_idx not in visited:
+                                    curr_r, curr_c = nr, nc
+                                    moved = True
+                                    break
+                                    
+                        if not moved: # Safety check (should not happen in a valid full board)
+                            break
+                            
+                    solution[str(color)] = path
+
+                return {"size": size, "pairs": pairs, "solution": solution}
 
 PACK_CONFIG = [
     {"size": 5, "levels": 30, "pairs": (4, 5)},

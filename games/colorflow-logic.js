@@ -763,92 +763,101 @@ window.useColorFlowHint = function () {
 
         // 1. Calculate perfect 100% coverage solution if not cached
         if (!state.perfectPaths && state.puzzlePairs.length > 0) {
-            const size = state.size;
-            const totalCells = size * size;
-            const pairs = state.puzzlePairs;
-            const endpoints = new Int32Array(totalCells);
-            const board = new Int32Array(totalCells);
+            // Check if pre-computed solution exists in the level data
+            const levelData = COLORFLOW_LEVELS[state.size][state.levelIdx];
+            if (levelData && levelData.solution) {
+                state.perfectPaths = levelData.solution;
+                // console.log('Using pre-computed solution from generator.');
+            } else {
+                console.log('Calculating perfect paths via DFS fallback...');
+                const size = state.size;
+                const totalCells = size * size;
+                const pairs = state.puzzlePairs;
+                const endpoints = new Int32Array(totalCells);
+                const board = new Int32Array(totalCells);
 
-            pairs.forEach(p => {
-                const c = p[4];
-                endpoints[p[0] * size + p[1]] = c;
-                endpoints[p[2] * size + p[3]] = c;
-                board[p[0] * size + p[1]] = c;
-                board[p[2] * size + p[3]] = c;
-            });
+                pairs.forEach(p => {
+                    const c = p[4];
+                    endpoints[p[0] * size + p[1]] = c;
+                    endpoints[p[2] * size + p[3]] = c;
+                    board[p[0] * size + p[1]] = c;
+                    board[p[2] * size + p[3]] = c;
+                });
 
-            let found = null;
-            const rDirs = [0, 1, 0, -1], cDirs = [1, 0, -1, 0];
-            let iters = 0;
+                let found = null;
+                const rDirs = [0, 1, 0, -1], cDirs = [1, 0, -1, 0];
+                let iters = 0;
+                const MAX_ITERS = 2500000; // Increased significantly for 9x9 grids
 
-            function solve(colorIdx, r, c, currentPath, currentPathsMap) {
-                if (found || iters++ > 1000000) return; // limit iterations for safety
+                function solve(colorIdx, r, c, currentPath, currentPathsMap) {
+                    if (found || iters++ > MAX_ITERS) return; // limit iterations for safety
 
-                if (colorIdx >= pairs.length) {
-                    let emptyCount = 0;
-                    for (let i = 0; i < totalCells; i++) if (board[i] === 0) emptyCount++;
-                    if (emptyCount === 0) found = JSON.parse(JSON.stringify(currentPathsMap));
-                    return;
-                }
-
-                const p = pairs[colorIdx];
-                const tr = p[2], tc = p[3], color = p[4];
-
-                if (r === tr && c === tc) {
-                    if (colorIdx + 1 < pairs.length) {
-                        const np = pairs[colorIdx + 1];
-                        const nextStartIdx = np[0] * size + np[1];
-                        const nextPathMap = Object.assign({}, currentPathsMap);
-                        const newPath = [nextStartIdx];
-                        nextPathMap[np[4]] = newPath;
-                        solve(colorIdx + 1, np[0], np[1], newPath, nextPathMap);
-                    } else {
-                        solve(colorIdx + 1, -1, -1, currentPath, currentPathsMap);
+                    if (colorIdx >= pairs.length) {
+                        let emptyCount = 0;
+                        for (let i = 0; i < totalCells; i++) if (board[i] === 0) emptyCount++;
+                        if (emptyCount === 0) found = JSON.parse(JSON.stringify(currentPathsMap));
+                        return;
                     }
-                    return;
-                }
 
-                // Warnsdorff's Rule: prefer directions with fewer empty neighbors
-                let validMoves = [];
-                for (let d = 0; d < 4; d++) {
-                    const nr = r + rDirs[d], nc = c + cDirs[d];
-                    if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
-                        const idx = nr * size + nc;
-                        if (board[idx] === 0 || (nr === tr && nc === tc && endpoints[idx] === color)) {
-                            let emptyNeighbors = 0;
-                            for (let dd = 0; dd < 4; dd++) {
-                                const nnr = nr + rDirs[dd], nnc = nc + cDirs[dd];
-                                if (nnr >= 0 && nnr < size && nnc >= 0 && nnc < size) {
-                                    const nIdx = nnr * size + nnc;
-                                    if (board[nIdx] === 0 || endpoints[nIdx] > 0) emptyNeighbors++;
+                    const p = pairs[colorIdx];
+                    const tr = p[2], tc = p[3], color = p[4];
+
+                    if (r === tr && c === tc) {
+                        if (colorIdx + 1 < pairs.length) {
+                            const np = pairs[colorIdx + 1];
+                            const nextStartIdx = np[0] * size + np[1];
+                            const nextPathMap = Object.assign({}, currentPathsMap);
+                            const newPath = [nextStartIdx];
+                            nextPathMap[np[4]] = newPath;
+                            solve(colorIdx + 1, np[0], np[1], newPath, nextPathMap);
+                        } else {
+                            solve(colorIdx + 1, -1, -1, currentPath, currentPathsMap);
+                        }
+                        return;
+                    }
+
+                    // Warnsdorff's Rule: prefer directions with fewer empty neighbors
+                    let validMoves = [];
+                    for (let d = 0; d < 4; d++) {
+                        const nr = r + rDirs[d], nc = c + cDirs[d];
+                        if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+                            const idx = nr * size + nc;
+                            if (board[idx] === 0 || (nr === tr && nc === tc && endpoints[idx] === color)) {
+                                let emptyNeighbors = 0;
+                                for (let dd = 0; dd < 4; dd++) {
+                                    const nnr = nr + rDirs[dd], nnc = nc + cDirs[dd];
+                                    if (nnr >= 0 && nnr < size && nnc >= 0 && nnc < size) {
+                                        const nIdx = nnr * size + nnc;
+                                        if (board[nIdx] === 0 || endpoints[nIdx] > 0) emptyNeighbors++;
+                                    }
                                 }
+                                validMoves.push({ nr, nc, idx, emptyNeighbors });
                             }
-                            validMoves.push({ nr, nc, idx, emptyNeighbors });
                         }
                     }
+
+                    validMoves.sort((a, b) => a.emptyNeighbors - b.emptyNeighbors);
+
+                    for (const move of validMoves) {
+                        if (found) return;
+                        const prev = board[move.idx];
+                        board[move.idx] = color;
+                        currentPath.push(move.idx);
+
+                        solve(colorIdx, move.nr, move.nc, currentPath, currentPathsMap);
+
+                        currentPath.pop();
+                        board[move.idx] = prev;
+                    }
                 }
 
-                validMoves.sort((a, b) => a.emptyNeighbors - b.emptyNeighbors);
+                const firstPair = pairs[0];
+                const startIdx = firstPair[0] * size + firstPair[1];
+                const initPath = [startIdx];
+                solve(0, firstPair[0], firstPair[1], initPath, { [firstPair[4]]: initPath });
 
-                for (const move of validMoves) {
-                    if (found) return;
-                    const prev = board[move.idx];
-                    board[move.idx] = color;
-                    currentPath.push(move.idx);
-
-                    solve(colorIdx, move.nr, move.nc, currentPath, currentPathsMap);
-
-                    currentPath.pop();
-                    board[move.idx] = prev;
-                }
+                if (found) state.perfectPaths = found;
             }
-
-            const firstPair = pairs[0];
-            const startIdx = firstPair[0] * size + firstPair[1];
-            const initPath = [startIdx];
-            solve(0, firstPair[0], firstPair[1], initPath, { [firstPair[4]]: initPath });
-
-            if (found) state.perfectPaths = found;
         }
 
         let hintColor = null;
@@ -888,28 +897,112 @@ window.useColorFlowHint = function () {
             candidates.sort((a, b) => a.correctLen - b.correctLen);
             const best = candidates[0];
             hintColor = best.color;
+
+            // 동적 스케일링: 보드 사이즈가 클 수 록 더 많은 힌트를 보여줌. (최소 4칸 ~ 보드 크기 - 1개)
+            const hintLength = Math.max(4, state.size - 1);
             let startSlice = Math.max(0, best.correctLen - 1);
-            hintCells = best.perfectPath.slice(startSlice, startSlice + 4);
+            hintCells = best.perfectPath.slice(startSlice, startSlice + hintLength);
+            console.log(`[Hint Debug] state.size=${state.size}, hintLength=${hintLength}, startSlice=${startSlice}, hintCells.length=${hintCells.length}`);
 
         } else {
             // Ultimate fallback (BFS if DFS failed/timed out, very rare)
-            let bestScore = Infinity;
-            for (const p of state.puzzlePairs) {
-                if (!isColorConnected(p[4])) {
-                    const pathLen = (state.paths[p[4]] || []).length;
-                    if (pathLen < bestScore) {
-                        bestScore = pathLen;
-                        hintColor = p[4];
+            console.warn('DFS fallback: using BFS hint.');
+
+            // Helper to check if a line is correctly connected (used for BFS fallback)
+            const checkLineCorrectness = (pairIndex) => {
+                const p = state.puzzlePairs[pairIndex];
+                const color = p[4];
+                const userPath = state.paths[color] || [];
+                const startIdx = getIdx(p[0], p[1]);
+                const endIdx = getIdx(p[2], p[3]);
+
+                if (userPath.length === 0 || userPath[0] !== startIdx) return false;
+
+                // Check if the path reaches the end point
+                if (userPath[userPath.length - 1] !== endIdx) return false;
+
+                // Check for self-intersection or incorrect turns (simple check)
+                const pathSet = new Set();
+                for (let i = 0; i < userPath.length; i++) {
+                    if (pathSet.has(userPath[i]) && i !== 0 && i !== userPath.length - 1) return false; // Allow endpoints to be revisited if path loops
+                    pathSet.add(userPath[i]);
+                }
+                return true;
+            };
+
+            let unsolved = [];
+            for (let i = 0; i < state.puzzlePairs.length; i++) {
+                if (!checkLineCorrectness(i)) unsolved.push(i);
+            }
+            if (unsolved.length === 0) {
+                showToast('🎉 All pairs connected!');
+                return;
+            }
+
+            const targetLine = unsolved[0];
+            const p = state.puzzlePairs[targetLine];
+            hintColor = p[4]; // Use p[4] for color
+            const startIdx = getIdx(p[0], p[1]);
+            const endIdx = getIdx(p[2], p[3]);
+
+            // A very simple BFS to find A path (might not be coverage 100%)
+            let queue = [[startIdx]];
+            let visited = new Set([startIdx]);
+            let foundPath = null;
+            const rDirs = [0, 1, 0, -1], cDirs = [1, 0, -1, 0];
+
+            while (queue.length > 0) {
+                let path = queue.shift();
+                let lastIdx = path[path.length - 1];
+                if (lastIdx === endIdx) {
+                    foundPath = path;
+                    break;
+                }
+                let r = Math.floor(lastIdx / state.size);
+                let c = lastIdx % state.size;
+                for (let d = 0; d < 4; d++) {
+                    let nr = r + rDirs[d], nc = c + cDirs[d];
+                    if (nr >= 0 && nr < state.size && nc >= 0 && nc < state.size) {
+                        let idx = nr * state.size + nc;
+                        // Allow moving into empty cells, the target endpoint, or cells already part of this color's path
+                        const isCurrentColorPath = state.paths[hintColor] && state.paths[hintColor].includes(idx);
+                        if (!visited.has(idx) && (state.boardContent[idx] === 0 || idx === endIdx || state.boardContent[idx] === hintColor || isCurrentColorPath)) {
+                            visited.add(idx);
+                            queue.push([...path, idx]);
+                        }
                     }
                 }
             }
-            if (!hintColor) return showToast('🎉 All pairs connected!');
 
-            const pair = state.puzzlePairs.find(p => p[4] === hintColor);
-            const startIdx = getIdx(pair[0], pair[1]);
-            const endIdx = getIdx(pair[2], pair[3]);
-            hintCells = [startIdx, endIdx];
+            if (foundPath) {
+                // Determine how much is already drawn
+                let correctLen = 1;
+                const drawnPath = state.paths[hintColor] || [];
+                for (let i = 1; i < drawnPath.length; i++) {
+                    if (i < foundPath.length && drawnPath[i] === foundPath[i]) {
+                        correctLen++;
+                    } else break;
+                }
+                let startSlice = Math.max(0, correctLen - 1);
+                hintCells = foundPath.slice(startSlice, startSlice + Math.max(4, state.size - 1));
+            } else {
+                hintCells = [startIdx, endIdx];
+            }
         }
+
+        if (!hintCells || hintCells.length < 2) {
+            showToast("No clear path found. Try undoing some lines.");
+            return;
+        }
+
+        state.hintsUsed++;
+
+        // Clear previous hints
+        document.querySelectorAll('.cf-hint-overlay, .cf-hint-arrow').forEach(el => el.remove());
+
+        // HINT_NUM_CIRCLES extends up to 10 for larger boards
+        const HINT_NUM_CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
+        const numSequenceCount = Math.min(hintCells.length, HINT_NUM_CIRCLES.length);
 
         const cssColor = HINT_COLOR_MAP[hintColor] || 'var(--pv-amber)';
 
@@ -956,8 +1049,14 @@ window.useColorFlowHint = function () {
         }, 3500);
 
         SFX.play('hint');
-        const colorNames = { 1: 'Red', 2: 'Blue', 3: 'Green', 4: 'Orange', 5: 'Purple', 6: 'Pink', 7: 'Orange', 8: 'Cyan', 9: 'Lime' };
-        showToast(`💡 ${colorNames[hintColor] || ''} path: follow ① sequence!`);
+        const colorNameMap = {
+            1: "Red", 2: "Blue", 3: "Green", 4: "Orange", 5: "Purple",
+            6: "Pink", 7: "Orange", 8: "Cyan", 9: "Lime", 10: "Yellow" // Added more colors for completeness
+        };
+        const cName = colorNameMap[hintColor] || "This";
+
+        // Dynamic Toast message depending on how many hints are shown
+        showToast(`💡 ${cName} path: follow ① to ${HINT_NUM_CIRCLES[numSequenceCount - 1]} sequence!`);
     };
 
     if (typeof HintManager !== 'undefined') {
