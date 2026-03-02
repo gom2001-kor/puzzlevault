@@ -223,27 +223,41 @@ const PipeLink = {
             }
         });
 
-        const hintRestartBtns = [
-            document.getElementById('pl-btn-hint-restart'),
-            document.getElementById('pl-btn-hint-close'),
-            document.getElementById('pl-btn-hint-view')
-        ];
-
-        hintRestartBtns.forEach(btn => {
-            if (btn) {
-                btn.addEventListener('click', () => {
-                    if (typeof AdController !== 'undefined') {
-                        AdController.showRewardAd(() => {
-                            document.getElementById('pl-hint-restart-modal').classList.remove('open');
-                            this.resetLevel();
-                        });
-                    } else {
-                        document.getElementById('pl-hint-restart-modal').classList.remove('open');
-                        this.resetLevel();
-                    }
-                });
+        const handleModalAdClick = (callback) => {
+            if (typeof AdController !== 'undefined') {
+                AdController.showRewardAd(callback);
+            } else {
+                callback();
             }
-        });
+        };
+
+        const btnHintRestart = document.getElementById('pl-btn-hint-restart');
+        if (btnHintRestart) {
+            btnHintRestart.addEventListener('click', () => {
+                handleModalAdClick(() => {
+                    document.getElementById('pl-hint-restart-modal').classList.remove('open');
+                    this.resetLevel();
+                });
+            });
+        }
+
+        const btnHintClose = document.getElementById('pl-btn-hint-close');
+        if (btnHintClose) {
+            btnHintClose.addEventListener('click', () => {
+                handleModalAdClick(() => {
+                    document.getElementById('pl-hint-restart-modal').classList.remove('open');
+                });
+            });
+        }
+
+        const btnHintView = document.getElementById('pl-btn-hint-view');
+        if (btnHintView) {
+            btnHintView.addEventListener('click', () => {
+                handleModalAdClick(() => {
+                    document.getElementById('pl-hint-restart-modal').classList.remove('open');
+                });
+            });
+        }
 
         // Modals & Extras
         document.getElementById('pl-btn-help').addEventListener('click', () => {

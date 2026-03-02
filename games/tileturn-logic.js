@@ -77,27 +77,41 @@ function initUIEvents() {
         switchView('levels');
     });
 
-    const hintRestartBtns = [
-        document.getElementById('tt-btn-hint-restart'),
-        document.getElementById('tt-btn-hint-close'),
-        document.getElementById('tt-btn-hint-view')
-    ];
-
-    hintRestartBtns.forEach(btn => {
-        if (btn) {
-            btn.addEventListener('click', () => {
-                if (typeof AdController !== 'undefined') {
-                    AdController.showRewardAd(() => {
-                        document.getElementById('tt-hint-restart-modal').classList.remove('open');
-                        resetLevel();
-                    });
-                } else {
-                    document.getElementById('tt-hint-restart-modal').classList.remove('open');
-                    resetLevel();
-                }
-            });
+    const handleModalAdClick = (callback) => {
+        if (typeof AdController !== 'undefined') {
+            AdController.showRewardAd(callback);
+        } else {
+            callback();
         }
-    });
+    };
+
+    const btnHintRestart = document.getElementById('tt-btn-hint-restart');
+    if (btnHintRestart) {
+        btnHintRestart.addEventListener('click', () => {
+            handleModalAdClick(() => {
+                document.getElementById('tt-hint-restart-modal').classList.remove('open');
+                resetLevel();
+            });
+        });
+    }
+
+    const btnHintClose = document.getElementById('tt-btn-hint-close');
+    if (btnHintClose) {
+        btnHintClose.addEventListener('click', () => {
+            handleModalAdClick(() => {
+                document.getElementById('tt-hint-restart-modal').classList.remove('open');
+            });
+        });
+    }
+
+    const btnHintView = document.getElementById('tt-btn-hint-view');
+    if (btnHintView) {
+        btnHintView.addEventListener('click', () => {
+            handleModalAdClick(() => {
+                document.getElementById('tt-hint-restart-modal').classList.remove('open');
+            });
+        });
+    }
 }
 
 function switchView(viewName) {
