@@ -219,61 +219,107 @@ function renderLevels(packId) {
 // ---------------------------
 // INITIALIZATION / PUZZLE GEN
 // ---------------------------
+function backwardStepCascade(boardArr, tapIdx, size) {
+    const tr = Math.floor(tapIdx / size);
+    const tc = tapIdx % size;
+    const M_indices = [];
+    const addIfValid = (r, c) => {
+        if (r >= 0 && r < size && c >= 0 && c < size) M_indices.push(r * size + c);
+    };
+    addIfValid(tr, tc);
+    addIfValid(tr - 1, tc);
+    addIfValid(tr + 1, tc);
+    addIfValid(tr, tc - 1);
+    addIfValid(tr, tc + 1);
+
+    const predecessors = [];
+    const numSubsets = 1 << M_indices.length;
+
+    for (let mask = 0; mask < numSubsets; mask++) {
+        const A = [];
+        for (let bit = 0; bit < M_indices.length; bit++) {
+            if ((mask & (1 << bit)) !== 0) A.push(M_indices[bit]);
+        }
+
+        const cascadeMask = new Array(size * size).fill(0);
+        A.forEach(idx => {
+            const r = Math.floor(idx / size);
+            const c = idx % size;
+            const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+            dirs.forEach(([dr, dc]) => {
+                const nr = r + dr, nc = c + dc;
+                if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+                    cascadeMask[nr * size + nc] ^= 1;
+                }
+            });
+        });
+
+        const X_test = [...boardArr];
+        M_indices.forEach(idx => X_test[idx] ^= 1);
+        for (let i = 0; i < cascadeMask.length; i++) {
+            if (cascadeMask[i]) X_test[i] ^= 1;
+        }
+
+        let valid = true;
+        for (let bit = 0; bit < M_indices.length; bit++) {
+            const idx = M_indices[bit];
+            const shouldBeZero = (mask & (1 << bit)) !== 0;
+            const isZero = (X_test[idx] === 0);
+            if (shouldBeZero !== isZero) {
+                valid = false;
+                break;
+            }
+        }
+        if (valid) predecessors.push(X_test);
+    }
+    return predecessors;
+}
+
 function generatePuzzle(pack, levelIdx) {
-    // Determine number of backward taps based on level progress within the pack's range
     let ratio = (levelIdx - 1) / Math.max(1, (pack.levels - 1));
     let tRange = pack.tapRange;
     let minTapsTarget = Math.round(tRange[0] + ratio * (tRange[1] - tRange[0]));
 
-    // Seeded Random for determinism per level
-    // So identical pack/level always generates identical puzzle
     const seed = getDailySeed(`${GAME_ID}_p${pack.id}_l${levelIdx}`);
     const rng = new SeededRandom(seed);
-
     let size = pack.size;
     let totalCells = size * size;
 
-    // Start in Solved State
-    // Classic/Cascade: Target is 1 (ON). Spectrum: Target is 2 (Blue/Unified). 
     let board = new Array(totalCells).fill(pack.mode === 'spectrum' ? 2 : 1);
-
-    // Reverse tap logic
     let historyMoves = [];
-
-    // To prevent immediate trivial repeats, keep track of recent taps
     let tapCounts = new Array(totalCells).fill(0);
 
-    for (let i = 0; i < minTapsTarget; i++) {
-        // Pick a random cell
-        let cell = rng.nextInt(0, totalCells - 1);
+    let validMovesMade = 0;
+    let attempts = 0;
 
-        // Slightly discourage tapping the exact same cell multiple times back-to-back
-        // in order to actually scramble the board
+    while (validMovesMade < minTapsTarget && attempts < 1000) {
+        attempts++;
+        let cell = rng.nextInt(0, totalCells - 1);
         while (tapCounts[cell] > 1 || (historyMoves.length > 0 && historyMoves[historyMoves.length - 1] === cell)) {
             cell = rng.nextInt(0, totalCells - 1);
-            // Safety breakout if taking too long 
             if (rng.next() < 0.1) break;
         }
 
-        tapCounts[cell]++;
-        historyMoves.push(cell);
-
-        // Apply reverse tap
-        if (pack.mode === 'classic' || pack.mode === 'cascade') {
-            // Toggling is symmetric, so reverse tap == forward tap
+        if (pack.mode === 'cascade') {
+            const predecessors = backwardStepCascade(board, cell, size);
+            if (predecessors.length > 0) {
+                board = predecessors[rng.nextInt(0, predecessors.length - 1)];
+                tapCounts[cell]++;
+                historyMoves.push(cell);
+                validMovesMade++;
+            }
+        } else {
+            tapCounts[cell]++;
+            historyMoves.push(cell);
             applyTapLogic(board, cell, size, pack.mode, true);
-        } else if (pack.mode === 'spectrum') {
-            // Spectrum cycles 0->1->2->0 forward. 
-            // Backward is 0->2, 2->1, 1->0
-            applyTapLogic(board, cell, size, pack.mode, true); // true = reverse
+            validMovesMade++;
         }
     }
 
-    // MinTaps could theoretically be lower if moves cancelled out, but we'll use target
-    // for a generous baseline.
     return {
         board: board,
-        minTaps: minTapsTarget
+        minTaps: validMovesMade,
+        solutionSequence: historyMoves.reverse()
     };
 }
 
@@ -304,16 +350,8 @@ function applyTapLogic(boardArr, tapIdx, size, mode, isReverse = false) {
     toggleCell(tr, tc - 1); // Left
     toggleCell(tr, tc + 1); // Right
 
-    // Cascade propagates 2 levels deep
-    if (mode === 'cascade') {
-        const cascadeOpts = [
-            [-2, 0], [2, 0], [0, -2], [0, 2], // Outermost tips
-            [-1, -1], [-1, 1], [1, -1], [1, 1] // Diagonals
-        ];
-        cascadeOpts.forEach(offset => {
-            toggleCell(tr + offset[0], tc + offset[1]);
-        });
-    }
+    // Cascade propagates 2 levels deep (now only used directly by forward logic if we need it)
+    // NOTE: Generating backward no longer uses applyTapLogic for cascade!
 }
 
 // Get the affected indices for animation purposes (returns array of cell indices)
@@ -362,6 +400,7 @@ function startLevel(packId, levelIdx) {
     const setup = generatePuzzle(pack, levelIdx);
     state.board = [...setup.board];
     state.minMoves = setup.minTaps;
+    state.solution = setup.solutionSequence;
 
     // Update UI headers
     document.getElementById('tt-game-level-lbl').textContent = `Pack ${pack.id} - Level ${levelIdx}`;
@@ -708,28 +747,31 @@ window.useTileTurnHint = function () {
 
     const revealHint = () => {
         if (state.hintsUsed === 0) state.hintsUsed++;
+
+        // Reset board to pristine state to show the perfect solution
+        if (state.history.length > 0) {
+            state.board = [...state.history[0].board];
+            state.history = [];
+            state.moves = 0;
+            updateMoveCounter();
+            refreshBoardDOM();
+        }
+
         state.isAutoSolving = true;
+        let stepIndex = 0;
 
         const solveNext = () => {
             if (!state.isPlaying || !state.isAutoSolving) return;
 
-            // Find optimal tile: try each cell and see which gets us closer to win
-            const targetVal = (state.mode === 'spectrum') ? 2 : 1;
-            let bestIdx = 0;
-            let bestScore = -1;
-
-            for (let i = 0; i < state.board.length; i++) {
-                const testBoard = [...state.board];
-                applyTapLogic(testBoard, i, state.size, state.mode, false);
-                let matches = testBoard.filter(v => v === targetVal).length;
-                if (matches > bestScore) {
-                    bestScore = matches;
-                    bestIdx = i;
-                }
+            if (stepIndex >= state.solution.length) {
+                checkWinCondition();
+                return;
             }
 
-            // Highlight the best tile with golden pulse
-            const tile = document.getElementById(`tt-tile-${bestIdx}`);
+            const nextMoveIdx = state.solution[stepIndex];
+            stepIndex++;
+
+            const tile = document.getElementById(`tt-tile-${nextMoveIdx}`);
             if (tile) {
                 tile.style.boxShadow = '0 0 12px 4px #D97706';
                 tile.style.border = '3px solid #D97706';
@@ -739,21 +781,16 @@ window.useTileTurnHint = function () {
                         tile.style.boxShadow = '';
                         tile.style.border = '';
                     }
-                }, 400); // Shorter duration for continuous hinting
+                }, 400);
             }
 
-            // Programmatically "tap" the tile to trigger cascading/spectrum logic natively
-            // Temporarily disable isAutoSolving so handleTileTap accepts the input
+            // Simulate tap
             state.isAutoSolving = false;
-            handleTileTap(bestIdx);
+            handleTileTap(nextMoveIdx);
             state.isAutoSolving = true;
 
-            // If game is still playing, schedule next hint
-            if (state.isPlaying) {
-                // Cascade needs a bit more time for its 2-step animation
-                const delay = state.mode === 'cascade' ? 800 : 500;
-                setTimeout(solveNext, delay);
-            }
+            const nextDelay = state.mode === 'cascade' ? 800 : 500;
+            setTimeout(solveNext, nextDelay);
         };
 
         solveNext();
