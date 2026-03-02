@@ -77,20 +77,27 @@ function initUIEvents() {
         switchView('levels');
     });
 
-    const btnHintRestart = document.getElementById('tt-btn-hint-restart');
-    if (btnHintRestart) {
-        btnHintRestart.addEventListener('click', () => {
-            if (typeof AdController !== 'undefined') {
-                AdController.showRewardAd(() => {
+    const hintRestartBtns = [
+        document.getElementById('tt-btn-hint-restart'),
+        document.getElementById('tt-btn-hint-close'),
+        document.getElementById('tt-btn-hint-view')
+    ];
+
+    hintRestartBtns.forEach(btn => {
+        if (btn) {
+            btn.addEventListener('click', () => {
+                if (typeof AdController !== 'undefined') {
+                    AdController.showRewardAd(() => {
+                        document.getElementById('tt-hint-restart-modal').classList.remove('open');
+                        resetLevel();
+                    });
+                } else {
                     document.getElementById('tt-hint-restart-modal').classList.remove('open');
                     resetLevel();
-                });
-            } else {
-                document.getElementById('tt-hint-restart-modal').classList.remove('open');
-                resetLevel();
-            }
-        });
-    }
+                }
+            });
+        }
+    });
 }
 
 function switchView(viewName) {

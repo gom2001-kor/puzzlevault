@@ -588,19 +588,16 @@
 
         <!-- Auto-Solve Restart Modal -->
         <div class="pv-modal" id="tt-hint-restart-modal">
-            <div class="pv-modal-backdrop"
-                onclick="document.getElementById('tt-hint-restart-modal').classList.remove('open')"></div>
+            <div class="pv-modal-backdrop"></div>
             <div class="pv-modal-content">
-                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+                <button class="pv-modal-close" id="tt-btn-hint-close">✕</button>
                 <h2 style="font-size:1.6rem; margin-bottom:8px;">Auto-Solve Complete!</h2>
                 <p style="margin-bottom: 24px; color: var(--pv-text-secondary); font-size: 0.95rem;">
                     The puzzle has been completed automatically via Hint. Would you like to restart this puzzle?
                 </p>
                 <div class="tt-modal-btns">
                     <button class="btn-primary" id="tt-btn-hint-restart">🔄 Restart Puzzle (Ad)</button>
-                    <button class="btn-secondary"
-                        onclick="document.getElementById('tt-hint-restart-modal').classList.remove('open')">View
-                        Board</button>
+                    <button class="btn-secondary" id="tt-btn-hint-view">View Board</button>
                 </div>
             </div>
         </div>
@@ -680,7 +677,7 @@
     <script src="/js/seed.js"></script>
     <script src="/js/sfx.js"></script>
     <script src="/js/share.js"></script>
-    <script src="/games/tileturn-logic.js?v=4"></script>
+    <script src="/games/tileturn-logic.js?v=5"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 
