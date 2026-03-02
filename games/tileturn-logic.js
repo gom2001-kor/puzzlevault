@@ -781,7 +781,7 @@ window.useTileTurnHint = function () {
                         tile.style.boxShadow = '';
                         tile.style.border = '';
                     }
-                }, 400);
+                }, 800);
             }
 
             // Simulate tap
@@ -789,7 +789,7 @@ window.useTileTurnHint = function () {
             handleTileTap(nextMoveIdx);
             state.isAutoSolving = true;
 
-            const nextDelay = state.mode === 'cascade' ? 800 : 500;
+            const nextDelay = state.mode === 'cascade' ? 1500 : 1000;
             setTimeout(solveNext, nextDelay);
         };
 
