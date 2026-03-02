@@ -186,6 +186,7 @@ function startLevel(packId, levelIdx) {
     state.lastDrawnIdx = -1;
     state.history = [];
     state.hintsUsed = 0;
+    state.perfectPaths = null;
     state.startTime = Date.now();
 
     // Load puzzle
@@ -760,125 +761,163 @@ window.useColorFlowHint = function () {
         // Remove any existing hint overlays
         document.querySelectorAll('.cf-hint-overlay, .cf-hint-arrow').forEach(el => el.remove());
 
-        // Find a disconnected color (prefer one with least progress)
+        // 1. Calculate perfect 100% coverage solution if not cached
+        if (!state.perfectPaths && state.puzzlePairs.length > 0) {
+            const size = state.size;
+            const totalCells = size * size;
+            const pairs = state.puzzlePairs;
+            const endpoints = new Int32Array(totalCells);
+            const board = new Int32Array(totalCells);
+
+            pairs.forEach(p => {
+                const c = p[4];
+                endpoints[p[0] * size + p[1]] = c;
+                endpoints[p[2] * size + p[3]] = c;
+                board[p[0] * size + p[1]] = c;
+                board[p[2] * size + p[3]] = c;
+            });
+
+            let found = null;
+            const rDirs = [0, 1, 0, -1], cDirs = [1, 0, -1, 0];
+            let iters = 0;
+
+            function solve(colorIdx, r, c, currentPath, currentPathsMap) {
+                if (found || iters++ > 1000000) return; // limit iterations for safety
+
+                if (colorIdx >= pairs.length) {
+                    let emptyCount = 0;
+                    for (let i = 0; i < totalCells; i++) if (board[i] === 0) emptyCount++;
+                    if (emptyCount === 0) found = JSON.parse(JSON.stringify(currentPathsMap));
+                    return;
+                }
+
+                const p = pairs[colorIdx];
+                const tr = p[2], tc = p[3], color = p[4];
+
+                if (r === tr && c === tc) {
+                    if (colorIdx + 1 < pairs.length) {
+                        const np = pairs[colorIdx + 1];
+                        const nextStartIdx = np[0] * size + np[1];
+                        const nextPathMap = Object.assign({}, currentPathsMap);
+                        const newPath = [nextStartIdx];
+                        nextPathMap[np[4]] = newPath;
+                        solve(colorIdx + 1, np[0], np[1], newPath, nextPathMap);
+                    } else {
+                        solve(colorIdx + 1, -1, -1, currentPath, currentPathsMap);
+                    }
+                    return;
+                }
+
+                // Warnsdorff's Rule: prefer directions with fewer empty neighbors
+                let validMoves = [];
+                for (let d = 0; d < 4; d++) {
+                    const nr = r + rDirs[d], nc = c + cDirs[d];
+                    if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+                        const idx = nr * size + nc;
+                        if (board[idx] === 0 || (nr === tr && nc === tc && endpoints[idx] === color)) {
+                            let emptyNeighbors = 0;
+                            for (let dd = 0; dd < 4; dd++) {
+                                const nnr = nr + rDirs[dd], nnc = nc + cDirs[dd];
+                                if (nnr >= 0 && nnr < size && nnc >= 0 && nnc < size) {
+                                    const nIdx = nnr * size + nnc;
+                                    if (board[nIdx] === 0 || endpoints[nIdx] > 0) emptyNeighbors++;
+                                }
+                            }
+                            validMoves.push({ nr, nc, idx, emptyNeighbors });
+                        }
+                    }
+                }
+
+                validMoves.sort((a, b) => a.emptyNeighbors - b.emptyNeighbors);
+
+                for (const move of validMoves) {
+                    if (found) return;
+                    const prev = board[move.idx];
+                    board[move.idx] = color;
+                    currentPath.push(move.idx);
+
+                    solve(colorIdx, move.nr, move.nc, currentPath, currentPathsMap);
+
+                    currentPath.pop();
+                    board[move.idx] = prev;
+                }
+            }
+
+            const firstPair = pairs[0];
+            const startIdx = firstPair[0] * size + firstPair[1];
+            const initPath = [startIdx];
+            solve(0, firstPair[0], firstPair[1], initPath, { [firstPair[4]]: initPath });
+
+            if (found) state.perfectPaths = found;
+        }
+
         let hintColor = null;
-        let bestScore = Infinity;
-        for (const p of state.puzzlePairs) {
-            if (!isColorConnected(p[4])) {
-                const pathLen = (state.paths[p[4]] || []).length;
-                if (pathLen < bestScore) {
-                    bestScore = pathLen;
-                    hintColor = p[4];
-                }
-            }
-        }
-        if (hintColor === null) {
-            showToast('🎉 All pairs connected!');
-            return;
-        }
-
-        const pair = state.puzzlePairs.find(p => p[4] === hintColor);
-        const startIdx = getIdx(pair[0], pair[1]);
-        const endIdx = getIdx(pair[2], pair[3]);
-
-        // Determine search starting point
-        const currentPath = state.paths[hintColor] || [];
-        const searchFrom = currentPath.length > 0 ? currentPath[currentPath.length - 1] : startIdx;
-
-        // BFS: can pass through empty, own path, AND other color paths (since game allows overwriting)
-        // Only block on other color markers (endpoints)
-        const visited = new Set();
-        visited.add(searchFrom);
-        const queue = [[searchFrom, [searchFrom]]];
-        let foundPath = null;
-
-        while (queue.length > 0) {
-            const [curr, path] = queue.shift();
-            if (curr === endIdx) {
-                foundPath = path;
-                break;
-            }
-
-            const [cr, cc] = getRC(curr);
-            const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
-            for (const [dr, dc] of dirs) {
-                const nr = cr + dr;
-                const nc = cc + dc;
-                if (nr < 0 || nr >= state.size || nc < 0 || nc >= state.size) continue;
-                const nIdx = getIdx(nr, nc);
-                if (visited.has(nIdx)) continue;
-
-                const content = state.boardContent[nIdx];
-                const isTarget = (nIdx === endIdx);
-                const isEmpty = (content.type === 'empty');
-                const isOwnPath = (content.type === 'path' && content.color === hintColor);
-                const isOtherPath = (content.type === 'path' && content.color !== hintColor);
-                // Block only on other color markers (can't draw through someone else's endpoint)
-                const isOtherMarker = (content.type === 'marker' && content.color !== hintColor);
-                if (isOtherMarker) continue;
-                if (!isEmpty && !isTarget && !isOwnPath && !isOtherPath) continue;
-
-                visited.add(nIdx);
-                queue.push([nIdx, [...path, nIdx]]);
-            }
-        }
-
-        // Select 3-4 hint cells from the found path
         let hintCells = [];
-        if (foundPath && foundPath.length > 1) {
-            const skipFirst = currentPath.length > 0 ? 1 : 0;
-            const maxShow = Math.min(4, foundPath.length - skipFirst);
-            hintCells = foundPath.slice(skipFirst, skipFirst + maxShow);
-        }
 
-        // Fallback: if BFS fails completely, try reverse direction
-        if (hintCells.length === 0) {
-            const visited2 = new Set();
-            visited2.add(endIdx);
-            const queue2 = [[endIdx, [endIdx]]];
-            let foundPath2 = null;
+        if (state.perfectPaths) {
+            // Find the color pattern that deviates the earliest
+            let candidates = [];
+            for (const p of state.puzzlePairs) {
+                const color = p[4];
+                const userPath = state.paths[color] || [];
+                const perfectPath = state.perfectPaths[color] || [];
 
-            while (queue2.length > 0) {
-                const [curr, path] = queue2.shift();
-                if (curr === searchFrom) {
-                    foundPath2 = path.reverse();
-                    break;
-                }
-                const [cr, cc] = getRC(curr);
-                const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
-                for (const [dr, dc] of dirs) {
-                    const nr = cr + dr;
-                    const nc = cc + dc;
-                    if (nr < 0 || nr >= state.size || nc < 0 || nc >= state.size) continue;
-                    const nIdx = getIdx(nr, nc);
-                    if (visited2.has(nIdx)) continue;
-                    const content = state.boardContent[nIdx];
-                    const isOtherMarker = (content.type === 'marker' && content.color !== hintColor);
-                    if (isOtherMarker && nIdx !== searchFrom) continue;
-                    visited2.add(nIdx);
-                    queue2.push([nIdx, [...path, nIdx]]);
+                if (perfectPath.length > 0) {
+                    let correctLen = 1;
+                    while (correctLen < userPath.length && correctLen < perfectPath.length) {
+                        if (userPath[correctLen] === perfectPath[correctLen]) {
+                            correctLen++;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    const isPerfectlyConnected = (isColorConnected(color) && correctLen === perfectPath.length && userPath.length === perfectPath.length);
+                    if (!isPerfectlyConnected) {
+                        candidates.push({ color, correctLen, perfectPath });
+                    }
                 }
             }
-            if (foundPath2 && foundPath2.length > 1) {
-                const skipFirst = currentPath.length > 0 ? 1 : 0;
-                hintCells = foundPath2.slice(skipFirst, skipFirst + 4);
-            }
-        }
 
-        // Ultimate fallback: show the two endpoints with a message
-        if (hintCells.length === 0) {
+            if (candidates.length === 0) {
+                showToast('🎉 Perfect coverage achieved! Just connect them all!');
+                return;
+            }
+
+            // Prioritize the line with the least correctly drawn parts
+            candidates.sort((a, b) => a.correctLen - b.correctLen);
+            const best = candidates[0];
+            hintColor = best.color;
+            let startSlice = Math.max(0, best.correctLen - 1);
+            hintCells = best.perfectPath.slice(startSlice, startSlice + 4);
+
+        } else {
+            // Ultimate fallback (BFS if DFS failed/timed out, very rare)
+            let bestScore = Infinity;
+            for (const p of state.puzzlePairs) {
+                if (!isColorConnected(p[4])) {
+                    const pathLen = (state.paths[p[4]] || []).length;
+                    if (pathLen < bestScore) {
+                        bestScore = pathLen;
+                        hintColor = p[4];
+                    }
+                }
+            }
+            if (!hintColor) return showToast('🎉 All pairs connected!');
+
+            const pair = state.puzzlePairs.find(p => p[4] === hintColor);
+            const startIdx = getIdx(pair[0], pair[1]);
+            const endIdx = getIdx(pair[2], pair[3]);
             hintCells = [startIdx, endIdx];
         }
 
-        // Get CSS color for this hint color
         const cssColor = HINT_COLOR_MAP[hintColor] || 'var(--pv-amber)';
 
-        // Render hint overlays with numbered circles and directional arrows
+        // 3. Render 3-4 blocks of hint path
         hintCells.forEach((idx, i) => {
             const cell = document.getElementById(`cf-cell-${idx}`);
             if (!cell) return;
 
-            // Create overlay with number
             const overlay = document.createElement('div');
             overlay.className = 'cf-hint-overlay';
             overlay.style.backgroundColor = `color-mix(in srgb, ${cssColor} 50%, transparent)`;
@@ -886,11 +925,12 @@ window.useColorFlowHint = function () {
             overlay.style.animationDelay = `${i * 0.15}s`;
             cell.appendChild(overlay);
 
-            // Add directional arrow to next cell
             if (i < hintCells.length - 1) {
                 const nextIdx = hintCells[i + 1];
-                const [cr, cc] = getRC(idx);
-                const [nr, nc] = getRC(nextIdx);
+                const cr = Math.floor(idx / state.size);
+                const cc = idx % state.size;
+                const nr = Math.floor(nextIdx / state.size);
+                const nc = nextIdx % state.size;
                 const dr = nr - cr;
                 const dc = nc - cc;
 
@@ -910,17 +950,14 @@ window.useColorFlowHint = function () {
             }
         });
 
-        // Auto-remove after 3.5 seconds
+        // 4. Auto-remove after 3.5 seconds
         setTimeout(() => {
             document.querySelectorAll('.cf-hint-overlay, .cf-hint-arrow').forEach(el => el.remove());
         }, 3500);
 
         SFX.play('hint');
-
-        // Show the color name in the toast
         const colorNames = { 1: 'Red', 2: 'Blue', 3: 'Green', 4: 'Orange', 5: 'Purple', 6: 'Pink', 7: 'Orange', 8: 'Cyan', 9: 'Lime' };
-        const colorName = colorNames[hintColor] || '';
-        showToast(`💡 ${colorName} path: follow ①→② sequence!`);
+        showToast(`💡 ${colorNames[hintColor] || ''} path: follow ① sequence!`);
     };
 
     if (typeof HintManager !== 'undefined') {
