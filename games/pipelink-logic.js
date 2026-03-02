@@ -223,21 +223,27 @@ const PipeLink = {
             }
         });
 
-        const btnHintRestart = document.getElementById('pl-btn-hint-restart');
-        if (btnHintRestart) {
-            btnHintRestart.addEventListener('click', () => {
-                if (typeof AdController !== 'undefined') {
-                    // PipeLink AdController usually implements showRewardAd
-                    AdController.showRewardAd(() => {
+        const hintRestartBtns = [
+            document.getElementById('pl-btn-hint-restart'),
+            document.getElementById('pl-btn-hint-close'),
+            document.getElementById('pl-btn-hint-view')
+        ];
+
+        hintRestartBtns.forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    if (typeof AdController !== 'undefined') {
+                        AdController.showRewardAd(() => {
+                            document.getElementById('pl-hint-restart-modal').classList.remove('open');
+                            this.resetLevel();
+                        });
+                    } else {
                         document.getElementById('pl-hint-restart-modal').classList.remove('open');
                         this.resetLevel();
-                    });
-                } else {
-                    document.getElementById('pl-hint-restart-modal').classList.remove('open');
-                    this.resetLevel();
-                }
-            });
-        }
+                    }
+                });
+            }
+        });
 
         // Modals & Extras
         document.getElementById('pl-btn-help').addEventListener('click', () => {

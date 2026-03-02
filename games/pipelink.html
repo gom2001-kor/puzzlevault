@@ -587,18 +587,15 @@
 
         <!-- Auto-Solve Restart Modal -->
         <div class="pv-modal" id="pl-hint-restart-modal">
-            <div class="pv-modal-backdrop"
-                onclick="document.getElementById('pl-hint-restart-modal').classList.remove('open')"></div>
+            <div class="pv-modal-backdrop"></div>
             <div class="pv-modal-content">
-                <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
+                <button class="pv-modal-close" id="pl-btn-hint-close">✕</button>
                 <h2 style="font-size:1.6rem; margin-bottom:8px; color:white;">Auto-Solve Complete!</h2>
                 <p style="margin-bottom: 24px; color: var(--pv-slate); font-size: 0.95rem;">
                     The circuit has been completed automatically via Hint. Would you like to restart this puzzle?
                 </p>
                 <button class="btn-primary" id="pl-btn-hint-restart">🔄 Restart Puzzle (Ad)</button>
-                <button class="btn-secondary"
-                    onclick="document.getElementById('pl-hint-restart-modal').classList.remove('open')">View
-                    Board</button>
+                <button class="btn-secondary" id="pl-btn-hint-view">View Board</button>
             </div>
         </div>
 
@@ -668,7 +665,7 @@
     <script src="/js/seed.js"></script>
     <script src="/js/sfx.js"></script>
     <script src="/js/share.js"></script>
-    <script src="/games/pipelink-logic.js?v=3"></script>
+    <script src="/games/pipelink-logic.js?v=4"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 
