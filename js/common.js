@@ -287,6 +287,7 @@ function updateStreak(gameId) {
     let streak = parseInt(localStorage.getItem(`pv_${gameId}_streak`) || '0');
 
     const yesterday = new Date();
+    // Offset by 24 hours to get yesterday's UTC date
     yesterday.setUTCDate(yesterday.getUTCDate() - 1);
     const yesterdayStr = yesterday.toISOString().slice(0, 10);
 
