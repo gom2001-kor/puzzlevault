@@ -366,15 +366,16 @@
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      max-width: 600px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
-    @media (min-width: 480px) {
+    @media (min-width: 600px) {
       .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
       }
     }
 
@@ -382,9 +383,20 @@
       background: var(--pv-card-bg);
       border: 1px solid var(--pv-border);
       border-radius: var(--pv-radius);
-      padding: 20px 12px;
+      padding: 16px 8px;
       text-align: center;
       transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-width: 0;
+    }
+
+    @media (min-width: 600px) {
+      .stat-card {
+        padding: 20px 12px;
+      }
     }
 
     .stat-card:hover {
@@ -392,19 +404,23 @@
       box-shadow: var(--pv-shadow-lg);
     }
 
-    .stat-card-icon {
+    .stat-icon {
       font-size: 1.5rem;
       margin-bottom: 8px;
     }
 
-    .stat-card-value {
-      font-size: 1.6rem;
+    .stat-value {
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
       font-weight: 800;
       color: var(--pv-text);
       margin-bottom: 4px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .stat-card-label {
+    .stat-label {
       font-size: 0.75rem;
       color: var(--pv-text-secondary);
       text-transform: uppercase;
@@ -458,8 +474,11 @@
     }
 
     #stat-favorite-game {
-      font-size: clamp(1rem, 4vw, 1.5rem);
-      word-break: break-word;
+      font-size: clamp(0.9rem, 3.5vw, 1.4rem);
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   </style>
 </head>
