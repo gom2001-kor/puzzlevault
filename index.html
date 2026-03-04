@@ -684,6 +684,9 @@
         if (maxGameStreak > bestStreak) {
           bestStreak = maxGameStreak;
           streakGame = GAME_NAMES[gameId] || '-';
+        } else if (maxGameStreak > 0 && maxGameStreak === bestStreak && streakGame === '-') {
+          // Edge case: if the first game we check is tied at highest, take its name
+          streakGame = GAME_NAMES[gameId] || '-';
         }
       }
 
