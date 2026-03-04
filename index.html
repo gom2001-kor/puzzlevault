@@ -456,6 +456,11 @@
     .anim-stagger>*:nth-child(10) {
       animation-delay: 0.5s;
     }
+
+    #stat-favorite-game {
+      font-size: clamp(1rem, 4vw, 1.5rem);
+      word-break: break-word;
+    }
   </style>
 </head>
 
@@ -523,24 +528,24 @@
         </div>
         <div class="stats-grid anim-stagger">
           <div class="stat-card">
-            <div class="stat-card-icon">🏆</div>
-            <div class="stat-card-value" id="stat-total-score">0</div>
-            <div class="stat-card-label">Total Score</div>
+            <span class="stat-icon">🏆</span>
+            <span class="stat-value" id="stat-total-score">0</span>
+            <span class="stat-label">TOTAL SCORE</span>
           </div>
           <div class="stat-card">
-            <div class="stat-card-icon">🎮</div>
-            <div class="stat-card-value" id="stat-games-played">0</div>
-            <div class="stat-card-label">Games Played</div>
+            <span class="stat-icon">🎮</span>
+            <span class="stat-value" id="stat-games-played">0</span>
+            <span class="stat-label">GAMES PLAYED</span>
           </div>
           <div class="stat-card">
-            <div class="stat-card-icon">🔥</div>
-            <div class="stat-card-value" id="stat-best-streak">0</div>
-            <div class="stat-card-label">Best Streak</div>
+            <span class="stat-icon">🔥</span>
+            <span class="stat-value" id="stat-best-streak">0</span>
+            <span class="stat-label">BEST STREAK</span>
           </div>
           <div class="stat-card">
-            <div class="stat-card-icon">⭐</div>
-            <div class="stat-card-value" id="stat-fav-game">—</div>
-            <div class="stat-card-label">Favorite Game</div>
+            <span class="stat-icon">⭐</span>
+            <span class="stat-value" id="stat-favorite-game">-</span>
+            <span class="stat-label">FAVORITE GAME</span>
           </div>
         </div>
       </section>
@@ -590,12 +595,13 @@
       }
 
       /* --- Streak badge --- */
-      const maxStreak = getMaxStreak();
+      const maxStreak = document.getElementById('stat-best-streak') ? parseInt(document.getElementById('stat-best-streak').textContent) || 0 : 0;
       if (maxStreak > 0) {
         const badge = document.getElementById('streak-badge');
         if (badge) {
           badge.style.display = 'inline-flex';
-          document.getElementById('streak-count').textContent = maxStreak;
+          const count = document.getElementById('streak-count');
+          if (count) count.textContent = maxStreak;
         }
       }
 
@@ -622,53 +628,99 @@
       renderBlogCards(3);
 
       /* --- Stats --- */
-      const stats = getStats();
-      document.getElementById('stat-total-score').textContent = formatNumber(stats.totalScore);
-      document.getElementById('stat-games-played').textContent = formatNumber(stats.totalGames);
-
-      // Best streak (check all games)
-      const bestStreak = getMaxStreak();
-      document.getElementById('stat-best-streak').textContent = bestStreak;
-
-      // Favorite game (most played / highest score)
-      const favGame = getFavoriteGame(stats);
-      document.getElementById('stat-fav-game').textContent = favGame;
+      updateStatsSection();
     });
 
-    /**
-     * Get max streak across all games from localStorage.
-     * @returns {number}
-     */
-    function getMaxStreak() {
-      let max = 0;
-      Object.keys(PV_GAMES).forEach(id => {
-        const s = parseInt(localStorage.getItem('pv_' + id + '_streak') || '0');
-        if (s > max) max = s;
-      });
-      return max;
-    }
+    const GAME_IDS = ['numvault', 'gridsmash', 'patternpop', 'sortstack', 'quickcalc', 'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch'];
 
-    /**
-     * Determine the player's favorite game based on best scores.
-     * @param {{ bestScores: Object }} stats
-     * @returns {string} Game name or '—'
-     */
-    function getFavoriteGame(stats) {
-      const best = stats.bestScores;
-      if (!best || Object.keys(best).length === 0) return '—';
-      let topId = null;
-      let topScore = 0;
-      for (const [id, score] of Object.entries(best)) {
-        if (score > topScore) {
-          topScore = score;
-          topId = id;
+    const GAME_NAMES = {
+      numvault: 'NumVault',
+      gridsmash: 'GridSmash',
+      patternpop: 'PatternPop',
+      sortstack: 'SortStack',
+      quickcalc: 'QuickCalc',
+      tileturn: 'TileTurn',
+      colorflow: 'ColorFlow',
+      pipelink: 'PipeLink',
+      mergechain: 'MergeChain',
+      hexmatch: 'HexMatch'
+    };
+
+    function updateStatsSection() {
+      // a. TOTAL SCORE
+      let totalScore = 0;
+      for (const gameId of GAME_IDS) {
+        const best = parseInt(localStorage.getItem('pv_' + gameId + '_best')) || 0;
+        totalScore += best;
+      }
+
+      // b. GAMES PLAYED
+      let totalPlayed = 0;
+      for (const gameId of GAME_IDS) {
+        try {
+          const stats = JSON.parse(localStorage.getItem('pv_' + gameId + '_stats'));
+          if (stats && stats.played) totalPlayed += stats.played;
+        } catch (e) { }
+      }
+
+      // c. BEST STREAK
+      let bestStreak = 0;
+      for (const gameId of GAME_IDS) {
+        try {
+          const stats = JSON.parse(localStorage.getItem('pv_' + gameId + '_stats'));
+          if (stats && stats.bestStreak && stats.bestStreak > bestStreak) {
+            bestStreak = stats.bestStreak;
+          }
+        } catch (e) { }
+
+        // Also check the current streak key as fallback:
+        const currentStreak = parseInt(localStorage.getItem('pv_' + gameId + '_streak')) || 0;
+        if (currentStreak > bestStreak) bestStreak = currentStreak;
+      }
+
+      // d. FAVORITE GAME
+      let maxPlayed = 0;
+      let favoriteGame = '-';
+      for (const gameId of GAME_IDS) {
+        try {
+          const stats = JSON.parse(localStorage.getItem('pv_' + gameId + '_stats'));
+          if (stats && stats.played && stats.played > maxPlayed) {
+            maxPlayed = stats.played;
+            favoriteGame = GAME_NAMES[gameId];
+          }
+        } catch (e) { }
+      }
+
+      // e, f, g. UPDATE THE DOM & EDGE CASE
+      if (totalPlayed === 0) {
+        document.getElementById('stat-total-score').textContent = "0";
+        document.getElementById('stat-games-played').textContent = "0";
+        document.getElementById('stat-best-streak').textContent = "0";
+        document.getElementById('stat-favorite-game').textContent = "-";
+      } else {
+        document.getElementById('stat-total-score').textContent = totalScore.toLocaleString();
+        document.getElementById('stat-games-played').textContent = totalPlayed;
+        document.getElementById('stat-best-streak').textContent = bestStreak;
+        document.getElementById('stat-favorite-game').textContent = favoriteGame;
+      }
+
+      // Update streak badge in hero area dynamically
+      if (bestStreak > 0) {
+        const badge = document.getElementById('streak-badge');
+        if (badge) {
+          badge.style.display = 'inline-flex';
+          const count = document.getElementById('streak-count');
+          if (count) count.textContent = bestStreak;
         }
       }
-      if (topId && PV_GAMES[topId]) {
-        return PV_GAMES[topId].name;
-      }
-      return '—';
     }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') {
+        updateStatsSection();
+      }
+    });
+
   </script>
   <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
