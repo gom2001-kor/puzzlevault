@@ -540,6 +540,8 @@
           <div class="stat-card">
             <span class="stat-icon">🔥</span>
             <span class="stat-value" id="stat-best-streak">0</span>
+            <div id="stat-streak-game"
+              style="font-size:0.8rem; color:var(--pv-text-secondary); margin-top:-2px; margin-bottom:4px;">-</div>
             <span class="stat-label">BEST STREAK</span>
           </div>
           <div class="stat-card">
@@ -665,17 +667,24 @@
 
       // c. BEST STREAK
       let bestStreak = 0;
+      let streakGame = '-';
       for (const gameId of GAME_IDS) {
+        let maxGameStreak = 0;
         try {
           const stats = JSON.parse(localStorage.getItem('pv_' + gameId + '_stats'));
-          if (stats && stats.bestStreak && stats.bestStreak > bestStreak) {
-            bestStreak = stats.bestStreak;
+          if (stats && stats.bestStreak && stats.bestStreak > maxGameStreak) {
+            maxGameStreak = stats.bestStreak;
           }
         } catch (e) { }
 
         // Also check the current streak key as fallback:
         const currentStreak = parseInt(localStorage.getItem('pv_' + gameId + '_streak')) || 0;
-        if (currentStreak > bestStreak) bestStreak = currentStreak;
+        if (currentStreak > maxGameStreak) maxGameStreak = currentStreak;
+
+        if (maxGameStreak > bestStreak) {
+          bestStreak = maxGameStreak;
+          streakGame = GAME_NAMES[gameId] || '-';
+        }
       }
 
       // d. FAVORITE GAME
@@ -696,11 +705,13 @@
         document.getElementById('stat-total-score').textContent = "0";
         document.getElementById('stat-games-played').textContent = "0";
         document.getElementById('stat-best-streak').textContent = "0";
+        document.getElementById('stat-streak-game').textContent = "-";
         document.getElementById('stat-favorite-game').textContent = "-";
       } else {
         document.getElementById('stat-total-score').textContent = totalScore.toLocaleString();
         document.getElementById('stat-games-played').textContent = totalPlayed;
         document.getElementById('stat-best-streak').textContent = bestStreak;
+        document.getElementById('stat-streak-game').textContent = bestStreak > 0 ? streakGame : "-";
         document.getElementById('stat-favorite-game').textContent = favoriteGame;
       }
 
