@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us | PuzzleVault</title>
@@ -111,52 +111,43 @@
                 border-color: var(--pv-slate);
             }
         }
+
+        .contact-form-wrapper iframe {
+            min-height: 600px;
+        }
+
+        @media (max-width: 480px) {
+            .contact-form-wrapper iframe {
+                height: 900px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <header id="pv-header"></header>
 
-    <main class="pv-support-page">
+    <main class="pv-container" style="max-width:700px; margin:0 auto; padding:2rem 1rem;">
         <h1>Contact Us</h1>
-        <p>Found a bug? Have a suggestion? Or just want to say hi? We'd love to hear from you. This form serves as a
-            placeholder for our official feedback channel!</p>
+        <p>Found a bug? Have a suggestion? We'd love to hear from you.</p>
 
-        <div class="contact-card">
-            <form class="contact-form"
-                onsubmit="event.preventDefault(); alert('Message submitted successfully! (This is a static placeholder)');">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Your Name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="subject">Subject</label>
-                    <select id="subject" name="subject" required>
-                        <option value="bug">Report a Bug</option>
-                        <option value="feedback">Game Feedback & Suggestions</option>
-                        <option value="business">Business Inquiry</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" placeholder="How can we help you?" required></textarea>
-                </div>
-
-                <button type="submit" class="submit-btn">Send Message</button>
-            </form>
+        <div class="contact-form-wrapper"
+            style="margin:2rem 0; border-radius:var(--pv-radius); overflow:hidden; background:var(--pv-card-bg); box-shadow:var(--pv-shadow-lg);">
+            <iframe src="https://forms.gle/NBjCNdVCBGaGGcbM9?embedded=true" width="100%" height="800" frameborder="0"
+                marginheight="0" marginwidth="0" title="PuzzleVault Feedback Form" loading="lazy">
+                Loading…
+            </iframe>
         </div>
 
-        <p style="margin-top:24px; font-size:0.95rem;">You can also report issues or suggest features on our
-            <a href="https://github.com/puzzlevault/puzzlevault/issues" target="_blank" rel="noopener noreferrer"
-                style="color:var(--pv-blue);font-weight:600">GitHub Issues</a> page.
+        <p style="text-align:center; color:var(--pv-text-secondary); font-size:0.9rem;">
+            Responses are reviewed regularly. Thank you for helping us improve!
+        </p>
+
+        <p style="text-align:center; margin-top:1rem;">
+            <a href="https://forms.gle/NBjCNdVCBGaGGcbM9" target="_blank" rel="noopener" class="pv-btn"
+                style="display:inline-block;">
+                Open in new tab →
+            </a>
         </p>
     </main>
 
