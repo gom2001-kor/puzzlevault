@@ -254,5 +254,14 @@ PuzzleVault includes a blog for SEO traffic and user engagement.
 - Each post has a "Related Games" section at the bottom showing 2-3 game cards
 
 ## Language
-- All UI text and content in English
+- Multilingual: 5 languages supported via client-side i18n
+  - English (en), Korean (ko), Japanese (ja), Chinese (zh), Spanish (es)
+- Translation engine: `/js/i18n.js` (I18n object)
+- Language files: `/lang/{en,ko,ja,zh,es}.json`
+- Language preference saved to localStorage: `pv_lang`
+- Auto-detects browser language, falls back to English
+- Language selector in header (flag + dropdown)
+- DOM binding via `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-title` attributes
+- Custom event `langchange` dispatched on language switch
+- Game names (NumVault, GridSmash, etc.) are NEVER translated
 - Global audience (all games are language-independent: numbers, colors, shapes only)

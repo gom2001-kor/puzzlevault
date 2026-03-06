@@ -2,12 +2,19 @@
 <html lang="en">
 
 <head>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service | PuzzleVault</title>
     <meta name="description" content="Terms of Service for using PuzzleVault's free online puzzle games.">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/terms.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/terms.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/ja/terms.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/terms.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/terms.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/terms.html">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="canonical" href="https://puzzlevault.pages.dev/terms.html">
     <meta name="theme-color" content="#2563EB">
@@ -59,7 +66,7 @@
     <header id="pv-header"></header>
 
     <main class="pv-support-page">
-        <h1>Terms of Service</h1>
+        <h1 data-i18n="pages.termsTitle">Terms of Service</h1>
         <p><em>Last Updated: February 27, 2026</em></p>
 
         <p>Welcome to PuzzleVault. By accessing and playing our games on the PuzzleVault website, you agree to comply
@@ -106,7 +113,14 @@
 
     <footer id="pv-footer"></footer>
 
+    <script src="/js/i18n.js"></script>
     <script src="/js/common.js"></script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/terms.html' : '/' + newLang + '/terms.html';
+        });
+    </script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

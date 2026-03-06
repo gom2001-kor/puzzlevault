@@ -11,6 +11,13 @@
         content="Master NumVault with these proven number deduction strategies. Learn systematic elimination, first-guess tactics, and how to solve any code in 6 tries or fewer.">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/posts/numvault-tips-and-strategy.html">
     <meta name="theme-color" content="#2563EB">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/numvault-tips-and-strategy.html">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="manifest" href="/manifest.json">
 
@@ -389,6 +396,7 @@
     <footer id="pv-footer"></footer>
 
     <script src="/js/blog-data.js"></script>
+    <script src="/js/i18n.js"></script>
     <script src="/js/common.js"></script>
     <script>
         const POST_SLUG = 'numvault-tips-and-strategy';
@@ -412,6 +420,12 @@
                 c.innerHTML = `<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;
                 rpc.appendChild(c);
             });
+        });
+    </script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/blog/posts/numvault-tips-and-strategy.html' : '/blog/' + newLang + '/numvault-tips-and-strategy.html';
         });
     </script>
 </body>

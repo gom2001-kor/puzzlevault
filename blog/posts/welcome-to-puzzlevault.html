@@ -11,6 +11,13 @@
         content="Introducing PuzzleVault: 10 unique, free browser-based puzzle games. From number deduction to hexagonal matching, discover your next brain challenge.">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html">
     <meta name="theme-color" content="#2563EB">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/welcome-to-puzzlevault.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/welcome-to-puzzlevault.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/welcome-to-puzzlevault.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/welcome-to-puzzlevault.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="manifest" href="/manifest.json">
 
@@ -410,6 +417,7 @@
     <footer id="pv-footer"></footer>
 
     <script src="/js/blog-data.js"></script>
+    <script src="/js/i18n.js"></script>
     <script src="/js/common.js"></script>
     <script>
         const POST_SLUG = 'welcome-to-puzzlevault';
@@ -433,6 +441,12 @@
                 c.innerHTML = `<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;
                 rpc.appendChild(c);
             });
+        });
+    </script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/blog/posts/welcome-to-puzzlevault.html' : '/blog/' + newLang + '/welcome-to-puzzlevault.html';
         });
     </script>
 </body>

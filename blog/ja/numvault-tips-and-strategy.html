@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字パズルをマスターする方法：NumVault攻略のコツ | PuzzleVault Blog</title>
+    <meta name="description" content="実証済みの数字推理戦略でNumVaultをマスター。6回以内で解く方法。">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/numvault-tips-and-strategy.html">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="stylesheet" href="/css/global.css"><link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="article"><meta property="og:title" content="数字パズルをマスターする方法：NumVault攻略のコツ">
+    <meta property="og:description" content="実証済みの数字推理戦略でNumVaultをマスター。6回以内で解く方法。">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/numvault-tips-and-strategy.html">
+    <meta name="twitter:card" content="summary"><meta name="twitter:title" content="数字パズルをマスターする方法：NumVault攻略のコツ">
+    <meta name="twitter:description" content="実証済みの数字推理戦略でNumVaultをマスター。6回以内で解く方法。">
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/numvault-tips-and-strategy.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/numvault-tips-and-strategy.html">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BlogPosting","headline":"数字パズルをマスターする方法：NumVault攻略のコツ","description":"実証済みの数字推理戦略でNumVaultをマスター。6回以内で解く方法。","inLanguage":"ja","datePublished":"2026-02-28","dateModified":"2026-02-28","author":{"@type":"Organization","name":"PuzzleVault"},"publisher":{"@type":"Organization","name":"PuzzleVault"},"mainEntityOfPage":"https://puzzlevault.pages.dev/blog/ja/numvault-tips-and-strategy.html"}
+    </script>
+    <style>
+        .blog-post-header {
+            max-width: 700px;
+            margin: 40px auto 0;
+            padding: 0 20px
+        }
+
+        .blog-post-category {
+            display: inline-block;
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--pv-blue);
+            background: rgba(37, 99, 235, .08);
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin-bottom: 16px
+        }
+
+        .blog-post-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 12px;
+            color: var(--pv-text)
+        }
+
+        .blog-post-meta {
+            font-size: .85rem;
+            color: var(--pv-text-secondary);
+            margin-bottom: 32px
+        }
+
+        .blog-content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 20px;
+            color: var(--pv-text);
+            font-size: 1.05rem;
+            line-height: 1.8
+        }
+
+        .blog-content p {
+            margin-bottom: 20px
+        }
+
+        .blog-content h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--pv-text)
+        }
+
+        .blog-content ul,
+        .blog-content ol {
+            margin-bottom: 20px;
+            padding-left: 28px
+        }
+
+        .blog-content li {
+            margin-bottom: 8px
+        }
+
+        .blog-content blockquote {
+            border-left: 4px solid var(--pv-blue);
+            margin: 24px 0;
+            padding: 16px 20px;
+            background: rgba(37, 99, 235, .04);
+            border-radius: 0 var(--pv-radius-sm) var(--pv-radius-sm) 0;
+            color: var(--pv-text-secondary);
+            font-style: italic
+        }
+
+        .blog-content a {
+            color: var(--pv-blue);
+            text-decoration: none;
+            font-weight: 500
+        }
+
+        .blog-content a:hover {
+            text-decoration: underline
+        }
+
+        .blog-content strong {
+            font-weight: 700;
+            color: var(--pv-text)
+        }
+
+        .blog-related {
+            max-width: 700px;
+            margin: 48px auto;
+            padding: 0 20px
+        }
+
+        .blog-related h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px
+        }
+
+        .related-games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px
+        }
+
+        .related-game-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: all .2s ease
+        }
+
+        .related-game-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--pv-shadow-lg);
+            border-color: var(--pv-blue)
+        }
+
+        .related-game-icon {
+            font-size: 2rem
+        }
+
+        .related-game-info {
+            flex: 1
+        }
+
+        .related-game-name {
+            font-weight: 700;
+            font-size: .95rem
+        }
+
+        .related-game-tagline {
+            font-size: .75rem;
+            color: var(--pv-text-secondary)
+        }
+
+        .related-posts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px
+        }
+
+        @media(min-width:600px) {
+            .related-posts-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        .related-post-card {
+            display: block;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: all .2s ease
+        }
+
+        .related-post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--pv-shadow-lg);
+            border-color: var(--pv-blue)
+        }
+
+        .related-post-title {
+            font-weight: 700;
+            font-size: .95rem;
+            margin-bottom: 4px;
+            color: var(--pv-text)
+        }
+
+        .related-post-desc {
+            font-size: .8rem;
+            color: var(--pv-text-secondary);
+            line-height: 1.4
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 32px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--pv-blue);
+            text-decoration: none
+        }
+
+        .back-link:hover {
+            text-decoration: underline
+        }
+    </style>
+</head>
+<body>
+    <header id="pv-header"></header>
+    <div class="blog-post-header"><span class="blog-post-category">攻略</span><h1>数字パズルをマスターする方法：NumVault攻略のコツ</h1><div class="blog-post-meta">2026年2月28日 · 4分</div></div>
+    <article class="blog-content">
+        <p><a href="/games/numvault.html">NumVault</a>はPuzzleVaultの看板推理パズルです。秘密の数字コードを最少回数で当てましょう。</p>
+        <h2>基本ルール</h2>
+        <p>推測後のフィードバック：🟢正しい数字・正しい位置 / 🟡正しい数字・間違った位置 / ⚫コードにない数字。</p>
+        <h2>初手戦略</h2>
+        <p>最初はできるだけ多くの情報を得るために異なる数字を使いましょう。例：1-2-3-4で始めると4つの数字の情報が一度に得られます。</p>
+        <h2>体系的消去法</h2>
+        <p>ナンバートラッカーを活用して不可能な数字を即座に排除しましょう。</p>
+        <blockquote>核心原則：ランダムに推測しないでください。すべての推測は特定の仮説をテストすべきです。</blockquote>
+        <h2>6回以内で解く</h2>
+        <p>体系的アプローチで大半のコードは4-5回で解けます。デイリーモードで練習しましょう！</p>
+    </article>
+    <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto;"></div>
+    <section class="blog-related"><h2>🎮 Try These Games</h2><div class="related-games-grid" id="related-games"></div></section>
+    <section class="blog-related"><h2>📖 Read More</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/ja/" class="back-link">← ブログに戻る</a></section>
+    <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto;"></div>
+    <footer id="pv-footer"></footer>
+    <script src="/js/blog-data.js"></script><script src="/js/i18n.js"></script><script src="/js/common.js"></script>
+    <script>
+        const POST_SLUG='numvault-tips-and-strategy';
+        document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');getRelatedGames(post.tags).forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||`/blog/ja/${rp.slug}.html`;c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})}); </script>
+    <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/blog/posts/numvault-tips-and-strategy.html' : '/blog/' + newLang + '/numvault-tips-and-strategy.html';
+        });
+    </script>
+</body></html>

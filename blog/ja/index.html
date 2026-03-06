@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PuzzleVault ブログ — パズルのコツ、攻略法 & 脳科学</title>
+    <meta name="description" content="ヒント、攻略法、脳科学 — PuzzleVaultブログでパズルスキルを磨きましょう。">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PuzzleVault ブログ — パズルのコツ、攻略法 & 脳科学">
+    <meta property="og:description" content="ヒント、攻略法、脳科学 — PuzzleVaultブログでパズルスキルを磨きましょう。">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/">
+
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/">
+
+    <style>
+        .blog-page-header {
+            text-align: center;
+            padding: 40px 0 16px;
+        }
+
+        .blog-page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .blog-page-header p {
+            color: var(--pv-text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .pv-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 24px auto;
+            max-width: 500px;
+        }
+
+        .pv-tab {
+            padding: 8px 18px;
+            border: 1px solid var(--pv-border);
+            border-radius: 100px;
+            background: var(--pv-card-bg);
+            color: var(--pv-text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pv-tab:hover {
+            border-color: var(--pv-blue);
+            color: var(--pv-blue);
+        }
+
+        .pv-tab.active {
+            background: var(--pv-blue);
+            color: #fff;
+            border-color: var(--pv-blue);
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 600px) {
+            .blog-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .blog-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .blog-card {
+            display: flex;
+            flex-direction: column;
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 24px 20px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s ease;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--pv-shadow-lg);
+            border-color: var(--pv-blue);
+        }
+
+        .blog-card-category {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--pv-blue);
+            background: rgba(37, 99, 235, 0.08);
+            padding: 4px 10px;
+            border-radius: 100px;
+            margin-bottom: 12px;
+            align-self: flex-start;
+        }
+
+        .blog-card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            color: var(--pv-text);
+        }
+
+        .blog-card-desc {
+            font-size: 0.85rem;
+            color: var(--pv-text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .blog-card-meta {
+            font-size: 0.75rem;
+            color: var(--pv-text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .blog-card-read {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--pv-blue);
+            margin-top: auto;
+        }
+
+        .blog-card:hover .blog-card-read {
+            text-decoration: underline;
+        }
+
+        .load-more-wrap {
+            text-align: center;
+            margin: 32px 0;
+        }
+
+        .load-more-btn {
+            padding: 12px 32px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: var(--pv-card-bg);
+            color: var(--pv-blue);
+            border: 2px solid var(--pv-blue);
+            border-radius: var(--pv-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .load-more-btn:hover {
+            background: var(--pv-blue);
+            color: #fff;
+        }
+
+        .blog-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--pv-text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <main class="pv-container">
+        <div class="blog-page-header">
+            <h1>📝 PuzzleVault ブログ</h1>
+            <p>ヒント、攻略法、脳科学、アップデートでより優れたパズルプレイヤーになりましょう。</p>
+        </div>
+
+        <div class="pv-tabs" id="blog-tabs">
+            <button class="pv-tab active" data-category="">全て</button>
+            <button class="pv-tab" data-category="tips">ヒント</button>
+            <button class="pv-tab" data-category="strategy">攻略</button>
+            <button class="pv-tab" data-category="updates">アップデート</button>
+            <button class="pv-tab" data-category="science">科学</button>
+        </div>
+
+        <div class="blog-grid" id="blog-grid"></div>
+
+        <div class="load-more-wrap" id="load-more-wrap" style="display: none;">
+            <button class="load-more-btn" id="load-more-btn">もっと見る</button>
+        </div>
+    </main>
+
+    <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
+
+    <footer id="pv-footer"></footer>
+
+    <script src="/js/blog-data.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+        const POSTS_PER_PAGE = 9;
+        let currentCategory = '';
+        let visibleCount = POSTS_PER_PAGE;
+
+        function renderBlogGrid() {
+            const grid = document.getElementById('blog-grid');
+            const loadMoreWrap = document.getElementById('load-more-wrap');
+            if (!grid) return;
+
+            const allPosts = getBlogPosts(undefined, currentCategory || undefined);
+            const postsToShow = allPosts.slice(0, visibleCount);
+
+            grid.innerHTML = '';
+
+            if (allPosts.length === 0) {
+                grid.innerHTML = '<p class="blog-empty">このカテゴリの記事はまだありません。</p>';
+                loadMoreWrap.style.display = 'none';
+                return;
+            }
+
+            postsToShow.forEach(post => {
+                const card = document.createElement('a');
+                card.className = 'blog-card';
+                card.href = post.url || `/blog/ja/${post.slug}.html`;
+                const catText = (typeof I18n !== 'undefined') ? I18n.t('blog.' + post.category) : post.category;
+                const readTime = (typeof I18n !== 'undefined') ? I18n.t('common.minuteRead', { min: post.readTime }) : post.readTime + ' min';
+                card.innerHTML = `
+                    <span class="blog-card-category">${catText}</span>
+                    <h3 class="blog-card-title">${post.title}</h3>
+                    <p class="blog-card-desc">${post.description}</p>
+                    <span class="blog-card-meta">${post.date} · ${readTime}</span>
+                    <span class="blog-card-read">読む →</span>
+                `;
+                grid.appendChild(card);
+            });
+
+            loadMoreWrap.style.display = visibleCount < allPosts.length ? 'block' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBlogGrid();
+            document.getElementById('blog-tabs').addEventListener('click', e => {
+                const tab = e.target.closest('.pv-tab');
+                if (!tab) return;
+                document.querySelectorAll('#blog-tabs .pv-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCategory = tab.dataset.category;
+                visibleCount = POSTS_PER_PAGE;
+                renderBlogGrid();
+            });
+            document.getElementById('load-more-btn').addEventListener('click', () => {
+                visibleCount += POSTS_PER_PAGE;
+                renderBlogGrid();
+            });
+        });
+    </script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/blog/' : '/blog/' + newLang + '/';
+        });
+    </script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+</body>
+
+</html>

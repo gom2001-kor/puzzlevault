@@ -8,6 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us | PuzzleVault</title>
     <meta name="description" content="Contact the PuzzleVault team for support, feedback, or business inquiries.">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/contact.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/contact.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/ja/contact.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/contact.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/contact.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/contact.html">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="canonical" href="https://puzzlevault.pages.dev/contact.html">
     <meta name="theme-color" content="#2563EB">
@@ -128,7 +135,7 @@
     <header id="pv-header"></header>
 
     <main class="pv-container" style="max-width:700px; margin:0 auto; padding:2rem 1rem;">
-        <h1>Contact Us</h1>
+        <h1 data-i18n="pages.contactTitle">Contact Us</h1>
         <p>Found a bug? Have a suggestion? We'd love to hear from you.</p>
 
         <div class="contact-form-wrapper"
@@ -153,7 +160,14 @@
 
     <footer id="pv-footer"></footer>
 
+    <script src="/js/i18n.js"></script>
     <script src="/js/common.js"></script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/contact.html' : '/' + newLang + '/contact.html';
+        });
+    </script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

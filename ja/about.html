@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About PuzzleVault | 無料オンラインパズルゲーム</title>
+    <meta name="description"
+        content="Learn more about PuzzleVault, a collection of 100% free, browser-based puzzle games with no downloads or accounts required.">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/about.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/about.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/ja/about.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/about.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/about.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/about.html">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/ja/about.html">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        .pv-support-page {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: 60vh;
+            color: var(--pv-text);
+            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .pv-support-page h1 {
+            color: var(--pv-blue);
+            margin-bottom: 24px;
+            font-size: 2.5rem;
+        }
+
+        .pv-support-page h2 {
+            margin-top: 32px;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+            color: var(--pv-text);
+        }
+
+        .pv-support-page p {
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            color: var(--pv-text-secondary);
+        }
+
+        .pv-support-page a {
+            color: var(--pv-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pv-support-page a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <main class="pv-support-page">
+        <h1 data-i18n="pages.aboutTitle">PuzzleVaultについて</h1>
+
+        <p>無料で高品質なパズルゲームの究極の目的地、<strong>PuzzleVault</strong>へようこそ。</p>
+
+        <p>私たちの使命はシンプルです。誰でもすぐにアクセスできる、魅力的で頭を使うパズル体験を提供することです。<strong>すべてのゲームはブラウザで100%実行されます — ダウンロード、アカウント、データ収集は不要です。</strong></p>
+
+        <h2>ウェブのための構築</h2>
+        <p>PuzzleVaultは純粋なHTML、CSS、JavaScriptで構築されています。CanvasやWeb Audioなどの標準ウェブAPIに依存し、フレームワークのオーバーヘッドなしでスムーズな60fpsのゲームプレイを提供します。</p>
+
+        <h2>私たちのゲーム</h2>
+        <p>10種類のパズルゲームそれぞれを、オリジナルの視覚的美学と独自のメカニズムで慎重に設計しました。論理的コードの解読からグリッド操作まで、常に新しい課題が待っています。</p>
+        <p>すべてのゲームには<strong>デイリーチャレンジ</strong>があります。世界中の全員に同じパズルが毎日出題されます。連続記録を追跡し、スキルを磨きましょう。</p>
+
+        <h2>プライバシーと利用規約</h2>
+        <p>私たちはあなたのプライバシーを尊重します。ゲームの進行状況や設定は、ブラウザの<code>localStorage</code>を使用してデバイスにローカルに保存されます。詳細は<a href="/ja/privacy.html">プライバシーポリシー</a>と<a href="/ja/terms.html">利用規約</a>をご覧ください。</p>
+
+        <p>プレイしていただきありがとうございます！</p>
+    </main>
+
+    <footer id="pv-footer"></footer>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/about.html' : '/' + newLang + '/about.html';
+        });
+    </script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+</body>
+
+</html>

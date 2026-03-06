@@ -11,6 +11,13 @@
         content="Discover how daily puzzle play strengthens memory, sharpens focus, and builds cognitive resilience — backed by real research.">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/posts/5-tips-to-boost-your-brain-with-puzzles.html">
     <meta name="theme-color" content="#2563EB">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/5-tips-to-boost-your-brain-with-puzzles.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/5-tips-to-boost-your-brain-with-puzzles.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/5-tips-to-boost-your-brain-with-puzzles.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/5-tips-to-boost-your-brain-with-puzzles.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/5-tips-to-boost-your-brain-with-puzzles.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/5-tips-to-boost-your-brain-with-puzzles.html">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="manifest" href="/manifest.json">
 
@@ -348,6 +355,7 @@
     <footer id="pv-footer"></footer>
 
     <script src="/js/blog-data.js"></script>
+    <script src="/js/i18n.js"></script>
     <script src="/js/common.js"></script>
     <script>
         const POST_SLUG = '5-tips-to-boost-your-brain-with-puzzles';
@@ -371,6 +379,12 @@
                 c.innerHTML = `<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;
                 rpc.appendChild(c);
             });
+        });
+    </script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/blog/posts/5-tips-to-boost-your-brain-with-puzzles.html' : '/blog/' + newLang + '/5-tips-to-boost-your-brain-with-puzzles.html';
         });
     </script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>

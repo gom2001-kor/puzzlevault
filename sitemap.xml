@@ -130,4 +130,110 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+
+  <!-- Language Landing Pages -->
+  <url>
+    <loc>https://puzzlevault.pages.dev/ko/</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/ja/</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/zh/</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/es/</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Blog Language Indexes -->
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/ko/</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/ja/</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/zh/</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/es/</loc>
+    <lastmod>2026-03-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog Posts: Korean -->
+  <url><loc>https://puzzlevault.pages.dev/blog/ko/5-tips-to-boost-your-brain-with-puzzles.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ko/gridsmash-beginner-strategy-guide.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ko/daily-challenge-streak-tips.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ko/welcome-to-puzzlevault.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ko/numvault-tips-and-strategy.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+
+  <!-- Blog Posts: Japanese -->
+  <url><loc>https://puzzlevault.pages.dev/blog/ja/5-tips-to-boost-your-brain-with-puzzles.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ja/gridsmash-beginner-strategy-guide.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ja/daily-challenge-streak-tips.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ja/welcome-to-puzzlevault.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ja/numvault-tips-and-strategy.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+
+  <!-- Blog Posts: Chinese -->
+  <url><loc>https://puzzlevault.pages.dev/blog/zh/5-tips-to-boost-your-brain-with-puzzles.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/zh/gridsmash-beginner-strategy-guide.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/zh/daily-challenge-streak-tips.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/zh/welcome-to-puzzlevault.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/zh/numvault-tips-and-strategy.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+
+  <!-- Blog Posts: Spanish -->
+  <url><loc>https://puzzlevault.pages.dev/blog/es/5-tips-to-boost-your-brain-with-puzzles.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/es/gridsmash-beginner-strategy-guide.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/es/daily-challenge-streak-tips.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/es/welcome-to-puzzlevault.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/es/numvault-tips-and-strategy.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+
+  <!-- Localized Static Pages -->
+  <!-- KO -->
+  <url><loc>https://puzzlevault.pages.dev/ko/about.html</loc><lastmod>2026-03-06</lastmod><priority>0.6</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/ko/contact.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/ko/privacy.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/ko/terms.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+
+  <!-- JA -->
+  <url><loc>https://puzzlevault.pages.dev/ja/about.html</loc><lastmod>2026-03-06</lastmod><priority>0.6</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/ja/contact.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/ja/privacy.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/ja/terms.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+
+  <!-- ZH -->
+  <url><loc>https://puzzlevault.pages.dev/zh/about.html</loc><lastmod>2026-03-06</lastmod><priority>0.6</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/zh/contact.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/zh/privacy.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/zh/terms.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+
+  <!-- ES -->
+  <url><loc>https://puzzlevault.pages.dev/es/about.html</loc><lastmod>2026-03-06</lastmod><priority>0.6</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/es/contact.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/es/privacy.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/es/terms.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+
 </urlset>

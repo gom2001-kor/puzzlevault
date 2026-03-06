@@ -11,6 +11,13 @@
     <meta name="description" content="POST_DESCRIPTION">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/posts/POST_SLUG.html">
     <meta name="theme-color" content="#2563EB">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/_template.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/_template.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/_template.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/_template.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/_template.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/_template.html">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="manifest" href="/manifest.json">
 
@@ -366,6 +373,12 @@
                 `;
                 relatedPostsContainer.appendChild(card);
             });
+        });
+    </script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/blog/posts/_template.html' : '/blog/' + newLang + '/_template.html';
         });
     </script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>

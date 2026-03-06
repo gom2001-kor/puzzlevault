@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-title="landing.title">
 
 <head>
   <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
@@ -12,6 +12,14 @@
   <meta name="theme-color" content="#2563EB">
   <link rel="canonical" href="https://puzzlevault.pages.dev/">
   <link rel="manifest" href="/manifest.json">
+
+  <!-- hreflang -->
+  <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/">
+  <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/">
+  <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/ja/">
+  <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/">
+  <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/">
+  <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -493,12 +501,12 @@
         <span class="hero-logo-icon">🧩</span>
         <span class="hero-logo-text">PuzzleVault</span>
       </div>
-      <h1 class="hero-tagline">Free Brain Puzzles — No Download Needed</h1>
-      <p class="hero-subtext">
+      <h1 class="hero-tagline" data-i18n="landing.hero">Free Brain Puzzles — No Download Needed</h1>
+      <p class="hero-subtext" data-i18n="landing.heroSub">
         Challenge your mind with 10 unique puzzle games. Play directly in your browser.
       </p>
       <a href="#games" class="hero-cta">
-        ▶ Start Playing
+        <span data-i18n="common.startPlaying">▶ Start Playing</span>
       </a>
     </section>
 
@@ -506,8 +514,8 @@
       <!-- ===== Daily Challenges ===== -->
       <section class="daily-section">
         <div class="section-heading">
-          <h2>📅 Today's Daily Challenges</h2>
-          <p>Fresh puzzles every day — can you keep your streak alive?</p>
+          <h2 data-i18n="landing.dailyHeading">📅 Today's Daily Challenges</h2>
+          <p data-i18n="landing.dailySub">Fresh puzzles every day — can you keep your streak alive?</p>
         </div>
         <div class="daily-grid anim-stagger" id="daily-grid"></div>
         <div class="text-center">
@@ -520,8 +528,8 @@
       <!-- ===== All Games Grid ===== -->
       <section class="games-section" id="games">
         <div class="section-heading">
-          <h2>🎮 All Games</h2>
-          <p>10 unique puzzles — pick your favorite</p>
+          <h2 data-i18n="landing.allGamesHeading">🎮 All Games</h2>
+          <p data-i18n="landing.allGamesSub">10 unique puzzles — pick your favorite</p>
         </div>
         <div class="all-games-grid anim-stagger" id="all-games-grid"></div>
       </section>
@@ -532,41 +540,41 @@
       <!-- ===== Blog Preview ===== -->
       <section class="blog-section">
         <div class="section-heading">
-          <h2>📝 Latest from the Blog</h2>
-          <p>Tips, strategies, and brain science</p>
+          <h2 data-i18n="landing.blogHeading">📝 Latest from the Blog</h2>
+          <p data-i18n="landing.blogSub">Tips, strategies, and brain science</p>
         </div>
         <div class="blog-posts-container"></div>
-        <a href="/blog/" class="blog-view-all">View All Posts →</a>
+        <a href="/blog/" class="blog-view-all" data-i18n="landing.viewAllPosts">View All Posts →</a>
       </section>
 
       <!-- ===== Stats Section ===== -->
       <section class="stats-section">
         <div class="section-heading">
-          <h2>📊 Your Stats</h2>
-          <p>Track your progress across all games</p>
+          <h2 data-i18n="landing.statsHeading">📊 Your Stats</h2>
+          <p data-i18n="landing.statsSub">Track your progress across all games</p>
         </div>
         <div class="stats-grid anim-stagger">
           <div class="stat-card">
             <span class="stat-icon">🏆</span>
             <span class="stat-value" id="stat-total-score">0</span>
-            <span class="stat-label">TOTAL SCORE</span>
+            <span class="stat-label" data-i18n="landing.totalScore">TOTAL SCORE</span>
           </div>
           <div class="stat-card">
             <span class="stat-icon">🎮</span>
             <span class="stat-value" id="stat-games-played">0</span>
-            <span class="stat-label">GAMES PLAYED</span>
+            <span class="stat-label" data-i18n="landing.gamesPlayed">GAMES PLAYED</span>
           </div>
           <div class="stat-card">
             <span class="stat-icon">🔥</span>
             <span class="stat-value" id="stat-best-streak">0</span>
             <div id="stat-streak-game"
               style="font-size:0.8rem; color:var(--pv-text-secondary); margin-top:-2px; margin-bottom:4px;">-</div>
-            <span class="stat-label">BEST STREAK</span>
+            <span class="stat-label" data-i18n="landing.bestStreak">BEST STREAK</span>
           </div>
           <div class="stat-card">
             <span class="stat-icon">⭐</span>
             <span class="stat-value" id="stat-favorite-game">-</span>
-            <span class="stat-label">FAVORITE GAME</span>
+            <span class="stat-label" data-i18n="landing.favoriteGame">FAVORITE GAME</span>
           </div>
         </div>
       </section>
@@ -576,44 +584,71 @@
   <footer id="pv-footer"></footer>
 
   <script src="/js/blog-data.js"></script>
+  <script src="/js/i18n.js"></script>
   <script src="/js/common.js"></script>
   <script src="/js/adsense.js"></script>
   <script>
-    /* === Game descriptions for landing page === */
-    const GAME_DESCRIPTIONS = {
-      numvault: 'Crack the secret number code',
-      gridsmash: 'Place blocks, clear lines, chase combos',
-      patternpop: 'How sharp is your memory?',
-      sortstack: 'Sort the colors into stacks',
-      quickcalc: 'Race against time with mental math',
-      tileturn: 'Flip tiles to light them all',
-      colorflow: 'Connect matching colors, fill the grid',
-      pipelink: 'Route energy through the circuit',
-      mergechain: 'Drop and merge numbers to 2048',
-      hexmatch: 'Match hex tiles in chain reactions',
-    };
+    /* === Game descriptions — uses i18n tagline keys === */
+    function getGameDesc(gameId) {
+      if (typeof I18n !== 'undefined') {
+        return I18n.t('games.' + gameId + '.tagline');
+      }
+      return PV_GAMES[gameId] ? PV_GAMES[gameId].tagline : '';
+    }
 
     /* === Daily Challenge featured games === */
     const DAILY_FEATURED = ['numvault', 'gridsmash', 'colorflow'];
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function renderLandingCards() {
       /* --- Daily Challenges --- */
       const dailyGrid = document.getElementById('daily-grid');
       if (dailyGrid) {
+        dailyGrid.innerHTML = '';
         DAILY_FEATURED.forEach(id => {
           const game = PV_GAMES[id];
           if (!game) return;
+          const playNowText = (typeof I18n !== 'undefined') ? I18n.t('common.playNow') : 'Play Now';
           const card = document.createElement('div');
           card.className = 'daily-card';
           card.innerHTML = `
             <div class="daily-card-icon">${game.emoji}</div>
             <div class="daily-card-name">${game.name}</div>
-            <div class="daily-card-desc">${GAME_DESCRIPTIONS[id]}</div>
-            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary">Play Now</a>
+            <div class="daily-card-desc">${getGameDesc(id)}</div>
+            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary">${playNowText}</a>
           `;
           dailyGrid.appendChild(card);
         });
       }
+
+      /* --- All Games Grid --- */
+      const gamesGrid = document.getElementById('all-games-grid');
+      if (gamesGrid) {
+        gamesGrid.innerHTML = '';
+        const playBtnText = (typeof I18n !== 'undefined') ? I18n.t('landing.playBtn') : 'Play ▸';
+        Object.entries(PV_GAMES).forEach(([id, game]) => {
+          const card = document.createElement('a');
+          card.className = 'game-card-link';
+          card.href = game.path;
+          card.innerHTML = `
+            <div class="game-card-icon">${game.emoji}</div>
+            <div class="game-card-body">
+              <div class="game-card-name">${game.name}</div>
+              <div class="game-card-desc">${getGameDesc(id)}</div>
+            </div>
+            <div class="game-card-play">${playBtnText}</div>
+          `;
+          gamesGrid.appendChild(card);
+        });
+      }
+
+      /* --- Blog Cards --- */
+      const blogContainer = document.querySelector('.blog-posts-container');
+      if (blogContainer) blogContainer.innerHTML = '';
+      renderBlogCards(3);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderLandingCards();
 
       /* --- Streak badge --- */
       const maxStreak = document.getElementById('stat-best-streak') ? parseInt(document.getElementById('stat-best-streak').textContent) || 0 : 0;
@@ -626,30 +661,18 @@
         }
       }
 
-      /* --- All Games Grid --- */
-      const gamesGrid = document.getElementById('all-games-grid');
-      if (gamesGrid) {
-        Object.entries(PV_GAMES).forEach(([id, game]) => {
-          const card = document.createElement('a');
-          card.className = 'game-card-link';
-          card.href = game.path;
-          card.innerHTML = `
-            <div class="game-card-icon">${game.emoji}</div>
-            <div class="game-card-body">
-              <div class="game-card-name">${game.name}</div>
-              <div class="game-card-desc">${GAME_DESCRIPTIONS[id] || game.tagline}</div>
-            </div>
-            <div class="game-card-play">Play ▸</div>
-          `;
-          gamesGrid.appendChild(card);
-        });
-      }
-
-      /* --- Blog Cards --- */
-      renderBlogCards(3);
-
       /* --- Stats --- */
       updateStatsSection();
+    });
+
+    /* --- Language change: navigate to correct landing page --- */
+    window.addEventListener('langchange', (e) => {
+      const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+      if (newLang === 'en') {
+        renderLandingCards();
+      } else {
+        window.location.href = '/' + newLang + '/';
+      }
     });
 
     const GAME_IDS = ['numvault', 'gridsmash', 'patternpop', 'sortstack', 'quickcalc', 'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch'];

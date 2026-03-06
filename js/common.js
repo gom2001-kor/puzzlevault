@@ -5,16 +5,16 @@
 
 /* --- Game Registry --- */
 const PV_GAMES = {
-    numvault: { emoji: '🔢', name: 'NumVault', tagline: 'Number Deduction Puzzle', path: '/games/numvault.html' },
-    gridsmash: { emoji: '🧱', name: 'GridSmash', tagline: 'Block Placement Puzzle', path: '/games/gridsmash.html' },
-    patternpop: { emoji: '🧠', name: 'PatternPop', tagline: 'Pattern Memory', path: '/games/patternpop.html' },
-    sortstack: { emoji: '📚', name: 'SortStack', tagline: 'Color Sorting', path: '/games/sortstack.html' },
-    quickcalc: { emoji: '⚡', name: 'QuickCalc', tagline: 'Speed Math Arcade', path: '/games/quickcalc.html' },
-    tileturn: { emoji: '🔄', name: 'TileTurn', tagline: 'Tile Flip Puzzle', path: '/games/tileturn.html' },
-    colorflow: { emoji: '🎨', name: 'ColorFlow', tagline: 'Color Path Connection', path: '/games/colorflow.html' },
-    pipelink: { emoji: '🔧', name: 'PipeLink', tagline: 'Circuit Connection Puzzle', path: '/games/pipelink.html' },
-    mergechain: { emoji: '🔮', name: 'MergeChain', tagline: 'Number Merge', path: '/games/mergechain.html' },
-    hexmatch: { emoji: '⬡', name: 'HexMatch', tagline: 'Hexagonal Color Match', path: '/games/hexmatch.html' },
+    numvault: { emoji: '🔢', name: 'NumVault', tagline: 'Number Deduction Puzzle', taglineKey: 'games.numvault.tagline', path: '/games/numvault.html' },
+    gridsmash: { emoji: '🧱', name: 'GridSmash', tagline: 'Block Placement Puzzle', taglineKey: 'games.gridsmash.tagline', path: '/games/gridsmash.html' },
+    patternpop: { emoji: '🧠', name: 'PatternPop', tagline: 'Pattern Memory', taglineKey: 'games.patternpop.tagline', path: '/games/patternpop.html' },
+    sortstack: { emoji: '📚', name: 'SortStack', tagline: 'Color Sorting', taglineKey: 'games.sortstack.tagline', path: '/games/sortstack.html' },
+    quickcalc: { emoji: '⚡', name: 'QuickCalc', tagline: 'Speed Math Arcade', taglineKey: 'games.quickcalc.tagline', path: '/games/quickcalc.html' },
+    tileturn: { emoji: '🔄', name: 'TileTurn', tagline: 'Tile Flip Puzzle', taglineKey: 'games.tileturn.tagline', path: '/games/tileturn.html' },
+    colorflow: { emoji: '🎨', name: 'ColorFlow', tagline: 'Color Path Connection', taglineKey: 'games.colorflow.tagline', path: '/games/colorflow.html' },
+    pipelink: { emoji: '🔧', name: 'PipeLink', tagline: 'Circuit Connection Puzzle', taglineKey: 'games.pipelink.tagline', path: '/games/pipelink.html' },
+    mergechain: { emoji: '🔮', name: 'MergeChain', tagline: 'Number Merge', taglineKey: 'games.mergechain.tagline', path: '/games/mergechain.html' },
+    hexmatch: { emoji: '⬡', name: 'HexMatch', tagline: 'Hexagonal Color Match', taglineKey: 'games.hexmatch.tagline', path: '/games/hexmatch.html' },
 };
 
 /* --- Cross-Promotion Map --- */
@@ -33,11 +33,24 @@ const CROSS_PROMO_MAP = {
 
 /* --- Navigation Links --- */
 const NAV_LINKS = [
-    { label: 'Home', href: '/' },
-    { label: 'Games', href: '/#games' },
-    { label: 'Blog', href: '/blog/' },
-    { label: 'About', href: '/about.html' },
+    { i18nKey: 'common.home', href: '/' },
+    { i18nKey: 'common.games', href: '/#games' },
+    { i18nKey: 'common.blog', href: '/blog/' },
+    { i18nKey: 'common.about', href: '/about.html' },
 ];
+
+
+/* --- Localization Helper --- */
+function getLocalizedPath(href) {
+    if (typeof I18n === 'undefined' || I18n.currentLang === 'en') return href;
+    const lang = I18n.currentLang;
+    if (href === '/') return `/${lang}/`;
+    if (href === '/#games') return `/${lang}/#games`;
+    if (href === '/blog/') return `/blog/${lang}/`;
+    if (href.startsWith('/games/')) return href;
+    if (href.startsWith('/')) return `/${lang}${href}`;
+    return href;
+}
 
 /* --- Header --- */
 /**
@@ -55,7 +68,7 @@ function renderHeader() {
     // Logo
     const logo = document.createElement('a');
     logo.className = 'pv-logo';
-    logo.href = '/';
+    logo.href = typeof getLocalizedPath === 'function' ? getLocalizedPath('/') : '/';
     logo.innerHTML = '<span class="pv-logo-icon">🧩</span><span>PuzzleVault</span>';
 
     // Nav
@@ -65,8 +78,8 @@ function renderHeader() {
 
     NAV_LINKS.forEach(link => {
         const a = document.createElement('a');
-        a.href = link.href;
-        a.textContent = link.label;
+        a.href = typeof getLocalizedPath === 'function' ? getLocalizedPath(link.href) : link.href;
+        a.textContent = typeof I18n !== 'undefined' ? I18n.t(link.i18nKey) : link.i18nKey.split('.').pop();
         // Highlight active page
         if (window.location.pathname === link.href ||
             (link.href !== '/' && window.location.pathname.startsWith(link.href))) {
@@ -74,6 +87,48 @@ function renderHeader() {
         }
         nav.appendChild(a);
     });
+
+    // Language selector
+    const langSelector = document.createElement('div');
+    langSelector.className = 'lang-selector';
+    const langBtn = document.createElement('button');
+    langBtn.className = 'lang-btn';
+    langBtn.id = 'lang-toggle';
+    const currentLangInfo = (typeof I18n !== 'undefined' && I18n.supportedLangs) ?
+        (I18n.supportedLangs.find(l => l.code === I18n.currentLang) || I18n.supportedLangs[0]) :
+        { flag: '🇺🇸', code: 'en' };
+    langBtn.innerHTML = '<span id="lang-current-flag">' + currentLangInfo.flag + '</span><span id="lang-current-code">' + currentLangInfo.code.toUpperCase() + '</span><span class="lang-arrow">▾</span>';
+    const langDropdown = document.createElement('div');
+    langDropdown.className = 'lang-dropdown';
+    langDropdown.id = 'lang-dropdown';
+    if (typeof I18n !== 'undefined' && I18n.supportedLangs) {
+        I18n.supportedLangs.forEach(lang => {
+            const option = document.createElement('div');
+            option.className = 'lang-option' + (lang.code === I18n.currentLang ? ' active' : '');
+            option.textContent = lang.flag + ' ' + lang.name;
+            option.addEventListener('click', async () => {
+                await I18n.switchLang(lang.code);
+                renderHeader();
+                renderFooter();
+                langDropdown.classList.remove('open');
+            });
+            langDropdown.appendChild(option);
+        });
+    }
+    langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langDropdown.classList.toggle('open');
+    });
+    // Use a single global click handler (prevent duplicate registration on re-render)
+    if (!window._pvLangDropdownClickBound) {
+        document.addEventListener('click', () => {
+            const dd = document.getElementById('lang-dropdown');
+            if (dd) dd.classList.remove('open');
+        });
+        window._pvLangDropdownClickBound = true;
+    }
+    langSelector.appendChild(langBtn);
+    langSelector.appendChild(langDropdown);
 
     // Mobile menu toggle
     const toggle = document.createElement('button');
@@ -87,6 +142,7 @@ function renderHeader() {
 
     inner.appendChild(logo);
     inner.appendChild(nav);
+    inner.appendChild(langSelector);
     inner.appendChild(toggle);
     header.appendChild(inner);
 
@@ -117,25 +173,24 @@ function renderFooter() {
     links.className = 'pv-footer-links';
 
     const footerLinks = [
-        { label: 'About', href: '/about.html' },
-        { label: 'Privacy', href: '/privacy.html' },
-        { label: 'Terms', href: '/terms.html' },
-        { label: 'Contact', href: '/contact.html' },
-        { label: 'Blog', href: '/blog/' },
+        { i18nKey: 'common.about', href: '/about.html' },
+        { i18nKey: 'common.privacy', href: '/privacy.html' },
+        { i18nKey: 'common.terms', href: '/terms.html' },
+        { i18nKey: 'common.contact', href: '/contact.html' },
+        { i18nKey: 'common.blog', href: '/blog/' },
     ];
 
     footerLinks.forEach(link => {
         const a = document.createElement('a');
-        a.href = link.href;
-        a.textContent = link.label;
+        a.href = typeof getLocalizedPath === 'function' ? getLocalizedPath(link.href) : link.href;
+        a.textContent = typeof I18n !== 'undefined' ? I18n.t(link.i18nKey) : link.i18nKey.split('.').pop();
         links.appendChild(a);
     });
 
     // Copyright
     const copy = document.createElement('p');
     copy.className = 'pv-footer-copy';
-    const year = new Date().getFullYear();
-    copy.textContent = `© ${year} PuzzleVault. All rights reserved.`;
+    copy.textContent = typeof I18n !== 'undefined' ? I18n.t('common.copyright') : '© 2026 PuzzleVault. All rights reserved.';
 
     inner.appendChild(links);
     inner.appendChild(copy);
@@ -161,7 +216,7 @@ function renderCrossPromo(currentGameId) {
 
     const promoIds = CROSS_PROMO_MAP[currentGameId] || Object.keys(PV_GAMES).filter(id => id !== currentGameId).slice(0, 3);
 
-    container.innerHTML = '<h2>🎮 Try Another Puzzle</h2>';
+    container.innerHTML = '<h2>🎮 ' + (typeof I18n !== 'undefined' ? I18n.t('common.tryAnotherPuzzle') : 'Try Another Puzzle') + '</h2>';
     const grid = document.createElement('div');
     grid.className = 'cross-promo-grid';
 
@@ -172,11 +227,12 @@ function renderCrossPromo(currentGameId) {
         const card = document.createElement('a');
         card.className = 'pv-game-card';
         card.href = game.path;
+        const taglineText = (typeof I18n !== 'undefined' && game.taglineKey) ? I18n.t(game.taglineKey) : game.tagline;
         card.innerHTML = `
       <div class="pv-game-card-icon">${game.emoji}</div>
       <div class="pv-game-card-body">
         <div class="pv-game-card-name">${game.name}</div>
-        <div class="pv-game-card-tagline">${game.tagline}</div>
+        <div class="pv-game-card-tagline">${taglineText}</div>
       </div>
     `;
         grid.appendChild(card);
@@ -205,13 +261,15 @@ function renderBlogCards(count = 3, category) {
     posts.forEach(post => {
         const card = document.createElement('a');
         card.className = 'blog-card';
-        card.href = `/blog/posts/${post.slug}.html`;
+        card.href = post.url || `/blog/posts/${post.slug}.html`;
+
+        const categoryText = (typeof I18n !== 'undefined') ? I18n.t('blog.' + post.category) : post.category;
 
         card.innerHTML = `
-      <span class="blog-card-category">${post.category}</span>
+      <span class="blog-card-category">${categoryText}</span>
       <h3 class="blog-card-title">${post.title}</h3>
       <p class="blog-card-desc">${post.description}</p>
-      <span class="blog-card-meta">${post.date} · ${post.readTime} min read</span>
+      <span class="blog-card-meta">${post.date} · ${typeof I18n !== 'undefined' ? I18n.t('common.minuteRead', { min: post.readTime }) : post.readTime + ' min read'}</span>
     `;
         grid.appendChild(card);
     });
@@ -417,7 +475,10 @@ const HintManager = {
  * Initialize common page elements.
  * Called on DOMContentLoaded for every page.
  */
-function initPage() {
+async function initPage() {
+    if (typeof I18n !== 'undefined') {
+        await I18n.init();
+    }
     renderHeader();
     renderFooter();
 

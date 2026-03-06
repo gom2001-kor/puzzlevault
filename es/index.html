@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PuzzleVault — Juegos de Puzzles Gratis en Línea</title>
+  <meta name="description"
+    content="Juega 10 juegos de puzzles gratuitos directamente en tu navegador. Sin descargas, sin cuentas. Desafíos diarios y seguimiento de puntuaciones.">
+  <meta name="theme-color" content="#2563EB">
+  <link rel="canonical" href="https://puzzlevault.pages.dev/es/">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PuzzleVault — Juegos de Puzzles Gratis en Línea">
+  <meta property="og:description"
+    content="Juega 10 juegos de puzzles gratuitos directamente en tu navegador.">
+  <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+  <meta property="og:url" content="https://puzzlevault.pages.dev/es/">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PuzzleVault — Juegos de Puzzles Gratis en Línea">
+  <meta name="twitter:description"
+    content="Juega 10 juegos de puzzles gratuitos directamente en tu navegador.">
+
+  <!-- hreflang -->
+  <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/">
+  <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/">
+  <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/ja/">
+  <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/">
+  <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/">
+  <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/">
+
+  <link rel="stylesheet" href="/css/global.css">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "PuzzleVault",
+    "url": "https://puzzlevault.pages.dev/es/",
+    "inLanguage": "es",
+    "description": "Juega 10 juegos de puzzles gratuitos directamente en tu navegador."
+  }
+  </script>
+
+  <style>
+    /* === Landing Page Specific Styles === */
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 64px 16px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .hero-logo-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.3));
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .hero-logo-text {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--pv-blue), var(--pv-violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+
+    .hero-tagline {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--pv-text);
+      margin-bottom: 8px;
+      animation: slideUp 0.6s ease 0.1s both;
+    }
+
+    .hero-subtext {
+      font-size: 1rem;
+      color: var(--pv-text-secondary);
+      max-width: 460px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+      animation: slideUp 0.6s ease 0.2s both;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--pv-blue), var(--pv-violet));
+      color: #fff;
+      border: none;
+      border-radius: var(--pv-radius);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+      text-decoration: none;
+      animation: slideUp 0.6s ease 0.3s both;
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(37, 99, 235, 0.4);
+    }
+
+    .hero-cta:active {
+      transform: scale(0.97);
+    }
+
+    /* Section headings */
+    .section-heading {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .section-heading h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .section-heading p {
+      font-size: 0.9rem;
+      color: var(--pv-text-secondary);
+    }
+
+    /* Daily Challenges */
+    .daily-section {
+      padding: 40px 0;
+    }
+
+    .daily-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 600px) {
+      .daily-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .daily-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--pv-card-bg);
+      border: 1px solid var(--pv-border);
+      border-radius: var(--pv-radius);
+      padding: 24px 20px;
+      text-align: center;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .daily-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--pv-blue), var(--pv-violet));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .daily-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--pv-shadow-lg);
+    }
+
+    .daily-card:hover::before {
+      opacity: 1;
+    }
+
+    .daily-card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .daily-card-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .daily-card-desc {
+      font-size: 0.85rem;
+      color: var(--pv-text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .daily-card .pv-btn {
+      width: 100%;
+      margin-top: auto;
+    }
+
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--pv-amber), var(--pv-orange));
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+    }
+
+    /* All Games */
+    .games-section {
+      padding: 40px 0;
+    }
+
+    .all-games-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (min-width: 480px) {
+      .all-games-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .all-games-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .all-games-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+
+    .game-card-link {
+      display: flex;
+      flex-direction: column;
+      background: var(--pv-card-bg);
+      border: 1px solid var(--pv-border);
+      border-radius: var(--pv-radius);
+      overflow: hidden;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .game-card-link:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      border-color: var(--pv-blue);
+    }
+
+    .game-card-icon {
+      font-size: 2.8rem;
+      text-align: center;
+      padding: 24px 0 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .game-card-link:hover .game-card-icon {
+      transform: scale(1.15);
+    }
+
+    .game-card-body {
+      padding: 8px 14px 18px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .game-card-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--pv-text);
+    }
+
+    .game-card-desc {
+      font-size: 0.78rem;
+      color: var(--pv-text-secondary);
+      line-height: 1.4;
+    }
+
+    .game-card-play {
+      display: block;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--pv-blue);
+      background: rgba(37, 99, 235, 0.06);
+      border-top: 1px solid var(--pv-border);
+      transition: all 0.2s ease;
+      margin-top: auto;
+    }
+
+    .game-card-link:hover .game-card-play {
+      background: var(--pv-blue);
+      color: #fff;
+    }
+
+    /* Blog preview */
+    .blog-section {
+      padding: 40px 0;
+    }
+
+    .blog-section .blog-grid {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .blog-view-all {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--pv-blue);
+      transition: color 0.2s ease;
+    }
+
+    .blog-view-all:hover {
+      color: var(--pv-violet);
+    }
+
+    /* Stats */
+    .stats-section {
+      padding: 40px 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 600px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+    }
+
+    .stat-card {
+      background: var(--pv-card-bg);
+      border: 1px solid var(--pv-border);
+      border-radius: var(--pv-radius);
+      padding: 16px 8px;
+      text-align: center;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-width: 0;
+    }
+
+    @media (min-width: 600px) {
+      .stat-card {
+        padding: 20px 12px;
+      }
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--pv-shadow-lg);
+    }
+
+    .stat-icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+      font-weight: 800;
+      color: var(--pv-text);
+      margin-bottom: 4px;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--pv-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Stagger animations */
+    .anim-stagger>* {
+      opacity: 0;
+      animation: slideUp 0.4s ease forwards;
+    }
+
+    .anim-stagger>*:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .anim-stagger>*:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .anim-stagger>*:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .anim-stagger>*:nth-child(4) {
+      animation-delay: 0.2s;
+    }
+
+    .anim-stagger>*:nth-child(5) {
+      animation-delay: 0.25s;
+    }
+
+    .anim-stagger>*:nth-child(6) {
+      animation-delay: 0.3s;
+    }
+
+    .anim-stagger>*:nth-child(7) {
+      animation-delay: 0.35s;
+    }
+
+    .anim-stagger>*:nth-child(8) {
+      animation-delay: 0.4s;
+    }
+
+    .anim-stagger>*:nth-child(9) {
+      animation-delay: 0.45s;
+    }
+
+    .anim-stagger>*:nth-child(10) {
+      animation-delay: 0.5s;
+    }
+
+    #stat-favorite-game {
+      font-size: clamp(0.9rem, 3.5vw, 1.4rem);
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+
+<body>
+  <header id="pv-header"></header>
+
+  <main>
+    <!-- ===== Hero Section ===== -->
+    <section class="hero">
+      <div class="hero-logo">
+        <span class="hero-logo-icon">🧩</span>
+        <span class="hero-logo-text">PuzzleVault</span>
+      </div>
+      <h1 class="hero-tagline">Puzzles Cerebrales Gratis — Sin Descargas</h1>
+      <p class="hero-subtext">
+        Desafía tu mente con 10 juegos de puzzles únicos. Juega directamente en tu navegador.
+      </p>
+      <a href="#games" class="hero-cta">
+        <span>▶ Empezar a Jugar</span>
+      </a>
+    </section>
+
+    <div class="pv-container">
+      <!-- ===== Daily Challenges ===== -->
+      <section class="daily-section">
+        <div class="section-heading">
+          <h2>📅 Desafíos Diarios de Hoy</h2>
+          <p>Puzzles nuevos cada día — ¿puedes mantener tu racha?</p>
+        </div>
+        <div class="daily-grid anim-stagger" id="daily-grid"></div>
+        <div class="text-center">
+          <div class="streak-badge" id="streak-badge" style="display: none;">
+            🔥 Tu Racha: <span id="streak-count">0</span> días
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== All Games Grid ===== -->
+      <section class="games-section" id="games">
+        <div class="section-heading">
+          <h2>🎮 Todos los Juegos</h2>
+          <p>10 puzzles únicos — elige tu favorito</p>
+        </div>
+        <div class="all-games-grid anim-stagger" id="all-games-grid"></div>
+      </section>
+
+      <!-- ===== Ad Slot ===== -->
+      <div class="ad-slot" id="ad-bottom"></div>
+
+      <!-- ===== Blog Preview ===== -->
+      <section class="blog-section">
+        <div class="section-heading">
+          <h2>📝 Últimas del Blog</h2>
+          <p>Consejos, estrategias y ciencia cerebral</p>
+        </div>
+        <div class="blog-posts-container"></div>
+        <a href="/blog/es/" class="blog-view-all">Ver Todas las Publicaciones →</a>
+      </section>
+
+      <!-- ===== Stats Section ===== -->
+      <section class="stats-section">
+        <div class="section-heading">
+          <h2>📊 Tus Estadísticas</h2>
+          <p>Sigue tu progreso en todos los juegos</p>
+        </div>
+        <div class="stats-grid anim-stagger">
+          <div class="stat-card">
+            <span class="stat-icon">🏆</span>
+            <span class="stat-value" id="stat-total-score">0</span>
+            <span class="stat-label">PUNTUACIÓN TOTAL</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">🎮</span>
+            <span class="stat-value" id="stat-games-played">0</span>
+            <span class="stat-label">PARTIDAS JUGADAS</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">🔥</span>
+            <span class="stat-value" id="stat-best-streak">0</span>
+            <div id="stat-streak-game"
+              style="font-size:0.8rem; color:var(--pv-text-secondary); margin-top:-2px; margin-bottom:4px;">-</div>
+            <span class="stat-label">MEJOR RACHA</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">⭐</span>
+            <span class="stat-value" id="stat-favorite-game">-</span>
+            <span class="stat-label">JUEGO FAVORITO</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer id="pv-footer"></footer>
+
+  <script src="/js/blog-data.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/adsense.js"></script>
+  <script>
+    /* === Game descriptions — hardcoded for SEO, also uses i18n === */
+    const GAME_DESCRIPTIONS = {
+      numvault: 'Descifra el código numérico secreto',
+      gridsmash: 'Coloca bloques, despeja líneas, busca combos',
+      patternpop: '¿Qué tan buena es tu memoria?',
+      sortstack: 'Ordena los colores en pilas',
+      quickcalc: 'Cálculo mental contra el reloj',
+      tileturn: 'Voltea fichas para encenderlas todas',
+      colorflow: 'Conecta colores iguales y llena la cuadrícula',
+      pipelink: 'Dirige la energía por el circuito',
+      mergechain: 'Fusiona números hasta llegar a 2048',
+      hexmatch: 'Empareja fichas hexagonales en cadena',
+    };
+
+    /* === Daily Challenge featured games === */
+    const DAILY_FEATURED = ['numvault', 'gridsmash', 'colorflow'];
+
+    function renderLandingCards() {
+      const dailyGrid = document.getElementById('daily-grid');
+      if (dailyGrid) {
+        dailyGrid.innerHTML = '';
+        DAILY_FEATURED.forEach(id => {
+          const game = PV_GAMES[id];
+          if (!game) return;
+          const desc = (typeof I18n !== 'undefined') ? I18n.t('games.' + id + '.tagline') : GAME_DESCRIPTIONS[id];
+          const playNow = (typeof I18n !== 'undefined') ? I18n.t('common.playNow') : 'Jugar Ahora';
+          const card = document.createElement('div');
+          card.className = 'daily-card';
+          card.innerHTML = `
+            <div class="daily-card-icon">${game.emoji}</div>
+            <div class="daily-card-name">${game.name}</div>
+            <div class="daily-card-desc">${desc}</div>
+            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary">${playNow}</a>
+          `;
+          dailyGrid.appendChild(card);
+        });
+      }
+
+      const gamesGrid = document.getElementById('all-games-grid');
+      if (gamesGrid) {
+        gamesGrid.innerHTML = '';
+        const playBtn = (typeof I18n !== 'undefined') ? I18n.t('landing.playBtn') : 'Jugar ▸';
+        Object.entries(PV_GAMES).forEach(([id, game]) => {
+          const desc = (typeof I18n !== 'undefined') ? I18n.t('games.' + id + '.tagline') : (GAME_DESCRIPTIONS[id] || game.tagline);
+          const card = document.createElement('a');
+          card.className = 'game-card-link';
+          card.href = game.path;
+          card.innerHTML = `
+            <div class="game-card-icon">${game.emoji}</div>
+            <div class="game-card-body">
+              <div class="game-card-name">${game.name}</div>
+              <div class="game-card-desc">${desc}</div>
+            </div>
+            <div class="game-card-play">${playBtn}</div>
+          `;
+          gamesGrid.appendChild(card);
+        });
+      }
+
+      const blogContainer = document.querySelector('.blog-posts-container');
+      if (blogContainer) blogContainer.innerHTML = '';
+      renderBlogCards(3);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderLandingCards();
+      const maxStreak = document.getElementById('stat-best-streak') ? parseInt(document.getElementById('stat-best-streak').textContent) || 0 : 0;
+      if (maxStreak > 0) {
+        const badge = document.getElementById('streak-badge');
+        if (badge) {
+          badge.style.display = 'inline-flex';
+          const count = document.getElementById('streak-count');
+          if (count) count.textContent = maxStreak;
+        }
+      }
+      updateStatsSection();
+    });
+
+    /* --- Language change: navigate to correct landing --- */
+    window.addEventListener('langchange', (e) => {
+      const newLang = e.detail ? e.detail.lang : (I18n ? I18n.currentLang : 'en');
+      if (newLang === 'en') {
+        window.location.href = '/';
+      } else {
+        window.location.href = '/' + newLang + '/';
+      }
+    });
+
+    /* --- Re-render on language change (fallback if same page) --- */
+    window.addEventListener('langchange', () => {
+      renderLandingCards();
+    });
+
+    const GAME_IDS = ['numvault', 'gridsmash', 'patternpop', 'sortstack', 'quickcalc', 'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch'];
+
+    const GAME_NAMES = {
+      numvault: 'NumVault', gridsmash: 'GridSmash', patternpop: 'PatternPop',
+      sortstack: 'SortStack', quickcalc: 'QuickCalc', tileturn: 'TileTurn',
+      colorflow: 'ColorFlow', pipelink: 'PipeLink', mergechain: 'MergeChain',
+      hexmatch: 'HexMatch'
+    };
+
+    function updateStatsSection() {
+      let totalScore = 0;
+      for (const gameId of GAME_IDS) {
+        const best = parseInt(localStorage.getItem('pv_' + gameId + '_best')) || 0;
+        totalScore += best;
+      }
+      let totalPlayed = 0;
+      for (const gameId of GAME_IDS) {
+        try {
+          const stats = JSON.parse(localStorage.getItem('pv_' + gameId + '_stats'));
+          if (stats && stats.played) totalPlayed += stats.played;
+        } catch (e) { }
+      }
+      let bestStreak = 0; let streakGame = '-';
+      for (const gameId of GAME_IDS) {
+        let maxGameStreak = 0;
+        try {
+          const stats = JSON.parse(localStorage.getItem('pv_' + gameId + '_stats'));
+          if (stats && stats.bestStreak && stats.bestStreak > maxGameStreak) maxGameStreak = stats.bestStreak;
+        } catch (e) { }
+        const currentStreak = parseInt(localStorage.getItem('pv_' + gameId + '_streak')) || 0;
+        if (currentStreak > maxGameStreak) maxGameStreak = currentStreak;
+        if (maxGameStreak > bestStreak) {
+          bestStreak = maxGameStreak; streakGame = GAME_NAMES[gameId] || '-';
+        } else if (maxGameStreak > 0 && maxGameStreak === bestStreak && streakGame === '-') {
+          streakGame = GAME_NAMES[gameId] || '-';
+        }
+      }
+      let maxPlayed = 0; let favoriteGame = '-';
+      for (const gameId of GAME_IDS) {
+        try {
+          const stats = JSON.parse(localStorage.getItem('pv_' + gameId + '_stats'));
+          if (stats && stats.played && stats.played > maxPlayed) {
+            maxPlayed = stats.played; favoriteGame = GAME_NAMES[gameId];
+          }
+        } catch (e) { }
+      }
+      if (totalPlayed === 0) {
+        document.getElementById('stat-total-score').textContent = "0";
+        document.getElementById('stat-games-played').textContent = "0";
+        document.getElementById('stat-best-streak').textContent = "0";
+        document.getElementById('stat-streak-game').textContent = "-";
+        document.getElementById('stat-favorite-game').textContent = "-";
+      } else {
+        document.getElementById('stat-total-score').textContent = totalScore.toLocaleString();
+        document.getElementById('stat-games-played').textContent = totalPlayed;
+        document.getElementById('stat-best-streak').textContent = bestStreak;
+        document.getElementById('stat-streak-game').textContent = bestStreak > 0 ? streakGame : "-";
+        document.getElementById('stat-favorite-game').textContent = favoriteGame;
+      }
+      if (bestStreak > 0) {
+        const badge = document.getElementById('streak-badge');
+        if (badge) {
+          badge.style.display = 'inline-flex';
+          const count = document.getElementById('streak-count');
+          if (count) count.textContent = bestStreak;
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') updateStatsSection();
+    });
+
+  </script>
+  <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+</body>
+
+</html>

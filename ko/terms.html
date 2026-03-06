@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | PuzzleVault</title>
+    <meta name="description" content="Terms of Service for using PuzzleVault's free online puzzle games.">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/terms.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/terms.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/ja/terms.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/terms.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/terms.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/terms.html">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/ko/terms.html">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        .pv-support-page {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: 60vh;
+            color: var(--pv-text);
+            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .pv-support-page h1 {
+            color: var(--pv-blue);
+            margin-bottom: 24px;
+            font-size: 2.5rem;
+        }
+
+        .pv-support-page h2 {
+            margin-top: 32px;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+            color: var(--pv-text);
+        }
+
+        .pv-support-page p,
+        .pv-support-page ul {
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            color: var(--pv-text-secondary);
+        }
+
+        .pv-support-page a {
+            color: var(--pv-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pv-support-page a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <main class="pv-support-page">
+        <h1 data-i18n="pages.termsTitle">Terms of Service</h1>
+        <p style="color:var(--pv-coral);"><i>참고: 이 문서는 법적 명확성을 위해 영어로 제공됩니다.</i></p>
+        <p><em>Last Updated: February 27, 2026</em></p>
+
+        <p>Welcome to PuzzleVault. By accessing and playing our games on the PuzzleVault website, you agree to comply
+            with and be bound by the following Terms of Service. If you do not agree with these terms, please do not use
+            our website.</p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>PuzzleVault is a free-to-play, ad-supported website providing browser-based puzzle games. By visiting our
+            site, you accept these terms in full.</p>
+
+        <h2>2. As-Is Service</h2>
+        <p>All games and content on PuzzleVault are provided on an "as-is" and "as-available" basis. We make no
+            warranties, expressed or implied, regarding the continuous availability or bug-free operation of our games.
+            Game high scores and progress are stored locally on your device and may be lost if browser caches are
+            cleared; PuzzleVault is not responsible for any lost progress.</p>
+
+        <h2>3. Intellectual Property and Copyright</h2>
+        <p>All original visual design, game mechanics, source code (HTML, CSS, JavaScript), and the PuzzleVault brand
+            are the exclusive intellectual property of PuzzleVault. You may not copy, reverse-engineer, redistribute, or
+            commercially exploit our game assets, unique mechanics, or visual aesthetics without explicit permission.
+        </p>
+        <p>Our games are independently designed to avoid copyright infringement and do not utilize trademarked names,
+            protected visual layouts, or specific copyrighted elements of third-party games. If you believe any content
+            infringes upon your copyright, please contact us immediately.</p>
+
+        <h2>4. Acceptable Use</h2>
+        <p>You agree to use PuzzleVault only for lawful purposes. You may not use automated bots, scripts, or any
+            exploiting tools to manipulate game scores, daily challenges, or our web infrastructure.</p>
+
+        <h2>5. Advertising</h2>
+        <p>To maintain our games for free, PuzzleVault serves advertisements. By using our site, you agree to the
+            display of these ads, which may include interstitial banners and reward-based videos.
+            Note that the use of ad-blockers may interfere with certain site functionalities or your ability to watch
+            ads for in-game hints.</p>
+
+        <h2>6. Changes to Terms</h2>
+        <p>We reserve the right to modify these Terms of Service at any time. Your continued use of the website
+            following any changes indicates your acceptance of the new terms.</p>
+
+        <h2>Contact</h2>
+        <p>If you have any questions regarding these Terms, please contact us via our <a href="/contact.html">Contact
+                page</a>.</p>
+    </main>
+
+    <footer id="pv-footer"></footer>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/terms.html' : '/' + newLang + '/terms.html';
+        });
+    </script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+</body>
+
+</html>

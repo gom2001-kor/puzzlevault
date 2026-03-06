@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PuzzleVault Blog — Puzzle Tips, Strategies & Brain Science</title>
@@ -11,6 +11,13 @@
         content="Tips, strategies, and brain science — the PuzzleVault blog helps you become a better puzzle solver.">
     <meta name="theme-color" content="#2563EB">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="manifest" href="/manifest.json">
 
@@ -197,7 +204,7 @@
 
     <main class="pv-container">
         <div class="blog-page-header">
-            <h1>📝 PuzzleVault Blog</h1>
+            <h1 data-i18n="blog.heading">📝 PuzzleVault Blog</h1>
             <p>Tips, strategies, brain science, and updates to help you become a better puzzle solver.</p>
         </div>
 
@@ -224,6 +231,7 @@
     <footer id="pv-footer"></footer>
 
     <script src="/js/blog-data.js"></script>
+    <script src="/js/i18n.js"></script>
     <script src="/js/common.js"></script>
     <script>
         const POSTS_PER_PAGE = 9;
@@ -249,7 +257,7 @@
             postsToShow.forEach(post => {
                 const card = document.createElement('a');
                 card.className = 'blog-card';
-                card.href = `/blog/posts/${post.slug}.html`;
+                card.href = post.url || `/blog/posts/${post.slug}.html`;
                 card.innerHTML = `
                     <span class="blog-card-category">${post.category}</span>
                     <h3 class="blog-card-title">${post.title}</h3>
@@ -285,6 +293,12 @@
                 visibleCount += POSTS_PER_PAGE;
                 renderBlogGrid();
             });
+        });
+    </script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/blog/' : '/blog/' + newLang + '/';
         });
     </script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>

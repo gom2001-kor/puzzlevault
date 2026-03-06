@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | PuzzleVault</title>
+    <meta name="description" content="Contact the PuzzleVault team for support, feedback, or business inquiries.">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/contact.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/contact.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/ja/contact.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/contact.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/contact.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/contact.html">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/zh/contact.html">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        .pv-support-page {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: 60vh;
+            color: var(--pv-text);
+            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .pv-support-page h1 {
+            color: var(--pv-blue);
+            margin-bottom: 24px;
+            font-size: 2.5rem;
+        }
+
+        .pv-support-page p {
+            margin-bottom: 24px;
+            font-size: 1.1rem;
+            color: var(--pv-text-secondary);
+        }
+
+        .contact-card {
+            background: var(--pv-card-bg);
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius);
+            padding: 32px;
+            box-shadow: var(--pv-shadow-lg);
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--pv-text);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px 16px;
+            border: 1px solid var(--pv-border);
+            border-radius: var(--pv-radius-sm);
+            font-family: inherit;
+            font-size: 1rem;
+            background: var(--pv-bg-light);
+            color: var(--pv-text);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--pv-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 160px;
+        }
+
+        .submit-btn {
+            background: var(--pv-blue);
+            color: #ffffff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: var(--pv-radius-sm);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            align-self: flex-start;
+        }
+
+        .submit-btn:hover {
+            background: var(--pv-emerald);
+        }
+
+        @media (prefers-color-scheme: dark) {
+
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                background: var(--pv-grid-dark);
+                border-color: var(--pv-slate);
+            }
+        }
+
+        .contact-form-wrapper iframe {
+            min-height: 600px;
+        }
+
+        @media (max-width: 480px) {
+            .contact-form-wrapper iframe {
+                height: 900px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="pv-header"></header>
+
+    <main class="pv-container" style="max-width:700px; margin:0 auto; padding:2rem 1rem;">
+        <h1 data-i18n="pages.contactTitle">联系我们</h1>
+        <p>发现错误？有建议吗？我们很乐意听取您的意见。</p>
+
+        <div class="contact-form-wrapper"
+            style="margin:2rem 0; border-radius:var(--pv-radius); overflow:hidden; background:var(--pv-card-bg); box-shadow:var(--pv-shadow-lg);">
+            <iframe src="https://forms.gle/NBjCNdVCBGaGGcbM9?embedded=true" width="100%" height="800" frameborder="0"
+                marginheight="0" marginwidth="0" title="PuzzleVault Feedback Form" loading="lazy">
+                Loading…
+            </iframe>
+        </div>
+
+        <p style="text-align:center; color:var(--pv-text-secondary); font-size:0.9rem;">我们会定期审核回复。感谢您帮助我们改进！</p>
+
+        <p style="text-align:center; margin-top:1rem;">
+            <a href="https://forms.gle/NBjCNdVCBGaGGcbM9" target="_blank" rel="noopener" class="pv-btn"
+                style="display:inline-block;">
+                在新标签页中打开 →
+            </a>
+        </p>
+    </main>
+
+    <footer id="pv-footer"></footer>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/contact.html' : '/' + newLang + '/contact.html';
+        });
+    </script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+</body>
+
+</html>

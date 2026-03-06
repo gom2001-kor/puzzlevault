@@ -22,7 +22,7 @@ function shareResult(text) {
  */
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-        showToast('Copied to clipboard!');
+        showToast(typeof I18n !== 'undefined' ? I18n.t('common.copiedToClipboard') : 'Copied to clipboard!');
     }).catch(() => {
         // Fallback for older browsers
         const textarea = document.createElement('textarea');
@@ -33,7 +33,7 @@ function copyToClipboard(text) {
         textarea.select();
         try {
             document.execCommand('copy');
-            showToast('Copied to clipboard!');
+            showToast(typeof I18n !== 'undefined' ? I18n.t('common.copiedToClipboard') : 'Copied to clipboard!');
         } catch (e) {
             showToast('Failed to copy');
         }

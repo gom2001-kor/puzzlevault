@@ -2,13 +2,20 @@
 <html lang="en">
 
 <head>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy | PuzzleVault</title>
     <meta name="description"
         content="Read the Privacy Policy for PuzzleVault. Learn how we protect your data while you enjoy our free puzzle games.">
+        <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/privacy.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/privacy.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/ja/privacy.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/privacy.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/privacy.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/privacy.html">
     <link rel="stylesheet" href="/css/global.css">
     <link rel="canonical" href="https://puzzlevault.pages.dev/privacy.html">
     <meta name="theme-color" content="#2563EB">
@@ -68,7 +75,7 @@
     <header id="pv-header"></header>
 
     <main class="pv-support-page">
-        <h1>Privacy Policy</h1>
+        <h1 data-i18n="pages.privacyTitle">Privacy Policy</h1>
         <p><em>Last Updated: February 27, 2026</em></p>
 
         <p>At PuzzleVault, your privacy is extremely important to us. This Privacy Policy outlines the types of
@@ -115,7 +122,14 @@
 
     <footer id="pv-footer"></footer>
 
+    <script src="/js/i18n.js"></script>
     <script src="/js/common.js"></script>
+    <script>
+        window.addEventListener('langchange', (e) => {
+            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
+            window.location.href = newLang === 'en' ? '/privacy.html' : '/' + newLang + '/privacy.html';
+        });
+    </script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

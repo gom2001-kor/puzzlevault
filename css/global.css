@@ -1340,3 +1340,68 @@ body {
 .anim-shake {
   animation: shake 0.5s ease;
 }
+
+/* === Language Selector === */
+.lang-selector {
+  position: relative;
+}
+
+.lang-btn {
+  background: transparent;
+  border: 1px solid var(--pv-border);
+  border-radius: var(--pv-radius-sm);
+  padding: 4px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--pv-text);
+  transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+  border-color: var(--pv-blue);
+}
+
+.lang-arrow {
+  font-size: 0.7rem;
+}
+
+.lang-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--pv-card-bg);
+  border: 1px solid var(--pv-border);
+  border-radius: var(--pv-radius-sm);
+  box-shadow: var(--pv-shadow-lg);
+  min-width: 150px;
+  z-index: 1000;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.lang-dropdown.open {
+  display: block;
+}
+
+.lang-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  transition: background 0.15s ease;
+}
+
+.lang-option:hover {
+  background: var(--pv-grid-bg);
+}
+
+.lang-option.active {
+  font-weight: 700;
+  color: var(--pv-blue);
+}
