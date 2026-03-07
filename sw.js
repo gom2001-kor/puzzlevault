@@ -3,7 +3,7 @@
    Cache game HTML/CSS/JS for offline play
    =================================================== */
 
-const CACHE_VERSION = 3;
+const CACHE_VERSION = 4;
 const CACHE_NAME = 'puzzlevault-v' + CACHE_VERSION;
 const ASSETS = [
     '/',
@@ -15,6 +15,12 @@ const ASSETS = [
     '/js/sfx.js',
     '/js/share.js',
     '/js/blog-data.js',
+    '/js/i18n.js',
+    '/lang/en.json',
+    '/lang/ko.json',
+    '/lang/ja.json',
+    '/lang/zh.json',
+    '/lang/es.json',
     '/manifest.json',
     '/about.html',
     '/privacy.html',
@@ -86,8 +92,8 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // CSS/JS: cache-first (game assets)
-    if (url.pathname.match(/\.(css|js)$/)) {
+    // CSS/JS/JSON: cache-first (game assets)
+    if (url.pathname.match(/\.(css|js|json)$/)) {
         event.respondWith(
             caches.match(event.request).then(cached =>
                 cached || fetch(event.request).then(response => {
