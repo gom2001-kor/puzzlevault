@@ -412,7 +412,7 @@ function onGameEnd(won) {
             G.speedScore += calcSpeedPoints();
             updateSpeedDisplay();
             // Generate next code
-            G.code = generateCode({ digits: 4, maxAttempts: 8, allowDuplicates: false });
+            G.code = generateCode({ digits: 3, maxAttempts: 8, allowDuplicates: false });
             G.guesses = [];
             G.feedback = [];
             G.currentInput = [];
