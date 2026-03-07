@@ -244,11 +244,22 @@ function generateProblem(qNum) {
                 // 2-step: A op1 B op2 C
                 let a = randomInt(10, 50), b = randomInt(2, 10), c = randomInt(1, 10);
                 let op1 = randomInt(1, 2), op2 = randomInt(1, 3);
-                let r1 = op1 === 1 ? a + b : a - b;
-                let r2 = op2 === 1 ? r1 + c : op2 === 2 ? r1 - c : r1 * c;
+                let answerResult = 0;
+
+                // Calculate correct precedence: Multiplication first
+                if (op2 === 3) {
+                    // a op1 (b * c)
+                    let multVal = b * c;
+                    answerResult = op1 === 1 ? a + multVal : a - multVal;
+                } else {
+                    // (a op1 b) op2 c
+                    let r1 = op1 === 1 ? a + b : a - b;
+                    answerResult = op2 === 1 ? r1 + c : r1 - c;
+                }
+
                 let ops = ['+', '-', '×'];
                 display = `${a} ${ops[op1 - 1]} ${b} ${ops[op2 - 1]} ${c}`;
-                answer = r2;
+                answer = answerResult;
                 choices.push(answer);
                 choices.push(answer + randomInt(1, 5));
                 choices.push(answer - randomInt(1, 5));
