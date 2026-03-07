@@ -14,6 +14,7 @@ const DIFFICULTIES = {
 /* === GAME STATE === */
 let G = {};
 function resetState() {
+    if (G && G.speedInterval) clearInterval(G.speedInterval);
     G = {
         mode: 'daily', // daily | free | speed
         difficulty: { ...DIFFICULTIES.medium },

@@ -106,25 +106,38 @@ function renderHeader() {
             const option = document.createElement('div');
             option.className = 'lang-option' + (lang.code === I18n.currentLang ? ' active' : '');
             option.textContent = lang.flag + ' ' + lang.name;
-            option.addEventListener('click', async () => {
+            const selectLang = async (e) => {
+                if (e.type === 'touchstart') {
+                    e.preventDefault(); // hover 더블탭 이슈 방지
+                    e.stopPropagation();
+                }
                 await I18n.switchLang(lang.code);
                 renderHeader();
                 renderFooter();
                 langDropdown.classList.remove('open');
-            });
+            };
+            option.addEventListener('click', selectLang);
+            option.addEventListener('touchstart', selectLang, { passive: false });
             langDropdown.appendChild(option);
         });
     }
-    langBtn.addEventListener('click', (e) => {
+
+    const toggleDropdown = (e) => {
         e.stopPropagation();
+        if (e.type === 'touchstart') e.preventDefault();
         langDropdown.classList.toggle('open');
-    });
+    };
+    langBtn.addEventListener('click', toggleDropdown);
+    langBtn.addEventListener('touchstart', toggleDropdown, { passive: false });
+
     // Use a single global click handler (prevent duplicate registration on re-render)
     if (!window._pvLangDropdownClickBound) {
-        document.addEventListener('click', () => {
+        const closeDropdown = () => {
             const dd = document.getElementById('lang-dropdown');
             if (dd) dd.classList.remove('open');
-        });
+        };
+        document.addEventListener('click', closeDropdown);
+        document.addEventListener('touchstart', closeDropdown, { passive: true });
         window._pvLangDropdownClickBound = true;
     }
     langSelector.appendChild(langBtn);
