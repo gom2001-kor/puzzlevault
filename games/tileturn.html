@@ -609,57 +609,47 @@
 
         <section class="game-guide pv-container" style="margin-top:40px;">
             <h2>How to Play TileTurn 🔄</h2>
-            <p>TileTurn is a strategic puzzle where every move causes a chain reaction. Navigate through three unique
-                gameplay modes to test your logic.</p>
-
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">🎮 Modes</h3>
-            <ul style="padding-left: 20px; line-height: 1.6; margin-bottom: 16px;">
-                <li><strong>Classic Mode:</strong> Turn all tiles ON. Tapping a tile flips its current state (ON to OFF,
-                    or OFF to ON) along with its direct top, bottom, left, and right neighbors.</li>
-                <li><strong>Cascade Mode:</strong> Identical to Classic, but the flip effect penetrates twice as deep,
-                    creating complex patterns.</li>
-                <li><strong>Spectrum Mode:</strong> Make the entire board a uniform color. Tapping cycles through three
-                    vibrant colors for the target and its neighbors.</li>
-            </ul>
-
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">⭐ Scoring</h3>
-            <p><strong>300 base points</strong> per level. Move efficiency bonus for solving in minimum moves.
-                Completing without hints earns a <strong>×1.2 multiplier</strong>.
-                Clearing an entire pack awards <strong>2000 bonus points</strong>!</p>
-
-            <h3 style="margin-top: 16px; margin-bottom: 8px;">💡 Hints</h3>
-            <p>Use the 💡 Hint button to highlight the optimal tile to flip (golden pulse). First hint per session
-                is FREE; subsequent hints require a reward ad. Completing without hints earns a score bonus!</p>
+            <p data-i18n="games.tileturn.guide">TileTurn is a strategic puzzle where every move causes a chain reaction.
+                In Classic mode, tap a tile to toggle it and its four neighbors between ON and OFF. Your goal is to turn
+                all tiles ON. Cascade mode adds a second layer — the toggle effect spreads two steps outward, affecting
+                up to 13 tiles per tap. In Spectrum mode, tiles cycle through three colors instead of two. Each level
+                has a minimum number of taps to solve. Achieve that minimum for 3 stars!</p>
         </section>
 
         <section class="pv-faq pv-container">
             <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
             <details>
                 <summary data-i18n="games.tileturn.faq1q">Is every puzzle logically solvable?</summary>
-                <p data-i18n="games.tileturn.faq1a">Yes. Every single puzzle in the game is generated using the "Reverse Method." The game starts with a
+                <p data-i18n="games.tileturn.faq1a">Yes. Every single puzzle in the game is generated using the "Reverse
+                    Method." The game starts with a
                     completed board and logically taps backwards to scramble it, guaranteeing that a solution always
                     exists.</p>
             </details>
             <details>
                 <summary data-i18n="games.tileturn.faq2q">Does using the Undo button impact my star rating?</summary>
-                <p data-i18n="games.tileturn.faq2a">No! The Undo button actually subtracts a move from your total move counter, reverting you exactly to
+                <p data-i18n="games.tileturn.faq2a">No! The Undo button actually subtracts a move from your total move
+                    counter, reverting you exactly to
                     the state you were previously in. Feel free to use it constantly to test out different ripple
                     patterns without penalty.</p>
             </details>
             <details>
-                <summary data-i18n="games.tileturn.faq3q">Do I have to unlock earlier packs to play later ones?</summary>
-                <p data-i18n="games.tileturn.faq3a">No, all 7 packs (140 levels total) are unlocked from the start. Within a pack, you must
+                <summary data-i18n="games.tileturn.faq3q">Do I have to unlock earlier packs to play later ones?
+                </summary>
+                <p data-i18n="games.tileturn.faq3a">No, all 7 packs (140 levels total) are unlocked from the start.
+                    Within a pack, you must
                     complete levels sequentially.</p>
             </details>
             <details>
                 <summary data-i18n="games.tileturn.faq4q">How does the Cascade mode work?</summary>
-                <p data-i18n="games.tileturn.faq4a">Cascade is a 2-step chain reaction. Step 1: tap toggles the target + adjacent tiles normally.
+                <p data-i18n="games.tileturn.faq4a">Cascade is a 2-step chain reaction. Step 1: tap toggles the target +
+                    adjacent tiles normally.
                     After a 300ms delay, Step 2: tiles turned ON in Step 1 also toggle THEIR adjacent tiles.
                     This creates ripple effects that require deeper planning.</p>
             </details>
             <details>
                 <summary data-i18n="games.tileturn.faq5q">What's Spectrum mode goal?</summary>
-                <p data-i18n="games.tileturn.faq5a">In Spectrum mode, tiles cycle through 3 states: OFF (dark) → Blue → Green. Tapping
+                <p data-i18n="games.tileturn.faq5a">In Spectrum mode, tiles cycle through 3 states: OFF (dark) → Blue →
+                    Green. Tapping
                     advances the target and its neighbors by one state. The goal is to get ALL tiles to Green.</p>
             </details>
         </section>
