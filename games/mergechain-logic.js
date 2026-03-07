@@ -207,8 +207,8 @@ function switchMode(mode) {
 }
 
 function startMode(mode) {
-    if (M.reqId) cancelAnimationFrame(M.reqId);
-    if (M.timerInterval) clearInterval(M.timerInterval);
+    if (M.reqId !== null) cancelAnimationFrame(M.reqId);
+    if (M.timerInterval !== null) clearInterval(M.timerInterval);
 
     M.mode = mode;
     M.balls = [];
@@ -698,7 +698,7 @@ function toggleSound() {
 function gameOver(reason) {
     M.isPlaying = false;
     if (M.reqId) cancelAnimationFrame(M.reqId);
-    if (M.timerInterval) clearInterval(M.timerInterval);
+    if (M.timerInterval !== null) clearInterval(M.timerInterval);
     document.getElementById('mc-canvas-wrap').classList.remove('danger');
 
     if (typeof SFX !== 'undefined') SFX.play('gameover');

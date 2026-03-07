@@ -19,6 +19,7 @@ let state = {
 
     timerRAF: null,
     lastTick: 0,
+    waitingForNext: false,
 
     rng: null
 };
@@ -87,7 +88,7 @@ function initUIEvents() {
 }
 
 function startGame() {
-    if (state.timerRAF) cancelAnimationFrame(state.timerRAF);
+    if (state.timerRAF !== null) cancelAnimationFrame(state.timerRAF);
     document.getElementById('qc-start-screen').style.display = 'none';
 
     const config = getModeConfig(state.mode);
@@ -286,6 +287,7 @@ function generateProblem(qNum) {
 
 function nextProblem() {
     state.currentProblem = generateProblem(state.questionNum);
+    state.waitingForNext = false;
 
     // Update UI DOM
     document.getElementById('qc-q-info').textContent = `#${state.questionNum} · ${state.currentProblem.label}`;
@@ -384,7 +386,7 @@ function createFloatingText(x, y, text, isPenalty = false) {
 }
 
 function handleChoiceTap(idx) {
-    if (!state.isPlaying) return;
+    if (!state.isPlaying || state.waitingForNext) return;
 
     let btn = document.getElementById(`qc-btn-${idx}`);
     let choice = state.currentProblem.choices[idx];
@@ -397,6 +399,7 @@ function handleChoiceTap(idx) {
 
     if (choice === state.currentProblem.answer) {
         // Correct
+        state.waitingForNext = true;
         SFX.play('correct');
         btn.classList.add('correct');
 
