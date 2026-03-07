@@ -1,0 +1,100 @@
+dba6aa8 10개 게임 전체와 5개의 모든 언어 사전을 대규모로 패치
+78a4334 다국어 번역이 날것(common.tryAnotherPuzzle 등)으로 나오던 문제 해결 및 게임 가이드(How to Play) 번역 반영 오류 확인 완료 및 모바일 레이아웃 최적화 (승인 없이 직권 적용 완수)
+7511285 모든 게임 가이드 영역 및 추천 게임(Try Another Puzzle) 섹션의 다국어 번역 오류를 완벽하게 수정
+d0f420b "다국어 전환 엉망 버그"를 모두 찾아내어 아키텍처 수준에서 완벽하게 치료
+118ecb4 모든 10개 게임의 "How to Play" 섹션에 대한 다국어 번역 적용을 완벽하게 완료
+176f6b6 다국어 드롭다운 버튼(🇺🇸 EN ▾)이 보이지 않았던 이유를 찾아 완벽하게 해결
+94d6c84 다국어 지원 구현 완료
+f149e66 work_summary_2026_03_05_03_48.md 파일 생성
+b0894b4 Your Stats 섹션 레이아웃 개선
+7f97bd4 2026.03.04 작업 내용 작성 문서 파일 생성
+7c527a3 🔥 BEST STREAK 연속 계산 수정
+d779e88 🔥 1BEST STREAK 밑에 해당 게임의 이름 표시 오류 수정
+11caa42 🔥 BEST STREAK" 기록 바로 밑에 해당 기록을 달성한 게임의 이름이 표시
+d43586e 메인 랜딩 페이지 통계(Your Stats) 섹션을 실시간 로컬스토리지 데이터를 반영하도록 완벽하게 수정
+98c05ff contact.html  파일의 내용을 완벽하게 업데이트
+90a26fc QuickCalc 게임의 '+5s' 버튼과 옆에 있는 일반 '💡 Hint' 버튼 모두 동일하게 0.75rem 크기로 작게 일치 시킴
+4afdba6 3월 02-03 작업 내용 문서 작성 저장
+3c8bde1 TileTurn 게임의 Auto-Solve(힌트) 기능이 정답을 푸는 속도를 늦춤.
+86a788b TileTurn 게임에서 일부 퍼즐이 풀리지 않는 원인을 정밀하게 분석하여 마침내 해결을 완료
+b4a1207 PipeLink와 TileTurn 두 게임 모두 "Auto-Solve Complete!" 모달창의 동작을 다시 수정 완료
+f07cfa4 TileTurn 게임의 "Auto-Solve Complete!" 모달 내 버튼 동작을 수정 완료
+9acfe3f PipeLink 게임의 "Auto-Solve Complete!" 모달 창에서 '닫기(✕)' 버튼과 'View Board' 버튼을 개선
+14d44ec TileTurn 게임의 힌트 및 리스타트 기능 개발 완료
+bcf41ea PipeLink 게임의 힌트 시스템을 성공적으로 개편 완료
+7193b31 SortStack 게임에서 힌트 버튼 클릭 시 화면이 먹통이 되는 문제를 해결
+a57ce3c ColorFlow 게임 내의 힌트 기능을 삭제 완료 처리
+5af97a9 colorflow 힌트 오류 수정
+9f649ec 파비콘 이미지가 탭에서 꽉 차게 보이도록, 기존 이미지의 흰색 여백(Padding)을 완전히 잘라내고 배경을 투명하게 처리한 뒤 다시 생성
+c2512a2 파비콘(Favicon) 및 웹 앱용 아이콘 제작이 완료
+830dd32 모든 레벨에서 100% 커버리지를 위한 완벽한 힌트 제공 시스템 구축
+f531215 ColorFlow의 완벽한 100% 힌트 기능 구현 및 검증을 모두 완료했습니다!
+1d4f02d 오류 수정
+fd948b7 ColorFlow의 모든 Pack, 모든 Level (총 150개)을 100% 커버리지가 물리적으로 가능하도록 전면 교체 완료
+77d9667 Pack 1의 Level 17의 정답 화면을 이미지 생성
+fccb11d ColorFlow 힌트 시스템 개선(제미나이)
+9081d09 history-2026-03-01.md  파일에 오늘 작업 내역 5건 모두 추가 완료
+74064aa ColorFlow 힌트 개선
+8474631 모달 닫기 버튼 누락 수정 완료
+1a62ff9 ColorFlow 색 타일 클릭 시 undo 버그 수정 완료
+5bfb8c1 힌트 시스템 수정 완료
+c0c696b 블로그 시스템 — 프롬프트 반영 완료
+623c5dc PWA 지원 + 최종 검증 완료
+fda33bf 정적 페이지 및 설정 파일 — 프롬프트 반영 검증 완료
+ea2bc84 P-12 HexMatch — 업데이트된 SKILL.md 기준 반영 완료
+7a00248 P-11 MergeChain — 업데이트된 SKILL.md 기준 반영 완료
+dd264b9 P-10 PipeLink — 업데이트된 SKILL.md 기준 반영 완료
+51b7d7c P-09 ColorFlow — 업데이트된 SKILL.md 기준 반영 완료
+e1aaff0 P-08 TileTurn — 업데이트된 SKILL.md 기준 반영 완료
+af92c9d P-07 QuickCalc — 업데이트된 SKILL.md 기준 반영 완료
+62fe8fa P-06 SortStack — 업데이트된 SKILL.md 기준 반영 완료
+a6e2efa P-05 PatternPop — 업데이트된 SKILL.md 기준 반영 완료
+bf16efb P-04 GridSmash — 업데이트된 SKILL.md 기준 반영 완료
+f1db879 P-03 NumVault — 업데이트된 SKILL.md 기준 반영 완료
+92f7ff8 P-01 Foundation 업데이트 프롬프트 반영 완료
+7dd294e 프로젝트 완성도 분석 + 이미지 에셋 생성
+d7c396c P-15 프롬프트 수행 완료
+878de1f P-14 프롬프트 수행 완료
+0c433c2 프롬프트 P-13 반영 여부 검토 및 일부 오류 수정
+1a982f0 모든 지원 페이지(about, privacy, terms, contact)와 사이트맵(sitemap.xml), robots.txt 업데이트, 그리고 Cloudflare Pages를 위한 URL 리다이렉트 설정(_redirects) 작성을 깔끔하게 완료했습니다.
+de8d291 힌트기능 추가
+437cbd1 셔플 및 fillEmpty 버그 수정 완료
+5ff5e5e 셔플기능 추가에 대해 game-guides.md 파일에 설명 추가
+abce4f9 셔플 기능 추가
+4cb5a43 게임화면 역동적으로 개선 및 fillEmpty  버그 수정
+3a74e7e 잠재적 문제 개선
+3158f31 HexMatch 게임 구현 완료
+0e85d39 MergeChain Continue(리워드 광고) 기능 구현을 완료
+eadd0c2 시간 경과 난이도 증가
+259f6ce 결과 모달 닫기(✕) 버튼이 추가되지 않은 것에 대한 수정
+edf4cd4 필드가 안 찼는데 게임 오버되는 원인을 찾아 수정완료했습니다! 그리고 결과 모달 닫기(✕) 버튼 추가
+391cf55 MergeChain 게임이 끝나지 않는 원인을 정밀 분석하여 2가지 치명적 버그를 발견하고 수정 완료했습니다!
+61965bc Claude Opus 4.6이 SKILL.md와 puzzlevault-rules.md 기준으로 MergeChain을 정밀 분석하여 총 10가지 문제를 발견하고 모두 수정 완료했습니다!
+1fe4cb3 mergechain 게임 화면 오류 재수정
+33f1e62 캔버스(화면) 깜깜함 문제 해결 및 도움말(❓) 버튼 추가
+73d548d MergeChain(Game 9)의 구현을 완료
+b96db95 정답 없는 문제 재 수정
+b90118b 정답 오류 문제 수정
+9658684 Reset버튼 오류와 연속 게임 후 뒤로가기 시 자물쇠 안풀림 문제 해결
+dee7add 정답 없는 오류 수정
+fcc4b82 PipeLink 게임 정답 확인(Hint) 기능을 추가 완료
+05a30ce PipeLink 렌더링 초기화 버그를 발견하여 해결
+95018e6 게임 진입 오류 수정
+292be0f PipeLink(회로 기판 보드 퍼즐) 게임의 모든 구현과 로컬 검증이 성공적으로 완료
+32ee95c 사운드 아이콘(🔊/🔇) 실시간 변환 및 초기화 문제 해결, TileTurn 통계 모달창 누락 문제 해결
+fe5b433 Undo Path, Reset All 수정 및 ColorFlow HTML에 통계 모달창 UI 요소와 클릭 이벤트 연결이 누락 문제 재검토 후 개선
+1f8fec8 Undo Path, Reset All 수정 및 ColorFlow HTML에 통계 모달창 UI 요소와 클릭 이벤트 연결이 누락 문제 해결
+1f5b36a ColorFlow (색상 경로 연결 퍼즐) 게임 구현 완료
+5ab4ca4 TileTurn 게임 구현 완료
+cc336fc 정답 위치를 랜덤하게 수정
+d36be3f Quickcalc 게임 내의 게임 설명(How to play)과 자주 묻는 질문(FAQ), 그리고 도움말 모달(Help Modal)의 텍스트를 모두 이전 게임들과 동일한 형식의 영어로 수정 완료
+6f35121 QuickCalc 게임 구현 완료
+2ef392c Sortstack 게임 통계창을 수정하여 완벽하게 작동하는 통계 기능을 구현
+62c08a1 Sortstack 게임 팝업창(결과 화면) 우측 상단에 ✕ 모양의 닫기 버튼을 추가
+c8206ad 제미나이3.1프로로 작업. SortStack 게임 구현을 완료
+7e0e53f Game Guides에 GridSmash 게임에서 블록 회전 방법 설명 추가
+6b121ea GridSmash 게임에서 더이상 블록을 놓을 수 없을 때 GAME OVER 되도록 수정
+4cb2ff4 모바일 터치 회전 오류 수정
+e5d1931 GridSmash 블록 회전 기능 구현 완료
+4ce9293 같은 행의 모든 카드에서 Play 버튼이 수평으로 일렬 정렬
+667e0eb first commit
