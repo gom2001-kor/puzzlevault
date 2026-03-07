@@ -229,7 +229,8 @@ function renderCrossPromo(currentGameId) {
 
     const promoIds = CROSS_PROMO_MAP[currentGameId] || Object.keys(PV_GAMES).filter(id => id !== currentGameId).slice(0, 3);
 
-    container.innerHTML = '<h2>🎮 ' + (typeof I18n !== 'undefined' ? I18n.t('common.tryAnotherPuzzle') : 'Try Another Puzzle') + '</h2>';
+    const tryAnotherText = typeof I18n !== 'undefined' ? I18n.t('common.tryAnotherPuzzle') : 'Try Another Puzzle';
+    container.innerHTML = `<h2>🎮 <span data-i18n="common.tryAnotherPuzzle">${tryAnotherText}</span></h2>`;
     const grid = document.createElement('div');
     grid.className = 'cross-promo-grid';
 
