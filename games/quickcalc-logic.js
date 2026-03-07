@@ -87,6 +87,7 @@ function initUIEvents() {
 }
 
 function startGame() {
+    if (state.timerRAF) cancelAnimationFrame(state.timerRAF);
     document.getElementById('qc-start-screen').style.display = 'none';
 
     const config = getModeConfig(state.mode);

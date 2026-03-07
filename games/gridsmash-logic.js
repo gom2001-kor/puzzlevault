@@ -33,6 +33,7 @@ const CELL_PAD = 2;
 /* === GAME STATE === */
 let G = {};
 function resetState() {
+    if (G && G.timerInterval !== null) clearInterval(G.timerInterval);
     G = {
         mode: 'classic',
         grid: Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(null)),
