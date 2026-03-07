@@ -613,8 +613,8 @@
           card.innerHTML = `
             <div class="daily-card-icon">${game.emoji}</div>
             <div class="daily-card-name">${game.name}</div>
-            <div class="daily-card-desc">${getGameDesc(id)}</div>
-            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary">${playNowText}</a>
+            <div class="daily-card-desc" data-i18n="games.${id}.tagline">${getGameDesc(id)}</div>
+            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary" data-i18n="common.playNow">${playNowText}</a>
           `;
           dailyGrid.appendChild(card);
         });
@@ -633,9 +633,9 @@
             <div class="game-card-icon">${game.emoji}</div>
             <div class="game-card-body">
               <div class="game-card-name">${game.name}</div>
-              <div class="game-card-desc">${getGameDesc(id)}</div>
+              <div class="game-card-desc" data-i18n="games.${id}.tagline">${getGameDesc(id)}</div>
             </div>
-            <div class="game-card-play">${playBtnText}</div>
+            <div class="game-card-play" data-i18n="landing.playBtn">${playBtnText}</div>
           `;
           gamesGrid.appendChild(card);
         });
@@ -665,14 +665,10 @@
       updateStatsSection();
     });
 
-    /* --- Language change: navigate to correct landing page --- */
-    window.addEventListener('langchange', (e) => {
-      const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
-      if (newLang === 'en') {
-        renderLandingCards();
-      } else {
-        window.location.href = '/' + newLang + '/';
-      }
+    /* --- Language change --- */
+    window.addEventListener('langchange', () => {
+      renderLandingCards();
+      if (typeof I18n !== 'undefined') I18n.applyAll();
     });
 
     const GAME_IDS = ['numvault', 'gridsmash', 'patternpop', 'sortstack', 'quickcalc', 'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch'];

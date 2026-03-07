@@ -245,7 +245,7 @@ function renderCrossPromo(currentGameId) {
       <div class="pv-game-card-icon">${game.emoji}</div>
       <div class="pv-game-card-body">
         <div class="pv-game-card-name">${game.name}</div>
-        <div class="pv-game-card-tagline">${taglineText}</div>
+        <div class="pv-game-card-tagline" data-i18n="${game.taglineKey}">${taglineText}</div>
       </div>
     `;
         grid.appendChild(card);
@@ -279,7 +279,7 @@ function renderBlogCards(count = 3, category) {
         const categoryText = (typeof I18n !== 'undefined') ? I18n.t('blog.' + post.category) : post.category;
 
         card.innerHTML = `
-      <span class="blog-card-category">${categoryText}</span>
+      <span class="blog-card-category" data-i18n="blog.${post.category}">${categoryText}</span>
       <h3 class="blog-card-title">${post.title}</h3>
       <p class="blog-card-desc">${post.description}</p>
       <span class="blog-card-meta">${post.date} · ${typeof I18n !== 'undefined' ? I18n.t('common.minuteRead', { min: post.readTime }) : post.readTime + ' min read'}</span>
