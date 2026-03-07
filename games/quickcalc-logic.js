@@ -56,15 +56,37 @@ function initUIEvents() {
     // Mode tabs
     document.querySelectorAll('#qc-tabs .pv-tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
-            if (state.isPlaying) return; // Prevent switching while active
+            let mode = e.target.dataset.mode;
+            if (state.mode === mode) return;
+
+            if (state.isPlaying) {
+                if (!confirm('Restart current game?')) return;
+                if (state.timerRAF !== null) cancelAnimationFrame(state.timerRAF);
+                state.isPlaying = false;
+            }
+
             document.querySelectorAll('#qc-tabs .pv-tab').forEach(t => t.classList.remove('active'));
             e.target.classList.add('active');
-            let mode = e.target.dataset.mode;
 
             document.getElementById('qc-daily-tag').style.display = (mode === 'daily') ? 'inline-block' : 'none';
             document.getElementById('qc-daily-tag').textContent = 'Daily';
 
             state.mode = mode;
+
+            document.getElementById('qc-result').classList.remove('open');
+            document.getElementById('qc-start-screen').style.display = 'flex';
+            document.getElementById('qc-status-row').style.opacity = '0.5';
+            document.getElementById('qc-timer-wrap').style.opacity = '0.5';
+            document.getElementById('qc-problem-text').innerHTML = 'Press Start';
+            for (let i = 0; i < 4; i++) {
+                let btn = document.getElementById(`qc-btn-${i}`);
+                btn.textContent = '-';
+                btn.className = 'qc-choice-btn';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+            state.questionNum = 1;
+            document.getElementById('qc-q-info').textContent = '#1';
         });
     });
 
