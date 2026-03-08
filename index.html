@@ -589,14 +589,6 @@
   <script src="/js/common.js"></script>
   <script src="/js/adsense.js"></script>
   <script>
-    /* === Game descriptions — uses i18n tagline keys === */
-    function getGameDesc(gameId) {
-      if (typeof I18n !== 'undefined') {
-        return I18n.t('games.' + gameId + '.tagline');
-      }
-      return PV_GAMES[gameId] ? PV_GAMES[gameId].tagline : '';
-    }
-
     /* === Daily Challenge featured games === */
     const DAILY_FEATURED = ['numvault', 'gridsmash', 'colorflow'];
 
@@ -608,14 +600,13 @@
         DAILY_FEATURED.forEach(id => {
           const game = PV_GAMES[id];
           if (!game) return;
-          const playNowText = (typeof I18n !== 'undefined') ? I18n.t('common.playNow') : 'Play Now';
           const card = document.createElement('div');
           card.className = 'daily-card';
           card.innerHTML = `
             <div class="daily-card-icon">${game.emoji}</div>
             <div class="daily-card-name">${game.name}</div>
-            <div class="daily-card-desc" data-i18n="games.${id}.tagline">${getGameDesc(id)}</div>
-            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary" data-i18n="common.playNow">${playNowText}</a>
+            <div class="daily-card-desc" data-i18n="games.${id}.tagline">${game.tagline}</div>
+            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary" data-i18n="common.playNow">Play Now</a>
           `;
           dailyGrid.appendChild(card);
         });
@@ -625,7 +616,6 @@
       const gamesGrid = document.getElementById('all-games-grid');
       if (gamesGrid) {
         gamesGrid.innerHTML = '';
-        const playBtnText = (typeof I18n !== 'undefined') ? I18n.t('landing.playBtn') : 'Play ▸';
         Object.entries(PV_GAMES).forEach(([id, game]) => {
           const card = document.createElement('a');
           card.className = 'game-card-link';
@@ -634,9 +624,9 @@
             <div class="game-card-icon">${game.emoji}</div>
             <div class="game-card-body">
               <div class="game-card-name">${game.name}</div>
-              <div class="game-card-desc" data-i18n="games.${id}.tagline">${getGameDesc(id)}</div>
+              <div class="game-card-desc" data-i18n="games.${id}.tagline">${game.tagline}</div>
             </div>
-            <div class="game-card-play" data-i18n="landing.playBtn">${playBtnText}</div>
+            <div class="game-card-play" data-i18n="landing.playBtn">Play ▸</div>
           `;
           gamesGrid.appendChild(card);
         });
@@ -648,9 +638,9 @@
       renderBlogCards(3);
     }
 
-    function onPageReady() {
+    document.addEventListener('DOMContentLoaded', () => {
       renderLandingCards();
-      if (typeof I18n !== 'undefined') I18n.applyAll();
+      updateStatsSection();
 
       /* --- Streak badge --- */
       const maxStreak = document.getElementById('stat-best-streak') ? parseInt(document.getElementById('stat-best-streak').textContent) || 0 : 0;
@@ -662,27 +652,12 @@
           if (count) count.textContent = maxStreak;
         }
       }
+    });
 
-      /* --- Stats --- */
-      updateStatsSection();
-    }
-
-    // Wait for i18n to be fully loaded before rendering
-    let _pageReadyDone = false;
-    function safePageReady() {
-      if (_pageReadyDone) return;
-      _pageReadyDone = true;
-      onPageReady();
-    }
-    if (window.pvReady) {
-      safePageReady();
-    } else {
-      window.addEventListener('pvReady', safePageReady);
-      // Fallback: if pvReady never fires, render after DOM is ready
-      document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(safePageReady, 500);
-      });
-    }
+    /* i18n ready → re-apply translations to dynamic elements */
+    window.addEventListener('pvReady', () => {
+      if (typeof I18n !== 'undefined') I18n.applyAll();
+    });
 
     /* --- Language change --- */
     window.addEventListener('langchange', () => {

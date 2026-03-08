@@ -609,15 +609,13 @@
         DAILY_FEATURED.forEach(id => {
           const game = PV_GAMES[id];
           if (!game) return;
-          const desc = (typeof I18n !== 'undefined') ? I18n.t('games.' + id + '.tagline') : GAME_DESCRIPTIONS[id];
-          const playNow = (typeof I18n !== 'undefined') ? I18n.t('common.playNow') : '立即游玩';
           const card = document.createElement('div');
           card.className = 'daily-card';
           card.innerHTML = `
             <div class="daily-card-icon">${game.emoji}</div>
             <div class="daily-card-name">${game.name}</div>
-            <div class="daily-card-desc">${desc}</div>
-            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary">${playNow}</a>
+            <div class="daily-card-desc" data-i18n="games.${id}.tagline">${GAME_DESCRIPTIONS[id] || game.tagline}</div>
+            <a href="${game.path}?mode=daily" class="pv-btn pv-btn-primary" data-i18n="common.playNow">立即游玩</a>
           `;
           dailyGrid.appendChild(card);
         });
@@ -626,9 +624,7 @@
       const gamesGrid = document.getElementById('all-games-grid');
       if (gamesGrid) {
         gamesGrid.innerHTML = '';
-        const playBtn = (typeof I18n !== 'undefined') ? I18n.t('landing.playBtn') : '游玩 ▸';
         Object.entries(PV_GAMES).forEach(([id, game]) => {
-          const desc = (typeof I18n !== 'undefined') ? I18n.t('games.' + id + '.tagline') : (GAME_DESCRIPTIONS[id] || game.tagline);
           const card = document.createElement('a');
           card.className = 'game-card-link';
           card.href = game.path;
@@ -636,9 +632,9 @@
             <div class="game-card-icon">${game.emoji}</div>
             <div class="game-card-body">
               <div class="game-card-name">${game.name}</div>
-              <div class="game-card-desc">${desc}</div>
+              <div class="game-card-desc" data-i18n="games.${id}.tagline">${GAME_DESCRIPTIONS[id] || game.tagline}</div>
             </div>
-            <div class="game-card-play">${playBtn}</div>
+            <div class="game-card-play" data-i18n="landing.playBtn">游玩 ▸</div>
           `;
           gamesGrid.appendChild(card);
         });
@@ -649,9 +645,9 @@
       renderBlogCards(3);
     }
 
-    function onPageReady() {
+    document.addEventListener('DOMContentLoaded', () => {
       renderLandingCards();
-      if (typeof I18n !== 'undefined') I18n.applyAll();
+      updateStatsSection();
       const maxStreak = document.getElementById('stat-best-streak') ? parseInt(document.getElementById('stat-best-streak').textContent) || 0 : 0;
       if (maxStreak > 0) {
         const badge = document.getElementById('streak-badge');
@@ -661,23 +657,11 @@
           if (count) count.textContent = maxStreak;
         }
       }
-      updateStatsSection();
-    }
+    });
 
-    let _pageReadyDone = false;
-    function safePageReady() {
-      if (_pageReadyDone) return;
-      _pageReadyDone = true;
-      onPageReady();
-    }
-    if (window.pvReady) {
-      safePageReady();
-    } else {
-      window.addEventListener('pvReady', safePageReady);
-      document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(safePageReady, 500);
-      });
-    }
+    window.addEventListener('pvReady', () => {
+      if (typeof I18n !== 'undefined') I18n.applyAll();
+    });
 
     /* --- Language change: navigate to correct landing --- */
     window.addEventListener('langchange', (e) => {
