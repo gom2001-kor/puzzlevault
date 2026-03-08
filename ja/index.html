@@ -664,10 +664,19 @@
       updateStatsSection();
     }
 
-    if (window.pvReady) {
+    let _pageReadyDone = false;
+    function safePageReady() {
+      if (_pageReadyDone) return;
+      _pageReadyDone = true;
       onPageReady();
+    }
+    if (window.pvReady) {
+      safePageReady();
     } else {
-      window.addEventListener('pvReady', onPageReady);
+      window.addEventListener('pvReady', safePageReady);
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(safePageReady, 500);
+      });
     }
 
     /* --- Language change: navigate to correct landing --- */

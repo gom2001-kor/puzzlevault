@@ -490,8 +490,12 @@ const HintManager = {
  * Called on DOMContentLoaded for every page.
  */
 async function initPage() {
-    if (typeof I18n !== 'undefined') {
-        await I18n.init();
+    try {
+        if (typeof I18n !== 'undefined') {
+            await I18n.init();
+        }
+    } catch (e) {
+        // i18n load failed — continue with defaults
     }
     renderHeader();
     renderFooter();
