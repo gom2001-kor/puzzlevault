@@ -226,7 +226,7 @@
             "flowBonus": "¡Bonus de flujo!",
             "connected": "conectado",
             "allFlows": "¡Todos los flujos conectados!",
-            "guide": "ColorFlow es un puzle de conexión de caminos. Cada cuadrícula tiene pares de marcadores del mismo color. Dibuja caminos horizontales o verticales para conectar cada par. Los caminos no pueden cruzarse. Llena todas las celdas para una calificación Perfecta. Bonus por caminos eficientes dentro de 1.5× la distancia mínima. Desde 5×5 hasta 14×14.",
+            "guide": "ColorFlow es un puzle de conexión de caminos. Cada cuadrícula tiene pares de marcadores del mismo color. Dibuja caminos horizontales o verticales para conectar cada par. Los caminos no pueden cruzarse. Llena todas las celdas para una calificación Perfecta. Bonus por caminos eficientes dentro de 1.5× la distancia mínima. Desde 5×5 hasta 9×9.",
             "faq1q": "¿Cómo consigo 3 estrellas?",
             "faq1a": "Logra 100% de cobertura: conecta todos los pares y llena todas las celdas. 80%+ da 2 estrellas, solo conectar da 1.",
             "faq2q": "¿Qué es el Bonus de flujo?",
