@@ -496,6 +496,10 @@ async function initPage() {
     renderHeader();
     renderFooter();
 
+    // Signal that i18n + header/footer are ready
+    window.pvReady = true;
+    window.dispatchEvent(new CustomEvent('pvReady'));
+
     // Initialize SFX on first user interaction
     document.addEventListener('pointerdown', () => {
         if (typeof SFX !== 'undefined' && !SFX.ctx) {

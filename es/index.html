@@ -649,8 +649,9 @@
       renderBlogCards(3);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function onPageReady() {
       renderLandingCards();
+      if (typeof I18n !== 'undefined') I18n.applyAll();
       const maxStreak = document.getElementById('stat-best-streak') ? parseInt(document.getElementById('stat-best-streak').textContent) || 0 : 0;
       if (maxStreak > 0) {
         const badge = document.getElementById('streak-badge');
@@ -661,7 +662,13 @@
         }
       }
       updateStatsSection();
-    });
+    }
+
+    if (window.pvReady) {
+      onPageReady();
+    } else {
+      window.addEventListener('pvReady', onPageReady);
+    }
 
     /* --- Language change: navigate to correct landing --- */
     window.addEventListener('langchange', (e) => {
