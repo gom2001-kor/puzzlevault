@@ -131,6 +131,31 @@
     <priority>0.6</priority>
   </url>
 
+    <url>
+    <loc>https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html</loc>
+    <lastmod>2026-03-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html</loc>
+    <lastmod>2026-03-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/posts/colorflow-advanced-pathing-strategies.html</loc>
+    <lastmod>2026-03-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html</loc>
+    <lastmod>2026-03-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
   <!-- Language Landing Pages -->
   <url>
     <loc>https://puzzlevault.pages.dev/ko/</loc>
@@ -190,6 +215,11 @@
   <url><loc>https://puzzlevault.pages.dev/blog/ko/welcome-to-puzzlevault.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/ko/numvault-tips-and-strategy.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
 
+    <url><loc>https://puzzlevault.pages.dev/blog/ko/the-evolution-of-browser-puzzles.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ko/why-we-built-puzzlevault-with-vanilla-js.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ko/colorflow-advanced-pathing-strategies.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+
   <!-- Blog Posts: Japanese -->
   <url><loc>https://puzzlevault.pages.dev/blog/ja/5-tips-to-boost-your-brain-with-puzzles.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/ja/gridsmash-beginner-strategy-guide.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
@@ -197,12 +227,22 @@
   <url><loc>https://puzzlevault.pages.dev/blog/ja/welcome-to-puzzlevault.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/ja/numvault-tips-and-strategy.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
 
+    <url><loc>https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ja/why-we-built-puzzlevault-with-vanilla-js.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ja/colorflow-advanced-pathing-strategies.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+
   <!-- Blog Posts: Chinese -->
   <url><loc>https://puzzlevault.pages.dev/blog/zh/5-tips-to-boost-your-brain-with-puzzles.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/zh/gridsmash-beginner-strategy-guide.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/zh/daily-challenge-streak-tips.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/zh/welcome-to-puzzlevault.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/zh/numvault-tips-and-strategy.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
+
+    <url><loc>https://puzzlevault.pages.dev/blog/zh/the-evolution-of-browser-puzzles.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/zh/colorflow-advanced-pathing-strategies.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
 
   <!-- Blog Posts: Spanish -->
   <url><loc>https://puzzlevault.pages.dev/blog/es/5-tips-to-boost-your-brain-with-puzzles.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
@@ -235,5 +275,10 @@
   <url><loc>https://puzzlevault.pages.dev/es/contact.html</loc><lastmod>2026-03-06</lastmod><priority>0.5</priority></url>
   <url><loc>https://puzzlevault.pages.dev/es/privacy.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
   <url><loc>https://puzzlevault.pages.dev/es/terms.html</loc><lastmod>2026-03-06</lastmod><priority>0.4</priority></url>
+
+  <url><loc>https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/es/colorflow-advanced-pathing-strategies.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
+  <url><loc>https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html</loc><lastmod>2026-03-29</lastmod><priority>0.5</priority></url>
 
 </urlset>

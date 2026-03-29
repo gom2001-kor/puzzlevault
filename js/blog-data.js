@@ -11,6 +11,90 @@
 
 const BLOG_POSTS = [
     {
+        slug: 'the-evolution-of-browser-puzzles',
+        title: {
+            en: 'The Evolution of Browser Puzzles: From Flash to HTML5',
+            ko: '웹 브라우저 퍼즐 게임의 진화: 플래시에서 HTML5까지',
+            ja: 'ブラウザパズルゲームの進化：FlashからHTML5へ',
+            zh: '网页益智游戏的演变：从Flash到HTML5',
+            es: 'La Evolución de los Puzzles de Navegador: De Flash a HTML5'
+        },
+        description: {
+            en: 'Explore the fascinating history of web-based puzzle games. Learn how browser technology evolved from the Flash era to modern, high-performance HTML5 Canvas games.',
+            ko: '웹 기반 퍼즐 게임의 흥미로운 역사를 탐구해보세요. 플래시 시대부터 현대적인 고성능 HTML5 캔버스 게임에 이르기까지 브라우저 기술이 어떻게 진화했는지 알아봅니다.',
+            ja: 'ウェブベースのパズルゲームの魅力的な歴史を探ります。Flash時代から現代の高性能HTML5 Canvasゲームへと、ブラウザ技術がどのように進化したかを学びます。',
+            zh: '探索基于网页的益智游戏的迷人历史。了解浏览器技术如何从Flash时代演变到现代高性能的HTML5 Canvas游戏。',
+            es: 'Explora la fascinante historia de los juegos de puzzle en la web. Descubre cómo la tecnología de los navegadores evolucionó desde la era de Flash hasta los modernos juegos de Canvas HTML5 de alto rendimiento.'
+        },
+        date: '2026-03-29',
+        category: 'updates',
+        tags: ['all-games'],
+        readTime: 5
+    },
+    {
+        slug: 'why-we-built-puzzlevault-with-vanilla-js',
+        title: {
+            en: 'Why We Built PuzzleVault with Vanilla JS (No Frameworks)',
+            ko: '퍼즐볼트가 React 대신 바닐라 자바스크립트를 선택한 이유',
+            ja: 'PuzzleVaultがVanilla JSで構築された理由（フレームワーク不使用）',
+            zh: '为什么我们使用原生JS构建PuzzleVault（不使用框架）',
+            es: 'Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)'
+        },
+        description: {
+            en: 'Discover why PuzzleVault rejected modern JavaScript frameworks like React and Vue, opting for pure Vanilla JS to ensure peak performance and zero loading times.',
+            ko: '가장 빠른 로딩 시간과 최고의 성능을 위해 PuzzleVault가 React나 Vue 같은 최신 프레임워크를 버리고 순수 바닐라 JS를 선택한 이유를 알아봅니다.',
+            ja: 'PuzzleVaultがReactやVueのような最新のJavaScriptフレームワークを却下し、最高のパフォーマンスとゼロのロード時間を確保するために純粋なVanilla JSを選んだ理由を発見してください。',
+            zh: '了解为什么PuzzleVault拒绝使用React和Vue等现代JavaScript框架，而选择纯原生JS以确保峰值性能和零加载时间。',
+            es: 'Descubre por qué PuzzleVault rechazó frameworks de JavaScript modernos como React y Vue, optando por puro Vanilla JS para asegurar un rendimiento máximo y tiempos de carga cero.'
+        },
+        date: '2026-03-29',
+        category: 'updates',
+        tags: ['performance'],
+        readTime: 6
+    },
+    {
+        slug: 'colorflow-advanced-pathing-strategies',
+        title: {
+            en: 'Advanced Pathing Strategies for ColorFlow 9x9 Grids',
+            ko: 'ColorFlow 9x9 레벨의 경로 탐색 고급 전략 완벽 가이드',
+            ja: 'ColorFlow 9x9グリッドのための高度な経路探索戦略',
+            zh: 'ColorFlow 9x9网格的高级路径策略',
+            es: 'Estrategias de Rutas Avanzadas para Cuadrículas de 9x9 en ColorFlow'
+        },
+        description: {
+            en: 'Master the massive 9x9 levels in ColorFlow. Learn advanced path-routing strategies, edge-hugging techniques, and how to reliably achieve the Flow Bonus.',
+            ko: '거대한 9x9 레벨을 마스터하세요. 외곽 경로 우회, 교차점 회피, 완벽한 플로우 보너스 획득을 위한 고급 전략을 배웁니다.',
+            ja: 'ColorFlowの巨大な9x9レベルをマスターしよう。高度な経路ルーティング戦略、エッジハギング技術、そしてフローボーナスを確実に獲得する方法を学びます。',
+            zh: '掌握ColorFlow中巨大的9x9关卡。学习高级路径规划策略、贴边技巧以及如何可靠地获得流动奖励。',
+            es: 'Domina los enormes niveles de 9x9 en ColorFlow. Aprende estrategias avanzadas de enrutamiento, técnicas de abrazar los bordes y cómo conseguir el Bono de Flujo de manera confiable.'
+        },
+        date: '2026-03-29',
+        category: 'strategy',
+        tags: ['colorflow', 'strategy', 'tips'],
+        readTime: 7
+    },
+    {
+        slug: 'the-math-behind-sortstack',
+        title: {
+            en: 'The Math Behind SortStack: Guaranteeing Every Puzzle is Solvable',
+            ko: 'SortStack 퍼즐 디자인에 숨겨진 수학: 모든 퍼즐이 100% 풀리는 원리',
+            ja: 'SortStackの背後にある数学：すべてのパズルが解けることを保証する方法',
+            zh: 'SortStack背后的数学：保证每个谜题都可解',
+            es: 'Las Matemáticas Detrás de SortStack: Garantizando que Cada Puzzle Tenga Solución'
+        },
+        description: {
+            en: 'Ever wonder if a sorting puzzle is actually impossible? Discover the mathematical reverse-moves algorithm PuzzleVault utilizes to ensure every level is 100% solvable.',
+            ko: '퍼즐을 풀다가 아예 풀 수 없는 문제라고 의심해본 적이 있나요? PuzzleVault가 무작위 배치를 거부하고 역추적 백트래킹 수학 알고리즘을 사용한 이유를 밝힙니다.',
+            ja: '並べ替えパズルが本当に不可能だと疑問に思ったことはありませんか？PuzzleVaultがすべてのレベルで100%解けることを保証するために利用している数学的なリバースムーブアルゴリズムを発見してください。',
+            zh: '有没有想过排序拼图是否实际上是不可能的？发现PuzzleVault用来确保每个关卡100%可解的数学反向移动算法。',
+            es: '¿Alguna vez te has preguntado si un puzzle de clasificación es realmente imposible? Descubre el algoritmo matemático de movimientos inversos que utiliza PuzzleVault para asegurar que cada nivel sea 100% resoluble.'
+        },
+        date: '2026-03-29',
+        category: 'science',
+        tags: ['sortstack', 'math', 'strategy'],
+        readTime: 6
+    },
+    {
         slug: '5-tips-to-boost-your-brain-with-puzzles',
         title: {
             en: '5 Science-Backed Ways Puzzle Games Boost Your Brain',
