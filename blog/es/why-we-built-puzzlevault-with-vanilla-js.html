@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" translate="no" class="notranslate">
+<head>
+    <meta name="google" content="notranslate">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+    <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-K90N7DX7S6');</script>
+  <script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","vtmy819a2e");</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks) | PuzzleVault Blog</title>
+    <meta name="description" content="Descubre por qué PuzzleVault rechazó frameworks modernos como React y Vue, optando por puro Vanilla JS para rendimiento máximo.">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)">
+    <meta property="og:description" content="Descubre por qué PuzzleVault rechazó frameworks modernos como React y Vue, optando por puro Vanilla JS para rendimiento máximo.">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)">
+    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html">
+    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/why-we-built-puzzlevault-with-vanilla-js.html">
+    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/why-we-built-puzzlevault-with-vanilla-js.html">
+    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html">
+    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html">
+    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)","inLanguage":"es","datePublished":"2026-03-29","dateModified":"2026-03-29","author":{"@type":"Organization","name":"PuzzleVault"},"publisher":{"@type":"Organization","name":"PuzzleVault"},"mainEntityOfPage":"https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html"}</script>
+    <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
+</head>
+<body>
+    <header id="pv-header"></header>
+    <div class="blog-post-header">
+        <span class="blog-post-category">Actualización</span>
+        <h1>Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)</h1>
+        <div class="blog-post-meta">29 de Marzo de 2026 · 6min de lectura</div>
+    </div>
+    <article class="blog-content">
+        <p>Si miras bajo el capó de la mayoría de las aplicaciones web modernas, casi seguro encontrarás un framework JavaScript pesado. Entonces, ¿por qué PuzzleVault se construyó con puro <strong>Vanilla JavaScript, HTML5 y CSS3</strong>?</p>
+<h2>1. Cero Tiempos de Carga</h2>
+<p>Un SPA de React requiere descargar varios megabytes de JavaScript. El payload de PuzzleVault es de menos de 100KB. <strong>SortStack</strong> o <strong>PatternPop</strong> se inicializan en 50 milisegundos.</p>
+<h2>2. Control Total del Ciclo de Renderizado</h2>
+<p>El DOM Virtual de React es genial para tablas de datos, pero causa micro-stutters en juegos a 60 FPS. Vanilla JS permite acceso directo a <code>requestAnimationFrame()</code> y la API Canvas.</p>
+<h2>3. Evitando el Infierno de Dependencias</h2>
+<p>Al depender solo de APIs Web nativas del estándar W3C, nuestro código no se deteriora. Sin herramientas de build, Webpack ni módulos Node.</p>
+<h2>4. Maximizando la Vida de la Batería</h2>
+<p>La lógica vanilla pura no tiene la sobrecarga de asignación de memoria de stores de estado reactivos, reduciendo la actividad del recolector de basura y conservando batería.</p>
+<h2>Conclusión</h2>
+<p>Los frameworks son herramientas increíbles para software empresarial, pero para puzzles interactivos instantáneos y de alto rendimiento, agregan peso innecesario. Vanilla JS garantiza la velocidad y accesibilidad de PuzzleVault.</p>
+    </article>
+    <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
+    <section class="blog-related"><h2>🎮 Prueba Estos Juegos</h2><div class="related-games-grid" id="related-games"></div></section>
+    <section class="blog-related"><h2>📖 Leer Más</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/es/" class="back-link">← Volver al Blog</a></section>
+    <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
+    <footer id="pv-footer"></footer>
+    <script src="/js/blog-data.js"></script><script src="/js/i18n.js"></script><script src="/js/common.js"></script>
+    <script>const POST_SLUG='why-we-built-puzzlevault-with-vanilla-js';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['mergechain','sortstack','patternpop'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/es/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
+    <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html':'/blog/'+nl+'/why-we-built-puzzlevault-with-vanilla-js.html'});</script>
+    <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
+</body>
+</html>
