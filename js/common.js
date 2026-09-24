@@ -292,16 +292,31 @@ function renderBlogCards(count = 3, category) {
 }
 
 /* --- Stats System --- */
+let pvStatsMemory = { totalGames: 0, totalScore: 0, bestScores: {} };
+let pvStatsStorageUnavailable = false;
 /**
  * Get global stats from localStorage.
  * @returns {{ totalGames: number, totalScore: number, bestScores: Object }}
  */
 function getStats() {
-    return {
-        totalGames: parseInt(localStorage.getItem('pv_total_games') || '0'),
-        totalScore: parseInt(localStorage.getItem('pv_total_score') || '0'),
-        bestScores: JSON.parse(localStorage.getItem('pv_best_scores') || '{}'),
-    };
+    try {
+        if (pvStatsStorageUnavailable) return { ...pvStatsMemory, bestScores: { ...pvStatsMemory.bestScores } };
+        const totalGames = Number(localStorage.getItem('pv_total_games') || 0);
+        const totalScore = Number(localStorage.getItem('pv_total_score') || 0);
+        let storedBest = {};
+        try { storedBest = JSON.parse(localStorage.getItem('pv_best_scores') || '{}') || {}; }
+        catch (error) { /* Discard malformed best scores. */ }
+        const bestScores = {};
+        Object.keys(PV_GAMES).forEach(id => {
+            if (Number.isFinite(storedBest[id]) && storedBest[id] >= 0) bestScores[id] = storedBest[id];
+        });
+        pvStatsMemory = {
+            totalGames: Number.isFinite(totalGames) && totalGames >= 0 ? Math.floor(totalGames) : 0,
+            totalScore: Number.isFinite(totalScore) && totalScore >= 0 ? totalScore : 0,
+            bestScores,
+        };
+    } catch (error) { pvStatsStorageUnavailable = true; }
+    return { ...pvStatsMemory, bestScores: { ...pvStatsMemory.bestScores } };
 }
 
 /**
@@ -309,25 +324,28 @@ function getStats() {
  * @param {string} gameId — e.g. 'numvault'
  * @param {number} score — Score achieved
  */
-function updateStats(gameId, score) {
-    const totalGames = parseInt(localStorage.getItem('pv_total_games') || '0') + 1;
-    const totalScore = parseInt(localStorage.getItem('pv_total_score') || '0') + score;
-    localStorage.setItem('pv_total_games', totalGames);
-    localStorage.setItem('pv_total_score', totalScore);
+function updateStats(gameId, score, options) {
+    if (!Object.prototype.hasOwnProperty.call(PV_GAMES, gameId) || !Number.isFinite(score) || score < 0) return null;
+    const progress = window.PVProgress ? window.PVProgress.recordRound(gameId, score, options) : null;
+    if (progress && progress.duplicate) return progress;
 
-    const bestScores = JSON.parse(localStorage.getItem('pv_best_scores') || '{}');
-    const bestKey = `${gameId}`;
-    if (!bestScores[bestKey] || score > bestScores[bestKey]) {
-        bestScores[bestKey] = score;
-        localStorage.setItem('pv_best_scores', JSON.stringify(bestScores));
-    }
+    const stats = getStats();
+    stats.totalGames++;
+    stats.totalScore += score;
+    if (!stats.bestScores[gameId] || score > stats.bestScores[gameId]) stats.bestScores[gameId] = score;
+    pvStatsMemory = stats;
 
-    // Also store individual game best
-    const individualKey = `pv_${gameId}_best`;
-    const currentBest = parseInt(localStorage.getItem(individualKey) || '0');
-    if (score > currentBest) {
-        localStorage.setItem(individualKey, score);
-    }
+    try {
+        localStorage.setItem('pv_total_games', stats.totalGames);
+        localStorage.setItem('pv_total_score', stats.totalScore);
+        localStorage.setItem('pv_best_scores', JSON.stringify(stats.bestScores));
+
+        // Keep each game's existing high-score convention unchanged.
+        const individualKey = `pv_${gameId}_best`;
+        const currentBest = Number(localStorage.getItem(individualKey) || 0);
+        if (!Number.isFinite(currentBest) || score > currentBest) localStorage.setItem(individualKey, score);
+    } catch (error) { pvStatsStorageUnavailable = true; }
+    return progress;
 }
 
 /* --- Utility Functions --- */
@@ -458,7 +476,9 @@ const HintManager = {
         } else {
             // Require reward ad
             if (typeof AdController !== 'undefined') {
-                AdController.showRewardAd(hintCallback);
+                const labels = { en: 'one hint', ko: '힌트 1개', ja: 'ヒント1回', zh: '一次提示', es: 'una pista' };
+                const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+                AdController.showRewardAd(hintCallback, { rewardLabel: labels[lang] || labels.en });
             } else if (typeof hintCallback === 'function') {
                 hintCallback();
             }

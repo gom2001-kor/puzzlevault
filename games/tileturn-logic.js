@@ -644,6 +644,8 @@ function handleWin() {
     }
     if (packComplete) score += 2000;
 
+    if (typeof updateStats === 'function') updateStats(GAME_ID, score);
+
     // Display Result Overlay
     const modal = document.getElementById('tt-result-modal');
 
@@ -674,7 +676,7 @@ function handleWin() {
 
     // Show interstitial after 2s delay
     setTimeout(() => {
-        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+        if (typeof AdController !== 'undefined' && !state.isPlaying && modal.classList.contains('open')) {
             AdController.showInterstitial();
         }
     }, 2000);

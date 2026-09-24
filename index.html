@@ -54,6 +54,7 @@
     content="Play 10 free browser-based puzzle games. Challenge your mind daily. No download needed.">
 
   <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/arcade.css?v=12">
 
   <!-- Schema.org -->
   <script type="application/ld+json">
@@ -509,46 +510,48 @@
   </style>
 </head>
 
-<body>
+<body class="arcade-home">
   <header id="pv-header"></header>
 
   <main>
     <!-- ===== Hero Section ===== -->
-    <section class="hero">
-      <div class="hero-logo">
-        <span class="hero-logo-icon">🧩</span>
-        <span class="hero-logo-text">PuzzleVault</span>
+    <section class="arcade-hero">
+      <div class="arcade-hero-copy">
+        <span class="arcade-eyebrow"><span data-i18n="arcade.eyebrow">YOUR DAILY DOSE OF PLAY</span></span>
+        <h1 data-i18n="arcade.heroTitle">A little challenge.
+A bigger little victory.</h1>
+        <p class="arcade-intro" data-i18n="arcade.intro">Ten puzzles, fresh daily missions, and a 30-second challenge to send to your friends. Your next personal best starts here.</p>
+        <div class="arcade-actions"><a class="arcade-primary" href="/games/quickcalc.html?mode=blitz" data-arcade-start><span data-i18n="arcade.start">Take the 30-second challenge</span> <span aria-hidden="true">↗</span></a><a class="arcade-secondary" href="#games"><span data-i18n="arcade.browse">Explore games</span></a></div>
+        <div class="arcade-note"><span data-i18n="arcade.free">Free to play</span><span data-i18n="arcade.noAccount">No sign-up</span><span data-i18n="arcade.instant">Instant play</span></div>
       </div>
-      <h1 class="hero-tagline" data-i18n="landing.hero">Free Brain Puzzles — No Download Needed</h1>
-      <p class="hero-subtext" data-i18n="landing.heroSub">
-        Challenge your mind with 10 unique puzzle games. Play directly in your browser.
-      </p>
-      <a href="#games" class="hero-cta">
-        <span data-i18n="common.startPlaying">▶ Start Playing</span>
-      </a>
+      <div class="arcade-preview-wrap">
+        <div class="arcade-preview">
+          <div class="arcade-preview-top"><span data-i18n="arcade.previewLabel">QUICKCALC · WARM-UP</span><span class="arcade-time">00:30</span></div>
+          <div class="arcade-question" aria-label="8 × 7 = ?"><span class="arcade-number">8</span><small>×</small><span class="arcade-number">7</span><small>=</small><span class="arcade-answer" id="arcade-answer">?</span></div>
+          <div class="arcade-choices"><button class="arcade-choice" data-answer="48">48</button><button class="arcade-choice" data-answer="56">56</button><button class="arcade-choice" data-answer="64">64</button></div>
+          <p class="arcade-preview-feedback" id="arcade-preview-feedback" role="status"><span data-i18n="arcade.previewHint">Tap an answer. Give your brain a little warm-up.</span></p>
+        </div>
+        <div class="arcade-floating">↗ <span data-i18n="arcade.floating">Your friends. The same challenge.</span></div>
+      </div>
     </section>
+    <div class="arcade-strip"><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↻</span><div><strong><span data-i18n="arcade.strip1">A new reason to play</span></strong><small><span data-i18n="arcade.strip1Sub">Three fresh missions, every day</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">✦</span><div><strong><span data-i18n="arcade.strip2">Make every round count</span></strong><small><span data-i18n="arcade.strip2Sub">Earn XP and collect milestones</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↗</span><div><strong><span data-i18n="arcade.strip3">Pass the challenge on</span></strong><small><span data-i18n="arcade.strip3Sub">Same questions. Your own record.</span></small></div></div></div>
 
     <div class="pv-container">
       <!-- ===== Daily Challenges ===== -->
-      <section class="daily-section">
-        <div class="section-heading">
-          <h2 data-i18n="landing.dailyHeading">📅 Today's Daily Challenges</h2>
-          <p data-i18n="landing.dailySub">Fresh puzzles every day — can you keep your streak alive?</p>
-        </div>
-        <div class="daily-grid anim-stagger" id="daily-grid"></div>
-        <div class="text-center">
-          <div class="streak-badge" id="streak-badge" style="display: none;">
-            🔥 Your Streak: <span id="streak-count">0</span> days
-          </div>
-        </div>
+      <section class="arcade-hub" id="daily-hub" aria-labelledby="arcade-missions-title">
+        <div class="arcade-section-head"><div><h2 id="arcade-missions-title" data-i18n="arcade.missionsTitle">Three small goals for today</h2><p data-i18n="arcade.missionsSub">Finish a round, try something new, and make progress.</p></div><span class="arcade-reset" id="arcade-reset"></span></div>
+        <div class="arcade-hub-grid"><div class="arcade-missions" id="arcade-missions"></div><aside class="arcade-passport" id="arcade-passport"></aside></div>
+        <div class="arcade-resume" id="arcade-resume" hidden></div>
+        <button class="arcade-secondary" id="arcade-share" style="margin-top:16px;font-size:.78rem;min-height:40px">↗ <span data-i18n="arcade.share">Share today’s progress</span></button>
       </section>
 
       <!-- ===== All Games Grid ===== -->
       <section class="games-section" id="games">
         <div class="section-heading">
-          <h2 data-i18n="landing.allGamesHeading">🎮 All Games</h2>
-          <p data-i18n="landing.allGamesSub">10 unique puzzles — pick your favorite</p>
+          <h2 data-i18n="arcade.gamesTitle">Find your next favorite</h2>
+          <p data-i18n="arcade.gamesSub">Ten ways to take a good little break.</p>
         </div>
+        <div class="arcade-filters" role="group" aria-label="Explore games"><button class="arcade-filter" data-filter="all" aria-pressed="true"><span data-i18n="arcade.all">All puzzles</span></button><button class="arcade-filter" data-filter="quick" aria-pressed="false"><span data-i18n="arcade.quick">Quick thinking</span></button><button class="arcade-filter" data-filter="logic" aria-pressed="false"><span data-i18n="arcade.logic">Logic & strategy</span></button><button class="arcade-filter" data-filter="relax" aria-pressed="false"><span data-i18n="arcade.relax">Find your flow</span></button></div>
         <div class="all-games-grid anim-stagger" id="all-games-grid"></div>
       </section>
 
@@ -602,9 +605,12 @@
   <footer id="pv-footer"></footer>
 
   <script src="/js/blog-data.js"></script>
-  <script src="/js/i18n.js"></script>
-  <script src="/js/common.js"></script>
-  <script src="/js/adsense.js"></script>
+  <script src="/js/i18n.js?v=12"></script>
+  <script src="/js/progression.js?v=12"></script>
+  <script src="/js/common.js?v=12"></script>
+  <script src="/js/share.js?v=12"></script>
+  <script src="/js/arcade.js?v=12"></script>
+  <script src="/js/adsense.js?v=12"></script>
   <script>
     /* === Daily Challenge featured games === */
     const DAILY_FEATURED = ['numvault', 'gridsmash', 'colorflow'];

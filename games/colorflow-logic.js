@@ -644,6 +644,8 @@ function checkWinState() {
     // Flow Bonus: 100% coverage = 2× score
     if (state.coverage === 100) totalScore *= 2;
 
+    if (typeof updateStats === 'function') updateStats(GAME_ID, totalScore);
+
     // Save
     const progress = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_progress`)) || {};
     if (!progress[state.packId]) progress[state.packId] = {};
@@ -678,7 +680,7 @@ function checkWinState() {
 
     // Show interstitial after 2s delay
     setTimeout(() => {
-        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+        if (typeof AdController !== 'undefined' && !state.isPlaying && document.getElementById('cf-result-modal').classList.contains('open')) {
             AdController.showInterstitial();
         }
     }, 2000);

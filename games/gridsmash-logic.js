@@ -788,7 +788,7 @@ function showGameOver() {
 
     // Show interstitial after 2s delay
     setTimeout(() => {
-        if (typeof AdController !== 'undefined' && G.mode !== 'zen' && AdController.shouldShowInterstitial()) {
+        if (typeof AdController !== 'undefined' && G.mode !== 'zen' && popup.classList.contains('open')) {
             AdController.showInterstitial();
         }
     }, 2000);

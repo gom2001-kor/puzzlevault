@@ -1004,6 +1004,8 @@ const PipeLink = {
             if (this.hintsUsed === 0) score = Math.round(score * 1.2);
             if (this.dualMode) score = Math.round(score * 1.5);
 
+            if (typeof updateStats === 'function') updateStats('pipelink', score);
+
             let hc = '';
             for (let i = 0; i < 3; i++) hc += i < stars ? '⭐' : '★';
 
@@ -1037,7 +1039,7 @@ const PipeLink = {
 
             // Show interstitial after 2s delay
             setTimeout(() => {
-                if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+                if (typeof AdController !== 'undefined' && this.gameState === 'clear' && document.getElementById('pl-result-modal').classList.contains('open')) {
                     AdController.showInterstitial();
                 }
             }, 2000);

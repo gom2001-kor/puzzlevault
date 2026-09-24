@@ -3,12 +3,16 @@
    Cache game HTML/CSS/JS for offline play
    =================================================== */
 
-const CACHE_VERSION = 10;
+const CACHE_VERSION = 12;
 const CACHE_NAME = 'puzzlevault-v' + CACHE_VERSION;
 const ASSETS = [
     '/',
     '/index.html',
     '/css/global.css',
+    '/css/arcade.css',
+    '/js/progression.js',
+    '/js/arcade.js',
+    '/js/duel.js',
     '/js/common.js',
     '/js/adsense.js',
     '/js/seed.js',
@@ -21,6 +25,10 @@ const ASSETS = [
     '/lang/ja.json',
     '/lang/zh.json',
     '/lang/es.json',
+    '/ko/',
+    '/ja/',
+    '/zh/',
+    '/es/',
     '/manifest.json',
     '/about.html',
     '/privacy.html',
@@ -49,6 +57,9 @@ const ASSETS = [
     '/games/hexmatch-logic.js',
 ];
 
+// HTML references versioned assets so an older worker cannot serve stale game code.
+ASSETS.push(...ASSETS.filter(asset => /\.(css|js|json)$/.test(asset)).map(asset => asset + '?v=' + CACHE_VERSION));
+
 // Install: precache all core assets
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -62,7 +73,7 @@ self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(keys =>
             Promise.all(
-                keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+                keys.filter(key => key.startsWith('puzzlevault-v') && key !== CACHE_NAME).map(key => caches.delete(key))
             )
         ).then(() => {
             // Notify all clients that a new version is available
@@ -83,22 +94,17 @@ self.addEventListener('fetch', event => {
     // Skip non-GET and external requests
     if (event.request.method !== 'GET' || url.origin !== location.origin) return;
 
-    // Ad-related requests: network-first, don't cache
-    if (url.hostname.includes('googlesyndication') ||
-        url.hostname.includes('doubleclick') ||
-        url.hostname.includes('googleads') ||
-        url.pathname.includes('/adsense')) {
-        event.respondWith(fetch(event.request).catch(() => new Response('', { status: 503 })));
-        return;
-    }
+    // External ad requests are excluded above; the local ad controller is needed offline.
 
     // CSS/JS/JSON: cache-first (game assets)
     if (url.pathname.match(/\.(css|js|json)$/)) {
         event.respondWith(
             caches.match(event.request).then(cached =>
                 cached || fetch(event.request).then(response => {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+                    if (response.ok) {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+                    }
                     return response;
                 })
             )
@@ -110,10 +116,12 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         fetch(event.request)
             .then(response => {
-                const clone = response.clone();
-                caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+                if (response.ok) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+                }
                 return response;
             })
-            .catch(() => caches.match(event.request))
+            .catch(async () => (await caches.match(event.request)) || (await caches.match(url.pathname)) || new Response('Offline', { status: 503 }))
     );
 });

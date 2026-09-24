@@ -21,7 +21,14 @@ let state = {
     lastTick: 0,
     waitingForNext: false,
 
-    rng: null
+    rng: null,
+    courseSeed: null,
+    challengeTarget: null,
+    nextTimer: null,
+    adTimer: null,
+    roundId: 0,
+    timerBoostUsed: false,
+    dailyDate: null
 };
 
 // Config per mode
@@ -45,6 +52,10 @@ function getQuestionTimer(qNum) {
 
 document.addEventListener('DOMContentLoaded', () => {
     initUIEvents();
+    const invitation = PVDuel.parse(window.location.search);
+    state.courseSeed = invitation.seed;
+    state.challengeTarget = invitation.target;
+    selectMode(invitation.mode);
     if (typeof renderCrossPromo === 'function') renderCrossPromo(GAME_ID);
     if (typeof HintManager !== 'undefined') HintManager.init(GAME_ID);
 
@@ -52,41 +63,72 @@ document.addEventListener('DOMContentLoaded', () => {
     if (soundBtn) soundBtn.textContent = localStorage.getItem('pv_sound') === 'off' ? '🔇' : '🔊';
 });
 
+function qt(key, values) { return PVDuel.t(key, values); }
+
+function clearRoundTimers() {
+    if (state.timerRAF !== null) cancelAnimationFrame(state.timerRAF);
+    clearTimeout(state.nextTimer);
+    clearTimeout(state.adTimer);
+    state.timerRAF = state.nextTimer = state.adTimer = null;
+    state.roundId++;
+}
+
+function selectMode(mode) {
+    clearRoundTimers();
+    state.isPlaying = false;
+    state.mode = mode;
+    state.waitingForNext = false;
+    document.getElementById('qc-result').classList.remove('show');
+    document.getElementById('qc-start-screen').style.display = 'flex';
+    document.getElementById('qc-problem-text').textContent = qt('ready');
+    document.getElementById('qc-q-info').textContent = '#1';
+    for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`qc-btn-${i}`);
+        btn.textContent = '—';
+        btn.className = 'qc-choice-btn';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+    }
+    refreshQCLanguage();
+}
+
+function refreshQCLanguage() {
+    const duel = state.mode === 'blitz';
+    document.querySelectorAll('#qc-tabs .pv-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.mode === state.mode);
+        tab.setAttribute('aria-pressed', String(tab.dataset.mode === state.mode));
+        tab.textContent = qt(tab.dataset.mode);
+    });
+    document.getElementById('qc-daily-tag').style.display = state.mode === 'daily' ? 'inline-block' : 'none';
+    document.getElementById('qc-daily-tag').textContent = qt('daily');
+    document.getElementById('qc-start-title').textContent = qt(duel ? 'title' : state.mode === 'classic' ? 'classicTitle' : state.mode === 'daily' ? 'dailyTitle' : 'raceTitle');
+    document.getElementById('qc-start-description').textContent = qt(duel ? 'rules' : state.mode === 'classic' ? 'classicRules' : state.mode === 'daily' ? 'dailyRules' : 'raceRules');
+    document.getElementById('qc-start-btn').textContent = qt('start');
+    document.getElementById('qc-duel-banner').hidden = !duel;
+    document.getElementById('qc-duel-eyebrow').textContent = qt(state.challengeTarget === null ? 'soloLabel' : 'duelLabel');
+    document.getElementById('qc-duel-title').textContent = state.challengeTarget === null ? qt('title') : qt('target', { score: state.challengeTarget.toLocaleString() });
+    document.getElementById('qc-duel-note').textContent = qt(state.challengeTarget === null ? 'rules' : 'local');
+    document.querySelectorAll('.qc-icons .hint-btn').forEach(button => { button.hidden = duel; });
+    document.getElementById('qc-help-title').textContent = qt('helpTitle');
+    document.getElementById('qc-help-text').textContent = qt('help');
+    document.getElementById('qc-guide-title').textContent = `QuickCalc · ${qt('helpTitle')}`;
+    document.getElementById('qc-guide-text').textContent = qt('help');
+    document.getElementById('qc-modes-faq').textContent = ['classic', 'daily', 'timeattack', 'blitz'].map((mode, index) => `${qt(mode)}: ${qt(['classicRules', 'dailyRules', 'raceRules', 'rules'][index])}`).join(' ');
+    document.getElementById('qc-operators-faq').textContent = qt('rouletteHelp');
+    document.getElementById('qc-time-display').setAttribute('aria-label', qt('time'));
+    if (document.getElementById('qc-result').classList.contains('show')) renderResultOverlay(false);
+}
+
+window.addEventListener('langchange', refreshQCLanguage);
+
 function initUIEvents() {
     // Mode tabs
     document.querySelectorAll('#qc-tabs .pv-tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
-            let mode = e.target.dataset.mode;
+            let mode = e.currentTarget.dataset.mode;
             if (state.mode === mode) return;
-
-            if (state.isPlaying) {
-                if (!confirm('Restart current game?')) return;
-                if (state.timerRAF !== null) cancelAnimationFrame(state.timerRAF);
-                state.isPlaying = false;
-            }
-
-            document.querySelectorAll('#qc-tabs .pv-tab').forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
-
-            document.getElementById('qc-daily-tag').style.display = (mode === 'daily') ? 'inline-block' : 'none';
-            document.getElementById('qc-daily-tag').textContent = 'Daily';
-
-            state.mode = mode;
-
-            document.getElementById('qc-result').classList.remove('open');
-            document.getElementById('qc-start-screen').style.display = 'flex';
-            document.getElementById('qc-status-row').style.opacity = '0.5';
-            document.getElementById('qc-timer-wrap').style.opacity = '0.5';
-            document.getElementById('qc-problem-text').innerHTML = 'Press Start';
-            for (let i = 0; i < 4; i++) {
-                let btn = document.getElementById(`qc-btn-${i}`);
-                btn.textContent = '-';
-                btn.className = 'qc-choice-btn';
-                btn.disabled = false;
-                btn.style.opacity = '1';
-            }
-            state.questionNum = 1;
-            document.getElementById('qc-q-info').textContent = '#1';
+            if (state.isPlaying && !confirm(qt('restart'))) return;
+            selectMode(mode);
         });
     });
 
@@ -99,7 +141,7 @@ function initUIEvents() {
     document.getElementById('qc-btn-settings').addEventListener('click', () => {
         SFX.toggle();
         document.getElementById('qc-btn-settings').textContent = SFX.enabled ? '🔊' : '🔇';
-        showToast(SFX.enabled ? 'Sound On' : 'Sound Off');
+        showToast(qt(SFX.enabled ? 'soundOn' : 'soundOff'));
     });
     document.getElementById('qc-btn-stats').addEventListener('click', showStatsModal);
 
@@ -107,11 +149,18 @@ function initUIEvents() {
     for (let i = 0; i < 4; i++) {
         document.getElementById(`qc-btn-${i}`).addEventListener('click', () => handleChoiceTap(i));
     }
+    document.addEventListener('keydown', event => {
+        if (!state.isPlaying || event.repeat || event.ctrlKey || event.metaKey || event.altKey || !/^[1-4]$/.test(event.key)) return;
+        if (event.target && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) return;
+        event.preventDefault();
+        handleChoiceTap(Number(event.key) - 1);
+    });
 }
 
 function startGame() {
-    if (state.timerRAF !== null) cancelAnimationFrame(state.timerRAF);
+    clearRoundTimers();
     document.getElementById('qc-start-screen').style.display = 'none';
+    document.getElementById('qc-result').classList.remove('show');
 
     const config = getModeConfig(state.mode);
     state.isPlaying = true;
@@ -122,11 +171,17 @@ function startGame() {
     state.correctCount = 0;
     state.wrongCount = 0;
     state.hintsUsed = 0;
+    state.timerBoostUsed = false;
+    state.startTime = performance.now();
     state.lives = config.lives;
     state.maxLives = config.lives;
 
     if (state.mode === 'daily') {
         state.rng = new SeededRandom(getDailySeed(GAME_ID));
+        state.dailyDate = new Date().toISOString().slice(0, 10);
+    } else if (state.mode === 'blitz') {
+        if (state.courseSeed === null) state.courseSeed = PVDuel.newSeed();
+        state.rng = new SeededRandom(state.courseSeed);
     } else {
         state.rng = null;
     }
@@ -196,8 +251,8 @@ function generateProblem(qNum) {
         switch (op) {
             case '+': A = randomInt(5, 50); B = randomInt(5, 50); C = A + B; break;
             case '-': A = randomInt(20, 99); B = randomInt(5, A - 1); C = A - B; break;
-            case '×': A = randomInt(2, 12); B = randomInt(2, 12); C = A * B; break;
-            case '÷': B = randomInt(2, 12); C = randomInt(2, 12); A = B * C; break; // A ÷ B = C
+            case '×': A = randomInt(3, 12); B = randomInt(2, 12); C = A * B; break;
+            case '÷': B = randomInt(2, 12); C = randomInt(3, 12); A = B * C; break; // Avoid ambiguous 4 ? 2 = 2.
         }
 
         display = `${A} <span style="color:var(--pv-orange)">?</span> ${B} = ${C}`;
@@ -323,7 +378,8 @@ function nextProblem() {
     state.waitingForNext = false;
 
     // Update UI DOM
-    document.getElementById('qc-q-info').textContent = `#${state.questionNum} · ${state.currentProblem.label}`;
+    const labels = { Addition: 'addition', Subtraction: 'subtraction', Multiplication: 'multiplication', Division: 'division', 'Operator Roulette': 'roulette', 'Expert Roulette': 'expert', '2-Step': 'step', 'Hard Addition': 'hardAddition', 'Hard Subtraction': 'hardSubtraction' };
+    document.getElementById('qc-q-info').textContent = `#${state.questionNum} · ${qt(labels[state.currentProblem.label] || state.currentProblem.label)}`;
 
     const probArea = document.getElementById('qc-problem-area');
     const probText = document.getElementById('qc-problem-text');
@@ -338,6 +394,8 @@ function nextProblem() {
         let btn = document.getElementById(`qc-btn-${i}`);
         btn.textContent = state.currentProblem.choices[i];
         btn.className = 'qc-choice-btn'; // reset class
+        btn.disabled = false;
+        btn.style.opacity = '1';
 
         if (state.currentProblem.isOperator) {
             btn.classList.add('operator');
@@ -393,6 +451,7 @@ function updateTimerBarDOM(snap = false) {
     }
 
     bar.style.width = `${perc}%`;
+    document.getElementById('qc-time-display').textContent = `${(Math.max(0, state.timeLeft) / 1000).toFixed(1)}s`;
 
     // Color shift
     if (perc > 60) {
@@ -421,7 +480,11 @@ function createFloatingText(x, y, text, isPenalty = false) {
 function handleChoiceTap(idx) {
     if (!state.isPlaying || state.waitingForNext) return;
 
+    // Account for elapsed time before accepting input, including after a backgrounded tab.
+    if (!advanceClock(performance.now())) return;
+
     let btn = document.getElementById(`qc-btn-${idx}`);
+    if (!btn || btn.disabled) return;
     let choice = state.currentProblem.choices[idx];
 
     // get button center for popup
@@ -433,7 +496,7 @@ function handleChoiceTap(idx) {
     if (choice === state.currentProblem.answer) {
         // Correct
         state.waitingForNext = true;
-        SFX.play('correct');
+        SFX.play(state.combo > 0 && (state.combo + 1) % 5 === 0 ? 'combo' : 'correct');
         btn.classList.add('correct');
 
         state.correctCount++;
@@ -464,8 +527,9 @@ function handleChoiceTap(idx) {
         updateTimerBarDOM(true);
         updateStatusUI();
 
-        setTimeout(() => {
-            if (!state.isPlaying) return;
+        const roundId = state.roundId;
+        state.nextTimer = setTimeout(() => {
+            if (!state.isPlaying || state.roundId !== roundId) return;
             state.questionNum++;
             nextProblem();
         }, 120);
@@ -504,22 +568,26 @@ function handleChoiceTap(idx) {
 
         updateTimerBarDOM(true);
         updateStatusUI();
+        if (state.timeLeft <= 0) gameOver();
     }
 }
 
-function gameLoop(timestamp) {
-    if (!state.isPlaying) return;
-
-    let dt = timestamp - state.lastTick;
+function advanceClock(timestamp) {
+    if (!state.isPlaying) return false;
+    const dt = Math.max(0, timestamp - state.lastTick);
     state.lastTick = timestamp;
-
     state.timeLeft -= dt;
     if (state.timeLeft <= 0) {
         state.timeLeft = 0;
         gameOver();
         updateTimerBarDOM();
-        return;
+        return false;
     }
+    return true;
+}
+
+function gameLoop(timestamp) {
+    if (!advanceClock(timestamp)) return;
 
     // Only update DOM style efficiently on tick, snap is handled via events
     updateTimerBarDOM();
@@ -528,29 +596,35 @@ function gameLoop(timestamp) {
 }
 
 function gameOver() {
+    if (!state.isPlaying) return;
     state.isPlaying = false;
+    clearRoundTimers();
     SFX.play('gameover');
 
-    let totalStats = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_stats`)) || { played: 0, highscore: 0, maxCombo: 0 };
-    totalStats.played++;
-    if (state.score > totalStats.highscore) totalStats.highscore = state.score;
-    if (state.maxCombo > totalStats.maxCombo) totalStats.maxCombo = state.maxCombo;
-    localStorage.setItem(`pv_${GAME_ID}_stats`, JSON.stringify(totalStats));
-
-    // Daily logic
-    if (state.mode === 'daily') {
-        const today = new Date().toISOString().slice(0, 10);
-        localStorage.setItem(`pv_${GAME_ID}_daily_${today}`, JSON.stringify({
-            score: state.score,
-            combo: state.maxCombo,
-            qNum: state.questionNum
-        }));
-    }
+    try {
+        const totalStats = readQCStats();
+        totalStats.played++;
+        totalStats.highscore = Math.max(state.score, totalStats.highscore);
+        totalStats.maxCombo = Math.max(state.maxCombo, totalStats.maxCombo);
+        localStorage.setItem(`pv_${GAME_ID}_stats`, JSON.stringify(totalStats));
+        if (state.mode === 'daily') {
+            localStorage.setItem(`pv_${GAME_ID}_daily_${state.dailyDate}`, JSON.stringify({ score: state.score, combo: state.maxCombo, qNum: state.questionNum }));
+            if (typeof updateStreak === 'function') updateStreak(GAME_ID);
+        }
+    } catch (_) { /* Play remains available when browser storage is full or blocked. */ }
+    if (typeof updateStats === 'function') updateStats(GAME_ID, state.score);
 
     renderResultOverlay();
 }
 
-function renderResultOverlay() {
+function readQCStats() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_stats`)) || {}; } catch (_) { /* Defaults below. */ }
+    const finite = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
+    return { played: finite(saved.played), highscore: finite(saved.highscore), maxCombo: finite(saved.maxCombo) };
+}
+
+function renderResultOverlay(scheduleAd = true) {
     const el = document.getElementById('qc-result-card');
     const overlay = document.getElementById('qc-result');
     if (!el || !overlay) return;
@@ -558,38 +632,43 @@ function renderResultOverlay() {
     let totalQs = state.correctCount + state.wrongCount;
     let acc = totalQs > 0 ? Math.round((state.correctCount / totalQs) * 100) : 0;
 
-    let shareText = `⚡ QuickCalc ${state.mode === 'daily' ? 'Daily ' + new Date().toISOString().slice(0, 10) : 'Free Play'}
-Score: ${state.score}
-Reached Q${state.questionNum} (Acc: ${acc}%)
-Max Combo: x${state.maxCombo}
-https://puzzlevault.pages.dev/games/quickcalc`;
+    const duel = state.mode === 'blitz';
+    let resultTitle = qt('finished');
+    if (duel && state.challengeTarget !== null) {
+        resultTitle = state.score > state.challengeTarget ? qt('beat') : state.score === state.challengeTarget ? qt('tie') : qt('close', { points: (state.challengeTarget - state.score).toLocaleString() });
+    }
 
     el.innerHTML = `
-        <button class="pv-modal-close" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--pv-text-secondary);" onclick="dismissResult()">✕</button>
-        <div class="qc-result-title">Time's Up! ⏰</div>
-        <div class="qc-result-subtitle">Final Score: <span style="color:var(--pv-emerald); font-weight:800; font-size:1.2rem;">${state.score}</span></div>
+        <button class="pv-modal-close" aria-label="${qt('closeButton')}" onclick="dismissResult()">✕</button>
+        <div class="qc-result-title" id="qc-result-title">${resultTitle}</div>
+        <div class="qc-result-score">${state.score.toLocaleString()}</div>
+        <div class="qc-result-subtitle">${qt('score')} · ${qt(state.mode)}</div>
+        ${duel && state.challengeTarget !== null ? `<p class="qc-target-result">${qt('target', { score: state.challengeTarget.toLocaleString() })}</p>` : ''}
         <div class="qc-result-stats">
             <div class="qc-stat-item">
                 <div class="qc-stat-val">${state.correctCount}</div>
-                <div class="qc-stat-lbl">Correct</div>
+                <div class="qc-stat-lbl">${qt('correct')}</div>
             </div>
             <div class="qc-stat-item">
                 <div class="qc-stat-val">${acc}%</div>
-                <div class="qc-stat-lbl">Accuracy</div>
+                <div class="qc-stat-lbl">${qt('accuracy')}</div>
             </div>
             <div class="qc-stat-item" style="width:100%; margin-top:12px;">
                 <div class="qc-stat-val" style="color:var(--pv-orange)">🔥 x${state.maxCombo}</div>
-                <div class="qc-stat-lbl">Max Combo</div>
+                <div class="qc-stat-lbl">${qt('combo')}</div>
             </div>
         </div>
         <div class="result-actions">
-            <button class="pv-btn pv-btn-primary" onclick="shareQC()">📤 Share</button>
-            <button class="pv-btn pv-btn-secondary" onclick="resetToStart()">🔄 Play Again</button>
+            <button class="pv-btn pv-btn-primary" onclick="shareQC()">${qt(duel ? 'challenge' : 'share')} ↗</button>
+            <button class="pv-btn pv-btn-secondary" onclick="saveQCCard()">↓ ${qt('save')}</button>
+            <button class="pv-btn pv-btn-secondary" onclick="resetToStart()">↻ ${qt(duel ? 'replay' : 'again')}</button>
+            ${duel ? `<button class="qc-fresh-btn" onclick="newQCChallenge()">${qt('fresh')} →</button><p class="qc-local-note">${qt('local')}</p>` : ''}
         </div>
         <div id="qc-mini-promo"></div>
     `;
 
     overlay.classList.add('show');
+    if (scheduleAd) el.querySelector('button').focus();
 
     // Mini cross-promo inside result modal
     if (typeof renderMiniCrossPromo === 'function') {
@@ -598,15 +677,18 @@ https://puzzlevault.pages.dev/games/quickcalc`;
     }
 
     // Show interstitial after 2s delay
-    setTimeout(() => {
-        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+    if (scheduleAd) state.adTimer = setTimeout(() => {
+        if (!state.isPlaying && overlay.classList.contains('show') && typeof AdController !== 'undefined') {
             AdController.showInterstitial();
         }
     }, 2000);
 }
 
 window.dismissResult = function () {
+    clearTimeout(state.adTimer);
     document.getElementById('qc-result').classList.remove('show');
+    document.getElementById('qc-start-screen').style.display = 'flex';
+    document.getElementById('qc-start-btn').focus();
     if (typeof AdController !== 'undefined') AdController.refreshBottomAd();
 }
 
@@ -614,24 +696,27 @@ window.resetToStart = function () {
     document.getElementById('qc-result').classList.remove('show');
     if (window.AdController) AdController.hideInterstitial();
 
-    if (state.mode === 'daily') {
-        // normally daily is locked, but allow local restart for demo
-        startGame();
-    } else {
-        startGame();
-    }
+    startGame();
 }
 
+window.newQCChallenge = function () {
+    state.courseSeed = PVDuel.newSeed();
+    state.challengeTarget = null;
+    if (window.history && window.history.replaceState) window.history.replaceState(null, '', window.location.pathname + '?mode=blitz');
+    refreshQCLanguage();
+    window.resetToStart();
+};
+
 function showStatsModal() {
-    let stats = JSON.parse(localStorage.getItem(`pv_${GAME_ID}_stats`)) || { played: 0, highscore: 0, maxCombo: 0 };
+    let stats = readQCStats();
 
     const html = `
         <div class="ss-stats-row">
-            <div class="ss-stat-box"><div class="val">${stats.played}</div><div class="lbl">Played</div></div>
+            <div class="ss-stat-box"><div class="val">${stats.played}</div><div class="lbl">${qt('played')}</div></div>
         </div>
         <div class="ss-stats-row">
-            <div class="ss-stat-box"><div class="val" style="color:var(--pv-emerald); font-size: 1.4rem;">${stats.highscore}</div><div class="lbl">High Score</div></div>
-            <div class="ss-stat-box"><div class="val" style="color:var(--pv-orange); font-size: 1.4rem;">${stats.maxCombo}</div><div class="lbl">Best Combo</div></div>
+            <div class="ss-stat-box"><div class="val" style="color:var(--pv-emerald); font-size: 1.4rem;">${stats.highscore}</div><div class="lbl">${qt('best')}</div></div>
+            <div class="ss-stat-box"><div class="val" style="color:var(--pv-orange); font-size: 1.4rem;">${stats.maxCombo}</div><div class="lbl">${qt('combo')}</div></div>
         </div>
     `;
     document.getElementById('qc-stats-body').innerHTML = html;
@@ -639,42 +724,60 @@ function showStatsModal() {
 }
 
 /* === SHARE === */
+window.saveQCCard = function () {
+    if (typeof downloadShareCard !== 'function') return;
+    const url = state.mode === 'blitz' && state.courseSeed !== null
+        ? PVDuel.buildURL(window.location.href, state.courseSeed, state.score)
+        : new URL('/games/quickcalc.html' + (state.mode === 'daily' ? '?mode=daily' : ''), window.location.href).href;
+    return downloadShareCard({ title: `QuickCalc · ${qt(state.mode)}`, score: state.score.toLocaleString(), subtitle: `${state.correctCount} ${qt('correct')} · ${qt('combo')} ×${state.maxCombo}`, url });
+};
+
 window.shareQC = function () {
+    if (state.mode === 'blitz' && state.courseSeed !== null) {
+        return shareResult(`⚡ QuickCalc · ${qt('blitz')}\n${qt('shareLine', { score: state.score.toLocaleString() })}\n${qt('sameCourse')}\n${qt('local')}\n${PVDuel.buildURL(window.location.href, state.courseSeed, state.score)}`);
+    }
     const dayNum = getDailyNumber();
     const isDaily = state.mode === 'daily';
     let text = `⚡ QuickCalc${isDaily ? ' Daily #' + dayNum : ''}\n`;
     text += `Score: ${formatNumber(state.score)}\n`;
     text += `${state.correctCount} correct | 🔥 ${state.maxCombo} streak\n`;
-    text += 'puzzlevault.pages.dev/quickcalc';
-    shareResult(text);
+    text += new URL('/games/quickcalc.html' + (isDaily ? '?mode=daily' : ''), window.location.href).href;
+    return shareResult(text);
 };
 
 /* === HINT SYSTEM === */
-// Timer extension: always FREE (+5s)
+// One free time boost per round outside competitive duels.
 window.useTimerHint = function () {
     if (!state.isPlaying) return;
+    if (state.mode === 'blitz') { showToast(qt('hintsOff')); return; }
+    if (!advanceClock(performance.now())) return;
+    if (state.timerBoostUsed) { showToast(qt('boostUsed')); return; }
+    state.timerBoostUsed = true;
     state.timeLeft += 5000;
     SFX.play('hint');
-    showToast('⏰ +5 seconds!');
+    showToast(qt('boost'));
     updateTimerBarDOM(true);
 };
 
 // Operator hint: narrows to 2 choices (HintManager)
 window.useOperatorHint = function () {
+    if (state.mode === 'blitz') { showToast(qt('hintsOff')); return; }
     if (!state.isPlaying || !state.currentProblem || !state.currentProblem.isOperator) {
         showToast('💡 Only available for Operator Roulette!');
         return;
     }
 
+    const problem = state.currentProblem;
+    const roundId = state.roundId;
     const revealHint = () => {
+        if (!state.isPlaying || state.roundId !== roundId || state.currentProblem !== problem) return;
         state.hintsUsed++;
         const answer = state.currentProblem.answer;
         const allOps = ['+', '-', '×', '÷'];
         const wrongOps = allOps.filter(o => o !== answer);
         // Keep answer + 1 random wrong
-        const keptWrong = wrongOps[randomInt(0, wrongOps.length - 1)];
+        const keptWrong = wrongOps[Math.floor(Math.random() * wrongOps.length)];
         const narrowed = [answer, keptWrong];
-        shuffle(narrowed);
 
         // Disable 2 wrong buttons
         for (let i = 0; i < 4; i++) {

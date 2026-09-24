@@ -734,7 +734,7 @@ function gameOver(reason) {
 
     // Show interstitial after 2s delay
     setTimeout(() => {
-        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+        if (typeof AdController !== 'undefined' && !M.isPlaying && document.getElementById('mc-result').classList.contains('open')) {
             AdController.showInterstitial();
         }
     }, 2000);

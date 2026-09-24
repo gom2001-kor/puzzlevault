@@ -658,6 +658,7 @@ function winGame() {
 }
 
 function loseGame() {
+    if (state.isGameOver) return;
     state.isGameOver = true;
     SFX.play('gameover');
 
@@ -667,6 +668,7 @@ function loseGame() {
     stats.played++;
     localStorage.setItem(`pv_${GAME_ID}_stats`, JSON.stringify(stats));
 
+    if (typeof updateStats === 'function') updateStats(GAME_ID, 0);
     renderResultCard(false, 0, 0);
 }
 
@@ -751,7 +753,7 @@ function renderResultCard(isWin, timeSeconds, score) {
 
     // Show interstitial after 2s delay
     setTimeout(() => {
-        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+        if (typeof AdController !== 'undefined' && overlay.classList.contains('show')) {
             AdController.showInterstitial();
         }
     }, 2000);

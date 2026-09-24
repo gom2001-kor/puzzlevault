@@ -54,6 +54,7 @@
   <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/">
 
   <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/arcade.css?v=12">
 
   <!-- Schema.org -->
   <script type="application/ld+json">
@@ -505,46 +506,48 @@
   </style>
 </head>
 
-<body>
+<body class="arcade-home">
   <header id="pv-header"></header>
 
   <main>
     <!-- ===== Hero Section ===== -->
-    <section class="hero">
-      <div class="hero-logo">
-        <span class="hero-logo-icon">🧩</span>
-        <span class="hero-logo-text">PuzzleVault</span>
+    <section class="arcade-hero">
+      <div class="arcade-hero-copy">
+        <span class="arcade-eyebrow"><span data-i18n="arcade.eyebrow">毎日に、遊びのひととき</span></span>
+        <h1 data-i18n="arcade.heroTitle">小さな挑戦。
+記録を超える楽しさ。</h1>
+        <p class="arcade-intro" data-i18n="arcade.intro">10種類のパズル、日替わりミッション、友達に送れる30秒チャレンジ。今日の小さな達成を始めよう。</p>
+        <div class="arcade-actions"><a class="arcade-primary" href="/games/quickcalc.html?mode=blitz" data-arcade-start><span data-i18n="arcade.start">30秒チャレンジを始める</span> <span aria-hidden="true">↗</span></a><a class="arcade-secondary" href="#games"><span data-i18n="arcade.browse">ゲームを見る</span></a></div>
+        <div class="arcade-note"><span data-i18n="arcade.free">無料で遊べる</span><span data-i18n="arcade.noAccount">登録不要</span><span data-i18n="arcade.instant">すぐにスタート</span></div>
       </div>
-      <h1 class="hero-tagline">無料脳トレパズル — ダウンロード不要</h1>
-      <p class="hero-subtext">
-        10種類のユニークなパズルゲームで頭脳に挑戦。ブラウザですぐプレイ。
-      </p>
-      <a href="#games" class="hero-cta">
-        <span>▶ 今すぐプレイ</span>
-      </a>
+      <div class="arcade-preview-wrap">
+        <div class="arcade-preview">
+          <div class="arcade-preview-top"><span data-i18n="arcade.previewLabel">QUICKCALC · ウォームアップ</span><span class="arcade-time">00:30</span></div>
+          <div class="arcade-question" aria-label="8 × 7 = ?"><span class="arcade-number">8</span><small>×</small><span class="arcade-number">7</span><small>=</small><span class="arcade-answer" id="arcade-answer">?</span></div>
+          <div class="arcade-choices"><button class="arcade-choice" data-answer="48">48</button><button class="arcade-choice" data-answer="56">56</button><button class="arcade-choice" data-answer="64">64</button></div>
+          <p class="arcade-preview-feedback" id="arcade-preview-feedback" role="status"><span data-i18n="arcade.previewHint">答えをタップして、軽く頭の準備運動。</span></p>
+        </div>
+        <div class="arcade-floating">↗ <span data-i18n="arcade.floating">友達と同じ問題に挑戦！</span></div>
+      </div>
     </section>
+    <div class="arcade-strip"><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↻</span><div><strong><span data-i18n="arcade.strip1">毎日新しい目標</span></strong><small><span data-i18n="arcade.strip1Sub">日替わりの3つのミッション</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">✦</span><div><strong><span data-i18n="arcade.strip2">遊ぶたびに成長</span></strong><small><span data-i18n="arcade.strip2Sub">XPとバッジを集めよう</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↗</span><div><strong><span data-i18n="arcade.strip3">友達に挑戦状</span></strong><small><span data-i18n="arcade.strip3Sub">同じ問題、自分だけの記録</span></small></div></div></div>
 
     <div class="pv-container">
       <!-- ===== Daily Challenges ===== -->
-      <section class="daily-section">
-        <div class="section-heading">
-          <h2>📅 今日のデイリーチャレンジ</h2>
-          <p>毎日新しいパズル — 連続記録を更新しよう！</p>
-        </div>
-        <div class="daily-grid anim-stagger" id="daily-grid"></div>
-        <div class="text-center">
-          <div class="streak-badge" id="streak-badge" style="display: none;">
-            🔥 連続記録: <span id="streak-count">0</span>日
-          </div>
-        </div>
+      <section class="arcade-hub" id="daily-hub" aria-labelledby="arcade-missions-title">
+        <div class="arcade-section-head"><div><h2 id="arcade-missions-title" data-i18n="arcade.missionsTitle">今日の小さな目標3つ</h2><p data-i18n="arcade.missionsSub">1回遊んで、新しいパズルを見つけて、XPを獲得しよう。</p></div><span class="arcade-reset" id="arcade-reset"></span></div>
+        <div class="arcade-hub-grid"><div class="arcade-missions" id="arcade-missions"></div><aside class="arcade-passport" id="arcade-passport"></aside></div>
+        <div class="arcade-resume" id="arcade-resume" hidden></div>
+        <button class="arcade-secondary" id="arcade-share" style="margin-top:16px;font-size:.78rem;min-height:40px">↗ <span data-i18n="arcade.share">今日の進捗をシェア</span></button>
       </section>
 
       <!-- ===== All Games Grid ===== -->
       <section class="games-section" id="games">
         <div class="section-heading">
-          <h2>🎮 全ゲーム</h2>
-          <p>10種類のパズル — お気に入りを見つけよう</p>
+          <h2 data-i18n="arcade.gamesTitle">次のお気に入りを見つけよう</h2>
+          <p data-i18n="arcade.gamesSub">気分に合わせた10種類の息抜き。</p>
         </div>
+        <div class="arcade-filters" role="group" aria-label="ゲームを見る"><button class="arcade-filter" data-filter="all" aria-pressed="true"><span data-i18n="arcade.all">すべて</span></button><button class="arcade-filter" data-filter="quick" aria-pressed="false"><span data-i18n="arcade.quick">ひらめき</span></button><button class="arcade-filter" data-filter="logic" aria-pressed="false"><span data-i18n="arcade.logic">論理と戦略</span></button><button class="arcade-filter" data-filter="relax" aria-pressed="false"><span data-i18n="arcade.relax">じっくり集中</span></button></div>
         <div class="all-games-grid anim-stagger" id="all-games-grid"></div>
       </section>
 
@@ -598,9 +601,12 @@
   <footer id="pv-footer"></footer>
 
   <script src="/js/blog-data.js"></script>
-  <script src="/js/i18n.js"></script>
-  <script src="/js/common.js"></script>
-  <script src="/js/adsense.js"></script>
+  <script src="/js/i18n.js?v=12"></script>
+  <script src="/js/progression.js?v=12"></script>
+  <script src="/js/common.js?v=12"></script>
+  <script src="/js/share.js?v=12"></script>
+  <script src="/js/arcade.js?v=12"></script>
+  <script src="/js/adsense.js?v=12"></script>
   <script>
     /* === Game descriptions — hardcoded for SEO, also uses i18n === */
     const GAME_DESCRIPTIONS = {

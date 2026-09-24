@@ -24,6 +24,8 @@ function resetState() {
         feedback: [],
         currentInput: [],
         gameState: 'playing', // playing | won | lost
+        submitting: false,
+        completed: false,
         tracker: Array(10).fill('unused'), // unused | included | confirmed | excluded
         hintsUsed: 0,
         maxHints: 1,
@@ -230,31 +232,35 @@ function renderNumpad() {
 
 function updateHintBtn() {
     const btn = document.getElementById('nv-hint-btn');
-    if (btn) btn.disabled = G.hintsUsed >= G.maxHints || G.gameState !== 'playing';
+    if (btn) btn.disabled = G.hintsUsed >= G.maxHints || G.gameState !== 'playing' || G.submitting;
 }
 
 /* === INPUT HANDLING === */
 function inputDigit(d) {
-    if (G.gameState !== 'playing') return;
+    if (G.gameState !== 'playing' || G.submitting) return;
     if (G.currentInput.length >= G.difficulty.digits) return;
     G.currentInput.push(d);
     SFX.play('tap');
     renderGrid();
 }
 function inputBackspace() {
-    if (G.gameState !== 'playing' || G.currentInput.length === 0) return;
+    if (G.gameState !== 'playing' || G.submitting || G.currentInput.length === 0) return;
     G.currentInput.pop();
     renderGrid();
 }
 
 /* === SUBMIT GUESS === */
 function submitGuess() {
-    if (G.gameState !== 'playing') return;
+    if (G.gameState !== 'playing' || G.submitting || G.completed) return;
     if (G.currentInput.length !== G.difficulty.digits) {
         animateShake();
         SFX.play('wrong');
         return;
     }
+    const round = G;
+    const code = G.code;
+    G.submitting = true;
+    updateHintBtn();
     const guess = [...G.currentInput];
     const fb = evaluateGuess(guess, G.code);
     G.guesses.push(guess);
@@ -264,6 +270,8 @@ function submitGuess() {
 
     // Animate flip
     animateFlip(G.guesses.length - 1, fb, () => {
+        if (G !== round || G.code !== code || G.gameState !== 'playing' || !G.submitting || G.completed) return;
+        G.submitting = false;
         renderTracker();
         // Check win
         if (fb.every(f => f === 'green')) {
@@ -283,6 +291,9 @@ function submitGuess() {
 
 /* === FLIP ANIMATION === */
 function animateFlip(rowIdx, fb, callback) {
+    const round = G;
+    const code = G.code;
+    const isCurrent = () => G === round && G.code === code && G.gameState === 'playing' && !G.completed;
     const digits = G.difficulty.digits;
     const row = G.guesses[rowIdx];
     for (let c = 0; c < digits; c++) {
@@ -291,15 +302,17 @@ function animateFlip(rowIdx, fb, callback) {
         cell.textContent = row[c];
         cell.classList.remove('active', 'filled');
         setTimeout(() => {
+            if (!isCurrent()) return;
             cell.classList.add('flip');
             setTimeout(() => {
+                if (!isCurrent()) return;
                 const cls = fb[c] === 'green' ? 'green' : fb[c] === 'yellow' ? 'yellow' : 'gray';
                 cell.classList.add(cls);
             }, 250);
         }, c * 150);
     }
     setTimeout(() => {
-        if (callback) callback();
+        if (isCurrent() && callback) callback();
     }, digits * 150 + 500);
 }
 
@@ -328,7 +341,7 @@ function animateWave(rowIdx) {
 
 /* === HINT SYSTEM === */
 function useHint() {
-    if (G.gameState !== 'playing') return;
+    if (G.gameState !== 'playing' || G.submitting) return;
     // Find unconfirmed positions
     const unconfirmed = [];
     for (let i = 0; i < G.code.length; i++) {
@@ -398,6 +411,11 @@ function useHint() {
 
 /* === GAME END === */
 function onGameEnd(won) {
+    if (G.completed || G.gameState !== (won ? 'won' : 'lost')) return;
+    const round = G;
+    G.submitting = false;
+    // A solved code continues the same Speed run; only its final loss is recorded.
+    if (G.mode !== 'speed' || !won) G.completed = true;
     if (won) {
         animateWave(G.guesses.length - 1);
         SFX.play('win');
@@ -438,7 +456,9 @@ function onGameEnd(won) {
     saveStats(won);
     updateStats('numvault', score);
 
-    setTimeout(() => showResult(won, score), won ? 1200 : 600);
+    setTimeout(() => {
+        if (G === round && G.completed) showResult(won, score);
+    }, won ? 1200 : 600);
 }
 
 function calcSpeedPoints() {
@@ -495,7 +515,7 @@ function showResult(won, score) {
 
     // Show interstitial after 2s delay if applicable
     setTimeout(() => {
-        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+        if (typeof AdController !== 'undefined' && overlay.classList.contains('open')) {
             AdController.showInterstitial();
         }
     }, 2000);
@@ -591,8 +611,9 @@ function startGame(mode, diffKey) {
 /* === SPEED MODE TIMER === */
 function startSpeedTimer() {
     clearInterval(G.speedInterval);
+    const round = G;
     G.speedInterval = setInterval(() => {
-        if (G.gameState !== 'playing') return;
+        if (G !== round || G.gameState !== 'playing' || G.completed) return;
         G.speedTimer = Math.max(0, G.speedTimer - 0.1);
         updateSpeedDisplay();
         if (G.speedTimer <= 0) {
@@ -633,6 +654,10 @@ function switchMode(mode) {
 }
 
 function showDifficultySelect() {
+    // Leaving a round invalidates all pending animations before a new one starts.
+    resetState();
+    G.mode = 'free';
+    G.gameState = 'menu';
     document.getElementById('nv-game-area').style.display = 'none';
     document.getElementById('nv-daily-tag').style.display = 'none';
     const sel = document.getElementById('nv-diff-select');

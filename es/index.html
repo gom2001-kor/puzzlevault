@@ -54,6 +54,7 @@
   <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/">
 
   <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/arcade.css?v=12">
 
   <!-- Schema.org -->
   <script type="application/ld+json">
@@ -505,46 +506,48 @@
   </style>
 </head>
 
-<body>
+<body class="arcade-home">
   <header id="pv-header"></header>
 
   <main>
     <!-- ===== Hero Section ===== -->
-    <section class="hero">
-      <div class="hero-logo">
-        <span class="hero-logo-icon">🧩</span>
-        <span class="hero-logo-text">PuzzleVault</span>
+    <section class="arcade-hero">
+      <div class="arcade-hero-copy">
+        <span class="arcade-eyebrow"><span data-i18n="arcade.eyebrow">TU DOSIS DIARIA DE JUEGO</span></span>
+        <h1 data-i18n="arcade.heroTitle">Un pequeño reto.
+Una gran satisfacción.</h1>
+        <p class="arcade-intro" data-i18n="arcade.intro">Diez juegos, nuevas misiones diarias y un reto de 30 segundos para compartir con amigos. Tu próximo récord empieza aquí.</p>
+        <div class="arcade-actions"><a class="arcade-primary" href="/games/quickcalc.html?mode=blitz" data-arcade-start><span data-i18n="arcade.start">Empieza el reto de 30 segundos</span> <span aria-hidden="true">↗</span></a><a class="arcade-secondary" href="#games"><span data-i18n="arcade.browse">Explorar juegos</span></a></div>
+        <div class="arcade-note"><span data-i18n="arcade.free">Gratis</span><span data-i18n="arcade.noAccount">Sin registro</span><span data-i18n="arcade.instant">Juega al instante</span></div>
       </div>
-      <h1 class="hero-tagline">Puzzles Cerebrales Gratis — Sin Descargas</h1>
-      <p class="hero-subtext">
-        Desafía tu mente con 10 juegos de puzzles únicos. Juega directamente en tu navegador.
-      </p>
-      <a href="#games" class="hero-cta">
-        <span>▶ Empezar a Jugar</span>
-      </a>
+      <div class="arcade-preview-wrap">
+        <div class="arcade-preview">
+          <div class="arcade-preview-top"><span data-i18n="arcade.previewLabel">QUICKCALC · CALENTAMIENTO</span><span class="arcade-time">00:30</span></div>
+          <div class="arcade-question" aria-label="8 × 7 = ?"><span class="arcade-number">8</span><small>×</small><span class="arcade-number">7</span><small>=</small><span class="arcade-answer" id="arcade-answer">?</span></div>
+          <div class="arcade-choices"><button class="arcade-choice" data-answer="48">48</button><button class="arcade-choice" data-answer="56">56</button><button class="arcade-choice" data-answer="64">64</button></div>
+          <p class="arcade-preview-feedback" id="arcade-preview-feedback" role="status"><span data-i18n="arcade.previewHint">Toca una respuesta para calentar motores.</span></p>
+        </div>
+        <div class="arcade-floating">↗ <span data-i18n="arcade.floating">Tus amigos. El mismo reto.</span></div>
+      </div>
     </section>
+    <div class="arcade-strip"><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↻</span><div><strong><span data-i18n="arcade.strip1">Una nueva meta cada día</span></strong><small><span data-i18n="arcade.strip1Sub">Tres misiones que se renuevan a diario</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">✦</span><div><strong><span data-i18n="arcade.strip2">Cada partida cuenta</span></strong><small><span data-i18n="arcade.strip2Sub">Gana XP y consigue insignias</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↗</span><div><strong><span data-i18n="arcade.strip3">Reta a tus amigos</span></strong><small><span data-i18n="arcade.strip3Sub">Mismas preguntas. Tu propio récord.</span></small></div></div></div>
 
     <div class="pv-container">
       <!-- ===== Daily Challenges ===== -->
-      <section class="daily-section">
-        <div class="section-heading">
-          <h2>📅 Desafíos Diarios de Hoy</h2>
-          <p>Puzzles nuevos cada día — ¿puedes mantener tu racha?</p>
-        </div>
-        <div class="daily-grid anim-stagger" id="daily-grid"></div>
-        <div class="text-center">
-          <div class="streak-badge" id="streak-badge" style="display: none;">
-            🔥 Tu Racha: <span id="streak-count">0</span> días
-          </div>
-        </div>
+      <section class="arcade-hub" id="daily-hub" aria-labelledby="arcade-missions-title">
+        <div class="arcade-section-head"><div><h2 id="arcade-missions-title" data-i18n="arcade.missionsTitle">Tres pequeñas metas para hoy</h2><p data-i18n="arcade.missionsSub">Termina una partida, descubre otro juego y gana experiencia.</p></div><span class="arcade-reset" id="arcade-reset"></span></div>
+        <div class="arcade-hub-grid"><div class="arcade-missions" id="arcade-missions"></div><aside class="arcade-passport" id="arcade-passport"></aside></div>
+        <div class="arcade-resume" id="arcade-resume" hidden></div>
+        <button class="arcade-secondary" id="arcade-share" style="margin-top:16px;font-size:.78rem;min-height:40px">↗ <span data-i18n="arcade.share">Compartir el progreso de hoy</span></button>
       </section>
 
       <!-- ===== All Games Grid ===== -->
       <section class="games-section" id="games">
         <div class="section-heading">
-          <h2>🎮 Todos los Juegos</h2>
-          <p>10 puzzles únicos — elige tu favorito</p>
+          <h2 data-i18n="arcade.gamesTitle">Encuentra tu próximo favorito</h2>
+          <p data-i18n="arcade.gamesSub">Diez formas de disfrutar de una pequeña pausa.</p>
         </div>
+        <div class="arcade-filters" role="group" aria-label="Explorar juegos"><button class="arcade-filter" data-filter="all" aria-pressed="true"><span data-i18n="arcade.all">Todos</span></button><button class="arcade-filter" data-filter="quick" aria-pressed="false"><span data-i18n="arcade.quick">Agilidad mental</span></button><button class="arcade-filter" data-filter="logic" aria-pressed="false"><span data-i18n="arcade.logic">Lógica y estrategia</span></button><button class="arcade-filter" data-filter="relax" aria-pressed="false"><span data-i18n="arcade.relax">A tu ritmo</span></button></div>
         <div class="all-games-grid anim-stagger" id="all-games-grid"></div>
       </section>
 
@@ -598,9 +601,12 @@
   <footer id="pv-footer"></footer>
 
   <script src="/js/blog-data.js"></script>
-  <script src="/js/i18n.js"></script>
-  <script src="/js/common.js"></script>
-  <script src="/js/adsense.js"></script>
+  <script src="/js/i18n.js?v=12"></script>
+  <script src="/js/progression.js?v=12"></script>
+  <script src="/js/common.js?v=12"></script>
+  <script src="/js/share.js?v=12"></script>
+  <script src="/js/arcade.js?v=12"></script>
+  <script src="/js/adsense.js?v=12"></script>
   <script>
     /* === Game descriptions — hardcoded for SEO, also uses i18n === */
     const GAME_DESCRIPTIONS = {

@@ -54,6 +54,7 @@
   <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/">
 
   <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/arcade.css?v=12">
 
   <!-- Schema.org -->
   <script type="application/ld+json">
@@ -505,46 +506,48 @@
   </style>
 </head>
 
-<body>
+<body class="arcade-home">
   <header id="pv-header"></header>
 
   <main>
     <!-- ===== Hero Section ===== -->
-    <section class="hero">
-      <div class="hero-logo">
-        <span class="hero-logo-icon">🧩</span>
-        <span class="hero-logo-text">PuzzleVault</span>
+    <section class="arcade-hero">
+      <div class="arcade-hero-copy">
+        <span class="arcade-eyebrow"><span data-i18n="arcade.eyebrow">하루에 한 번, 즐거운 두뇌 놀이터</span></span>
+        <h1 data-i18n="arcade.heroTitle">작은 도전 하나.
+기록을 깨는 즐거움.</h1>
+        <p class="arcade-intro" data-i18n="arcade.intro">10가지 퍼즐, 매일 새로운 미션, 친구에게 건네는 30초 도전. 오늘의 작은 성취를 시작해 보세요.</p>
+        <div class="arcade-actions"><a class="arcade-primary" href="/games/quickcalc.html?mode=blitz" data-arcade-start><span data-i18n="arcade.start">30초 도전 시작하기</span> <span aria-hidden="true">↗</span></a><a class="arcade-secondary" href="#games"><span data-i18n="arcade.browse">전체 게임 보기</span></a></div>
+        <div class="arcade-note"><span data-i18n="arcade.free">무료 플레이</span><span data-i18n="arcade.noAccount">가입 없이</span><span data-i18n="arcade.instant">바로 시작</span></div>
       </div>
-      <h1 class="hero-tagline">무료 두뇌 퍼즐 — 다운로드 필요 없음</h1>
-      <p class="hero-subtext">
-        10가지 독창적인 퍼즐 게임으로 두뇌에 도전하세요. 브라우저에서 바로 플레이하세요.
-      </p>
-      <a href="#games" class="hero-cta">
-        <span>▶ 지금 시작하기</span>
-      </a>
+      <div class="arcade-preview-wrap">
+        <div class="arcade-preview">
+          <div class="arcade-preview-top"><span data-i18n="arcade.previewLabel">QUICKCALC · 가볍게 몸풀기</span><span class="arcade-time">00:30</span></div>
+          <div class="arcade-question" aria-label="8 × 7 = ?"><span class="arcade-number">8</span><small>×</small><span class="arcade-number">7</span><small>=</small><span class="arcade-answer" id="arcade-answer">?</span></div>
+          <div class="arcade-choices"><button class="arcade-choice" data-answer="48">48</button><button class="arcade-choice" data-answer="56">56</button><button class="arcade-choice" data-answer="64">64</button></div>
+          <p class="arcade-preview-feedback" id="arcade-preview-feedback" role="status"><span data-i18n="arcade.previewHint">정답을 눌러 가볍게 시작해 보세요.</span></p>
+        </div>
+        <div class="arcade-floating">↗ <span data-i18n="arcade.floating">친구와 같은 문제로 한 판!</span></div>
+      </div>
     </section>
+    <div class="arcade-strip"><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↻</span><div><strong><span data-i18n="arcade.strip1">매일 새로운 목표</span></strong><small><span data-i18n="arcade.strip1Sub">하루마다 바뀌는 세 가지 미션</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">✦</span><div><strong><span data-i18n="arcade.strip2">한 판마다 쌓이는 성취</span></strong><small><span data-i18n="arcade.strip2Sub">경험치를 모으고 배지를 획득하세요</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↗</span><div><strong><span data-i18n="arcade.strip3">친구에게 도전장</span></strong><small><span data-i18n="arcade.strip3Sub">같은 문제, 서로 다른 기록</span></small></div></div></div>
 
     <div class="pv-container">
       <!-- ===== Daily Challenges ===== -->
-      <section class="daily-section">
-        <div class="section-heading">
-          <h2>📅 오늘의 데일리 챌린지</h2>
-          <p>매일 새로운 퍼즐 — 연속 기록을 유지할 수 있나요?</p>
-        </div>
-        <div class="daily-grid anim-stagger" id="daily-grid"></div>
-        <div class="text-center">
-          <div class="streak-badge" id="streak-badge" style="display: none;">
-            🔥 연속 기록: <span id="streak-count">0</span>일
-          </div>
-        </div>
+      <section class="arcade-hub" id="daily-hub" aria-labelledby="arcade-missions-title">
+        <div class="arcade-section-head"><div><h2 id="arcade-missions-title" data-i18n="arcade.missionsTitle">오늘의 작은 목표 세 가지</h2><p data-i18n="arcade.missionsSub">한 판을 마치고, 새로운 퍼즐을 발견하고, 경험치를 쌓아 보세요.</p></div><span class="arcade-reset" id="arcade-reset"></span></div>
+        <div class="arcade-hub-grid"><div class="arcade-missions" id="arcade-missions"></div><aside class="arcade-passport" id="arcade-passport"></aside></div>
+        <div class="arcade-resume" id="arcade-resume" hidden></div>
+        <button class="arcade-secondary" id="arcade-share" style="margin-top:16px;font-size:.78rem;min-height:40px">↗ <span data-i18n="arcade.share">오늘의 성취 공유하기</span></button>
       </section>
 
       <!-- ===== All Games Grid ===== -->
       <section class="games-section" id="games">
         <div class="section-heading">
-          <h2>🎮 전체 게임</h2>
-          <p>10가지 퍼즐 — 마음에 드는 게임을 골라보세요</p>
+          <h2 data-i18n="arcade.gamesTitle">오늘은 어떤 퍼즐이 끌리나요?</h2>
+          <p data-i18n="arcade.gamesSub">기분에 맞게 골라 즐기는 열 가지 작은 휴식.</p>
         </div>
+        <div class="arcade-filters" role="group" aria-label="전체 게임 보기"><button class="arcade-filter" data-filter="all" aria-pressed="true"><span data-i18n="arcade.all">전체 퍼즐</span></button><button class="arcade-filter" data-filter="quick" aria-pressed="false"><span data-i18n="arcade.quick">빠른 두뇌 회전</span></button><button class="arcade-filter" data-filter="logic" aria-pressed="false"><span data-i18n="arcade.logic">논리와 전략</span></button><button class="arcade-filter" data-filter="relax" aria-pressed="false"><span data-i18n="arcade.relax">느긋한 몰입</span></button></div>
         <div class="all-games-grid anim-stagger" id="all-games-grid"></div>
       </section>
 
@@ -598,9 +601,12 @@
   <footer id="pv-footer"></footer>
 
   <script src="/js/blog-data.js"></script>
-  <script src="/js/i18n.js"></script>
-  <script src="/js/common.js"></script>
-  <script src="/js/adsense.js"></script>
+  <script src="/js/i18n.js?v=12"></script>
+  <script src="/js/progression.js?v=12"></script>
+  <script src="/js/common.js?v=12"></script>
+  <script src="/js/share.js?v=12"></script>
+  <script src="/js/arcade.js?v=12"></script>
+  <script src="/js/adsense.js?v=12"></script>
   <script>
     /* === Game descriptions — hardcoded for SEO, also uses i18n === */
     const GAME_DESCRIPTIONS = {

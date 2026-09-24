@@ -906,7 +906,7 @@ function gameOver() {
 
     // Show interstitial after 2s delay
     setTimeout(() => {
-        if (typeof AdController !== 'undefined' && AdController.shouldShowInterstitial()) {
+        if (typeof AdController !== 'undefined' && H.state === GameState.GAMEOVER && document.getElementById('hx-result').classList.contains('open')) {
             AdController.showInterstitial();
         }
     }, 2000);

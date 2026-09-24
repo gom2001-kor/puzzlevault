@@ -36,6 +36,7 @@
         content="How fast can you calculate? Race against the clock in this speed math arcade game!">
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
     <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/arcade.css?v=12">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"VideoGame","name":"QuickCalc","description":"A speed math arcade game testing quick mental calculation.","url":"https://puzzlevault.pages.dev/games/quickcalc","genre":"Arcade, Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
     </script>
@@ -359,6 +360,33 @@
             border-radius: var(--pv-radius);
             color: white;
             font-weight: 800;
+            padding: 28px;
+            text-align: center;
+        }
+
+        .qc-start-overlay h2 { font-size: clamp(1.5rem, 5vw, 2rem); line-height: 1.2; margin-bottom: 14px; }
+        .qc-start-overlay p { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; font-weight: 400; margin-bottom: 26px; max-width: 340px; }
+        .qc-duel-banner { padding: 18px 20px; border: 1px solid var(--pv-border); border-left: 4px solid var(--pv-violet); border-radius: var(--pv-radius); background: var(--pv-card-bg); margin-bottom: 16px; }
+        .qc-duel-banner[hidden], .qc-icons .hint-btn[hidden] { display: none; }
+        .qc-duel-eyebrow { color: var(--pv-violet); font-weight: 800; font-size: 0.7rem; letter-spacing: 0.08em; }
+        .qc-duel-banner h2 { font-size: 1.1rem; line-height: 1.4; margin: 6px 0; }
+        .qc-duel-banner p { font-size: 0.78rem; line-height: 1.5; margin: 0; color: var(--pv-text-secondary); }
+        .qc-time { font-variant-numeric: tabular-nums; font-size: 1.15rem; font-weight: 800; color: var(--pv-blue); }
+        .qc-result-score { color: var(--pv-blue); font-size: clamp(2.6rem, 9vw, 3.8rem); line-height: 1.15; font-weight: 900; margin: 16px 0 4px; }
+        .qc-target-result { margin: -8px 0 20px; font-size: 0.85rem; color: var(--pv-violet); font-weight: 700; }
+        .qc-result-card .result-actions { display: flex; flex-direction: column; gap: 8px; }
+        .qc-fresh-btn { background: none; color: var(--pv-text-secondary); border: 0; padding: 12px; cursor: pointer; font-weight: 600; }
+        .qc-local-note { font-size: 0.7rem; color: var(--pv-text-secondary); line-height: 1.5; margin: 2px 0 8px; }
+        .qc-choice-btn:focus-visible, .qc-start-btn:focus-visible, .qc-fresh-btn:focus-visible { outline: 3px solid var(--pv-violet); outline-offset: 3px; }
+        .qc-mode-tabs .pv-tabs { flex-wrap: wrap; }
+        @media (max-width: 480px) {
+            .qc-top-bar { flex-wrap: wrap; gap: 6px; }
+            .qc-mode-tabs .pv-tab { font-size: 0.78rem; padding: 9px 10px; }
+            .qc-game-container { margin-bottom: 80px; }
+            .qc-problem-text { font-size: clamp(2rem, 9vw, 3.5rem); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .qc-slide-in, .qc-score-pop, .qc-result-card, .qc-game-container.shake { animation: none !important; }
         }
 
         .qc-start-btn {
@@ -391,6 +419,8 @@
             justify-content: center;
             z-index: 1000;
             backdrop-filter: blur(4px);
+            padding: 24px 0;
+            overflow-y: auto;
         }
 
         .qc-result-overlay.show {
@@ -403,8 +433,10 @@
             padding: 32px 24px;
             border-radius: var(--pv-radius);
             text-align: center;
-            max-width: 340px;
+            max-width: 380px;
             width: 90%;
+            max-height: calc(100dvh - 48px);
+            overflow-y: auto;
             box-shadow: var(--pv-shadow-lg);
             animation: slideUp 0.3s ease-out;
             color: var(--pv-text);
@@ -539,25 +571,31 @@
                     </div>
                 </div>
 
+                <section class="qc-duel-banner" id="qc-duel-banner" hidden aria-live="polite">
+                    <span class="qc-duel-eyebrow" id="qc-duel-eyebrow">QUICK CHALLENGE</span>
+                    <h2 id="qc-duel-title">Your next 30 seconds</h2>
+                    <p id="qc-duel-note">Same questions. Same 30 seconds. No hints or time boosts.</p>
+                </section>
+
                 <!-- Main Game Container -->
                 <div class="qc-game-container" id="qc-container">
                     <!-- Overlays Start Screen inside container -->
                     <div class="qc-start-overlay" id="qc-start-screen">
-                        <h2 style="font-size: 2.5rem; margin-bottom: 8px;">30.0s</h2>
-                        <p style="margin-bottom: 32px; font-size: 1rem; color: #cbd5e1; font-weight: normal;">Race
-                            against the clock!</p>
+                        <h2 id="qc-start-title">Three hearts. How far can you go?</h2>
+                        <p id="qc-start-description">Choose the answer. Build a streak. Each mistake costs a heart.</p>
                         <button class="qc-start-btn" id="qc-start-btn">START</button>
                     </div>
 
                     <!-- Gameplay UI -->
-                    <div class="qc-timer-wrap">
+                    <div class="qc-timer-wrap" id="qc-timer-wrap">
                         <div class="qc-timer-bar" id="qc-timer-bar"></div>
                     </div>
 
-                    <div class="qc-status-row">
+                    <div class="qc-status-row" id="qc-status-row">
                         <div class="qc-status-left">
                             <span class="qc-question-num" id="qc-q-info">#1 · Addition</span>
                             <span class="qc-combo" id="qc-combo-display">🔥 Combo x3</span>
+                            <span class="qc-time" id="qc-time-display" aria-label="Time left">10.0s</span>
                         </div>
                         <div style="text-align:right">
                             <div id="qc-lives-display" style="font-size:1.2rem;letter-spacing:2px;margin-bottom:2px">
@@ -585,7 +623,7 @@
             </div>
         </div>
 
-        <div class="qc-result-overlay" id="qc-result" onclick="if(event.target === this) dismissResult()">
+        <div class="qc-result-overlay" id="qc-result" role="dialog" aria-modal="true" aria-labelledby="qc-result-title" onclick="if(event.target === this) dismissResult()">
             <div class="qc-result-card" id="qc-result-card">
                 <!-- Populated by JS -->
             </div>
@@ -598,25 +636,24 @@
 
         <!-- HTML documentation below -->
         <section class="game-guide pv-container">
-            <h2>How to Play QuickCalc ⚡</h2>
-            <p data-i18n="games.quickcalc.guide">QuickCalc is a fast-paced mental math game that tests your calculation
-                speed and accuracy. Answer equations correctly before the timer runs out! Difficulty scales in phases:
-                Phase 1 (Q1-5) uses numbers 1-20 with +/- only, Phase 2 (Q6-10) adds multiplication with numbers up to
-                50, Phase 3 (Q11-15) includes division with numbers up to 100, and Phase 4 (Q16+) features 2-step
-                equations with numbers up to 200. From question 8+, Operator Roulette may hide the operator — you must
-                identify it for ×2 points! Scoring: correct answers earn 100 × phase points, plus speed bonus and streak
-                bonus. Timer Extension (+5s) is always free, and Operator Hint narrows choices to 2.</p>
+            <h2 id="qc-guide-title">How to Play QuickCalc ⚡</h2>
+            <p id="qc-guide-text">Choose the correct answer, or use keys 1–4. Consecutive correct answers build a combo
+                for more points. Classic and Daily give you 3 hearts and a timer for each question. The daily course
+                changes at midnight UTC and can be replayed for practice. Timed modes subtract 3 seconds for each
+                wrong answer. A 30-second duel uses the same question sequence and answer positions for both friends,
+                with no hints or extra time. Share your result to send that exact course to a friend. Challenge scores
+                are self-reported and are not a verified leaderboard.</p>
         </section>
 
         <section class="pv-faq pv-container">
             <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
             <details>
                 <summary data-i18n="games.quickcalc.faq1q">What are the different game modes?</summary>
-                <p data-i18n="games.quickcalc.faq1a"><strong>Classic:</strong> 3 lives, increasing difficulty. Wrong
+                <p id="qc-modes-faq"><strong>Classic:</strong> 3 lives, increasing difficulty. Wrong
                     answers cost a life.
-                    <strong>Daily:</strong> Seeded sequence, one attempt per day, compete with everyone.
+                    <strong>Daily:</strong> A shared daily sequence, replayable for practice.
                     <strong>Time Attack:</strong> 2 minutes, answer as many as possible, wrong = -3s penalty.
-                    <strong>Blitz:</strong> 30 seconds of rapid fire, maximum pressure!
+                    <strong>30s duel:</strong> Challenge a friend on the same course, without hints or extra time.
                 </p>
             </details>
             <details>
@@ -627,9 +664,9 @@
             </details>
             <details>
                 <summary data-i18n="games.quickcalc.faq3q">What is Operator Roulette?</summary>
-                <p data-i18n="games.quickcalc.faq3a">From question 8+, sometimes the operator is hidden: "7 ? 3 = 21" —
+                <p id="qc-operators-faq">From question 11, sometimes the operator is hidden: "7 ? 3 = 21" —
                     you must identify "×".
-                    From Q15+, two operators may be hidden. Use the 💡 hint to narrow down to 2 choices.</p>
+                    Correct operator answers earn double points. Outside duels, hints can narrow the choices to 2.</p>
             </details>
             <details>
                 <summary data-i18n="games.quickcalc.faq4q">Are the wrong answers generated randomly?</summary>
@@ -651,16 +688,8 @@
         </div>
         <div class="pv-modal-content">
             <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
-            <h3 style="margin-bottom:12px">How to Play</h3>
-            <p style="font-size:0.9rem;margin-bottom:8px">Test the speed and limits of your pure calculation skills!</p>
-            <ul style="font-size:0.85rem; padding-left: 20px; color: var(--pv-text-secondary); line-height: 1.5;">
-                <li>Choose the correct answer (or operator) for the equation before the timer reaches 0.</li>
-                <li>Correct: Gain time (+2s) and points.</li>
-                <li>Wrong: Lose time (-3s) with a heavy screen shake.</li>
-                <li>Consecutive correct answers trigger "Combo Mode", significantly increasing your time reward up to
-                    +5s.</li>
-                <li>The difficulty automatically scales up as you progress. Survive as long as you can!</li>
-            </ul>
+            <h3 id="qc-help-title" style="margin-bottom:12px">How to Play</h3>
+            <p id="qc-help-text" style="font-size:0.9rem;line-height:1.7">Choose the correct answer, or use keys 1–4. Build your combo for more points. Share a 30-second duel to challenge a friend on the same questions.</p>
         </div>
     </div>
 
@@ -678,13 +707,16 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/js/i18n.js"></script>
-    <script src="/js/common.js"></script>
-    <script src="/js/adsense.js"></script>
+    <script src="/js/i18n.js?v=12"></script>
+    <script src="/js/progression.js?v=12"></script>
+    <script src="/js/common.js?v=12"></script>
+    <script src="/js/arcade.js?v=12"></script>
+    <script src="/js/adsense.js?v=12"></script>
     <script src="/js/seed.js"></script>
     <script src="/js/sfx.js"></script>
-    <script src="/js/share.js"></script>
-    <script src="/games/quickcalc-logic.js"></script>
+    <script src="/js/share.js?v=12"></script>
+    <script src="/js/duel.js?v=12"></script>
+    <script src="/games/quickcalc-logic.js?v=12"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 
