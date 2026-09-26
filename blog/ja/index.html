@@ -1,305 +1,37 @@
 <!DOCTYPE html>
 <html lang="ja" translate="no" class="notranslate">
-
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-
-  <!-- Google tag (gtag.js) -->
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PuzzleVault ブログ — パズルのコツ、攻略法 & 脳科学</title>
-    <meta name="description" content="ヒント、攻略法、脳科学 — PuzzleVaultブログでパズルスキルを磨きましょう。">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="PuzzleVault ブログ — パズルのコツ、攻略法 & 脳科学">
-    <meta property="og:description" content="ヒント、攻略法、脳科学 — PuzzleVaultブログでパズルスキルを磨きましょう。">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/">
-
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/">
-
-    <style>
-        .blog-page-header {
-            text-align: center;
-            padding: 40px 0 16px;
-        }
-
-        .blog-page-header h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .blog-page-header p {
-            color: var(--pv-text-secondary);
-            max-width: 500px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .pv-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 24px auto;
-            max-width: 500px;
-        }
-
-        .pv-tab {
-            padding: 8px 18px;
-            border: 1px solid var(--pv-border);
-            border-radius: 100px;
-            background: var(--pv-card-bg);
-            color: var(--pv-text-secondary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .pv-tab:hover {
-            border-color: var(--pv-blue);
-            color: var(--pv-blue);
-        }
-
-        .pv-tab.active {
-            background: var(--pv-blue);
-            color: #fff;
-            border-color: var(--pv-blue);
-        }
-
-        .blog-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 600px) {
-            .blog-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 900px) {
-            .blog-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        .blog-card {
-            display: flex;
-            flex-direction: column;
-            background: var(--pv-card-bg);
-            border: 1px solid var(--pv-border);
-            border-radius: var(--pv-radius);
-            padding: 24px 20px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.25s ease;
-        }
-
-        .blog-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--pv-shadow-lg);
-            border-color: var(--pv-blue);
-        }
-
-        .blog-card-category {
-            display: inline-block;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--pv-blue);
-            background: rgba(37, 99, 235, 0.08);
-            padding: 4px 10px;
-            border-radius: 100px;
-            margin-bottom: 12px;
-            align-self: flex-start;
-        }
-
-        .blog-card-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            line-height: 1.4;
-            color: var(--pv-text);
-        }
-
-        .blog-card-desc {
-            font-size: 0.85rem;
-            color: var(--pv-text-secondary);
-            line-height: 1.5;
-            margin-bottom: 16px;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .blog-card-meta {
-            font-size: 0.75rem;
-            color: var(--pv-text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .blog-card-read {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--pv-blue);
-            margin-top: auto;
-        }
-
-        .blog-card:hover .blog-card-read {
-            text-decoration: underline;
-        }
-
-        .load-more-wrap {
-            text-align: center;
-            margin: 32px 0;
-        }
-
-        .load-more-btn {
-            padding: 12px 32px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            background: var(--pv-card-bg);
-            color: var(--pv-blue);
-            border: 2px solid var(--pv-blue);
-            border-radius: var(--pv-radius);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .load-more-btn:hover {
-            background: var(--pv-blue);
-            color: #fff;
-        }
-
-        .blog-empty {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--pv-text-secondary);
-        }
-    </style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="ホーム"><a href="/ja/">🧩 PuzzleVault</a><a href="/ja/#games">ゲーム</a><a href="/blog/ja/">ブログ</a><a href="/ja/about.html">サイト情報</a></nav></header>
-
-    <main class="pv-container">
-        <div class="blog-page-header">
-            <h1>📝 PuzzleVault ブログ</h1>
-            <p>ヒント、攻略法、脳科学、アップデートでより優れたパズルプレイヤーになりましょう。</p>
-        </div>
-
-        <div class="pv-tabs" id="blog-tabs">
-            <button class="pv-tab active" data-category="">全て</button>
-            <button class="pv-tab" data-category="tips">ヒント</button>
-            <button class="pv-tab" data-category="strategy">攻略</button>
-            <button class="pv-tab" data-category="updates">アップデート</button>
-            <button class="pv-tab" data-category="science">科学</button>
-        </div>
-
-        <div class="blog-grid" id="blog-grid"></div>
-
-        <div class="load-more-wrap" id="load-more-wrap" style="display: none;">
-            <button class="load-more-btn" id="load-more-btn">もっと見る</button>
-        </div>
-    </main>
-
-    <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
-
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/ja/about.html">サイト情報</a><a href="/ja/privacy.html">プライバシー</a><a href="/ja/terms.html">利用規約</a><a href="/ja/contact.html">お問い合わせ</a><a href="/blog/ja/">ブログ</a></nav></footer>
-
-    <script src="/js/blog-data.js?v=14"></script>
-    <script src="/js/i18n.js?v=14"></script>
-    <script src="/js/common.js?v=14"></script>
-    <script>
-        const POSTS_PER_PAGE = 9;
-        let currentCategory = '';
-        let visibleCount = POSTS_PER_PAGE;
-
-        function renderBlogGrid() {
-            const grid = document.getElementById('blog-grid');
-            const loadMoreWrap = document.getElementById('load-more-wrap');
-            if (!grid) return;
-
-            const allPosts = getBlogPosts(undefined, currentCategory || undefined);
-            const postsToShow = allPosts.slice(0, visibleCount);
-
-            grid.innerHTML = '';
-
-            if (allPosts.length === 0) {
-                grid.innerHTML = '<p class="blog-empty">このカテゴリの記事はまだありません。</p>';
-                loadMoreWrap.style.display = 'none';
-                return;
-            }
-
-            postsToShow.forEach(post => {
-                const card = document.createElement('a');
-                card.className = 'blog-card';
-                card.href = post.url || `/blog/ja/${post.slug}.html`;
-                const catText = (typeof I18n !== 'undefined') ? I18n.t('blog.' + post.category) : post.category;
-                const readTime = (typeof I18n !== 'undefined') ? I18n.t('common.minuteRead', { min: post.readTime }) : post.readTime + ' min';
-                card.innerHTML = `
-                    <span class="blog-card-category">${catText}</span>
-                    <h3 class="blog-card-title">${post.title}</h3>
-                    <p class="blog-card-desc">${post.description}</p>
-                    <span class="blog-card-meta">${post.date} · ${readTime}</span>
-                    <span class="blog-card-read">読む →</span>
-                `;
-                grid.appendChild(card);
-            });
-
-            loadMoreWrap.style.display = visibleCount < allPosts.length ? 'block' : 'none';
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderBlogGrid();
-            document.getElementById('blog-tabs').addEventListener('click', e => {
-                const tab = e.target.closest('.pv-tab');
-                if (!tab) return;
-                document.querySelectorAll('#blog-tabs .pv-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentCategory = tab.dataset.category;
-                visibleCount = POSTS_PER_PAGE;
-                renderBlogGrid();
-            });
-            document.getElementById('load-more-btn').addEventListener('click', () => {
-                visibleCount += POSTS_PER_PAGE;
-                renderBlogGrid();
-            });
-        });
-    </script>
-    <script>
-        window.addEventListener('langchange', (e) => {
-            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
-            window.location.href = newLang === 'en' ? '/blog/' : '/blog/' + newLang + '/';
-        });
-    </script>
-    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
-</body>
-
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>PuzzleVault攻略：実例で学ぶ10のゲーム</title><meta name="description" content="一手で何が変わるでしょうか。図と手順で選択を比べ、ゲームの中で確かめてみましょう。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PuzzleVault攻略：実例で学ぶ10のゲーム"><meta property="og:description" content="一手で何が変わるでしょうか。図と手順で選択を比べ、ゲームの中で確かめてみましょう。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="PuzzleVault攻略：実例で学ぶ10のゲーム"><meta name="twitter:description" content="一手で何が変わるでしょうか。図と手順で選択を比べ、ゲームの中で確かめてみましょう。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "CollectionPage", "name": "PuzzleVault攻略：実例で学ぶ10のゲーム", "inLanguage": "ja", "url": "https://puzzlevault.pages.dev/blog/ja/"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="ホーム"><a href="/ja/">🧩 PuzzleVault</a><a href="/ja/#games">ゲーム</a><a href="/blog/ja/">攻略と読みもの</a><a href="/ja/about.html">紹介</a></nav></header>
+<main class="blog-shell"><header class="blog-hero"><p class="blog-eyebrow">PUZZLEVAULT / PLAY & LEARN</p><h1>PuzzleVault攻略：実例で学ぶ10のゲーム</h1><p>一手で何が変わるでしょうか。図と手順で選択を比べ、ゲームの中で確かめてみましょう。</p><a class="blog-editorial-link" href="/blog/ja/editorial.html">記事の作成と確認について →</a></header><section class="guide-directory"><h2>ゲームから攻略を探す</h2><p>10種類それぞれのルールと判断を実例で説明します。気になるゲームを選んでください。</p><nav aria-label="ゲームから攻略を探す"><a href="/blog/ja/numvault-tips-and-strategy.html"><span aria-hidden="true">🔢</span>NumVault</a><a href="/blog/ja/gridsmash-beginner-strategy-guide.html"><span aria-hidden="true">🧱</span>GridSmash</a><a href="/blog/ja/patternpop-targets-and-decoy-guide.html"><span aria-hidden="true">🧠</span>PatternPop</a><a href="/blog/ja/the-math-behind-sortstack.html"><span aria-hidden="true">📚</span>SortStack</a><a href="/blog/ja/quickcalc-accuracy-and-duel-guide.html"><span aria-hidden="true">⚡</span>QuickCalc</a><a href="/blog/ja/tileturn-cross-and-cascade-guide.html"><span aria-hidden="true">🔄</span>TileTurn</a><a href="/blog/ja/colorflow-advanced-pathing-strategies.html"><span aria-hidden="true">🎨</span>ColorFlow</a><a href="/blog/ja/pipelink-connections-and-rotation-guide.html"><span aria-hidden="true">🔧</span>PipeLink</a><a href="/blog/ja/mergechain-drop-and-merge-guide.html"><span aria-hidden="true">🔮</span>MergeChain</a><a href="/blog/ja/hexmatch-chains-and-special-gems-guide.html"><span aria-hidden="true">⬡</span>HexMatch</a></nav></section><div class="blog-tabs" id="blog-tabs" hidden><button type="button" data-category="" aria-pressed="true">すべて</button><button type="button" data-category="strategy" aria-pressed="false">ゲーム攻略</button><button type="button" data-category="tips" aria-pressed="false">遊び方のヒント</button><button type="button" data-category="updates" aria-pressed="false">プロジェクトの話</button></div><p id="blog-result-count" class="blog-result-count" aria-live="polite" data-template="{count}件の記事">15件の記事</p><div class="blog-grid" id="blog-grid"><a class="blog-card" data-category="strategy" href="/blog/ja/tileturn-cross-and-cascade-guide.html"><span class="blog-card-category">ゲーム攻略</span><h2>TileTurn攻略：十字の範囲を読み、連鎖の結果まで考える</h2><p class="blog-card-desc">中央の一手で解ける例と角の手を比較し、Cascadeで対角線が変わる理由、効果の重なり、Spectrumの3状態と星の条件を学びます。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/quickcalc-accuracy-and-duel-guide.html"><span class="blog-card-category">ゲーム攻略</span><h2>QuickCalc攻略：時計を追う前に連続正解を守る</h2><p class="blog-card-desc">計算の優先順位と具体的な得点例からQuickCalcを学び、3秒のペナルティや同じコースを使う30秒対決のルールを確認しましょう。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/pipelink-connections-and-rotation-guide.html"><span class="blog-card-category">ゲーム攻略</span><h2>PipeLink攻略：回す前に入口と出口を確かめる</h2><p class="blog-card-desc">学習用の回路を使い、PipeLinkの接続条件と時計回りの回転を解説。3回の操作でつなぐ例、交差管の仕組み、星評価の基準を確認できます。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/patternpop-targets-and-decoy-guide.html"><span class="blog-card-category">ゲーム攻略</span><h2>PatternPop攻略：順番ではなく位置を覚え、おとりを見分ける</h2><p class="blog-card-desc">6つの目標と1つのおとりを使った例で、PatternPopの記憶方法、入力順、ライフ、ヒント再生、得点の仕組みを確認しましょう。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/mergechain-drop-and-merge-guide.html"><span class="blog-card-category">ゲーム攻略</span><h2>MergeChain攻略：落とす相手と連鎖得点を見極める</h2><p class="blog-card-desc">2つの落下ルートと20点の連鎖例でMergeChainを解説。最初の接触ガイド、次を落とすタイミング、危険ラインの意味がわかります。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/hexmatch-chains-and-special-gems-guide.html"><span class="blog-card-category">ゲーム攻略</span><h2>HexMatch攻略：たどれる連鎖と特殊ジェムの使い方</h2><p class="blog-card-desc">虹を含む5個の例でHexMatchの隣接ルール、色の制約、爆弾の生成位置と得点を解説。枝分かれした集まりの見落としも確認できます。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/ja/why-we-built-puzzlevault-with-vanilla-js.html"><span class="blog-card-category">プロジェクトの話</span><h2>PuzzleVaultが素のJavaScriptを使う理由</h2><p class="blog-card-desc">HTML・CSS・JavaScriptで作るPuzzleVaultの構成を紹介。描画、ゲーム別のコード、保存機能と操作性の確認について説明します。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/the-math-behind-sortstack.html"><span class="blog-card-category">ゲーム攻略</span><h2>SortStack攻略：完成したチューブで作業場所を増やす</h2><p class="blog-card-desc">4手で解ける例を通して、先頭の色、1個ずつの移動、完成時に増える空チューブを使った手順を考えましょう。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/ja/the-evolution-of-browser-puzzles.html"><span class="blog-card-category">プロジェクトの話</span><h2>Flash以後のブラウザパズル：起動・記録・オフラインの違い</h2><p class="blog-card-desc">PuzzleVaultがゲームを読み込み、音を鳴らし、記録やファイルを保存する仕組みを解説。オフライン起動と進行保存を具体例で区別します。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/colorflow-advanced-pathing-strategies.html"><span class="blog-card-category">ゲーム攻略</span><h2>ColorFlow攻略：最後の接続前に空きマスを確認しよう</h2><p class="blog-card-desc">5×5の解説用盤面で二つの経路を比べ、すべてのペアを結んでも埋まる面積と星が変わる理由を学びましょう。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="tips" href="/blog/ja/5-tips-to-boost-your-brain-with-puzzles.html"><span class="blog-card-category">遊び方のヒント</span><h2>PuzzleVaultを楽しく遊ぶための5つのヒント</h2><p class="blog-card-desc">小さな目標、フィードバック、次の一手の空間、同じ条件での再挑戦を使う実用的な遊び方。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 5 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/numvault-tips-and-strategy.html"><span class="blog-card-category">ゲーム攻略</span><h2>NumVault攻略：次の入力の前にヒントを整理しよう</h2><p class="blog-card-desc">4回の推測を使った例で数字と位置を分けて考え、重複する数字の灰色ヒントを正しく読む方法を紹介します。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/ja/gridsmash-beginner-strategy-guide.html"><span class="blog-card-category">ゲーム攻略</span><h2>GridSmash攻略：1個の置き場所より3個の順番を考えよう</h2><p class="blog-card-desc">10×10の解説用盤面で二つの配置を比べ、2列消去の得点を計算しながら、残りのピースに必要な空間を確保しましょう。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="tips" href="/blog/ja/daily-challenge-streak-tips.html"><span class="blog-card-category">遊び方のヒント</span><h2>30日間デイリーチャレンジ連続記録を作る方法</h2><p class="blog-card-desc">UTC基準のデイリー更新とブラウザ内の記録を知り、自分のペースでパズルを楽しむためのヒント。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 5 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/ja/welcome-to-puzzlevault.html"><span class="blog-card-category">プロジェクトの話</span><h2>最初のPuzzleVaultゲームを選ぶ：遊びたい操作から始めよう</h2><p class="blog-card-desc">PuzzleVaultの全10ゲームを遊び方、最初の操作、小さな目標で比較。落ち着いた推理から30秒対決まで、自分に合う入口を見つけましょう。</p><span class="blog-card-meta">更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分で読めます</span><span class="blog-card-read">攻略を読む →</span></a></div></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/ja/about.html">紹介</a><a href="/ja/privacy.html">プライバシー</a><a href="/ja/terms.html">利用規約</a><a href="/ja/contact.html">お問い合わせ</a><a href="/blog/ja/">攻略と読みもの</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

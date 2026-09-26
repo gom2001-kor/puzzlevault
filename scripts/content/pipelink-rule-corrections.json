@@ -1,0 +1,27 @@
+{
+  "en": {
+    "guide": "Rotate the circuit tiles to connect the circular source to the square destination with the same letter. Each tap on an unlocked pipe turns it 90° clockwise and counts as one rotation. Both sides of a shared edge must have matching openings. Lit channels show where power reaches. From pack 4, connect A→A and B→B at once; a cross carries its horizontal and vertical routes separately. Pack 5 adds fixed pipes. You do not need to power every tile. Stars compare your rotation count with a target based on unlocked non-cross pipes; they do not prove a shortest solution. Reset restores the initial board and tap count. Hint demonstrates a stored solution by rotating and locking pieces in sequence, then offers a restart. Five packs contain 125 levels.",
+    "faq4q": "What does the Hint button do?",
+    "faq4a": "Hint starts an automatic demonstration that rotates and locks pieces toward a stored solution. It can reveal several steps, not just one move. When the demonstration connects the circuit, a restart prompt appears instead of the ordinary scored-clear result. Use it to study the route, then restart to practise."
+  },
+  "ko": {
+    "guide": "같은 글자가 표시된 원형 전원과 사각형 목적지를 연결하도록 회로 타일을 돌리세요. 잠기지 않은 파이프를 누르면 시계 방향으로 90도 회전하며 한 번으로 셉니다. 맞닿은 두 타일에는 서로 마주 보는 입구가 모두 있어야 합니다. 불이 들어온 통로는 전력이 도달한 곳입니다. 팩 4부터는 A끼리와 B끼리를 동시에 연결하며, 십자 타일의 가로·세로 통로는 서로 분리되어 있습니다. 팩 5에는 고정된 파이프가 추가됩니다. 모든 칸에 불을 켤 필요는 없습니다. 별점은 잠기지 않은 일반 파이프 수에 따른 기준과 회전 수를 비교하며, 최단 풀이를 증명하지는 않습니다. 다시 시작은 초기 배치와 회전 수를 복원합니다. 힌트는 저장된 풀이에 맞춰 타일을 차례로 돌리고 고정한 뒤 다시 시작을 안내합니다. 다섯 팩에 총 125개 레벨이 있습니다.",
+    "faq4q": "힌트 버튼은 어떻게 작동하나요?",
+    "faq4a": "힌트는 저장된 풀이에 맞춰 타일을 차례로 돌리고 고정하는 자동 시연입니다. 다음 한 수뿐 아니라 여러 단계가 공개될 수 있습니다. 시연으로 회로가 연결되면 일반 점수 결과 대신 다시 시작 안내가 나타납니다. 경로를 살펴본 뒤 다시 시작해 직접 연습해 보세요."
+  },
+  "ja": {
+    "guide": "同じ文字の丸い電源と四角い目的地をつなぐように回路を回します。固定されていない管は1回タップで時計回りに90度回転し、回転数も1増えます。隣接する境界では両方の管に向かい合う開口部が必要です。光る通路は電力が届いた場所です。パック4からはA→AとB→Bを同時につなぎます。十字管の縦と横は独立しています。パック5には固定管も登場します。すべてのマスを光らせる必要はありません。星は固定されていない通常管の数による基準と回転数を比較し、最短解を証明するものではありません。リセットは初期配置と回転数を戻します。ヒントは保存された解に沿って管を順に回して固定し、最後に再スタートを案内します。5パックに125レベルあります。",
+    "faq4q": "ヒントはどのように動作しますか？",
+    "faq4a": "ヒントは保存された解に向けて管を順に回し、固定する自動デモです。1手だけでなく複数の手順が示されます。接続が完成すると通常の得点結果ではなく再スタートの案内が出ます。経路を観察してからリセットし、自分で練習してみましょう。"
+  },
+  "zh": {
+    "guide": "旋转电路管道，把同字母的圆形电源与方形终点连接起来。点击未锁定管道会顺时针转90度，并计作一次旋转。相邻两格必须都有朝向对方的开口。亮起的管道表示电流已到达。从第4组开始，A→A和B→B要同时接通；十字管的水平与竖直通道彼此独立。第5组加入固定管道。不必点亮所有格子。星级根据未锁定普通管道数量设定门槛，再与旋转次数比较，并不证明最短解。重置会恢复初始布局与旋转计数。提示会按保存的解法逐步旋转并锁定管道，最后显示重新开始选项。五组共有125关。",
+    "faq4q": "提示按钮如何工作？",
+    "faq4a": "提示会启动自动演示，按保存的解法依次旋转并锁定管道。它可能展示多个步骤，而非只给下一步。演示接通电路后，会出现重新开始提示，而不是普通计分通关结果。可以先观察路线，再重置自行练习。"
+  },
+  "es": {
+    "guide": "Gira las tuberías para unir la fuente circular con el destino cuadrado de la misma letra. Cada toque en una pieza desbloqueada gira 90° en sentido horario y cuenta como una rotación. Ambos lados de un borde deben tener aberturas compatibles. Las luces muestran hasta dónde llega la energía. Desde el paquete 4 conecta A→A y B→B a la vez; el cruce mantiene separados sus canales horizontal y vertical. El paquete 5 añade tuberías fijas. No hace falta iluminar todas las piezas. Las estrellas comparan las rotaciones con un objetivo basado en tuberías normales desbloqueadas, sin demostrar una solución mínima. Reiniciar restaura el tablero inicial y los toques. La ayuda gira y bloquea piezas siguiendo una solución guardada y después ofrece reiniciar. Hay 125 niveles en cinco paquetes.",
+    "faq4q": "¿Qué hace el botón de ayuda?",
+    "faq4a": "Inicia una demostración automática que gira y bloquea piezas siguiendo una solución guardada. Puede revelar varios pasos, no solo uno. Al conectar el circuito, aparece una opción para reiniciar en vez del resultado normal con puntuación. Observa la ruta y reinicia para practicarla por tu cuenta."
+  }
+}

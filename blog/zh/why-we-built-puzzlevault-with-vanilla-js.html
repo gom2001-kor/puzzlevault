@@ -1,90 +1,41 @@
 <!DOCTYPE html>
 <html lang="zh" translate="no" class="notranslate">
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PuzzleVault为何使用原生JavaScript | PuzzleVault Blog</title>
-    <meta name="description" content="了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="PuzzleVault为何使用原生JavaScript | PuzzleVault Blog">
-    <meta property="og:description" content="了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="PuzzleVault为何使用原生JavaScript | PuzzleVault Blog">
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/why-we-built-puzzlevault-with-vanilla-js.html">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/why-we-built-puzzlevault-with-vanilla-js.html">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html">
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": "PuzzleVault为何使用原生JavaScript",
-  "inLanguage": "zh",
-  "datePublished": "2026-03-29",
-  "dateModified": "2026-09-26",
-  "author": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html",
-  "description": "了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。"
-}
-</script>
-    <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">博客</a><a href="/zh/about.html">关于</a></nav></header>
-    <div class="blog-post-header">
-        <span class="blog-post-category">更新</span>
-        <h1>PuzzleVault为何使用原生JavaScript</h1>
-        <div class="blog-post-meta">2026年3月29日 · 6分钟阅读 · <time datetime="2026-09-26">更新于2026年9月26日</time></div>
-    </div>
-    <article class="blog-content">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>PuzzleVault为何使用原生JavaScript | PuzzleVault</title><meta name="description" content="了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/why-we-built-puzzlevault-with-vanilla-js.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/why-we-built-puzzlevault-with-vanilla-js.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PuzzleVault为何使用原生JavaScript | PuzzleVault"><meta property="og:description" content="了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="PuzzleVault为何使用原生JavaScript | PuzzleVault"><meta name="twitter:description" content="了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "PuzzleVault为何使用原生JavaScript", "description": "了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。", "inLanguage": "zh", "datePublished": "2026-03-29", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/zh/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">攻略与随笔</a><a href="/zh/about.html">关于</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="攻略与随笔"><a href="/blog/zh/">← 攻略与随笔</a></nav><span class="blog-card-category">项目随笔</span><h1>PuzzleVault为何使用原生JavaScript</h1><p class="blog-post-description">了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。</p><p class="blog-post-meta">发布：PuzzleVault · 6 分钟阅读<br>首次发布 <time datetime="2026-03-29">2026-03-29</time> · 内容更新 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/zh/editorial.html">攻略的编写与核对方法</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="本文内容"><h2>本文内容</h2><ol><li><a href="#section-1">1. 页面仍然需要下载资源</a></li><li><a href="#section-2">2. 按游戏选择绘制方式</a></li><li><a href="#section-3">3. 少依赖仍然需要维护</a></li><li><a href="#section-4">4. 用实际操作检查响应性</a></li></ol></nav>
 <p>PuzzleVault使用HTML、CSS和JavaScript在浏览器中提供益智游戏。每个页面加载导航、语言选择和成绩分享等公共脚本，再加载对应游戏的规则代码。有的棋盘直接绘制在Canvas上，有的界面使用真正的按钮和文档元素。对于一组规则相对独立的小型游戏，这种结构方便逐项检查。</p>
 <p>这并不意味着原生代码永远比框架快。框架也能支持响应灵敏、便于操作的游戏。当前项目的数字更新、棋子移动和小棋盘绘制不需要额外的组件框架。能够直接跟踪玩家输入与下一次画面变化之间的过程，是这种选择的实际价值。</p>
-<h2>1. 页面仍然需要下载资源</h2>
+<h2 id="section-1">1. 页面仍然需要下载资源</h2>
 <p>HTML、样式、脚本和所需语言数据都需要加载。网络、缓存、设备性能及其他资源会影响游戏何时可以操作。不引入框架运行时可以减少一项依赖，却不能让下载和执行变成零耗时。更有用的问题是：当前页面中的每个文件是否承担了必要的工作？</p>
-<p>例如，<a href="/games/numvault.html">NumVault</a>的推理规则放在自己的脚本中，而语言切换和分享由公共代码处理。公共功能的修正可以服务多个游戏，同时开发者也需要管理重复代码和脚本加载顺序。</p>
-<h2>2. 按游戏选择绘制方式</h2>
-<p><a href="/games/patternpop.html">PatternPop</a>通过Canvas绘制棋盘和具有厚度的方块。QuickCalc则使用真正的答案按钮，利用其焦点与激活行为。Canvas需要自行实现点击区域和键盘控制，文档元素需要合理安排布局与更新。单靠选择某种技术，并不能保证良好的操作体验。</p>
+<p>例如，<a href="/games/numvault.html?lang=zh">NumVault</a>的推理规则放在自己的脚本中，而语言切换和分享由公共代码处理。公共功能的修正可以服务多个游戏，同时开发者也需要管理重复代码和脚本加载顺序。</p>
+<h2 id="section-2">2. 按游戏选择绘制方式</h2>
+<p><a href="/games/patternpop.html?lang=zh">PatternPop</a>通过Canvas绘制棋盘和具有厚度的方块。QuickCalc则使用真正的答案按钮，利用其焦点与激活行为。Canvas需要自行实现点击区域和键盘控制，文档元素需要合理安排布局与更新。单靠选择某种技术，并不能保证良好的操作体验。</p>
 <p><code>requestAnimationFrame</code>可以把绘制工作安排到浏览器的渲染周期中，但它不是固定帧率承诺。设备负载、显示刷新率和后台标签页都会影响回调间隔。限时游戏因此需要计算真实经过的时间，而不能假设每一帧长度都一样。</p>
-<h2>3. 少依赖仍然需要维护</h2>
+<h2 id="section-3">3. 少依赖仍然需要维护</h2>
 <p>当前代码可以直接作为静态文件提供，无需通过框架打包流程生成游戏。这使发布内容比较容易检查，但延迟回调清理、挑战链接验证、存储失败处理以及浏览器兼容性测试仍然属于应用自身的责任。采用浏览器原生API不代表代码永远不必修改。</p>
 <p>服务工作线程的缓存也需要管理。已有缓存可能帮助再次访问，但功能改变后必须更新旧脚本。不同版本的文件混合运行，会带来与加载速度无关的错误。可靠的更新流程与第一次显示页面同样值得重视。</p>
-<h2>4. 用实际操作检查响应性</h2>
+<h2 id="section-4">4. 用实际操作检查响应性</h2>
 <p>检查应覆盖窄屏、触摸、仅键盘操作和减少动态效果的设置。动画期间重新开始，以及切换标签页后回到限时游戏，也是有价值的测试场景。如果画面很快出现，却把点击映射到错误格子，玩家仍然难以顺利游戏。</p>
 <p>电池消耗不能由“没有框架”直接推断。绘制频率、特效计算、后台活动和设备本身都会影响耗电。减少无用工作，并在明确条件下测量，才有比较价值。本文没有提供实际电池寿命或加载时间基准，而是在说明为什么这种结构便于把代码与游戏一起检查、修改和测试。</p>
 <p>可以尝试PatternPop的记忆方块，再体验NumVault的数字键盘。两种界面使用不同工具，但都希望让下一步操作及其反馈更容易理解。</p>
-    </article>
-    <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
-    <section class="blog-related"><h2>🎮 试试这些游戏</h2><div class="related-games-grid" id="related-games"></div></section>
-    <section class="blog-related"><h2>📖 阅读更多</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/zh/" class="back-link">← 返回博客</a></section>
-    <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私政策</a><a href="/zh/terms.html">使用条款</a><a href="/zh/contact.html">联系我们</a><a href="/blog/zh/">博客</a></nav></footer>
-    <script src="/js/blog-data.js?v=14"></script><script src="/js/i18n.js?v=14"></script><script src="/js/common.js?v=14"></script>
-    <script>const POST_SLUG='why-we-built-puzzlevault-with-vanilla-js';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['mergechain','sortstack','patternpop'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/zh/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
-    <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html':'/blog/'+nl+'/why-we-built-puzzlevault-with-vanilla-js.html'});</script>
-    <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
-</body>
-</html>
+</article>
+<section class="blog-related"><h2>到游戏中试试</h2><div class="related-games-grid"><a class="related-game-card" href="/games/numvault.html?lang=zh"><span class="related-game-name">🔢 NumVault →</span></a><a class="related-game-card" href="/games/gridsmash.html?lang=zh"><span class="related-game-name">🧱 GridSmash →</span></a></div></section><section class="blog-related"><h2>继续阅读</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/zh/5-tips-to-boost-your-brain-with-puzzles.html"><div class="related-post-title">更愉快地玩PuzzleVault的五个实用方法</div><p class="related-post-desc">设定小目标，读懂反馈，为下一步留空间，用相同条件练习，并在自己选择的节点休息。</p></a><a class="related-post-card" href="/blog/zh/colorflow-advanced-pathing-strategies.html"><div class="related-post-title">ColorFlow攻略：连上最后一对前，先检查空格</div><p class="related-post-desc">比较5×5示意棋盘上的两种合法路线，了解为何全部配对成功后，仍可能留下空格并获得不同星数。</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私</a><a href="/zh/terms.html">条款</a><a href="/zh/contact.html">联系</a><a href="/blog/zh/">攻略与随笔</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

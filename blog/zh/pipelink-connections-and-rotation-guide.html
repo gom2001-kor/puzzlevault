@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh" translate="no" class="notranslate">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>PipeLink 攻略：旋转之前，先看入口和出口 | PuzzleVault</title><meta name="description" content="用一个专门设计的教学电路，理解 PipeLink 的双向接口、顺时针旋转和独立交叉通道，并看懂三次点击的解法与星级评分。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/pipelink-connections-and-rotation-guide.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/pipelink-connections-and-rotation-guide.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/pipelink-connections-and-rotation-guide.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/pipelink-connections-and-rotation-guide.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/pipelink-connections-and-rotation-guide.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/pipelink-connections-and-rotation-guide.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/pipelink-connections-and-rotation-guide.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PipeLink 攻略：旋转之前，先看入口和出口 | PuzzleVault"><meta property="og:description" content="用一个专门设计的教学电路，理解 PipeLink 的双向接口、顺时针旋转和独立交叉通道，并看懂三次点击的解法与星级评分。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/pipelink-connections-and-rotation-guide.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="PipeLink 攻略：旋转之前，先看入口和出口 | PuzzleVault"><meta name="twitter:description" content="用一个专门设计的教学电路，理解 PipeLink 的双向接口、顺时针旋转和独立交叉通道，并看懂三次点击的解法与星级评分。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "PipeLink 攻略：旋转之前，先看入口和出口", "description": "用一个专门设计的教学电路，理解 PipeLink 的双向接口、顺时针旋转和独立交叉通道，并看懂三次点击的解法与星级评分。", "inLanguage": "zh", "datePublished": "2026-09-26", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/zh/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/zh/pipelink-connections-and-rotation-guide.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">攻略与随笔</a><a href="/zh/about.html">关于</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="攻略与随笔"><a href="/blog/zh/">← 攻略与随笔</a></nav><span class="blog-card-category">游戏攻略</span><h1>PipeLink 攻略：旋转之前，先看入口和出口</h1><p class="blog-post-description">用一个专门设计的教学电路，理解 PipeLink 的双向接口、顺时针旋转和独立交叉通道，并看懂三次点击的解法与星级评分。</p><p class="blog-post-meta">发布：PuzzleVault · 6 分钟阅读<br>首次发布 <time datetime="2026-09-26">2026-09-26</time> · 内容更新 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/zh/editorial.html">攻略的编写与核对方法</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="本文内容"><h2>本文内容</h2><ol><li><a href="#section-1">先读接口，再旋转</a></li><li><a href="#section-2">三次点击接通的例子</a></li><li><a href="#section-3">看目标是否接通，不必追求全部点亮</a></li><li><a href="#section-4">星级与提示究竟表示什么</a></li></ol></nav>
+
+<p>在 PipeLink 中，管道看起来朝着终点，并不代表电流一定能通过。比“它朝哪里”更有用的问题是：“电流能从这一侧进入，再从需要的那一侧出去吗？”下面用一个小电路解释这个区别。它是专门设计的教学示例，不是实际游戏截图，也不是某个编号关卡的答案。</p>
+<h2 id="section-1">先读接口，再旋转</h2>
+<p>点击未锁定的管道，会让它顺时针旋转90度。点两次是180度，也计作两次旋转。圆形电源和方形终点用相同字母配对，这两种端点不能旋转。管道亮起来，只说明电流已经从电源到达这里，并不表示终点也已接通。两个相邻格子的公共边上，双方都必须有朝向对方的开口；只有一边开着，电流仍然过不去。</p>
+<p>直管连接两个相反方向，弯管连接两个相邻方向，T形管可以分支。十字管却不能随意转弯：它的水平通道和竖直通道彼此独立，从左边进入的电流不能在这里向上转。从第4组关卡开始，A→A与B→B都要同时接通。第5组还会出现固定管道，需要根据它们的方向安排周围路线。</p>
+<h2 id="section-2">三次点击接通的例子</h2>
+<figure class="guide-figure"><svg viewBox="0 0 520 240" role="img" aria-label="教学用四乘四电路，左为初始状态，右为接通状态。1号管道顺时针转一次，2号转两次。"><rect width="520" height="240" rx="12" fill="#0F172A"/><g stroke="#475569" fill="none"><path d="M20 20V220M20 20H220"/><path d="M70 20V220M20 70H220"/><path d="M120 20V220M20 120H220"/><path d="M170 20V220M20 170H220"/><path d="M220 20V220M20 220H220"/><path d="M280 20V220M280 20H480"/><path d="M330 20V220M280 70H480"/><path d="M380 20V220M280 120H480"/><path d="M430 20V220M280 170H480"/><path d="M480 20V220M280 220H480"/></g><g fill="none" stroke="#FDE68A" stroke-width="9" stroke-linecap="round"><path d="M45 95H70M95 70V120M145 70V95H170M145 120V145H170M170 145H195"/><path d="M305 95H330M330 95H380M380 95H405V120M405 120V145H430M430 145H455"/></g><g fill="#0F172A" stroke="#D97706" stroke-width="3"><circle cx="45" cy="95" r="17"/><rect x="179" y="129" width="32" height="32" rx="4"/><circle cx="305" cy="95" r="17"/><rect x="439" y="129" width="32" height="32" rx="4"/></g><g fill="#F8FAFC" font-family="system-ui,sans-serif" font-size="17" text-anchor="middle"><text x="45" y="101">A</text><text x="195" y="151">A</text><text x="305" y="101">A</text><text x="455" y="151">A</text><text x="95" y="60">1</text><text x="145" y="60">2</text><text x="355" y="60">1</text><text x="405" y="60">2</text><text x="260" y="122">→</text></g></svg><figcaption>专门构造的教学示例：左边是起点，右边是完成后的路线。空白是省略的格子，并不要求把所有格子填满。</figcaption></figure>
+<p>行从上往下数，列从左往右数，都从1开始。电源位于第2行第1列，朝右。1号是第2行第2列的竖直管道。2号是第2行第3列的弯管，初始开口朝上和右。它下方第3行第3列的弯管也朝上和右，终点位于第3行第4列，开口朝左。</p>
+<ol class="guide-steps"><li>从电源沿路线看到1号。它的上下开口无法接收左边来的电流。点击一次，把它转成左右连通。</li><li>2号必须从左边接收电流，再向下送出。初始的上、右开口转一次变为右、下，转第二次才变为下、左。因此点击两次。</li><li>下方弯管保持不动。它已经能从上方接入，并向右送到终点。总共三次旋转，A就接通了。</li></ol>
+<div class="guide-callout"><p><strong>容易误判的地方：</strong>2号转一次后已经朝下，看上去像是正确了。但它的另一个开口还朝右，无法接收左侧1号送来的电流。出口正确，并不能替代入口正确。</p></div>
+<h2 id="section-3">看目标是否接通，不必追求全部点亮</h2>
+<p>获胜条件不是点亮每一块管道。在本例中，旋转无关格子并不能打开2号缺失的左侧入口。在真实棋盘中，可以从电源向前检查，也可以从固定终点向回检查，每次只验证一条公共边。遇到十字管时，先沿当前通道直穿过去，再安排下一次转弯。绕路是否有用，要看每个入口与出口是否真的配合，而不是路线的形状是否漂亮。</p>
+<h2 id="section-4">星级与提示究竟表示什么</h2>
+<p>星级参考数N是未锁定格子中，除去空格和十字管之后的数量。旋转次数不超过1.5×N可得三星，不超过2×N可得两星，更多次但成功完成则得一星。它是评分门槛，并不证明某个解法已经最短。本例N为3，转三次或四次属于三星范围，五次则属于两星范围。普通通关分数以400分为基础，再加旋转奖励，并根据情况应用未用提示与双电路的倍率。</p>
+<p>重置会恢复初始布局与点击次数。目前的提示并不是只指出下一步，而是按保存的解法逐步旋转并锁定管道。想观察路线形成过程时可以使用，再重置后自行重做。看过帮助的解法和独立完成的解法，可以分开记录与理解。</p>
+<details><summary>练习：一根弯管朝右和下开口，要改成朝左和上，需要顺时针转几次？</summary><p>两次。第一次变成下、左，第二次变成左、上。每次都检查整对开口，不要只盯着想增加的方向。</p></details>
+<p>先打开一个早期关卡，在每次点击前预测新的入口与出口。 <a class="pv-btn pv-btn-primary" href="/games/pipelink.html?lang=zh">开始玩 PipeLink</a></p>
+<aside class="blog-review-note"><p>除非明确标注具体关卡，示例均为讲解而构造的棋盘。规则和示例结果已与当前游戏实现核对；随机关卡和每日棋盘可能不同。</p><p><a href="/zh/contact.html">若说明与游戏不符，请通过联系页面提供游戏名、模式、文章地址和复现步骤。</a></p></aside></article>
+<section class="blog-related"><h2>到游戏中试试</h2><div class="related-games-grid"><a class="related-game-card" href="/games/pipelink.html?lang=zh"><span class="related-game-name">🔧 PipeLink →</span></a><a class="related-game-card" href="/games/numvault.html?lang=zh"><span class="related-game-name">🔢 NumVault →</span></a></div></section><section class="blog-related"><h2>继续阅读</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/zh/colorflow-advanced-pathing-strategies.html"><div class="related-post-title">ColorFlow攻略：连上最后一对前，先检查空格</div><p class="related-post-desc">比较5×5示意棋盘上的两种合法路线，了解为何全部配对成功后，仍可能留下空格并获得不同星数。</p></a><a class="related-post-card" href="/blog/zh/gridsmash-beginner-strategy-guide.html"><div class="related-post-title">GridSmash攻略：规划三块的顺序，而不只看眼前一块</div><p class="related-post-desc">用10×10示意棋盘比较两种摆法，计算双行消除得分，并为托盘中剩余的形状保留可用空间。</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私</a><a href="/zh/terms.html">条款</a><a href="/zh/contact.html">联系</a><a href="/blog/zh/">攻略与随笔</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

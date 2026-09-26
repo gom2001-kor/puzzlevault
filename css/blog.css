@@ -1,0 +1,43 @@
+/* Static guides stay readable without JavaScript or remote assets. */
+.blog-shell{max-width:1120px;margin:36px auto 64px;padding:0 24px;color:var(--pv-text)}
+.blog-hero{max-width:760px;margin:0 0 28px}.blog-eyebrow{color:var(--pv-blue);font-size:.78rem;font-weight:800;letter-spacing:.08em;margin-bottom:12px}
+.blog-hero h1,.blog-post-header h1{font-size:clamp(1.85rem,4vw,2.8rem);line-height:1.25;letter-spacing:-.035em;margin-bottom:16px}
+.blog-hero p{font-size:1.05rem;line-height:1.8;color:var(--pv-text-secondary)}
+.blog-editorial-link{display:inline-block;margin-top:16px;color:var(--pv-blue);text-underline-offset:4px}
+.guide-directory{margin:30px 0;padding:24px;border:1px solid var(--pv-border);border-radius:18px;background:var(--pv-card-bg)}
+.guide-directory h2{font-size:1.2rem;margin-bottom:8px}.guide-directory>p{color:var(--pv-text-secondary);line-height:1.7;margin-bottom:16px}
+.guide-directory nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.guide-directory a{display:flex;align-items:center;gap:8px;min-height:48px;border:1px solid var(--pv-border);border-radius:10px;padding:10px;color:var(--pv-text);font-size:.9rem;font-weight:600}
+.guide-directory a:hover{border-color:var(--pv-blue);color:var(--pv-blue)}
+.blog-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}.blog-tabs button{min-height:44px;padding:8px 18px;border:1px solid var(--pv-border);border-radius:24px;background:var(--pv-card-bg);color:var(--pv-text);font:inherit;cursor:pointer}
+.blog-tabs button[aria-pressed=true]{background:var(--pv-blue);border-color:var(--pv-blue);color:white}
+.blog-result-count{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:16px}
+.blog-shell .blog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.blog-shell .blog-card{display:flex;flex-direction:column;gap:10px;border:1px solid var(--pv-border);background:var(--pv-card-bg);border-radius:16px;padding:24px;color:var(--pv-text);text-decoration:none;min-width:0}
+.blog-card-category{align-self:flex-start;border-radius:16px;padding:4px 10px;background:var(--pv-grid-bg);font-size:.75rem;color:var(--pv-blue);font-weight:700}
+.blog-shell .blog-card h2{font-size:1.13rem;line-height:1.5}.blog-shell .blog-card-desc{font-size:.92rem;line-height:1.7;color:var(--pv-text-secondary)}
+.blog-card-meta{font-size:.78rem;color:var(--pv-text-secondary);margin-top:auto;line-height:1.7}.blog-card-read{color:var(--pv-blue);font-weight:700;font-size:.9rem}.blog-shell .blog-card:hover{border-color:var(--pv-blue);box-shadow:var(--pv-shadow-lg)}
+.blog-post-header,.blog-content,.blog-related{max-width:780px;margin:0 auto;padding:0 24px}.blog-post-header{margin-top:36px}.blog-breadcrumb{display:flex;gap:10px;flex-wrap:wrap;font-size:.85rem;margin-bottom:24px;color:var(--pv-text-secondary)}
+.blog-breadcrumb a{color:var(--pv-blue)}.blog-post-header .blog-card-category{display:inline-block;margin-bottom:16px}.blog-post-description{font-size:1.1rem;color:var(--pv-text-secondary);line-height:1.8;margin-bottom:20px}.blog-post-meta{font-size:.82rem;line-height:1.9;color:var(--pv-text-secondary);padding-bottom:22px;border-bottom:1px solid var(--pv-border)}
+.blog-post-meta a{color:var(--pv-blue)}.blog-content{font-size:1.03rem;line-height:1.9;overflow-wrap:anywhere}.blog-content p{margin:20px 0}.blog-content h2{font-size:1.4rem;line-height:1.45;margin:36px 0 14px;scroll-margin-top:90px}.blog-content h3{font-size:1.15rem;margin:26px 0 12px}
+.blog-content ul,.blog-content ol{padding-left:24px;margin:18px 0}.blog-content ul{list-style:disc}.blog-content ol{list-style:decimal}.blog-content li{margin:8px 0}.blog-content a,.blog-related a{color:var(--pv-blue);text-decoration:underline;text-underline-offset:3px}
+.blog-toc{padding:22px 24px;border:1px solid var(--pv-border);border-radius:14px;background:var(--pv-card-bg);margin:26px 0}.blog-toc h2{font-size:1rem;margin:0 0 8px}.blog-toc ol{font-size:.9rem;margin:0}.blog-toc li{margin:4px 0}
+.guide-figure{padding:20px;margin:26px 0;border:1px solid var(--pv-border);border-radius:16px;background:var(--pv-card-bg);overflow-x:auto}.guide-figure svg{display:block;width:100%;height:auto;max-height:520px;border-radius:10px;background:#f8fafc;color:#1e293b}.guide-figure figcaption{font-size:.86rem;line-height:1.7;color:var(--pv-text-secondary);margin-top:12px}
+.guide-table-wrap{overflow-x:auto;margin:24px 0;border:1px solid var(--pv-border);border-radius:12px}.blog-content table{width:100%;border-collapse:collapse;font-size:.91rem;margin:12px 0;line-height:1.6}.blog-content caption{font-weight:700;text-align:left;padding:12px}.blog-content th,.blog-content td{padding:12px;text-align:left;border-bottom:1px solid var(--pv-border);vertical-align:top}.blog-content th{background:var(--pv-grid-bg);font-weight:700}.blog-content tr:last-child td{border-bottom:0}
+.guide-callout,.blog-content blockquote{padding:20px 22px;border-left:4px solid var(--pv-blue);border-radius:0 12px 12px 0;background:var(--pv-card-bg);margin:24px 0}.guide-callout p:first-child{margin-top:0}.guide-callout p:last-child{margin-bottom:0}
+.blog-content details{border:1px solid var(--pv-border);border-radius:12px;padding:16px 20px;margin:24px 0;background:var(--pv-card-bg)}.blog-content summary{font-weight:700;cursor:pointer;min-height:30px}.blog-content details[open] summary{margin-bottom:12px}
+.blog-content pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;padding:16px;border-radius:12px;background:var(--pv-grid-bg)}.blog-content code{font-size:.92em}.blog-content .cta-box{margin:30px 0;padding:22px;border-radius:16px;background:var(--pv-card-bg);border:1px solid var(--pv-blue)}
+.blog-content .cta-box a,.blog-content .guide-play{display:inline-block;background:var(--pv-blue);color:white;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:700;min-height:44px}
+.blog-content .game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.blog-content .game-card-link{display:flex;gap:12px;border:1px solid var(--pv-border);border-radius:12px;padding:16px;text-decoration:none}.blog-content .game-card-link .name{font-weight:700}.blog-content .game-card-link .desc{font-size:.85rem;color:var(--pv-text-secondary)}
+.blog-review-note{margin:36px 0 0;padding-top:22px;border-top:1px solid var(--pv-border);font-size:.85rem;line-height:1.8;color:var(--pv-text-secondary)}.blog-related{margin:36px auto}.blog-related h2{font-size:1.15rem;margin:0 0 14px}.related-games-grid,.related-posts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.blog-related .related-game-card,.blog-related .related-post-card{padding:18px;border:1px solid var(--pv-border);border-radius:12px;background:var(--pv-card-bg);text-decoration:none;display:block}.related-post-title,.related-game-name{font-weight:700;line-height:1.5}.related-post-desc{font-size:.85rem;line-height:1.7;color:var(--pv-text-secondary);margin-top:6px}
+.blog-content :focus-visible,.blog-shell :focus-visible,.blog-related :focus-visible{outline:3px solid var(--pv-blue);outline-offset:4px}.blog-shell [hidden]{display:none!important}.game-guide .guide-article-link{display:block;margin-top:18px;padding:16px;border:1px solid var(--pv-border);border-radius:12px;color:var(--pv-blue);font-weight:700}
+@media(max-width:900px){.guide-directory nav{grid-template-columns:repeat(3,minmax(0,1fr))}.blog-shell .blog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.blog-shell{padding:0 18px;margin-top:24px}.blog-shell .blog-grid{grid-template-columns:1fr}.guide-directory{padding:18px}.guide-directory nav{grid-template-columns:repeat(2,minmax(0,1fr))}.blog-post-header,.blog-content,.blog-related{padding:0 18px}.guide-figure{padding:10px}.blog-content th,.blog-content td{padding:8px}.related-games-grid,.related-posts-grid{grid-template-columns:1fr}.blog-content .game-grid{grid-template-columns:1fr}}
+
+/* Explicit link color keeps game CTAs legible inside article prose. */
+.blog-content a.pv-btn { color: #fff; text-decoration: none; }
+
+@media(prefers-color-scheme:dark){
+ .blog-content a,.blog-breadcrumb a,.blog-post-meta a,.blog-related a,.blog-editorial-link,.blog-card-read,.blog-card-category,.blog-eyebrow,.guide-directory a:hover{color:#93c5fd}
+ .blog-content a.pv-btn,.blog-content .cta-box a,.blog-content .guide-play{color:#fff}
+}
+html:lang(ko) .blog-hero h1,html:lang(ko) .blog-post-header h1,html:lang(ko) .blog-shell .blog-card h2 { word-break: keep-all; overflow-wrap: anywhere; }

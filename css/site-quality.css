@@ -24,6 +24,8 @@
 .pv-privacy-close { display: block; margin-top: 16px; padding: 8px 0; background: none; border: 0; color: var(--pv-text-secondary); cursor: pointer; min-height: 44px; }
 .pv-privacy-panel :focus-visible, .pv-privacy-controls :focus-visible { outline: 3px solid var(--pv-blue); outline-offset: 3px; }
 .ad-slot:empty { display: none; }
+.game-guide .guide-article-link { margin-top: 20px; padding: 16px; border: 1px solid var(--pv-border); border-radius: 12px; line-height: 1.7; }
+.game-guide .guide-article-link a { color: var(--pv-blue); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 :is(.nv-sidebar, .gs-sidebar, .pp-sidebar, .ss-sidebar, .qc-sidebar,
     .tt-sidebar, .cf-sidebar, .pl-sidebar, .mc-sidebar, .hx-sidebar):has(> .ad-slot:empty) { display: none; }
 /* Keep every game action reachable on narrow screens. Tube shelves scroll internally. */
@@ -37,3 +39,5 @@
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 @media (max-width: 480px) { .pv-editorial { padding-inline: 20px; margin-top: 28px; } .pv-privacy-panel { padding: 22px; } }
+
+@media(prefers-color-scheme:dark){.game-guide .guide-article-link a{color:#93c5fd}}

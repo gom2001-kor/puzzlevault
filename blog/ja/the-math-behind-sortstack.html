@@ -1,91 +1,27 @@
 <!DOCTYPE html>
 <html lang="ja" translate="no" class="notranslate">
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SortStackのパズル生成と手数制限 | PuzzleVault Blog</title>
-    <meta name="description" content="逆向きの移動で盤面を作る仕組みと、最短解や手数制限との違いを説明。空のチューブを使う判断にも役立ちます。">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="SortStackのパズル生成と手数制限 | PuzzleVault Blog">
-    <meta property="og:description" content="逆向きの移動で盤面を作る仕組みと、最短解や手数制限との違いを説明。空のチューブを使う判断にも役立ちます。">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="SortStackのパズル生成と手数制限 | PuzzleVault Blog">
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": "SortStackのパズル生成と手数制限",
-  "inLanguage": "ja",
-  "datePublished": "2026-03-29",
-  "dateModified": "2026-09-26",
-  "author": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html",
-  "description": "逆向きの移動で盤面を作る仕組みと、最短解や手数制限との違いを説明。空のチューブを使う判断にも役立ちます。"
-}
-</script>
-    <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="ホーム"><a href="/ja/">🧩 PuzzleVault</a><a href="/ja/#games">ゲーム</a><a href="/blog/ja/">ブログ</a><a href="/ja/about.html">サイト情報</a></nav></header>
-    <div class="blog-post-header">
-        <span class="blog-post-category">サイエンス</span>
-        <h1>SortStackのパズル生成と手数制限</h1>
-        <div class="blog-post-meta">2026年3月29日 · 6分で読める · <time datetime="2026-09-26">2026年9月26日更新</time></div>
-    </div>
-    <article class="blog-content">
-<p><a href="/games/sortstack.html">SortStack</a>の一手は、同じ色を重ねるだけではありません。下のブロックを出し、空のチューブを確保し、完成によって作業場所を増やすこともできます。盤面の生成方法を知ると、整列した状態に戻る道と、制限手数内で短い道を見つける課題を区別できます。</p>
-<h2>1. 移動の基本ルール</h2>
-<p>チューブの容量は4個です。一番上のブロック1個を、空のチューブか一番上が同じ色のチューブへ動かします。移動先には空きが必要で、下に埋まったブロックを直接取り出すことはできません。同じ色が4個そろうと完成して固定され、新しい空のチューブが追加されます。</p>
-<p>空き容量は資源です。同じ色数の盤面でも、表面に見える色によって次の選択は変わります。移動先だけでなく、動かした後に元のチューブから何色が現れるかを確認しましょう。</p>
-<h2>2. 完成した状態から逆向きに混ぜる</h2>
-<p>生成器は各色4個がそろったチューブと空のチューブから始めます。逆向きの移動では、取り出し元が1個だけ、または一番上とその下が同じ色のときに取り出せます。生成中の移動先は、容量が残っていれば色が違っていても構いません。</p>
-<p>この条件が重要です。直前の移動を逆にすると、ブロックは空になった場所か、同じ色が残った場所へ戻れます。生成順を逆にたどれば、基本の色合わせルールに沿って戻れるように設計されています。現在のコードは色数に比例した回数の移動で混ぜており、全ブロックを無条件に配る方法ではありません。</p>
-<h2>3. 最短解の証明とは異なる</h2>
-<p>生成後に最短経路を探索したり、選んだ手数制限内に収まるか検証したりする処理はありません。現在はMediumが50手、Hardが40手、Expertが35手で、Easyには手数制限がありません。Relaxedは選択した難易度の手数制限を外します。</p>
-<p>そのため、逆向きに生成する設計は、すべての制限付きの盤面を必ず手数内で解けるという約束にはなりません。混ぜた回数も最短手数ではありません。生成中に同じ状態へ戻ったり、互いに打ち消す移動を含んだりするためです。基本ルールでの復帰経路を設計することと、最適な難易度の証明は別の作業です。</p>
-<h2>4. 空のチューブを目的を持って使う</h2>
-<p>できれば空のチューブを残し、そこを埋めることで何を取り出せるか考えましょう。同じ色を集めると下の色を出せますが、一色を多くの場所へ分散すると後から整理しにくくなる場合があります。色を出す、まとめる、新しくできた空間で次の邪魔なブロックを動かす、という短い順序を探します。</p>
-<p>完成すると空のチューブが追加されるので、その後の選択肢が増えます。ただし、一色に多くの手数を使う前に、ほかの完成候補も確認してください。進行中の取り消しは別の道を試すのに便利で、制限付きのモードでは手数も戻ります。</p>
-<h2>5. 経路を理解してから短くする</h2>
-<p>Relaxedでは手数を気にせず、各移動が何に役立つか考えられます。下を出す、同じ色をまとめる、空間を作る、完成させる、のどれにも役立たない移動なら再検討しましょう。限られた手数では万能な手順を求めるより、不要な往復を減らす方針が実用的です。</p>
-<p>この記事は現在の<a href="/games/sortstack-logic.js?v=14">生成コードと移動判定</a>を基にしています。次の一手では、動かすブロックのすぐ下にも注目してみてください。</p>
-    </article>
-    <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
-    <section class="blog-related"><h2>🎮 ゲームを試す</h2><div class="related-games-grid" id="related-games"></div></section>
-    <section class="blog-related"><h2>📖 もっと読む</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/ja/" class="back-link">← ブログに戻る</a></section>
-    <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/ja/about.html">サイト情報</a><a href="/ja/privacy.html">プライバシー</a><a href="/ja/terms.html">利用規約</a><a href="/ja/contact.html">お問い合わせ</a><a href="/blog/ja/">ブログ</a></nav></footer>
-    <script src="/js/blog-data.js?v=14"></script><script src="/js/i18n.js?v=14"></script><script src="/js/common.js?v=14"></script>
-    <script>const POST_SLUG='the-math-behind-sortstack';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['sortstack','gridsmash','mergechain'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/ja/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
-    <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/the-math-behind-sortstack.html':'/blog/'+nl+'/the-math-behind-sortstack.html'});</script>
-    <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
-</body>
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>SortStack攻略：完成したチューブで作業場所を増やす | PuzzleVault</title><meta name="description" content="4手で解ける例を通して、先頭の色、1個ずつの移動、完成時に増える空チューブを使った手順を考えましょう。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SortStack攻略：完成したチューブで作業場所を増やす | PuzzleVault"><meta property="og:description" content="4手で解ける例を通して、先頭の色、1個ずつの移動、完成時に増える空チューブを使った手順を考えましょう。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="SortStack攻略：完成したチューブで作業場所を増やす | PuzzleVault"><meta name="twitter:description" content="4手で解ける例を通して、先頭の色、1個ずつの移動、完成時に増える空チューブを使った手順を考えましょう。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "SortStack攻略：完成したチューブで作業場所を増やす", "description": "4手で解ける例を通して、先頭の色、1個ずつの移動、完成時に増える空チューブを使った手順を考えましょう。", "inLanguage": "ja", "datePublished": "2026-03-29", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/ja/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="ホーム"><a href="/ja/">🧩 PuzzleVault</a><a href="/ja/#games">ゲーム</a><a href="/blog/ja/">攻略と読みもの</a><a href="/ja/about.html">紹介</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="攻略と読みもの"><a href="/blog/ja/">← 攻略と読みもの</a></nav><span class="blog-card-category">ゲーム攻略</span><h1>SortStack攻略：完成したチューブで作業場所を増やす</h1><p class="blog-post-description">4手で解ける例を通して、先頭の色、1個ずつの移動、完成時に増える空チューブを使った手順を考えましょう。</p><p class="blog-post-meta">発行：PuzzleVault · 6 分で読めます<br>公開 <time datetime="2026-03-29">2026-03-29</time> · 更新 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/ja/editorial.html">記事の作成と確認について</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="この記事の内容"><h2>この記事の内容</h2><ol><li><a href="#section-1">完成で盤面が変わる</a></li><li><a href="#section-2">下から上へ読む小さな例</a></li><li><a href="#section-3">移動先には役割がある</a></li><li><a href="#section-4">見えている3個から逆に考える</a></li><li><a href="#section-5">2手を言葉で説明する練習</a></li></ol></nav>
+<p>邪魔なボールを空チューブに一つずつ置いていくと、余裕はすぐになくなります。SortStackでは「この移動で何が見え、どんな場所ができるか」を考えると整理しやすくなります。チューブの容量は4個。通常の1手で動くのは一番上の1個だけです。移動先は空か、一番上が同色で、さらに空きが必要です。</p><h2 id="section-1">完成で盤面が変わる</h2><p>同色4個がそろうとチューブが完成してロックされ、右に新しい空チューブが追加されます。埋もれた色がすぐ出てこなくても、早い完成に価値がある理由です。新たに4個分の作業場所が増えます。狭い画面ではチューブの領域を横にスクロールして確認してください。</p><p>同色が連続していても、一度にまとめて注ぐ操作ではありません。3個移すには3手必要です。手数制限のあるモードでは、並べ替える前に移動数を数えましょう。頭の中でチューブを空にできても、残り手数で実行できるかは別の確認です。</p><h2 id="section-2">下から上へ読む小さな例</h2><figure class="guide-figure"><table class="guide-table"><thead><tr><th scope="col">チューブ</th><th scope="col">下 → 上</th></tr></thead><tbody><tr><th scope="row">A</th><td>1 · 1 · 1 · <strong>2</strong></td></tr><tr><th scope="row">B</th><td>2 · 2 · 2 · <strong>1</strong></td></tr><tr><th scope="row">C</th><td>3 · 3 · <strong>3</strong></td></tr><tr><th scope="row">D</th><td><strong>3</strong></td></tr><tr><th scope="row">E</th><td>空</td></tr></tbody></table><figcaption>解説用の開始状態。下から上の順で、右端の数字が動かせるボールです。</figcaption></figure><p>3色12個で構成した解説用の状態です。文字はチューブ名、数字はゲームのボールにも表示される色番号です。A = [1, 1, 1, 2]なら一番上は2。最初にロックされたチューブはなく、Eは空です。通常と同じ容量・移動ルールを使いますが、特定のDailyやランダムな開始画面ではありません。</p><ol class="guide-steps"><li><strong>D → C。</strong>色3をCの同色3個に重ねます。Cが完成しロック。Dが空になり、新しい空チューブFも増えます。1手で作業場所が広がりました。</li><li><strong>B → E。</strong>Bの一番上の色1を空のEへ。Bは[2, 2, 2]となり、色2が出ます。Aの上のボールを受け入れる場所を準備する移動です。</li><li><strong>A → B。</strong>色2をBへ移すとBが完成し、さらに空チューブが増えます。Aは[1, 1, 1]になります。</li><li><strong>E → A。</strong>一時保管した色1をAへ戻して完成。4手で3色がそろいます。残った空チューブを埋める必要はありません。</li></ol><h2 id="section-3">移動先には役割がある</h2><p>最初のB → Cは不可能です。色1を色3の上には置けません。D → Eは可能ですが、色3を別の空チューブに置くだけで、隠れたボールも出ず、完成もしません。D → Cなら1色を終え、作業場所をすぐ増やせます。これはこの例の比較であり、常に完成から始めるべきという証明ではありません。</p><p>D → Cの後は空チューブが複数あります。Bの上をEではなくDへ置いても同じ計画を続けられます。大切なのは名前ではなく、Aの準備ができるまで色1を保管する役割です。理由なく同色を多くの空チューブへ分散させないようにしましょう。</p><h2 id="section-4">見えている3個から逆に考える</h2><p>同色3個のチューブを探し、4個目がどこにあるか確認します。埋まっているなら、その上のどのボールを、どこへ動かすか具体的に決めます。「どこかへ退ける」だけでは実行可能な計画ではありません。あとで空にするつもりでも、別の色で満杯のチューブは今の移動先にはなりません。</p><p>Free PlayのEasyは3色・最初の5本で手数無制限。Mediumは5色・7本・50手、Hardは7色・9本・40手、Expertは10色・12本・35手です。Relaxedでは手数制限がなくなります。試行錯誤できる余裕は違いますが、ヒントが最短手順を保証するわけではありません。</p><h2 id="section-5">2手を言葉で説明する練習</h2><p>EasyかRelaxedを選び、「これをここへ動かすと、次に何ができるか」を選択前に言ってみましょう。2手目の移動先がまだなければ、1手目を見直します。完成で場所が増えたら、古い計画を機械的に続けず盤面を再確認してください。解いた後は省けたかもしれない一時保管を一つ選び、次のプレイでその判断を練習しましょう。</p><p><a class="pv-btn pv-btn-primary" href="/games/sortstack.html?lang=ja">SortStackで手順を練習する</a></p>
+<aside class="blog-review-note"><p>特定のレベルと明記しない限り、図は説明用に組み立てた盤面です。ルールと例の結果は現在のゲームと照合しています。ランダム・デイリー盤面は異なる場合があります。</p><p><a href="/ja/contact.html">説明と動作が違う場合は、ゲーム名、モード、記事のURLと再現手順をお問い合わせからお知らせください。</a></p></aside></article>
+<section class="blog-related"><h2>ゲームで試す</h2><div class="related-games-grid"><a class="related-game-card" href="/games/sortstack.html?lang=ja"><span class="related-game-name">📚 SortStack →</span></a><a class="related-game-card" href="/games/numvault.html?lang=ja"><span class="related-game-name">🔢 NumVault →</span></a></div></section><section class="blog-related"><h2>あわせて読む</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/ja/colorflow-advanced-pathing-strategies.html"><div class="related-post-title">ColorFlow攻略：最後の接続前に空きマスを確認しよう</div><p class="related-post-desc">5×5の解説用盤面で二つの経路を比べ、すべてのペアを結んでも埋まる面積と星が変わる理由を学びましょう。</p></a><a class="related-post-card" href="/blog/ja/gridsmash-beginner-strategy-guide.html"><div class="related-post-title">GridSmash攻略：1個の置き場所より3個の順番を考えよう</div><p class="related-post-desc">10×10の解説用盤面で二つの配置を比べ、2列消去の得点を計算しながら、残りのピースに必要な空間を確保しましょう。</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/ja/about.html">紹介</a><a href="/ja/privacy.html">プライバシー</a><a href="/ja/terms.html">利用規約</a><a href="/ja/contact.html">お問い合わせ</a><a href="/blog/ja/">攻略と読みもの</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

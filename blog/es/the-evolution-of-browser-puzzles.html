@@ -1,84 +1,44 @@
 <!DOCTYPE html>
 <html lang="es" translate="no" class="notranslate">
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>Después de Flash: cómo funcionan las partidas en el navegador | PuzzleVault</title><meta name="description" content="Entiende cómo PuzzleVault carga juegos, inicia sonidos y guarda archivos y récords locales, distinguiendo el acceso sin conexión del progreso de una partida.">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Después de Flash: cómo funcionan las partidas en el navegador | PuzzleVault"><meta property="og:description" content="Entiende cómo PuzzleVault carga juegos, inicia sonidos y guarda archivos y récords locales, distinguiendo el acceso sin conexión del progreso de una partida."><meta property="og:url" content="https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Después de Flash: cómo funcionan las partidas en el navegador | PuzzleVault"><meta name="twitter:description" content="Entiende cómo PuzzleVault carga juegos, inicia sonidos y guarda archivos y récords locales, distinguiendo el acceso sin conexión del progreso de una partida.">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Después de Flash: cómo funcionan las partidas en el navegador", "description": "Entiende cómo PuzzleVault carga juegos, inicia sonidos y guarda archivos y récords locales, distinguiendo el acceso sin conexión del progreso de una partida.", "inLanguage": "es", "datePublished": "2026-03-29", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/es/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="Inicio"><a href="/es/">🧩 PuzzleVault</a><a href="/es/#games">Juegos</a><a href="/blog/es/">Guías y notas</a><a href="/es/about.html">Acerca de</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="Guías y notas"><a href="/blog/es/">← Guías y notas</a></nav><span class="blog-card-category">Notas del proyecto</span><h1>Después de Flash: cómo funcionan las partidas en el navegador</h1><p class="blog-post-description">Entiende cómo PuzzleVault carga juegos, inicia sonidos y guarda archivos y récords locales, distinguiendo el acceso sin conexión del progreso de una partida.</p><p class="blog-post-meta">Publica: PuzzleVault · 6 min de lectura<br>Publicado <time datetime="2026-03-29">2026-03-29</time> · Actualizado <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/es/editorial.html">Cómo elaboramos las guías</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="En esta guía"><h2>En esta guía</h2><ol><li><a href="#section-1">¿Qué cambió después de Flash?</a></li><li><a href="#section-2">La página y el sonido pueden estar listos en momentos distintos</a></li><li><a href="#section-3">Archivos, registros y tablero actual son cosas diferentes</a></li><li><a href="#section-4">Jugar sin conexión requiere los archivos adecuados</a></li><li><a href="#section-5">Elige cuándo actualizar la página</a></li></ol></nav>
 
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Evolución de los Puzzles de Navegador: De Flash a HTML5 | PuzzleVault Blog</title>
-    <meta name="description" content="Explora la fascinante historia de los juegos de puzzle en la web. Descubre cómo la tecnología evolucionó desde Flash hasta los modernos juegos de Canvas HTML5.">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="La Evolución de los Puzzles de Navegador: De Flash a HTML5">
-    <meta property="og:description" content="Explora la fascinante historia de los juegos de puzzle en la web. Descubre cómo la tecnología evolucionó desde Flash hasta los modernos juegos de Canvas HTML5.">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="La Evolución de los Puzzles de Navegador: De Flash a HTML5">
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html">
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": "La Evolución de los Puzzles de Navegador: De Flash a HTML5",
-  "inLanguage": "es",
-  "datePublished": "2026-03-29",
-  "dateModified": "2026-09-26",
-  "author": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html"
-}
-</script>
-    <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="Inicio"><a href="/es/">🧩 PuzzleVault</a><a href="/es/#games">Juegos</a><a href="/blog/es/">Blog</a><a href="/es/about.html">Acerca de</a></nav></header>
-    <div class="blog-post-header">
-        <span class="blog-post-category">Actualización</span>
-        <h1>La Evolución de los Puzzles de Navegador: De Flash a HTML5</h1>
-        <div class="blog-post-meta">29 de Marzo de 2026 · 5min de lectura</div>
-    </div>
-    <article class="blog-content">
-        <p>Si creciste a finales de los 90 o principios de los 2000, seguramente recuerdas acceder a portales de juegos durante las clases de informática. Durante más de una década, los juegos de navegador fueron dominados por una tecnología: Adobe Flash.</p>
-<h2>La Era Dorada de los Juegos Flash</h2>
-<p>A principios de los 2000, construir experiencias interactivas para la web era increíblemente difícil. Adobe Flash resolvió esto proporcionando un entorno de ejecución unificado basado en plugins. Miles de juegos de puzzle icónicos nacieron durante esta era.</p>
-<p>Sin embargo, Flash tenía graves inconvenientes. Consumía enormes recursos, agotaba la batería rápidamente y se convirtió en un vector notorio de vulnerabilidades de seguridad.</p>
-<h2>El Período de Transición Incómoda</h2>
-<p>Con el fin del soporte de Flash, los desarrolladores necesitaron otras formas de crear juegos de navegador. El rendimiento de Canvas y JavaScript variaba entre navegadores y dispositivos, por lo que adaptar un juego requería revisar la animación, la entrada y la carga de renderizado.</p>
-<h2>El Renacimiento de HTML5 Canvas</h2>
-<p>La <strong>API Canvas de HTML5</strong> permite dibujar tableros en el navegador sin un plugin adicional. <strong>GridSmash</strong> y <strong>HexMatch</strong> usan Canvas para sus tableros y animaciones. La frecuencia de fotogramas real depende del dispositivo, del navegador y de la carga de trabajo.</p>
-<h2>PuzzleVault: Adoptando la Arquitectura Web Moderna</h2>
-<p>PuzzleVault ofrece 10 puzzles con HTML, CSS y JavaScript. Puedes abrir <strong>NumVault</strong> o <strong>TileTurn</strong> en un navegador compatible sin instalar una aplicación aparte. El tiempo de carga y el rendimiento de las animaciones dependen de la conexión, del navegador y del dispositivo.</p>
-    </article>
-    <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
-    <section class="blog-related"><h2>🎮 Prueba Estos Juegos</h2><div class="related-games-grid" id="related-games"></div></section>
-    <section class="blog-related"><h2>📖 Leer Más</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/es/" class="back-link">← Volver al Blog</a></section>
-    <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/es/about.html">Acerca de</a><a href="/es/privacy.html">Privacidad</a><a href="/es/terms.html">Términos</a><a href="/es/contact.html">Contacto</a><a href="/blog/es/">Blog</a></nav></footer>
-    <script src="/js/blog-data.js?v=14"></script><script src="/js/i18n.js?v=14"></script><script src="/js/common.js?v=14"></script>
-    <script>const POST_SLUG='the-evolution-of-browser-puzzles';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['numvault','gridsmash','hexmatch'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/es/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
-    <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/the-evolution-of-browser-puzzles.html':'/blog/'+nl+'/the-evolution-of-browser-puzzles.html'});</script>
-    <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
-</body>
-</html>
+<p>Abrir un puzle en el navegador parece sencillo: eliges un juego, haces un movimiento y ves el resultado. Detrás ocurren varias tareas independientes. El navegador carga el juego, ejecuta las reglas, dibuja el tablero, reproduce sonidos y guarda los registros compatibles. Saber qué hace cada parte ayuda cuando falta el sonido, no aparece una puntuación o quieres jugar sin conexión.</p>
+<h2 id="section-1">¿Qué cambió después de Flash?</h2>
+<p>Adobe terminó el soporte de Flash Player el 31 de diciembre de 2020 y bloqueó contenido Flash desde el 12 de enero de 2021. Las fechas constan en <a href="https://www.adobe.com/products/flashplayer/end-of-life.html">su aviso oficial</a>. Los juegos actuales de PuzzleVault utilizan HTML, CSS, JavaScript y Canvas en lugar de un complemento Flash. Abrir una página compatible no requiere crear una cuenta de PuzzleVault ni instalar una aplicación de juego independiente.</p>
+<p>Esa arquitectura explica la distribución, no promete una tasa de fotogramas ni un comportamiento idéntico en todos los navegadores. En <a href="/games/mergechain.html?lang=es">MergeChain</a>, por ejemplo, hay que actualizar las bolas móviles y sus colisiones mientras se dibuja el tablero. Una pantalla de deducción por turnos tiene otro trabajo. Observa la respuesta del juego en tu dispositivo real en vez de dar por hecho que todos los puzles web rinden igual.</p>
+<h2 id="section-2">La página y el sonido pueden estar listos en momentos distintos</h2>
+<p>PuzzleVault genera sus efectos breves mediante código. El controlador compartido inicializa el audio con la primera interacción del puntero, y el botón de sonido guarda tu preferencia de encendido o apagado. Si ves el tablero pero al principio no oyes nada, haz una interacción normal y comprueba después el botón del juego y el volumen del dispositivo. El silencio por sí solo no demuestra un fallo de carga.</p>
+<p>Si falla un control, comprueba primero si estás interactuando con el tablero o con la página que lo rodea. Las flechas de MergeChain requieren que el tablero tenga el foco. Volver atrás con el navegador tampoco equivale a reiniciar desde el juego. En un dispositivo desconocido, prueba una acción antes de empezar un intento cronometrado o importante para tu récord.</p>
+<h2 id="section-3">Archivos, registros y tablero actual son cosas diferentes</h2>
+<p>El almacenamiento local puede conservar datos entre sesiones; la navegación privada lo trata de otra manera. <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">MDN explica localStorage</a>. PuzzleVault lo utiliza para estadísticas compatibles, mejores puntuaciones, ajustes y progreso. La implementación no sube estos registros a una cuenta que sincronice tus dispositivos.</p>
+<div class="guide-table"><table><caption>Tres situaciones fáciles de confundir</caption><thead><tr><th scope="col">Lo que ves</th><th scope="col">Lo que se conserva</th><th scope="col">Lo que no demuestra</th></tr></thead><tbody><tr><td>El juego abre sin conexión</td><td>Páginas y archivos almacenados antes</td><td>Que una página nueva esté disponible</td></tr><tr><td>Reaparece un récord</td><td>Un registro local de este navegador</td><td>Que otro teléfono tenga el mismo récord</td></tr><tr><td>Hay un tablero abierto</td><td>El estado activo de esa página</td><td>Que toda partida pendiente se reanude al cerrar</td></tr></tbody></table></div>
+<p>Imagina este ejemplo: terminas una partida en el portátil y después abres la misma URL en el teléfono. Ambos muestran el mismo juego, pero el teléfono puede tener estadísticas locales nuevas. Eso no prueba que se haya borrado la puntuación del portátil. A la inversa, que un juego siga cargando desde caché después de borrar datos del sitio no demuestra que sobrevivan sus antiguos récords. Comprueba el mismo perfil de navegador y la misma dirección antes de comparar registros.</p>
+<h2 id="section-4">Jugar sin conexión requiere los archivos adecuados</h2>
+<p>Un service worker puede gestionar solicitudes y utilizar recursos en caché. <a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API">MDN describe esta API</a>. El de PuzzleVault intenta guardar las páginas principales de juegos, scripts, estilos y archivos de idioma. Para navegar a páginas prueba primero la red y recurre a la caché si falla; para scripts y estilos de juego consulta primero la caché.</p>
+<p>Es una función útil, no una garantía de que una visita breve haga accesibles todas las páginas para siempre. La instalación debe terminar, los archivos necesarios deben guardarse y seguir existiendo. Un récord no permite reconstruir una página sin copia utilizable. Antes de depender del modo sin conexión durante un viaje, carga por completo el juego concreto, desconecta brevemente y vuelve a abrirlo. Hazlo en una partida de práctica para no interrumpir un intento que quieras conservar.</p>
+<h2 id="section-5">Elige cuándo actualizar la página</h2>
+<p>PuzzleVault puede mostrar un aviso de actualización cuando haya un nuevo worker disponible. Actualizar vuelve a cargar la página, así que termina primero una ronda cronometrada si quieres conservar ese intento. Una actualización de contenido y una puntuación personal son datos distintos. Ni el aviso de actualización ni un aspecto nuevo demuestran sincronización en la nube.</p>
+<p>Estas diferencias ayudan a jugar con menos dudas: identifica el control que usas, dónde viven tus registros y si la página necesaria está disponible de verdad. Para una primera comprobación tranquila, abre un puzle lógico sin tiempo antes de perseguir un récord. <a class="pv-btn pv-btn-primary" href="/games/numvault.html?lang=es">Probar NumVault</a></p>
+</article>
+<section class="blog-related"><h2>Pruébalo en estos juegos</h2><div class="related-games-grid"><a class="related-game-card" href="/games/numvault.html?lang=es"><span class="related-game-name">🔢 NumVault →</span></a><a class="related-game-card" href="/games/gridsmash.html?lang=es"><span class="related-game-name">🧱 GridSmash →</span></a></div></section><section class="blog-related"><h2>Sigue leyendo</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/es/welcome-to-puzzlevault.html"><div class="related-post-title">Elige tu primer juego de PuzzleVault</div><p class="related-post-desc">Compara los diez juegos de PuzzleVault por estilo, primera acción y un objetivo sencillo; después elige un rompecabezas tranquilo o un reto breve con reloj.</p></a><a class="related-post-card" href="/blog/es/5-tips-to-boost-your-brain-with-puzzles.html"><div class="related-post-title">Cinco formas prácticas de disfrutar de PuzzleVault</div><p class="related-post-desc">Elige una meta, interpreta las pistas, reserva espacio para el próximo movimiento y practica en condiciones comparables.</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/es/about.html">Acerca de</a><a href="/es/privacy.html">Privacidad</a><a href="/es/terms.html">Condiciones</a><a href="/es/contact.html">Contacto</a><a href="/blog/es/">Guías y notas</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

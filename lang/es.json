@@ -90,7 +90,7 @@
         "allGamesSub": "Diez formas de disfrutar de una pequeña pausa.",
         "playBtn": "Jugar ▸",
         "blogHeading": "📝 Últimas publicaciones del blog",
-        "blogSub": "Consejos de juego, estrategias e historias entre bastidores",
+        "blogSub": "Guías, ejemplos paso a paso y notas del proyecto",
         "viewAllPosts": "Ver todas las publicaciones →",
         "statsHeading": "📊 Tus estadísticas",
         "statsSub": "Consulta tu progreso en todos los juegos",
@@ -119,7 +119,8 @@
             "faq4a": "A medianoche UTC, con el mismo código para todos. Tras registrar tu intento diario, puedes usar Juego libre hasta el siguiente puzle.",
             "faq5q": "¿Cómo funcionan las pistas?",
             "faq5a": "Revela una posición pendiente: una vez en Diario, dos en Juego libre y ninguna en Velocidad. Al usarla pierdes el bono sin pistas y se indica en el resultado compartido. La ayuda es gratuita actualmente; si se activa publicidad de recompensa, se pedirá permiso antes.",
-            "guideTitle": "Cómo jugar a NumVault"
+            "guideTitle": "Cómo jugar a NumVault",
+            "articleGuide": "<a href=\"/blog/es/numvault-tips-and-strategy.html\">NumVault: interpreta las pistas antes de gastar otro intento →</a>"
         },
         "gridsmash": {
             "tagline": "Coloca bloques, completa líneas, encadena combos",
@@ -142,7 +143,8 @@
             "faq5a": "Clásico continúa mientras alguna pieza restante quepa, también girada. Diario comparte una secuencia de tres minutos. Sprint busca 40 líneas. Zen elimina especiales y zona de ruptura.",
             "guide2": "Con teclado, enfoca el tablero y elige una pieza con 1, 2 o 3. Muévela con las flechas, gira con R, coloca con Enter y cancela con Esc. Las filas y columnas llenas se borran juntas. Cada casilla colocada vale 10 puntos; las líneas y las colocaciones que borran consecutivamente suman bonos. Deja sitio para piezas largas y prueba a girarlas cuando parezcan no caber.",
             "guide3": "Fuera de Zen, las piezas especiales aparecen desde el turno 10. El cristal borra un área cercana de 3×3 al colocarlo y da 200 puntos. El hielo crea dos casillas que necesitan dos impactos de líneas. El comodín dorado ocupa una casilla y requiere un hueco vacío. Cada diez turnos, las dos filas inferiores forman una zona de ruptura durante tres turnos: completar una fila allí triplica sus puntos. Al terminar pueden llenarse tres huecos. Diario comparte la secuencia de piezas y dura tres minutos; Sprint pide borrar 40 líneas. Zen elimina las piezas especiales y la zona de ruptura.",
-            "guideTitle": "Cómo jugar a GridSmash"
+            "guideTitle": "Cómo jugar a GridSmash",
+            "articleGuide": "<a href=\"/blog/es/gridsmash-beginner-strategy-guide.html\">GridSmash: planifica la bandeja completa, no solo el siguiente bloque →</a>"
         },
         "patternpop": {
             "tagline": "¿Qué tan aguda es tu memoria?",
@@ -163,7 +165,8 @@
             "faq4a": "La pista repite el patrón más despacio y conserva los objetivos encontrados. Actualmente es gratis. Si se conecta un proveedor de recompensas, se pedirá permiso antes del anuncio.",
             "faq5q": "¿En qué se diferencian los modos?",
             "faq5a": "Clásico y Diario empiezan con tres vidas. Diario comparte las posiciones y permite repetir. Infinito no limita vidas. Velocidad empieza con una; actualmente su tiempo de memorización es igual al de Clásico.",
-            "guideTitle": "Cómo jugar a PatternPop"
+            "guideTitle": "Cómo jugar a PatternPop",
+            "articleGuide": "<a href=\"/blog/es/patternpop-targets-and-decoy-guide.html\">PatternPop: recuerda los objetivos y descarta el señuelo →</a>"
         },
         "sortstack": {
             "tagline": "Ordena los colores en pilas",
@@ -182,7 +185,8 @@
             "faq3a": "Fácil: 3 colores, 5 tubos, sin límite. Medio: 5 colores, 7 tubos, 50 movimientos. Difícil: 7 colores, 9 tubos, 40 movimientos. Experto: 10 colores, 12 tubos, 35 movimientos. Relajado elimina límites; Diario elige la dificultad del día.",
             "faq4q": "¿Cómo se generan los puzles?",
             "faq4a": "Se parte de una disposición resuelta y se mezcla con movimientos inversos. Esto no demuestra la solución más corta ni garantiza terminar dentro del límite. Usa Deshacer o Relajado para explorar.",
-            "guideTitle": "Cómo jugar a SortStack"
+            "guideTitle": "Cómo jugar a SortStack",
+            "articleGuide": "<a href=\"/blog/es/the-math-behind-sortstack.html\">SortStack: completa tubos para crear espacio de trabajo →</a>"
         },
         "quickcalc": {
             "tagline": "Cálculo mental contra reloj",
@@ -202,7 +206,8 @@
             "faq3a": "Desde la pregunta 11, algunas ocultan un operador, como 7 ? 3 = 21. Elige ×. Estas respuestas dan el doble de puntos. Fuera de duelos, una pista puede reducir las opciones a dos.",
             "faq4q": "¿Cómo se crean las opciones?",
             "faq4a": "Las opciones numéricas combinan la respuesta correcta con errores cercanos y lejanos, y se mezclan. En un duelo, ambos reciben las mismas opciones en las mismas posiciones.",
-            "guideTitle": "Cómo jugar a QuickCalc"
+            "guideTitle": "Cómo jugar a QuickCalc",
+            "articleGuide": "<a href=\"/blog/es/quickcalc-accuracy-and-duel-guide.html\">QuickCalc: protege tu racha antes de correr contra el reloj →</a>"
         },
         "tileturn": {
             "tagline": "Voltea las fichas y enciéndelas todas",
@@ -227,7 +232,8 @@
             "faq4a": "Primero alternan la casilla y sus cuatro vecinas. Tras 300 ms, solo las que se encendieron en ese paso alternan a sus propias vecinas. Los efectos superpuestos pueden anularse.",
             "faq5q": "¿Cuál es el objetivo de Espectro?",
             "faq5a": "Todas las casillas deben quedar verdes ✓. El ciclo es oscuro ○ → azul ◆ → verde ✓ → oscuro ○. Cada toque avanza la casilla y sus cuatro vecinas.",
-            "guideTitle": "Cómo jugar a TileTurn"
+            "guideTitle": "Cómo jugar a TileTurn",
+            "articleGuide": "<a href=\"/blog/es/tileturn-cross-and-cascade-guide.html\">TileTurn: entiende la cruz antes de seguir la cascada →</a>"
         },
         "colorflow": {
             "tagline": "Conecta colores iguales, llena la cuadrícula",
@@ -243,7 +249,8 @@
             "faq2a": "Conecta todas las parejas y cubre cada casilla para ganar tres estrellas y duplicar la puntuación. No hay un bono independiente por caminos cortos.",
             "faq3q": "¿Cuántos niveles hay?",
             "faq3a": "Cinco paquetes de 30 niveles: 150 en total, con tableros de 5×5 a 9×9.",
-            "guideTitle": "Cómo jugar a ColorFlow"
+            "guideTitle": "Cómo jugar a ColorFlow",
+            "articleGuide": "<a href=\"/blog/es/colorflow-advanced-pathing-strategies.html\">ColorFlow: planifica la cobertura antes de conectar la última pareja →</a>"
         },
         "pipelink": {
             "tagline": "Conecta la energía a través del circuito",
@@ -254,16 +261,17 @@
             "lockedTile": "Bloqueada 🔒",
             "rotations": "Rotaciones: {n}",
             "energyConnected": "¡Energía conectada!",
-            "guide": "Gira las piezas del circuito para unir la fuente circular con el destino cuadrado de la misma letra. Un toque gira una pieza desbloqueada 90° en sentido horario; dos toques, 180°. Los canales iluminados muestran dónde llega la energía. Desde el paquete 4, A→A y B→B deben conectarse a la vez. Las cruces transportan ambas rutas de forma independiente. El paquete 5 añade piezas bloqueadas. Basta con completar las conexiones necesarias: no debes alimentar todas las piezas. Las estrellas comparan tus giros con un objetivo basado en las piezas giratorias, sin demostrar la solución más corta. Planifica y usa Deshacer para comparar rutas. Hay 125 niveles en cinco paquetes.",
+            "guide": "Gira las tuberías para unir la fuente circular con el destino cuadrado de la misma letra. Cada toque en una pieza desbloqueada gira 90° en sentido horario y cuenta como una rotación. Ambos lados de un borde deben tener aberturas compatibles. Las luces muestran hasta dónde llega la energía. Desde el paquete 4 conecta A→A y B→B a la vez; el cruce mantiene separados sus canales horizontal y vertical. El paquete 5 añade tuberías fijas. No hace falta iluminar todas las piezas. Las estrellas comparan las rotaciones con un objetivo basado en tuberías normales desbloqueadas, sin demostrar una solución mínima. Reiniciar restaura el tablero inicial y los toques. La ayuda gira y bloquea piezas siguiendo una solución guardada y después ofrece reiniciar. Hay 125 niveles en cinco paquetes.",
             "faq1q": "¿Qué son las piezas bloqueadas?",
             "faq1a": "Aparecen en el paquete 5 y tienen orientación fija. Gira el circuito de alrededor para conectarlas.",
             "faq2q": "¿Qué es la doble fuente?",
             "faq2a": "Desde el paquete 4, conecta A→A y B→B a la vez. Las cruces mantienen ambos canales independientes.",
             "faq3q": "¿Cómo funcionan los niveles y las estrellas?",
             "faq3a": "Hay 125 niveles en cinco paquetes. Si N es el número de piezas desbloqueadas, sin vacías ni cruces, hasta 1,5×N giros dan tres estrellas; hasta 2×N, dos; el resto, una. Es una referencia de puntuación, no un óptimo demostrado.",
-            "faq4q": "¿Las pistas afectan a la puntuación?",
-            "faq4a": "Terminar sin pistas multiplica los puntos por 1,2. Actualmente la ayuda es gratis; si se conecta publicidad de recompensa, se pedirá permiso antes.",
-            "guideTitle": "Cómo jugar a PipeLink"
+            "faq4q": "¿Qué hace el botón de ayuda?",
+            "faq4a": "Inicia una demostración automática que gira y bloquea piezas siguiendo una solución guardada. Puede revelar varios pasos, no solo uno. Al conectar el circuito, aparece una opción para reiniciar en vez del resultado normal con puntuación. Observa la ruta y reinicia para practicarla por tu cuenta.",
+            "guideTitle": "Cómo jugar a PipeLink",
+            "articleGuide": "<a href=\"/blog/es/pipelink-connections-and-rotation-guide.html\">PipeLink: comprueba la entrada y la salida antes de girar →</a>"
         },
         "mergechain": {
             "tagline": "Lanza y fusiona números hasta 2048",
@@ -286,7 +294,8 @@
             "faq5a": "La pista sugiere una columna sobre una bola igual. La guía estima solo el primer contacto; rebotes y giros pueden cambiarlo. Actualmente es gratis. Si se activa un proveedor de recompensas, se pedirá permiso antes del anuncio.",
             "guide2": "La línea de puntos y el círculo indican el primer contacto en una caída recta. Verde identifica una bola del mismo número. Es una ayuda para planear, no una promesa de posición final: el movimiento, los choques y el rodar cambian el resultado. También puedes enfocar el tablero, apuntar con las flechas y soltar con Espacio o Enter. La breve pausa entre lanzamientos deja asentarse a las bolas.",
             "guide3": "Cada fusión puntúa el nuevo valor por el multiplicador de cadena. Fusiones rápidas lo aumentan; un nuevo lanzamiento o un segundo sin fusión acaba la cadena. Vigila la línea de peligro: las bolas asentadas que sobresalen inician un margen de dos a cuatro segundos según la dificultad. Las recién lanzadas quedan excluidas brevemente. Fácil tiene gravedad lenta y solo 2 y 4; niveles superiores añaden valores y presión con el tiempo. Diario repite la secuencia en la dificultad elegida. Contrarreloj dura dos minutos. La pista sugiere una columna con una bola igual, sin resolver la física.",
-            "guideTitle": "Cómo jugar a MergeChain"
+            "guideTitle": "Cómo jugar a MergeChain",
+            "articleGuide": "<a href=\"/blog/es/mergechain-drop-and-merge-guide.html\">MergeChain: elige el primer contacto y calcula la cadena →</a>"
         },
         "hexmatch": {
             "tagline": "Conecta fichas hexagonales en cadena",
@@ -309,17 +318,18 @@
             "faq6a": "Marca una ruta numerada de cuatro cristales si existe, o de tres. Sigue el orden. La ayuda es gratuita actualmente; un proveedor de recompensas pediría permiso antes. Si no hay combinación, usa Barajar.",
             "guide2": "Tres cristales dan 30 puntos; cuatro, 60; cinco, 120; seis, 300; siete o más, 600. Unir cinco o más deja además una bomba cerca del centro. Cuando el tablero esté listo, tócala para borrar las casillas ocupadas en dos anillos alrededor, a 20 puntos cada una. La estrella arcoíris puede acompañar a cualquier color dentro de una cadena. Aparece cada ocho cadenas completadas.",
             "guide3": "Tras borrar, las fichas se asientan por las columnas inclinadas y se reponen dejando libre la parte superior. Cada ocho cadenas, la marea las empuja hacia arriba y añade fichas abajo. Si una casilla superior ocupada sale del tablero, termina la partida. El contador ayuda a prepararse. La pista marca una ruta numerada de cuatro cristales si es posible, o de tres. Sigue los números, no todo el grupo conectado. Si no hay combinación, baraja los colores. Puedes continuar una vez tras terminar.",
-            "guideTitle": "Cómo jugar a HexMatch"
+            "guideTitle": "Cómo jugar a HexMatch",
+            "articleGuide": "<a href=\"/blog/es/hexmatch-chains-and-special-gems-guide.html\">HexMatch: traza una cadena válida y usa las gemas especiales →</a>"
         }
     },
     "blog": {
         "title": "Blog de PuzzleVault — Consejos, estrategias y entre bastidores",
         "heading": "📝 Blog de PuzzleVault",
         "all": "Todos",
-        "tips": "Consejos",
-        "strategy": "Estrategia",
-        "updates": "Novedades",
-        "science": "Ciencia",
+        "tips": "Consejos de juego",
+        "strategy": "Guías de juego",
+        "updates": "Notas del proyecto",
+        "science": "Cómo funcionan las reglas",
         "loadMore": "Cargar más",
         "noResults": "No se encontraron publicaciones en esta categoría.",
         "tryTheseGames": "🎮 Prueba estos juegos",

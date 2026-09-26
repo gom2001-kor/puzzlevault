@@ -90,7 +90,7 @@
         "allGamesSub": "Ten ways to take a good little break.",
         "playBtn": "Play ▸",
         "blogHeading": "📝 Latest from the Blog",
-        "blogSub": "Game tips, strategies, and behind-the-scenes stories",
+        "blogSub": "Game guides, worked examples, and project notes",
         "viewAllPosts": "View All Posts →",
         "statsHeading": "📊 Your Stats",
         "statsSub": "Track your progress across all games",
@@ -119,7 +119,8 @@
             "faq4a": "At midnight UTC. Everyone gets the same code. After your daily attempt is recorded, use Free Play until the next puzzle.",
             "faq5q": "How do hints work?",
             "faq5a": "A hint reveals one unconfirmed position. Daily allows one, Free Play two, and Speed none. Using one removes the no-hint score bonus and is noted in the shared result. Help is currently free; a configured reward ad would ask first.",
-            "guideTitle": "How to Play NumVault"
+            "guideTitle": "How to Play NumVault",
+            "articleGuide": "<a href=\"/blog/posts/numvault-tips-and-strategy.html\">NumVault: read the clues before spending another guess →</a>"
         },
         "gridsmash": {
             "tagline": "Place blocks, clear lines, chase combos",
@@ -142,7 +143,8 @@
             "faq5a": "Classic lasts while a remaining piece can fit, including rotations. Daily uses a shared three-minute sequence. Sprint aims for 40 lines. Zen removes special pieces and the Shatter Zone.",
             "guide2": "For keyboard play, focus the board and choose a piece with 1, 2, or 3. Move its preview with the arrow keys, rotate with R, and press Enter to place it. Escape cancels the preview. Filled rows and columns clear together. Each placed cell earns 10 points, and completed lines earn points with bonuses for consecutive clearing placements. Leave room for wide pieces and consider rotating before giving up on a tight space.",
             "guide3": "Special pieces begin appearing from turn 10 outside Zen mode. Placing a crystal clears a nearby 3 by 3 area and adds 200 points immediately. A frost piece creates two frozen cells that need two line-clear hits. The gold wild is a single-cell piece and still needs an empty cell. Every ten turns the bottom two rows become a three-turn Shatter Zone: completing a row there gives triple line points. When the zone expires, three empty cells may fill. Daily uses a shared seeded sequence and a three-minute timer; Sprint asks you to clear 40 lines. Zen removes special pieces and the Shatter Zone.",
-            "guideTitle": "How to Play GridSmash"
+            "guideTitle": "How to Play GridSmash",
+            "articleGuide": "<a href=\"/blog/posts/gridsmash-beginner-strategy-guide.html\">GridSmash: plan a tray, not just the next block →</a>"
         },
         "patternpop": {
             "tagline": "How sharp is your memory?",
@@ -163,7 +165,8 @@
             "faq4a": "The hint replays the current pattern more slowly and keeps targets already found. Help is currently free. If a reward provider is connected, it will ask before showing an ad.",
             "faq5q": "How do the modes differ?",
             "faq5a": "Classic and Daily start with three lives. Daily uses shared seeded layouts and allows replays. Endless has unlimited lives. Speed starts with one life; its memorization timing currently matches Classic.",
-            "guideTitle": "How to Play PatternPop"
+            "guideTitle": "How to Play PatternPop",
+            "articleGuide": "<a href=\"/blog/posts/patternpop-targets-and-decoy-guide.html\">PatternPop: remember the targets, ignore the decoy →</a>"
         },
         "sortstack": {
             "tagline": "Sort the colors into stacks",
@@ -182,7 +185,8 @@
             "faq3a": "Easy: 3 colors, 5 tubes, unlimited moves. Medium: 5 colors, 7 tubes, 50 moves. Hard: 7 colors, 9 tubes, 40 moves. Expert: 10 colors, 12 tubes, 35 moves. Relaxed removes limits; Daily selects a difficulty for the day.",
             "faq4q": "How are puzzles made?",
             "faq4a": "Boards are constructed by scrambling a solved arrangement with reverse moves. This does not prove the shortest solution or guarantee completion within a difficulty’s move limit. Use Undo or Relaxed to explore.",
-            "guideTitle": "How to Play SortStack"
+            "guideTitle": "How to Play SortStack",
+            "articleGuide": "<a href=\"/blog/posts/the-math-behind-sortstack.html\">SortStack: use completed tubes to create working space →</a>"
         },
         "quickcalc": {
             "tagline": "Race against time with mental math",
@@ -202,7 +206,8 @@
             "faq3a": "From question 11, some questions hide one operator, such as 7 ? 3 = 21. Choose × to solve it. Correct operator answers earn double points. Outside duels, a hint can narrow the choices to two.",
             "faq4q": "How are answer choices made?",
             "faq4a": "Numeric choices mix the correct value with nearby and more distant errors, then shuffle their positions. Duel friends receive the same choices in the same positions.",
-            "guideTitle": "How to Play QuickCalc"
+            "guideTitle": "How to Play QuickCalc",
+            "articleGuide": "<a href=\"/blog/posts/quickcalc-accuracy-and-duel-guide.html\">QuickCalc: protect your streak before racing the clock →</a>"
         },
         "tileturn": {
             "tagline": "Flip tiles to light them all",
@@ -227,7 +232,8 @@
             "faq4a": "First, the target and its four neighbors toggle. After 300 ms, only those that became ON in that first step toggle their own adjacent cells. Overlapping effects can cancel.",
             "faq5q": "What is the Spectrum goal?",
             "faq5a": "Every tile must be green ✓. The cycle is dark ○ → blue ◆ → green ✓ → dark ○. A tap advances the target and its four neighbors.",
-            "guideTitle": "How to Play TileTurn"
+            "guideTitle": "How to Play TileTurn",
+            "articleGuide": "<a href=\"/blog/posts/tileturn-cross-and-cascade-guide.html\">TileTurn: solve the cross before following the cascade →</a>"
         },
         "colorflow": {
             "tagline": "Connect matching colors, fill the grid",
@@ -243,7 +249,8 @@
             "faq2a": "Connect every pair and cover every cell for three stars and double the total score. Shorter paths do not earn a separate bonus.",
             "faq3q": "How many levels are there?",
             "faq3a": "Five packs of 30 levels: 150 total. Boards range from 5×5 to 9×9.",
-            "guideTitle": "How to Play ColorFlow"
+            "guideTitle": "How to Play ColorFlow",
+            "articleGuide": "<a href=\"/blog/posts/colorflow-advanced-pathing-strategies.html\">ColorFlow: plan coverage before connecting the final pair →</a>"
         },
         "pipelink": {
             "tagline": "Route energy through the circuit",
@@ -254,16 +261,17 @@
             "lockedTile": "Locked 🔒",
             "rotations": "Rotations: {n}",
             "energyConnected": "Energy Connected!",
-            "guide": "Rotate the raised circuit tiles to connect the circular energy source to the square destination with the same letter. Tap an unlocked tile for a clockwise quarter-turn; a double tap turns it halfway. Lit channels show which cells receive power. From pack 4, both A→A and B→B must connect at once. Cross tiles can carry the routes independently. Pack 5 adds locked tiles that cannot rotate. Completing the required connections wins; you do not need to power every tile. Stars depend on rotations compared with a target derived from the rotatable tile count, not a proven shortest solution. Plan before turning and use Undo to compare routes. Five packs contain 125 levels.",
+            "guide": "Rotate the circuit tiles to connect the circular source to the square destination with the same letter. Each tap on an unlocked pipe turns it 90° clockwise and counts as one rotation. Both sides of a shared edge must have matching openings. Lit channels show where power reaches. From pack 4, connect A→A and B→B at once; a cross carries its horizontal and vertical routes separately. Pack 5 adds fixed pipes. You do not need to power every tile. Stars compare your rotation count with a target based on unlocked non-cross pipes; they do not prove a shortest solution. Reset restores the initial board and tap count. Hint demonstrates a stored solution by rotating and locking pieces in sequence, then offers a restart. Five packs contain 125 levels.",
             "faq1q": "What are locked tiles?",
             "faq1a": "Pack 5 includes locked tiles. Their orientation is fixed, so rotate the surrounding circuit instead.",
             "faq2q": "What is Dual Source?",
             "faq2a": "From pack 4, connect A→A and B→B simultaneously. Cross tiles keep the two channels independent.",
             "faq3q": "How do levels and stars work?",
             "faq3a": "There are 125 levels in five packs. Let N be the number of unlocked tiles excluding empty and cross tiles: at most 1.5×N rotations earns three stars, at most 2×N earns two, otherwise one. This is a scoring target, not a proven optimum.",
-            "faq4q": "Do hints affect the score?",
-            "faq4a": "Finishing without hints earns a ×1.2 multiplier. Help is currently free; if a reward ad provider is connected, it will ask before showing an ad.",
-            "guideTitle": "How to Play PipeLink"
+            "faq4q": "What does the Hint button do?",
+            "faq4a": "Hint starts an automatic demonstration that rotates and locks pieces toward a stored solution. It can reveal several steps, not just one move. When the demonstration connects the circuit, a restart prompt appears instead of the ordinary scored-clear result. Use it to study the route, then restart to practise.",
+            "guideTitle": "How to Play PipeLink",
+            "articleGuide": "<a href=\"/blog/posts/pipelink-connections-and-rotation-guide.html\">PipeLink: read the ports before rotating a tile →</a>"
         },
         "mergechain": {
             "tagline": "Drop and merge numbers to 2048",
@@ -286,7 +294,8 @@
             "faq5a": "The hint suggests a column above a matching marble. The aiming guide estimates the first contact only; bouncing and rolling can change the result. Help is currently available without an ad. If a reward provider is enabled later, it will ask before showing a reward ad.",
             "guide2": "While aiming, the dotted line and outlined circle mark the first contact along a straight drop. A green guide identifies an equal-number target. This is a planning aid, not a promise of the final resting place: moving marbles, collisions, and rolling can change the outcome. You can also focus the board, use the left and right arrow keys to aim, and press Space or Enter to drop. The short drop cooldown gives the pile time to settle.",
             "guide3": "Each merge scores the new value, multiplied by the current chain. Quick follow-up merges grow that multiplier; a new drop or a one-second gap ends the chain. Watch the dashed danger line. Settled marbles extending above it start a grace period of two to four seconds depending on difficulty. Freshly dropped marbles have a brief exclusion while falling. Easy has slow gravity and only 2s and 4s; higher difficulties add larger drops and increase pressure over time. Daily repeats its seeded drop sequence at the selected difficulty. Time Attack gives you two minutes. A hint suggests a matching column; it does not solve the physics for you.",
-            "guideTitle": "How to Play MergeChain"
+            "guideTitle": "How to Play MergeChain",
+            "articleGuide": "<a href=\"/blog/posts/mergechain-drop-and-merge-guide.html\">MergeChain: choose a landing target and read the chain score →</a>"
         },
         "hexmatch": {
             "tagline": "Match hex tiles in chain reactions",
@@ -309,17 +318,18 @@
             "faq6a": "The hint outlines a numbered, traceable path of four matching crystals if possible, or three when only a shorter path is available. Follow the numbers in order. Help is currently available without an ad; a configured reward provider would ask first. If no match exists, use Shuffle.",
             "guide2": "Three crystals score 30 points, four score 60, five score 120, six score 300, and seven or more score 600. Chains of five or more also leave a bomb near their middle. Tap a bomb when the board is ready to clear occupied cells within two hexagon rings, scoring 20 points for each destroyed tile. Rainbow stars can join any one color in a chain. They appear every eight completed chains.",
             "guide3": "After a clear, tiles settle along the board's slanted columns and refill while leaving the top of each column open. Every eighth completed chain triggers Rising Tide, which shifts the columns upward and adds new tiles below. If an occupied top cell would be pushed out, the run ends. A countdown helps you prepare before the next rise. The hint button highlights a numbered path of four crystals when possible, otherwise a valid three-crystal path. Follow those numbers rather than tracing an entire connected group. If there is no match, the shuffle button rearranges colors. Continue is available once after a run ends.",
-            "guideTitle": "How to Play HexMatch"
+            "guideTitle": "How to Play HexMatch",
+            "articleGuide": "<a href=\"/blog/posts/hexmatch-chains-and-special-gems-guide.html\">HexMatch: trace a real chain and use special gems correctly →</a>"
         }
     },
     "blog": {
         "title": "PuzzleVault Blog — Game Tips, Strategies & Behind the Scenes",
         "heading": "📝 PuzzleVault Blog",
         "all": "All",
-        "tips": "Tips",
-        "strategy": "Strategy",
-        "updates": "Updates",
-        "science": "Science",
+        "tips": "Play tips",
+        "strategy": "Game guides",
+        "updates": "Project notes",
+        "science": "Behind the rules",
         "loadMore": "Load More",
         "noResults": "No posts found in this category.",
         "tryTheseGames": "🎮 Try These Games",

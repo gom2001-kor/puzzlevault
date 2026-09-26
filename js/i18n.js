@@ -22,10 +22,13 @@ const I18n = {
         const localizedRoute = pathname.match(/^\/(?:blog\/)?(ko|ja|zh|es)(?:\/|$)/);
         // Static editorial/policy pages have their language in the URL, including English.
         // Game pages and the dynamic home page continue to use the player's preference.
-        const englishStaticRoute = /^\/(?:about|privacy|contact|terms)(?:\.html|\/)?$/.test(pathname) || /^\/blog\/posts(?:\/|$)/.test(pathname);
+        const englishStaticRoute = /^\/(?:about|privacy|contact|terms)(?:\.html|\/)?$/.test(pathname) || /^\/blog\/posts(?:\/|$)/.test(pathname) || /^\/blog(?:\/(?:index|editorial)(?:\.html)?)?\/?$/.test(pathname);
         const routeLanguage = localizedRoute ? localizedRoute[1] : englishStaticRoute ? 'en' : null;
+        const requestedGameLanguage = /^\/games\//.test(pathname) ? new URLSearchParams(window.location.search || '').get('lang') : null;
         if (routeLanguage) {
             this.currentLang = routeLanguage;
+        } else if (this.supportedLangs.some(lang => lang.code === requestedGameLanguage)) {
+            this.currentLang = requestedGameLanguage;
         } else if (saved && this.supportedLangs.some(l => l.code === saved)) {
             this.currentLang = saved;
         } else {
@@ -48,14 +51,14 @@ const I18n = {
 
     async loadLang(langCode) {
         try {
-            const resp = await fetch('/lang/' + langCode + '.json?v=14');
+            const resp = await fetch('/lang/' + langCode + '.json?v=15');
             if (!resp.ok) throw new Error('Language file not found');
             this.translations = await resp.json();
             this.currentLang = langCode;
         } catch (e) {
             if (langCode !== 'en') {
                 try {
-                    const resp = await fetch('/lang/en.json?v=14');
+                    const resp = await fetch('/lang/en.json?v=15');
                     if (resp.ok) {
                         this.translations = await resp.json();
                         this.currentLang = 'en';
@@ -135,7 +138,12 @@ const I18n = {
     },
 
     async switchLang(langCode) {
-        if (langCode === this.currentLang) return;
+        if (!this.supportedLangs.some(lang => lang.code === langCode) || langCode === this.currentLang) return;
+        if (/^\/games\//.test(window.location.pathname)) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('lang', langCode);
+            window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+        }
         try { localStorage.setItem('pv_lang', langCode); } catch (_) { /* Session-only language choice. */ }
         document.cookie = `pv_lang=${langCode}; path=/; max-age=31536000`;
         this.currentLang = langCode;

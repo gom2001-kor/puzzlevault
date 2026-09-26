@@ -3,7 +3,7 @@
    Cache game HTML/CSS/JS for offline play
    =================================================== */
 
-const CACHE_VERSION = 14;
+const CACHE_VERSION = 15;
 const CACHE_NAME = 'puzzlevault-v' + CACHE_VERSION;
 const ASSETS = [
     '/',
@@ -11,6 +11,8 @@ const ASSETS = [
     '/css/global.css',
     '/css/arcade.css',
     '/css/site-quality.css',
+    '/css/blog.css',
+    '/js/blog-ui.js',
     '/js/canvas-depth.js',
     '/js/privacy-controls.js',
     '/js/progression.js',

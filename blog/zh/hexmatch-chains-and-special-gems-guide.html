@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh" translate="no" class="notranslate">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>HexMatch 攻略：画出有效连线，用对特殊宝石 | PuzzleVault</title><meta name="description" content="通过含彩虹的五颗宝石示例，理解HexMatch的相邻规则、颜色限制、炸弹位置和准确分数，避免无法一笔经过的分叉路线。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/hexmatch-chains-and-special-gems-guide.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/hexmatch-chains-and-special-gems-guide.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/hexmatch-chains-and-special-gems-guide.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/hexmatch-chains-and-special-gems-guide.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/hexmatch-chains-and-special-gems-guide.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/hexmatch-chains-and-special-gems-guide.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/hexmatch-chains-and-special-gems-guide.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HexMatch 攻略：画出有效连线，用对特殊宝石 | PuzzleVault"><meta property="og:description" content="通过含彩虹的五颗宝石示例，理解HexMatch的相邻规则、颜色限制、炸弹位置和准确分数，避免无法一笔经过的分叉路线。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/hexmatch-chains-and-special-gems-guide.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="HexMatch 攻略：画出有效连线，用对特殊宝石 | PuzzleVault"><meta name="twitter:description" content="通过含彩虹的五颗宝石示例，理解HexMatch的相邻规则、颜色限制、炸弹位置和准确分数，避免无法一笔经过的分叉路线。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "HexMatch 攻略：画出有效连线，用对特殊宝石", "description": "通过含彩虹的五颗宝石示例，理解HexMatch的相邻规则、颜色限制、炸弹位置和准确分数，避免无法一笔经过的分叉路线。", "inLanguage": "zh", "datePublished": "2026-09-26", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/zh/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/zh/hexmatch-chains-and-special-gems-guide.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">攻略与随笔</a><a href="/zh/about.html">关于</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="攻略与随笔"><a href="/blog/zh/">← 攻略与随笔</a></nav><span class="blog-card-category">游戏攻略</span><h1>HexMatch 攻略：画出有效连线，用对特殊宝石</h1><p class="blog-post-description">通过含彩虹的五颗宝石示例，理解HexMatch的相邻规则、颜色限制、炸弹位置和准确分数，避免无法一笔经过的分叉路线。</p><p class="blog-post-meta">发布：PuzzleVault · 6 分钟阅读<br>首次发布 <time datetime="2026-09-26">2026-09-26</time> · 内容更新 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/zh/editorial.html">攻略的编写与核对方法</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="本文内容"><h2>本文内容</h2><ol><li><a href="#section-1">先找能实际画出的路线</a></li><li><a href="#section-2">包含一颗彩虹的五连示例</a></li><li><a href="#section-3">按实际分数门槛判断</a></li><li><a href="#section-4">理解炸弹与上升棋盘</a></li></ol></nav>
+
+<p>看到五颗同色宝石聚在一起，并不等于能把它们连成五颗的路线。HexMatch要求你经过相邻六边形，画出一条连续路径，而且不能重复使用同一颗宝石。经过的顺序很重要，彩虹也不会解除所有限制。下面用专门构造的五颗宝石示例，说明如何在松手前检查路线。它不是游戏截图，也不保证下一局会出现同样布局。</p>
+<h2 id="section-1">先找能实际画出的路线</h2>
+<p>按住一颗宝石，拖向相邻的同色宝石。连到至少三颗再松手，才会消除并得分；一两颗不计分。普通宝石的颜色还配有不同形状标记，可以不只依赖色相辨认。选择中的数字表示经过顺序，状态提示则显示松手后能得到的分数。回到紧挨着的前一颗，可以撤掉最后一步。不能跨越空格，也不能再经过早先用过的宝石去收集另一条分支。</p>
+<p>彩虹可以和一种普通颜色一起连接。从彩虹开始时，直到选择第一颗普通宝石，路线颜色才确定。路线一旦确定为蓝色，继续加入彩虹也不会允许你再加入珊瑚色。炸弹不是拖入普通连线的宝石，而是在棋盘准备好后单独点击使用的对象。</p>
+<h2 id="section-2">包含一颗彩虹的五连示例</h2>
+<figure class="guide-figure"><svg viewBox="0 0 340 220" role="img" aria-label="教学用HexMatch路线从1到5横向排列。1、2、4、5为蓝色，3为彩虹。中间上方的珊瑚色不加入路线。"><rect width="340" height="220" rx="14" fill="#0F172A"/><g stroke="#93C5FD" stroke-width="2"><polygon points="80.00,117.68 80.00,152.32 50.00,169.64 20.00,152.32 20.00,117.68 50.00,100.36" fill="#2563EB"/><polygon points="140.00,117.68 140.00,152.32 110.00,169.64 80.00,152.32 80.00,117.68 110.00,100.36" fill="#2563EB"/><polygon points="200.00,117.68 200.00,152.32 170.00,169.64 140.00,152.32 140.00,117.68 170.00,100.36" fill="#7C3AED"/><polygon points="260.00,117.68 260.00,152.32 230.00,169.64 200.00,152.32 200.00,117.68 230.00,100.36" fill="#2563EB"/><polygon points="320.00,117.68 320.00,152.32 290.00,169.64 260.00,152.32 260.00,117.68 290.00,100.36" fill="#2563EB"/><polygon points="230.00,65.68 230.00,100.32 200.00,117.64 170.00,100.32 170.00,65.68 200.00,48.36" fill="#F43F5E"/></g><path d="M50 135H290" stroke="#FDE68A" stroke-width="4"/><g font-family="system-ui,sans-serif" font-weight="700" font-size="20" text-anchor="middle" fill="#FFFFFF"><text x="50" y="142">1</text><text x="110" y="142">2</text><text x="170" y="142">3★</text><text x="230" y="142">4</text><text x="290" y="142">5</text><text x="200" y="90">×</text></g></svg><figcaption>专门构造的示例：按1→2→3★→4→5连接。标记×的珊瑚色虽然相邻，但颜色不同，不能加入。数字仅说明本例顺序。</figcaption></figure>
+<p>五个路线格依次相邻。准确的六角坐标为(-2,0)、(-1,0)、(0,0)、(1,0)、(2,0)，珊瑚色邻格位于(1,-1)。玩游戏不必记住坐标，这里只是为了清楚定义示例位置。</p>
+<ol class="guide-steps"><li>从蓝色1移动到蓝色2，路线的普通颜色确定为蓝色。</li><li>经过彩虹3。彩虹可以加入，但不代表现在可以混合所有颜色。不要转向上方的珊瑚色分支。</li><li>继续经过蓝色4和蓝色5。每一步都跨过相邻六边形的公共边，没有重复格子。</li><li>松手后，五颗获得120分，并在第三颗被选择的格子，也就是原彩虹位置生成炸弹。重力与补充可能使其移动，所以等棋盘稳定后再次确认位置。</li></ol>
+<div class="guide-callout"><p><strong>容易走错的岔路：</strong>1→2→3★→珊瑚色不能组成混色连线。相邻只是必要条件，珊瑚色仍与已选蓝色冲突。同样，也不能为了收集分叉两端而重复经过中心格。</p></div>
+<h2 id="section-3">按实际分数门槛判断</h2>
+<div class="guide-table"><table><caption>松开普通连线时获得的分数</caption><thead><tr><th scope="col">连线宝石数</th><th scope="col">分数</th><th scope="col">生成炸弹</th></tr></thead><tbody><tr><td>3</td><td>30</td><td>否</td></tr><tr><td>4</td><td>60</td><td>否</td></tr><tr><td>5</td><td>120</td><td>是</td></tr><tr><td>6</td><td>300</td><td>是</td></tr><tr><td>7颗及以上</td><td>600</td><td>是</td></tr></tbody></table></div>
+<p>把四颗路线延长为五颗，立即得分会从60提升到120，并留下炸弹。但七颗和八颗都是600分。第八颗会改变被移除的格子，不会提高这张表中的最高奖励。因此，最长路线并不自动等于每个局面的最佳选择。还应观察留下的布局，以及有没有难以接近的区域需要清除。</p>
+<h2 id="section-4">理解炸弹与上升棋盘</h2>
+<p>炸弹清除两圈六边形范围内被占据的格子，每清除一个格子得到20分，炸弹自身所在格也算在内。它不是只消除一条直线。得分取决于范围内实际有多少格被占据，因此靠近边缘或空白的爆炸，可能比四周填满时得分低。不要默认每次爆炸都一样，先看周围的格子。</p>
+<p>普通消除后，宝石沿倾斜的列下落并补充，每列顶部留空。每完成八次连线，就会触发Rising Tide，同时生成彩虹。潮汐把各列向上推，再从底部加入新宝石；如果某列顶部已有宝石将被推出边界，本局结束。倒计时可以帮助判断下一次检查的时机。点击炸弹不增加“已完成连线”次数，爆炸也使用自己的计分方式。</p>
+<p>提示优先寻找能实际画出的四颗路线，找不到时再找三颗。按照数字顺序拖动即可，但它并不承诺最高分路线。没有有效组合时，可以使用出现的洗牌功能重新排列颜色。补充之后应重新读盘，不要认为上一轮的路线还存在。</p>
+<details><summary>练习：连六颗得多少分，炸弹最初生成在哪一格？</summary><p>300分，生成在第四颗被选中的格子。游戏采用从0计数后向下取整的中间索引。随后重力可能改变其位置。同样六格反向连接时，炸弹会出现在两颗中间宝石中的另一颗位置。</p></details>
+<p>开始拖动前，先用眼睛确认整条路线是否能一路走完。 <a class="pv-btn pv-btn-primary" href="/games/hexmatch.html?lang=zh">开始玩 HexMatch</a></p>
+<aside class="blog-review-note"><p>除非明确标注具体关卡，示例均为讲解而构造的棋盘。规则和示例结果已与当前游戏实现核对；随机关卡和每日棋盘可能不同。</p><p><a href="/zh/contact.html">若说明与游戏不符，请通过联系页面提供游戏名、模式、文章地址和复现步骤。</a></p></aside></article>
+<section class="blog-related"><h2>到游戏中试试</h2><div class="related-games-grid"><a class="related-game-card" href="/games/hexmatch.html?lang=zh"><span class="related-game-name">⬡ HexMatch →</span></a><a class="related-game-card" href="/games/numvault.html?lang=zh"><span class="related-game-name">🔢 NumVault →</span></a></div></section><section class="blog-related"><h2>继续阅读</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/zh/colorflow-advanced-pathing-strategies.html"><div class="related-post-title">ColorFlow攻略：连上最后一对前，先检查空格</div><p class="related-post-desc">比较5×5示意棋盘上的两种合法路线，了解为何全部配对成功后，仍可能留下空格并获得不同星数。</p></a><a class="related-post-card" href="/blog/zh/gridsmash-beginner-strategy-guide.html"><div class="related-post-title">GridSmash攻略：规划三块的顺序，而不只看眼前一块</div><p class="related-post-desc">用10×10示意棋盘比较两种摆法，计算双行消除得分，并为托盘中剩余的形状保留可用空间。</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私</a><a href="/zh/terms.html">条款</a><a href="/zh/contact.html">联系</a><a href="/blog/zh/">攻略与随笔</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

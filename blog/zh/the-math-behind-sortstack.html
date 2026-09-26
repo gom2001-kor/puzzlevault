@@ -1,91 +1,27 @@
 <!DOCTYPE html>
 <html lang="zh" translate="no" class="notranslate">
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SortStack的谜题生成与步数限制 | PuzzleVault Blog</title>
-    <meta name="description" content="了解SortStack如何通过反向移动生成棋盘、为何这不等于最短解证明，以及如何更有效地使用空管。">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="SortStack的谜题生成与步数限制 | PuzzleVault Blog">
-    <meta property="og:description" content="了解SortStack如何通过反向移动生成棋盘、为何这不等于最短解证明，以及如何更有效地使用空管。">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="SortStack的谜题生成与步数限制 | PuzzleVault Blog">
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": "SortStack的谜题生成与步数限制",
-  "inLanguage": "zh",
-  "datePublished": "2026-03-29",
-  "dateModified": "2026-09-26",
-  "author": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html",
-  "description": "了解SortStack如何通过反向移动生成棋盘、为何这不等于最短解证明，以及如何更有效地使用空管。"
-}
-</script>
-    <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">博客</a><a href="/zh/about.html">关于</a></nav></header>
-    <div class="blog-post-header">
-        <span class="blog-post-category">科学</span>
-        <h1>SortStack的谜题生成与步数限制</h1>
-        <div class="blog-post-meta">2026年3月29日 · 6分钟阅读 · <time datetime="2026-09-26">更新于2026年9月26日</time></div>
-    </div>
-    <article class="blog-content">
-<p>在<a href="/games/sortstack.html">SortStack</a>中，有用的一步不仅是把同色放在一起，还可能露出被挡住的方块、释放空管，或完成一管以增加操作空间。了解初始棋盘的生成方式，有助于区分两个问题：是否有回到整理状态的路径，以及能否在所选步数限制内找到足够短的路径。</p>
-<h2>1. 先看一次移动的规则</h2>
-<p>每管最多容纳四块。正常移动会取走顶部的一块，放入空管或顶部颜色相同且尚有空位的管子。被压在下面的方块不能直接取出。同色四块组成完整的一管后，当前游戏会锁定该管，并添加一个空管。</p>
-<p>所以空位是一种需要管理的资源。即使颜色数量相同，顶部暴露的颜色不同，下一步选择也不同。移动前不仅要看目标管，还要看原管下一块会露出什么颜色。有时露出需要的颜色比眼前合并更重要。</p>
-<h2>2. 从整理好的状态反向打乱</h2>
-<p>生成器先建立每种颜色各四块的完整管，并添加空管。随后进行一系列反向移动。允许取出方块的条件是：原管只有一块，或者顶块与紧接其下的方块同色。生成期间，目标管只需有空位，不要求顶部同色。</p>
-<p>关键就在取出条件。如果立即撤销刚才生成的一步，方块可以回到已经空出的原管，或回到留下同色顶块的原管。按生成顺序倒退，就能遵守基本的同色放置规则。当前实现按颜色数量安排打乱次数，而不是把所有方块毫无约束地随机分配。</p>
-<h2>3. 构造路径不等于证明最短解</h2>
-<p>生成结束后，游戏没有运行最短路径求解器，也没有验证解法是否符合当前步数上限。当前Medium限制50步、Hard限制40步、Expert限制35步，Easy没有步数上限。Relaxed会取消所选难度的步数限制。这些限制是整理棋盘之外的额外挑战。</p>
-<p>因此，反向移动的设计不能被理解为每一局限步游戏都保证能在限额内完成。打乱次数也不等于最短解长度：生成过程中可能回到旧状态，或出现互相抵消的步骤。这是在基本规则下设计返回路径，并非对最优难度作数学认证。</p>
-<h2>4. 有目的地使用空管</h2>
-<p>尽可能留出一根空管，在填入方块前先想清楚它能帮助露出什么。同色合并可能释放下面的方块，但把一种颜色拆到多个位置也可能增加后续整理的负担。可以寻找短序列：露出颜色、与同色合并，再利用腾出的空间移动下一个障碍。</p>
-<p>完成一管会增加空管，通常能扩大后续选择。不过在一个颜色上花费多步之前，也应检查其他管是否能更早完成，或露出当前需要的颜色。游戏仍在进行时，可以用撤销比较路线；限步模式中的撤销也会恢复一次移动额度。</p>
-<h2>5. 先理解路线，再缩短路线</h2>
-<p>用Relaxed探索较难的排列，说明每一步的作用：露出方块、合并颜色、释放空间或完成一管。如果一项都没有，不妨重新考虑。回到限步模式后，重点是减少不必要的来回移动，而不是寻找能解决所有棋盘的固定公式。</p>
-<p>本文依据当前<a href="/games/sortstack-logic.js?v=14">生成代码与移动判定</a>编写。下一次移动前，多看一眼目标方块下面的颜色，可能就会改变最合适的去向。</p>
-    </article>
-    <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
-    <section class="blog-related"><h2>🎮 试试这些游戏</h2><div class="related-games-grid" id="related-games"></div></section>
-    <section class="blog-related"><h2>📖 阅读更多</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/zh/" class="back-link">← 返回博客</a></section>
-    <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私政策</a><a href="/zh/terms.html">使用条款</a><a href="/zh/contact.html">联系我们</a><a href="/blog/zh/">博客</a></nav></footer>
-    <script src="/js/blog-data.js?v=14"></script><script src="/js/i18n.js?v=14"></script><script src="/js/common.js?v=14"></script>
-    <script>const POST_SLUG='the-math-behind-sortstack';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['sortstack','gridsmash','mergechain'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/zh/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
-    <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/the-math-behind-sortstack.html':'/blog/'+nl+'/the-math-behind-sortstack.html'});</script>
-    <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
-</body>
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>SortStack攻略：利用完成的管子增加操作空间 | PuzzleVault</title><meta name="description" content="通过四步整理的例子，理解顶层匹配、每次只移动一球以及完成后新增空管如何影响下一步选择。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SortStack攻略：利用完成的管子增加操作空间 | PuzzleVault"><meta property="og:description" content="通过四步整理的例子，理解顶层匹配、每次只移动一球以及完成后新增空管如何影响下一步选择。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="SortStack攻略：利用完成的管子增加操作空间 | PuzzleVault"><meta name="twitter:description" content="通过四步整理的例子，理解顶层匹配、每次只移动一球以及完成后新增空管如何影响下一步选择。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "SortStack攻略：利用完成的管子增加操作空间", "description": "通过四步整理的例子，理解顶层匹配、每次只移动一球以及完成后新增空管如何影响下一步选择。", "inLanguage": "zh", "datePublished": "2026-03-29", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/zh/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">攻略与随笔</a><a href="/zh/about.html">关于</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="攻略与随笔"><a href="/blog/zh/">← 攻略与随笔</a></nav><span class="blog-card-category">游戏攻略</span><h1>SortStack攻略：利用完成的管子增加操作空间</h1><p class="blog-post-description">通过四步整理的例子，理解顶层匹配、每次只移动一球以及完成后新增空管如何影响下一步选择。</p><p class="blog-post-meta">发布：PuzzleVault · 6 分钟阅读<br>首次发布 <time datetime="2026-03-29">2026-03-29</time> · 内容更新 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/zh/editorial.html">攻略的编写与核对方法</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="本文内容"><h2>本文内容</h2><ol><li><a href="#section-1">完成一管会改变局面</a></li><li><a href="#section-2">从下往上读这个小局面</a></li><li><a href="#section-3">目标管的作用比名字重要</a></li><li><a href="#section-4">从已经露出的三球组倒推</a></li><li><a href="#section-5">练习把两步说清楚</a></li></ol></nav>
+<p>把难处理的球分别存进空管，空间很快就会用完。玩SortStack时，可以换个问题：移动后会露出什么，又能创造什么空间？每管最多四球，正常一次只移走最上面的一球。目标管必须为空，或顶球同色，并且还装得下一个球。</p><h2 id="section-1">完成一管会改变局面</h2><p>同色四球组成一管后，该管锁定，右侧新增一根空管。这意味着，即使没有立刻露出被压住的颜色，尽早完成一组也可能有价值，因为多出了四个容量的操作空间。小屏幕上可在管子区域内横向滚动查看新管。</p><p>这里不是整段倾倒。连续三个同色球也要分三次移动。有步数限制时，开始整理前应先数清实际需要的转移次数。想象中能清空一管，并不代表剩余步数足以做到。</p><h2 id="section-2">从下往上读这个小局面</h2><figure class="guide-figure"><table class="guide-table"><thead><tr><th scope="col">管</th><th scope="col">底部 → 顶部</th></tr></thead><tbody><tr><th scope="row">A</th><td>1 · 1 · 1 · <strong>2</strong></td></tr><tr><th scope="row">B</th><td>2 · 2 · 2 · <strong>1</strong></td></tr><tr><th scope="row">C</th><td>3 · 3 · <strong>3</strong></td></tr><tr><th scope="row">D</th><td><strong>3</strong></td></tr><tr><th scope="row">E</th><td>空</td></tr></tbody></table><figcaption>构造的起始局面，从底部读到顶部，最右边的数字是可移动的球。</figcaption></figure><p>这是由三种颜色、十二个球构成的讲解局面。字母代表管子，数字代表游戏球面上的颜色编号。A = [1, 1, 1, 2]表示最上面是2。开始没有锁定管，E为空。容量和移动规则与正常对局一致，但它不是某日挑战或随机初始画面的截图。</p><ol class="guide-steps"><li><strong>D → C。</strong>把3号球放到C的三个同色球上。C完成并锁定，D变空，新增空管F。一步就改善了操作空间。</li><li><strong>B → E。</strong>把B最上面的1号球放入空E。B变成[2, 2, 2]，露出2号色，为A的顶球准备了匹配位置。</li><li><strong>A → B。</strong>把2号球移入B。B完成并锁定，又新增空管；A变成[1, 1, 1]。</li><li><strong>E → A。</strong>把暂存的1号球移回A。A完成，三种颜色共用四步整理好。剩余空管不用填满。</li></ol><h2 id="section-3">目标管的作用比名字重要</h2><p>初始时B → C不合法，因为1号不能放在3号上。D → E合法，却只是把3号球换个空管存放，没有露出隐藏球，也没有完成颜色。D → C则完成一组并立即增加空间。这是在比较本例的选择，不是证明所有局面都应该先完成一管。</p><p>D → C后会有多个空管。把B顶球放入D而非E，也能继续同样的计划。关键是这个位置暂存1号球，等待A准备好。没有明确理由时，尽量别把同色分散到许多空管里。</p><h2 id="section-4">从已经露出的三球组倒推</h2><p>找到有三个同色球的管，查找第四球在哪里。如果被压住，具体列出上面的哪些球需要移动，以及每球可去的合法目标。“先挪开”却没指定位置，仍不算能执行的计划。另一种颜色占满的管，即使以后打算清空，现在也不是空位。</p><p>自由模式Easy为三色、初始五管且不限步数；Medium为五色、七管、50步；Hard为七色、九管、40步；Expert为十色、十二管、35步。Relaxed取消步数限制。这决定了试错余地，但不表示提示会提供最短解法。</p><h2 id="section-5">练习把两步说清楚</h2><p>先选Easy或Relaxed。选择源管前，说完这句话：“我把这球放在这里，是为了下一步……”如果第二步仍没有合法目标，就重新考虑第一步。完成一管后记得检查新增空间，而不是机械继续旧计划。成功后找一个可能省下的暂存动作，下一局重点练习这个判断，不必背诵通用顺序。</p><p><a class="pv-btn pv-btn-primary" href="/games/sortstack.html?lang=zh">在SortStack练习规划</a></p>
+<aside class="blog-review-note"><p>除非明确标注具体关卡，示例均为讲解而构造的棋盘。规则和示例结果已与当前游戏实现核对；随机关卡和每日棋盘可能不同。</p><p><a href="/zh/contact.html">若说明与游戏不符，请通过联系页面提供游戏名、模式、文章地址和复现步骤。</a></p></aside></article>
+<section class="blog-related"><h2>到游戏中试试</h2><div class="related-games-grid"><a class="related-game-card" href="/games/sortstack.html?lang=zh"><span class="related-game-name">📚 SortStack →</span></a><a class="related-game-card" href="/games/numvault.html?lang=zh"><span class="related-game-name">🔢 NumVault →</span></a></div></section><section class="blog-related"><h2>继续阅读</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/zh/colorflow-advanced-pathing-strategies.html"><div class="related-post-title">ColorFlow攻略：连上最后一对前，先检查空格</div><p class="related-post-desc">比较5×5示意棋盘上的两种合法路线，了解为何全部配对成功后，仍可能留下空格并获得不同星数。</p></a><a class="related-post-card" href="/blog/zh/gridsmash-beginner-strategy-guide.html"><div class="related-post-title">GridSmash攻略：规划三块的顺序，而不只看眼前一块</div><p class="related-post-desc">用10×10示意棋盘比较两种摆法，计算双行消除得分，并为托盘中剩余的形状保留可用空间。</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私</a><a href="/zh/terms.html">条款</a><a href="/zh/contact.html">联系</a><a href="/blog/zh/">攻略与随笔</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

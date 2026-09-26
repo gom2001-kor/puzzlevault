@@ -1,0 +1,17 @@
+{
+  "base": "http://127.0.0.1:8765",
+  "checks": [
+    "Korean listing shows all 15 articles, all 10 game links, filters and live count",
+    "All ten Korean guides render figures and exercises without page overflow at 320px",
+    "All ten Korean guides render figures and exercises without page overflow at 390px",
+    "All ten Korean guides render figures and exercises without page overflow at 1280px",
+    "Korean guide link opens the game in Korean",
+    "Article language switch opens the translated version of the same article",
+    "All five static listing languages remain consistent with their routes",
+    "Revised chooser/browser articles fit mobile; dark theme links and light theme play CTA retain contrast",
+    "JavaScript disabled: all article links, body, figures, related links remain available"
+  ],
+  "errors": [],
+  "unexpectedExternalRequests": [],
+  "screenshots": "C:/Users/Public/Documents/ESTsoft/CreatorTemp/puzzlevault-blog-qa"
+}

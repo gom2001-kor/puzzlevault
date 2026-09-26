@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh" translate="no" class="notranslate">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>TileTurn 攻略：先看十字范围，再算连锁变化 | PuzzleVault</title><meta name="description" content="比较中心一步完成与角落误选的结果，弄清 Cascade 的对角变化及重叠抵消、Spectrum 的三种状态和星级目标。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/tileturn-cross-and-cascade-guide.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/tileturn-cross-and-cascade-guide.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TileTurn 攻略：先看十字范围，再算连锁变化 | PuzzleVault"><meta property="og:description" content="比较中心一步完成与角落误选的结果，弄清 Cascade 的对角变化及重叠抵消、Spectrum 的三种状态和星级目标。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/tileturn-cross-and-cascade-guide.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="TileTurn 攻略：先看十字范围，再算连锁变化 | PuzzleVault"><meta name="twitter:description" content="比较中心一步完成与角落误选的结果，弄清 Cascade 的对角变化及重叠抵消、Spectrum 的三种状态和星级目标。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "TileTurn 攻略：先看十字范围，再算连锁变化", "description": "比较中心一步完成与角落误选的结果，弄清 Cascade 的对角变化及重叠抵消、Spectrum 的三种状态和星级目标。", "inLanguage": "zh", "datePublished": "2026-09-26", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/zh/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/zh/tileturn-cross-and-cascade-guide.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">攻略与随笔</a><a href="/zh/about.html">关于</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="攻略与随笔"><a href="/blog/zh/">← 攻略与随笔</a></nav><span class="blog-card-category">游戏攻略</span><h1>TileTurn 攻略：先看十字范围，再算连锁变化</h1><p class="blog-post-description">比较中心一步完成与角落误选的结果，弄清 Cascade 的对角变化及重叠抵消、Spectrum 的三种状态和星级目标。</p><p class="blog-post-meta">发布：PuzzleVault · 6 分钟阅读<br>首次发布 <time datetime="2026-09-26">2026-09-26</time> · 内容更新 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/zh/editorial.html">攻略的编写与核对方法</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="本文内容"><h2>本文内容</h2><ol><li><a href="#section-1">三种模式的第一步都是十字</a></li><li><a href="#section-2">Classic：只需一步的例子</a></li><li><a href="#section-3">Cascade为什么会改变对角格？</a></li><li><a href="#section-4">Spectrum要计算三种状态</a></li><li><a href="#section-5">用撤销比较方案，正确理解目标步数</a></li><li><a href="#section-6">最后检查影响范围</a></li></ol></nav>
+
+<p>TileTurn里，暗着的格子不一定就是应该点击的格子。每次操作会改变一组格子，因此要问的是：<strong>哪一整组需要改变？</strong>先检查候选位置周围的十字，再计算当前模式的附加效果。下列棋盘是为了讲解而构造的例子，并非实际Daily截图，也不保证是某个编号关卡的解答。</p>
+<p>可以从<a href="/games/tileturn.html?lang=zh">TileTurn</a>的Starter关卡包开始练习较小的Classic棋盘。总共有7个关卡包、140关；所有关卡包均可选择，但每个包内部需要按顺序解锁。既可直接点击，也可通过正常键盘焦点操作选中并激活格子按钮。</p>
+<h2 id="section-1">三种模式的第一步都是十字</h2>
+<table class="guide-table"><caption>一次点击的作用</caption><thead><tr><th scope="col">模式</th><th scope="col">变化</th><th scope="col">目标</th></tr></thead><tbody><tr><th scope="row">Classic</th><td>翻转所选格及上下左右邻格的亮暗</td><td>全部点亮 ●</td></tr><tr><th scope="row">Cascade</th><td>先翻转十字，再由新亮起的格子翻转其邻格</td><td>全部点亮 ●</td></tr><tr><th scope="row">Spectrum</th><td>十字范围按 ○ → ◆ → ✓ → ○推进</td><td>全部绿色 ✓</td></tr></tbody></table>
+<p>上下左右不包含对角线。在3×3棋盘中，中心的第一步影响5格，非角落边缘影响4格，角落影响3格。超出边界的效果不会从另一边绕回来。</p>
+<h2 id="section-2">Classic：只需一步的例子</h2>
+<p>A到C表示从上往下的行，1到3表示从左往右的列。●是亮，○是暗。先列出暗格：A2、B1、B2、B3、C2。这五格刚好就是以B2为中心的十字。</p>
+<figure class="guide-figure"><table class="guide-table"><caption>点击前：中心十字的五格都是暗格</caption><thead><tr><th scope="col"> </th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th></tr></thead><tbody><tr><th scope="row">A</th><td>●</td><td>○</td><td>●</td></tr><tr><th scope="row">B</th><td>○</td><td>○</td><td>○</td></tr><tr><th scope="row">C</th><td>●</td><td>○</td><td>●</td></tr></tbody></table><figcaption>● = 1 · ○ = 0</figcaption></figure>
+<ol class="guide-steps"><li>虽然有多个暗格，先把B2作为候选。</li><li>检查完整影响范围：B2、A2、C2、B1、B3。</li><li>这些格子全部是暗的，翻转后全部变亮。</li><li>原本点亮的四个角不在十字里，因此保持不变。</li></ol>
+<figure class="guide-figure"><table class="guide-table"><caption>点击B2后：九格全部点亮</caption><thead><tr><th scope="col"> </th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th></tr></thead><tbody><tr><th scope="row">A</th><td>●</td><td>●</td><td>●</td></tr><tr><th scope="row">B</th><td>●</td><td>●</td><td>●</td></tr><tr><th scope="row">C</th><td>●</td><td>●</td><td>●</td></tr></tbody></table><figcaption>● = 1 · ○ = 0</figcaption></figure>
+<p><strong>看起来也不错的错误选择</strong>是A1，因为它能接触两个暗格。它会点亮A2和B1，却同时让A1变暗，B2、B3和C2也仍然是暗的。亮格数量从4增至5，但没有完成棋盘。<strong>适合本例的选择</strong>是B2，它的范围正好覆盖全部五个待改变位置。由此可见，一步后亮格更多，并不能单独证明方案更好。</p>
+<h2 id="section-3">Cascade为什么会改变对角格？</h2>
+<p>Cascade先进行同样的十字翻转。300毫秒后，只有第一步中从暗变亮的格子，才会翻转自己的上下左右邻格。第二步不会翻转作为发射点的格子自身，也不会因新亮起的格子而无限继续传播。</p>
+<p>另构造一张4×4棋盘，只有B1暗着，其余全亮。点击B2后，第一步只有B1新变亮；B2、A2、B3、C2则变暗。随后B1把第二步效果发到A1、C1、B2。A1和C1变暗，B2重新变亮。从最初点击的B2看，A1和C1位于对角方向，但它们是经过B1才改变的。游戏并不存在独立的“直接翻转对角线”模式。</p>
+<p>还要考虑重叠。如果点击B2前，A2和B1原本都暗，那么两者都会成为第二步的发射点。A1分别收到一次翻转，总共两次，最终保持原来的状态。操作前列出第一步新变亮的位置，再数共享邻格会收到几次影响。预览强调的是涉及范围，不表示每个高亮格的最终状态一定会不同。</p>
+<h2 id="section-4">Spectrum要计算三种状态</h2>
+<p>Spectrum的循环是暗色○ → 蓝色◆ → 绿色✓ → 暗色○。蓝格再推进一次就变绿，暗格需要两次，原本绿色的格子若在十字里则会变暗。只盯着被点击的一格，会忽略同时改变的邻格。</p>
+<p>Classic中，同一位置按两次，棋盘变化会相互抵消；Spectrum中需要按三次。不要把这个规则直接套用到Cascade，因为连锁发射点取决于当时的棋盘状态。</p>
+<h2 id="section-5">用撤销比较方案，正确理解目标步数</h2>
+<p>比较两种候选操作时，可免费使用Undo回到上一张棋盘。反复点击同一格来“恢复”会增加步数，在Cascade中还可能无法回到原状态。连锁模式要等两步动画结束后，再判断完整结果。</p>
+<p>显示的目标步数来自棋盘构造过程，并不代表数学上证明的最少步数。用不超过目标的步数完成可得三星，超过目标最多两步可得两星，其余完成则得一星。分数也奖励效率；没有使用提示时，在加入关卡包完成奖励之前还会增加20%。这些是游戏的计分目标，并不能证明不存在更短解法。</p>
+<h2 id="section-6">最后检查影响范围</h2>
+<p>在第一张3×3 Classic示例里，点击B2会改变A1吗？Spectrum里最初为暗色的格子要推进几次才能变绿？</p>
+<details><summary>查看答案</summary><p>不会，A1在B2的对角方向，不属于Classic的十字范围。Spectrum暗格需要两次：○ → ◆ → ✓。这里回答的是单个格子的变化；要解完整棋盘，仍必须计算每次点击共同影响的邻格。</p></details>
+<p><a class="pv-btn pv-btn-primary" href="/games/tileturn.html?lang=zh">开始玩 TileTurn</a></p>
+<aside class="blog-review-note"><p>除非明确标注具体关卡，示例均为讲解而构造的棋盘。规则和示例结果已与当前游戏实现核对；随机关卡和每日棋盘可能不同。</p><p><a href="/zh/contact.html">若说明与游戏不符，请通过联系页面提供游戏名、模式、文章地址和复现步骤。</a></p></aside></article>
+<section class="blog-related"><h2>到游戏中试试</h2><div class="related-games-grid"><a class="related-game-card" href="/games/tileturn.html?lang=zh"><span class="related-game-name">🔄 TileTurn →</span></a><a class="related-game-card" href="/games/numvault.html?lang=zh"><span class="related-game-name">🔢 NumVault →</span></a></div></section><section class="blog-related"><h2>继续阅读</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/zh/colorflow-advanced-pathing-strategies.html"><div class="related-post-title">ColorFlow攻略：连上最后一对前，先检查空格</div><p class="related-post-desc">比较5×5示意棋盘上的两种合法路线，了解为何全部配对成功后，仍可能留下空格并获得不同星数。</p></a><a class="related-post-card" href="/blog/zh/gridsmash-beginner-strategy-guide.html"><div class="related-post-title">GridSmash攻略：规划三块的顺序，而不只看眼前一块</div><p class="related-post-desc">用10×10示意棋盘比较两种摆法，计算双行消除得分，并为托盘中剩余的形状保留可用空间。</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私</a><a href="/zh/terms.html">条款</a><a href="/zh/contact.html">联系</a><a href="/blog/zh/">攻略与随笔</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

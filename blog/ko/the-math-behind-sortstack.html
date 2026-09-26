@@ -1,91 +1,27 @@
 <!DOCTYPE html>
 <html lang="ko" translate="no" class="notranslate">
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SortStack의 퍼즐 생성 방식과 이동 제한 | PuzzleVault Blog</title>
-    <meta name="description" content="SortStack의 역방향 이동 생성 방식, 최단 풀이와 이동 제한의 차이, 빈 튜브를 활용하는 판단 기준을 설명합니다.">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="SortStack의 퍼즐 생성 방식과 이동 제한 | PuzzleVault Blog">
-    <meta property="og:description" content="SortStack의 역방향 이동 생성 방식, 최단 풀이와 이동 제한의 차이, 빈 튜브를 활용하는 판단 기준을 설명합니다.">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="SortStack의 퍼즐 생성 방식과 이동 제한 | PuzzleVault Blog">
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": "SortStack의 퍼즐 생성 방식과 이동 제한",
-  "inLanguage": "ko",
-  "datePublished": "2026-03-29",
-  "dateModified": "2026-09-26",
-  "author": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html",
-  "description": "SortStack의 역방향 이동 생성 방식, 최단 풀이와 이동 제한의 차이, 빈 튜브를 활용하는 판단 기준을 설명합니다."
-}
-</script>
-    <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="홈"><a href="/ko/">🧩 PuzzleVault</a><a href="/ko/#games">게임</a><a href="/blog/ko/">블로그</a><a href="/ko/about.html">소개</a></nav></header>
-    <div class="blog-post-header">
-        <span class="blog-post-category">과학</span>
-        <h1>SortStack의 퍼즐 생성 방식과 이동 제한</h1>
-        <div class="blog-post-meta">2026년 3월 29일 · 6분 분량 · <time datetime="2026-09-26">2026년 9월 26일 수정</time></div>
-    </div>
-    <article class="blog-content">
-<p><a href="/games/sortstack.html">SortStack</a>에서 유용한 이동은 같은 색을 붙이는 데서 끝나지 않습니다. 아래에 가려진 블록을 드러내고, 빈 튜브를 확보하거나, 한 스택을 완성해 작업 공간을 늘릴 수 있습니다. 시작 보드의 생성 방식을 이해하면 이런 선택의 의미도 분명해집니다. 정리된 상태로 돌아갈 경로가 있다는 것과 제한된 이동 횟수 안에 짧은 경로를 찾는 것은 별개의 문제입니다.</p>
-<h2>1. 한 번의 이동이 지켜야 하는 규칙</h2>
-<p>튜브에는 최대 네 개의 블록이 들어갑니다. 맨 위 블록 하나를 빈 튜브 또는 맨 위 색이 같은 튜브로 옮길 수 있으며, 도착지에 빈자리가 있어야 합니다. 아래에 묻힌 블록을 바로 꺼낼 수는 없습니다. 같은 색 네 개를 모아 완성하면 해당 스택은 잠기고 새로운 빈 튜브가 추가됩니다.</p>
-<p>따라서 빈 공간은 관리할 자원입니다. 같은 색을 담은 보드라도 맨 위에 어떤 블록이 있느냐에 따라 다음 선택이 달라집니다. 도착지만 보지 말고, 옮긴 뒤 원래 튜브에서 어떤 색이 드러나는지도 확인하세요. 색을 합치는 효과보다 아래 블록을 여는 효과가 더 중요할 때도 있습니다.</p>
-<h2>2. 완성된 상태에서 역방향으로 섞습니다</h2>
-<p>생성기는 각 색 네 개가 모인 스택과 빈 튜브에서 시작합니다. 이후 역방향 이동을 반복합니다. 블록을 꺼낼 수 있는 출발지는 블록이 하나뿐이거나, 맨 위 블록과 바로 아래 블록의 색이 같은 튜브입니다. 생성 중에는 도착지의 맨 위 색이 달라도 되지만 공간은 있어야 합니다.</p>
-<p>이 출발지 조건이 핵심입니다. 방금 만든 이동을 되돌린다고 생각하면, 블록은 비어 있는 출발지 또는 같은 색이 남은 출발지로 돌아갈 수 있습니다. 생성 순서를 거꾸로 따라가면 기본 이동 규칙을 만족하도록 설계한 것입니다. 현재 코드는 색 개수에 비례한 횟수로 섞으며, 블록을 제약 없이 무작위 배분하는 방식은 아닙니다.</p>
-<h2>3. 최단 풀이를 검증하는 과정은 없습니다</h2>
-<p>생성 뒤 최단 경로를 계산하거나 선택한 제한 횟수 안에 풀리는지 검사하지는 않습니다. 현재 Medium은 50회, Hard는 40회, Expert는 35회 제한이며 Easy에는 이동 제한이 없습니다. Relaxed는 선택한 난도의 이동 제한을 없앱니다. 이 제한은 보드의 기본 정리 문제에 더해지는 별도의 조건입니다.</p>
-<p>따라서 역방향 생성 설계를 모든 제한 모드에서 반드시 성공할 수 있다는 약속으로 이해하면 안 됩니다. 섞은 횟수 역시 최소 풀이 횟수와 같지 않습니다. 생성 중 이전 상태를 다시 지나가거나 서로 상쇄하는 이동을 할 수 있기 때문입니다. 기본 규칙에 따른 복귀 경로를 설계한 것이며, 최적 난도를 증명한 것은 아닙니다.</p>
-<h2>4. 빈 튜브를 목적 있게 사용하세요</h2>
-<p>가능하면 빈 튜브를 하나 남기고, 채우기 전에 무엇을 꺼낼 수 있게 되는지 생각하세요. 같은 색을 모으면 아래 색이 드러나지만, 한 색을 여러 튜브로 흩어 놓으면 나중에 접근이 어려워질 수 있습니다. 색을 드러내고, 모으고, 그 결과 생긴 공간으로 다음 장애물을 옮기는 짧은 순서를 찾아보세요.</p>
-<p>스택 완성은 빈 튜브를 추가하므로 다음 선택을 넓힐 수 있습니다. 그래도 한 색에 여러 번의 이동을 쓰기 전에 다른 스택도 살펴보세요. 더 일찍 완성할 수 있거나 필요한 색을 드러낼 수 있는 경로가 있을 수 있습니다. 되돌리기는 진행 중인 판에서 대안을 살펴보는 데 유용하며 제한 모드에서는 이동 횟수도 복구합니다.</p>
-<h2>5. 먼저 경로를 이해하고 줄여 보세요</h2>
-<p>Relaxed에서 이동 횟수에 쫓기지 않고 선택을 살펴보세요. 각 이동이 블록 노출, 같은 색 합치기, 빈 공간 확보, 스택 완성 중 무엇을 하는지 설명해 보면 불필요한 왕복을 찾기 쉽습니다. 제한 모드에서는 모든 보드에 통하는 공식보다 이런 불필요한 이동을 줄이는 데 집중해 보세요.</p>
-<p>이 설명은 현재 <a href="/games/sortstack-logic.js?v=14">퍼즐 생성 코드와 이동 판정</a>을 바탕으로 합니다. 다음 블록을 옮기기 전에 바로 아래의 색을 한 번 더 보는 것부터 시작해 보세요.</p>
-    </article>
-    <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
-    <section class="blog-related"><h2>🎮 게임 해보기</h2><div class="related-games-grid" id="related-games"></div></section>
-    <section class="blog-related"><h2>📖 더 읽기</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/ko/" class="back-link">← 블로그로 돌아가기</a></section>
-    <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/ko/about.html">소개</a><a href="/ko/privacy.html">개인정보</a><a href="/ko/terms.html">이용약관</a><a href="/ko/contact.html">문의</a><a href="/blog/ko/">블로그</a></nav></footer>
-    <script src="/js/blog-data.js?v=14"></script><script src="/js/i18n.js?v=14"></script><script src="/js/common.js?v=14"></script>
-    <script>const POST_SLUG='the-math-behind-sortstack';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['sortstack','gridsmash','mergechain'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/ko/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
-    <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/the-math-behind-sortstack.html':'/blog/'+nl+'/the-math-behind-sortstack.html'});</script>
-    <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
-</body>
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>SortStack 공략: 완성한 통으로 작업 공간 늘리기 | PuzzleVault</title><meta name="description" content="네 번의 이동으로 푸는 SortStack 예제를 따라가며 맨 위 공의 색, 한 번에 한 공 이동, 새 빈 통이 생기는 규칙을 활용해 보세요.">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SortStack 공략: 완성한 통으로 작업 공간 늘리기 | PuzzleVault"><meta property="og:description" content="네 번의 이동으로 푸는 SortStack 예제를 따라가며 맨 위 공의 색, 한 번에 한 공 이동, 새 빈 통이 생기는 규칙을 활용해 보세요."><meta property="og:url" content="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="SortStack 공략: 완성한 통으로 작업 공간 늘리기 | PuzzleVault"><meta name="twitter:description" content="네 번의 이동으로 푸는 SortStack 예제를 따라가며 맨 위 공의 색, 한 번에 한 공 이동, 새 빈 통이 생기는 규칙을 활용해 보세요.">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "SortStack 공략: 완성한 통으로 작업 공간 늘리기", "description": "네 번의 이동으로 푸는 SortStack 예제를 따라가며 맨 위 공의 색, 한 번에 한 공 이동, 새 빈 통이 생기는 규칙을 활용해 보세요.", "inLanguage": "ko", "datePublished": "2026-03-29", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/ko/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="홈"><a href="/ko/">🧩 PuzzleVault</a><a href="/ko/#games">게임</a><a href="/blog/ko/">공략과 이야기</a><a href="/ko/about.html">소개</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="공략과 이야기"><a href="/blog/ko/">← 공략과 이야기</a></nav><span class="blog-card-category">게임 공략</span><h1>SortStack 공략: 완성한 통으로 작업 공간 늘리기</h1><p class="blog-post-description">네 번의 이동으로 푸는 SortStack 예제를 따라가며 맨 위 공의 색, 한 번에 한 공 이동, 새 빈 통이 생기는 규칙을 활용해 보세요.</p><p class="blog-post-meta">게시: PuzzleVault · 6 분 읽기<br>처음 게시 <time datetime="2026-03-29">2026-03-29</time> · 내용 수정 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/ko/editorial.html">공략 작성·검토 방법</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="이 글에서 살펴볼 내용"><h2>이 글에서 살펴볼 내용</h2><ol><li><a href="#section-1">통을 완성하면 보드가 달라집니다</a></li><li><a href="#section-2">아래에서 위로 읽는 작은 예제</a></li><li><a href="#section-3">목적지를 고르는 이유가 있어야 합니다</a></li><li><a href="#section-4">세 개가 모인 통에서 거꾸로 계획하세요</a></li><li><a href="#section-5">두 번의 이동을 말로 설명해 보세요</a></li></ol></nav>
+<p>옮기기 곤란한 공을 빈 통마다 하나씩 보관하면 여유 공간은 금방 사라집니다. SortStack에서는 ‘이 공을 옮기면 무엇이 드러나고 어떤 공간이 생길까’를 생각하는 것이 도움이 됩니다. 통 하나에는 공이 최대 네 개 들어가며, 한 번에 맨 위 공 하나만 옮깁니다. 목적지는 비어 있거나 맨 위 공의 색이 같아야 하고, 공이 들어갈 자리도 남아 있어야 합니다.</p><h2 id="section-1">통을 완성하면 보드가 달라집니다</h2><p>같은 색 네 개를 모으면 그 통이 완성되어 잠기고 오른쪽에 새 빈 통이 생깁니다. 밑에 묻힌 색이 바로 드러나지 않아도 일찍 한 색을 완성할 가치가 있는 이유입니다. 공 네 개를 담을 작업 공간이 추가됩니다. 작은 화면에서는 통이 있는 영역을 가로로 움직여 새 통을 확인하세요.</p><p>같은 색이 연달아 있다고 한꺼번에 붓는 방식은 아닙니다. 같은 색 공 세 개를 옮기려면 세 번 이동해야 합니다. 이동 제한이 있는 판에서는 정리를 시작하기 전에 필요한 횟수까지 세어 보세요. 머릿속으로 통 하나를 비우는 것과 남은 횟수 안에 실제로 비우는 것은 다릅니다.</p><h2 id="section-2">아래에서 위로 읽는 작은 예제</h2><figure class="guide-figure"><table class="guide-table"><thead><tr><th scope="col">통</th><th scope="col">아래 → 위</th></tr></thead><tbody><tr><th scope="row">A</th><td>1 · 1 · 1 · <strong>2</strong></td></tr><tr><th scope="row">B</th><td>2 · 2 · 2 · <strong>1</strong></td></tr><tr><th scope="row">C</th><td>3 · 3 · <strong>3</strong></td></tr><tr><th scope="row">D</th><td><strong>3</strong></td></tr><tr><th scope="row">E</th><td>비어 있음</td></tr></tbody></table><figcaption>설명용 시작 상태입니다. 아래에서 위의 순서이며 맨 오른쪽 숫자가 옮길 수 있는 공입니다.</figcaption></figure><p>세 가지 색, 공 열두 개로 만든 설명용 상태입니다. 알파벳은 통 이름이고 숫자는 게임의 공에 표시된 색 번호를 뜻합니다. A = [1, 1, 1, 2]라면 맨 위가 2입니다. 처음에는 잠긴 통이 없으며 E는 비어 있습니다. 실제 게임과 같은 통 용량과 이동 규칙을 사용하지만, 특정 일일 도전이나 무작위 시작 화면을 재현한 것은 아닙니다.</p><ol class="guide-steps"><li><strong>D → C.</strong> 3번 공을 C의 같은 색 세 개 위로 옮깁니다. C가 완성되어 잠깁니다. D는 비고 새 빈 통 F도 생깁니다. 한 번의 이동으로 작업 공간이 늘어납니다.</li><li><strong>B → E.</strong> B 맨 위의 1번 공을 빈 E로 옮깁니다. B는 [2, 2, 2]가 되어 2번 색이 드러납니다. A의 맨 위 공을 받아 줄 목적지를 준비하는 이동입니다.</li><li><strong>A → B.</strong> 2번 공을 B로 옮깁니다. B가 완성되어 잠기고 빈 통이 하나 더 생깁니다. A에는 [1, 1, 1]이 남습니다.</li><li><strong>E → A.</strong> 따로 보관했던 1번 공을 A로 옮깁니다. A까지 완성되어 네 번 만에 세 색을 모두 정리했습니다. 남은 빈 통은 채우지 않아도 됩니다.</li></ol><h2 id="section-3">목적지를 고르는 이유가 있어야 합니다</h2><p>처음 상태에서 B → C는 불가능합니다. 1번 공을 3번 공 위에 놓을 수 없기 때문입니다. D → E는 가능하지만 3번 공을 다른 빈 통에 보관할 뿐, 밑의 공을 드러내거나 한 색을 완성하지는 않습니다. D → C는 한 색을 끝내며 즉시 여유 공간까지 만듭니다. 이 예제에서 유용한 선택을 비교한 것이며 모든 판의 첫 수가 완성이어야 한다는 증명은 아닙니다.</p><p>D → C 다음에는 빈 통이 여러 개 있습니다. B의 맨 위 공을 E 대신 D로 옮겨도 같은 계획을 진행할 수 있습니다. 중요한 것은 통의 이름이 아니라 역할입니다. A가 준비될 때까지 1번 공을 잠깐 보관하는 자리라는 목적이 있으면 됩니다. 이유 없이 같은 색을 여러 빈 통에 흩어 놓지 마세요.</p><h2 id="section-4">세 개가 모인 통에서 거꾸로 계획하세요</h2><p>같은 색 세 개가 모인 통을 찾아 네 번째 공이 어디에 있는지 살펴봅니다. 그 공이 밑에 묻혀 있다면 위의 어떤 공을 먼저 옮겨야 하고 각각 어디로 갈 수 있는지 정하세요. ‘다른 곳으로 치운다’고만 생각하고 빈 목적지를 정하지 않으면 아직 실행 가능한 계획이 아닙니다. 나중에 비울 예정이라고 해도 다른 색으로 가득 찬 통에는 지금 공을 넣을 수 없습니다.</p><p>자유 플레이 Easy는 세 색과 처음 다섯 통으로 시작하며 이동 제한이 없습니다. Medium은 다섯 색·일곱 통·50회, Hard는 일곱 색·아홉 통·40회, Expert는 열 색·열두 통·35회입니다. Relaxed에서는 이동 제한이 없어집니다. 연습 여유는 달라지지만 힌트가 최단 풀이를 보장하는 것은 아닙니다.</p><h2 id="section-5">두 번의 이동을 말로 설명해 보세요</h2><p>연습은 Easy나 Relaxed에서 시작하세요. 공을 선택하기 전에 ‘이 공을 여기로 옮기면 다음에 무엇을 할 수 있다’를 끝까지 말해 봅니다. 두 번째 이동의 목적지가 아직 없다면 첫 이동부터 다시 생각하세요. 통을 완성해 새 공간이 생겼다면 이전 계획을 무조건 이어가기보다 보드를 다시 봅니다. 성공 후에는 줄일 수 있었던 임시 보관 이동 하나를 골라 다음 판에서 그 판단을 연습해 보세요.</p><p><a class="pv-btn pv-btn-primary" href="/games/sortstack.html?lang=ko">SortStack에서 이동 계획 연습하기</a></p>
+<aside class="blog-review-note"><p>특정 레벨이라고 밝힌 경우를 제외하면, 예제는 설명을 위해 구성한 게임판입니다. 규칙과 풀이 결과는 현재 게임 구현과 대조했으며, 무작위·데일리 게임판은 예제와 다를 수 있습니다.</p><p><a href="/ko/contact.html">게임과 설명이 다르면 문의 페이지에 게임명, 모드, 글 주소와 재현 순서를 알려 주세요.</a></p></aside></article>
+<section class="blog-related"><h2>게임에서 직접 해보기</h2><div class="related-games-grid"><a class="related-game-card" href="/games/sortstack.html?lang=ko"><span class="related-game-name">📚 SortStack →</span></a><a class="related-game-card" href="/games/numvault.html?lang=ko"><span class="related-game-name">🔢 NumVault →</span></a></div></section><section class="blog-related"><h2>함께 읽으면 좋은 글</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/ko/colorflow-advanced-pathing-strategies.html"><div class="related-post-title">ColorFlow 공략: 마지막 연결 전에 빈칸을 확인하세요</div><p class="related-post-desc">5×5 설명용 보드의 두 경로를 비교하며, 모든 쌍을 연결해도 빈칸과 별 점수가 달라지는 이유를 알아보세요.</p></a><a class="related-post-card" href="/blog/ko/gridsmash-beginner-strategy-guide.html"><div class="related-post-title">GridSmash 공략: 블록 하나보다 세 조각의 순서를 보세요</div><p class="related-post-desc">10×10 설명용 보드에서 두 배치를 비교하고 두 줄을 지웠을 때의 점수를 계산하며, 남은 조각이 들어갈 공간을 지키는 방법을 익혀 보세요.</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/ko/about.html">소개</a><a href="/ko/privacy.html">개인정보</a><a href="/ko/terms.html">이용약관</a><a href="/ko/contact.html">문의</a><a href="/blog/ko/">공략과 이야기</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

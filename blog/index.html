@@ -1,316 +1,37 @@
 <!DOCTYPE html>
 <html lang="en" translate="no" class="notranslate">
-
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-
-  <!-- Google tag (gtag.js) -->
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PuzzleVault Blog — Puzzle Tips, Strategies & Brain Science</title>
-    <meta name="description"
-        content="Tips, strategies, and brain science — the PuzzleVault blog helps you become a better puzzle solver.">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/">
-        <!-- hreflang -->
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="PuzzleVault Blog — Puzzle Tips, Strategies & Brain Science">
-    <meta property="og:description"
-        content="Tips, strategies, and brain science — the PuzzleVault blog helps you become a better puzzle solver.">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/">
-
-    <style>
-        .blog-page-header {
-            text-align: center;
-            padding: 40px 0 16px;
-        }
-
-        .blog-page-header h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .blog-page-header p {
-            color: var(--pv-text-secondary);
-            max-width: 500px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .pv-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 24px auto;
-            max-width: 500px;
-        }
-
-        .pv-tab {
-            padding: 8px 18px;
-            border: 1px solid var(--pv-border);
-            border-radius: 100px;
-            background: var(--pv-card-bg);
-            color: var(--pv-text-secondary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .pv-tab:hover {
-            border-color: var(--pv-blue);
-            color: var(--pv-blue);
-        }
-
-        .pv-tab.active {
-            background: var(--pv-blue);
-            color: #fff;
-            border-color: var(--pv-blue);
-        }
-
-        .blog-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 600px) {
-            .blog-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 900px) {
-            .blog-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        .blog-card {
-            display: flex;
-            flex-direction: column;
-            background: var(--pv-card-bg);
-            border: 1px solid var(--pv-border);
-            border-radius: var(--pv-radius);
-            padding: 24px 20px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.25s ease;
-        }
-
-        .blog-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--pv-shadow-lg);
-            border-color: var(--pv-blue);
-        }
-
-        .blog-card-category {
-            display: inline-block;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--pv-blue);
-            background: rgba(37, 99, 235, 0.08);
-            padding: 4px 10px;
-            border-radius: 100px;
-            margin-bottom: 12px;
-            align-self: flex-start;
-        }
-
-        .blog-card-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            line-height: 1.4;
-            color: var(--pv-text);
-        }
-
-        .blog-card-desc {
-            font-size: 0.85rem;
-            color: var(--pv-text-secondary);
-            line-height: 1.5;
-            margin-bottom: 16px;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .blog-card-meta {
-            font-size: 0.75rem;
-            color: var(--pv-text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .blog-card-read {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--pv-blue);
-            margin-top: auto;
-        }
-
-        .blog-card:hover .blog-card-read {
-            text-decoration: underline;
-        }
-
-        .load-more-wrap {
-            text-align: center;
-            margin: 32px 0;
-        }
-
-        .load-more-btn {
-            padding: 12px 32px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            background: var(--pv-card-bg);
-            color: var(--pv-blue);
-            border: 2px solid var(--pv-blue);
-            border-radius: var(--pv-radius);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .load-more-btn:hover {
-            background: var(--pv-blue);
-            color: #fff;
-        }
-
-        .blog-empty {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--pv-text-secondary);
-        }
-    </style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
-
-    <main class="pv-container">
-        <div class="blog-page-header">
-            <h1 data-i18n="blog.heading">📝 PuzzleVault Blog</h1>
-            <p>Tips, strategies, brain science, and updates to help you become a better puzzle solver.</p>
-        </div>
-
-        <!-- Category filter tabs -->
-        <div class="pv-tabs" id="blog-tabs">
-            <button class="pv-tab active" data-category="">All</button>
-            <button class="pv-tab" data-category="tips">Tips</button>
-            <button class="pv-tab" data-category="strategy">Strategy</button>
-            <button class="pv-tab" data-category="updates">Updates</button>
-            <button class="pv-tab" data-category="science">Science</button>
-        </div>
-
-        <!-- Blog posts grid -->
-        <div class="blog-grid" id="blog-grid"></div>
-
-        <!-- Load More -->
-        <div class="load-more-wrap" id="load-more-wrap" style="display: none;">
-            <button class="load-more-btn" id="load-more-btn">Load More</button>
-        </div>
-    </main>
-
-    <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
-
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
-
-    <script src="/js/blog-data.js?v=14"></script>
-    <script src="/js/i18n.js?v=14"></script>
-    <script src="/js/common.js?v=14"></script>
-    <script>
-        const POSTS_PER_PAGE = 9;
-        let currentCategory = '';
-        let visibleCount = POSTS_PER_PAGE;
-
-        function renderBlogGrid() {
-            const grid = document.getElementById('blog-grid');
-            const loadMoreWrap = document.getElementById('load-more-wrap');
-            if (!grid) return;
-
-            const allPosts = getBlogPosts(undefined, currentCategory || undefined);
-            const postsToShow = allPosts.slice(0, visibleCount);
-
-            grid.innerHTML = '';
-
-            if (allPosts.length === 0) {
-                grid.innerHTML = '<p class="blog-empty">No posts found in this category yet.</p>';
-                loadMoreWrap.style.display = 'none';
-                return;
-            }
-
-            postsToShow.forEach(post => {
-                const card = document.createElement('a');
-                card.className = 'blog-card';
-                card.href = post.url || `/blog/posts/${post.slug}.html`;
-                card.innerHTML = `
-                    <span class="blog-card-category">${post.category}</span>
-                    <h3 class="blog-card-title">${post.title}</h3>
-                    <p class="blog-card-desc">${post.description}</p>
-                    <span class="blog-card-meta">${post.date} · ${post.readTime} min read</span>
-                    <span class="blog-card-read">Read →</span>
-                `;
-                grid.appendChild(card);
-            });
-
-            // Show/hide Load More
-            loadMoreWrap.style.display = visibleCount < allPosts.length ? 'block' : 'none';
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderBlogGrid();
-
-            // Tab filtering
-            document.getElementById('blog-tabs').addEventListener('click', e => {
-                const tab = e.target.closest('.pv-tab');
-                if (!tab) return;
-
-                document.querySelectorAll('#blog-tabs .pv-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                currentCategory = tab.dataset.category;
-                visibleCount = POSTS_PER_PAGE;
-                renderBlogGrid();
-            });
-
-            // Load More
-            document.getElementById('load-more-btn').addEventListener('click', () => {
-                visibleCount += POSTS_PER_PAGE;
-                renderBlogGrid();
-            });
-        });
-    </script>
-    <script>
-        window.addEventListener('langchange', (e) => {
-            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
-            window.location.href = newLang === 'en' ? '/blog/' : '/blog/' + newLang + '/';
-        });
-    </script>
-    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
-</body>
-
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>PuzzleVault Guides: Worked Examples for Every Game</title><meta name="description" content="See what a move changes before you try it. Explore illustrated examples, compare choices, and put one idea into practice in the game.">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PuzzleVault Guides: Worked Examples for Every Game"><meta property="og:description" content="See what a move changes before you try it. Explore illustrated examples, compare choices, and put one idea into practice in the game."><meta property="og:url" content="https://puzzlevault.pages.dev/blog/">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="PuzzleVault Guides: Worked Examples for Every Game"><meta name="twitter:description" content="See what a move changes before you try it. Explore illustrated examples, compare choices, and put one idea into practice in the game.">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "CollectionPage", "name": "PuzzleVault Guides: Worked Examples for Every Game", "inLanguage": "en", "url": "https://puzzlevault.pages.dev/blog/"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Guides & notes</a><a href="/about.html">About</a></nav></header>
+<main class="blog-shell"><header class="blog-hero"><p class="blog-eyebrow">PUZZLEVAULT / PLAY & LEARN</p><h1>PuzzleVault Guides: Worked Examples for Every Game</h1><p>See what a move changes before you try it. Explore illustrated examples, compare choices, and put one idea into practice in the game.</p><a class="blog-editorial-link" href="/blog/editorial.html">How these guides are made →</a></header><section class="guide-directory"><h2>Find your game</h2><p>Ten games, ten dedicated guides. Choose a puzzle to see its rules in action.</p><nav aria-label="Find your game"><a href="/blog/posts/numvault-tips-and-strategy.html"><span aria-hidden="true">🔢</span>NumVault</a><a href="/blog/posts/gridsmash-beginner-strategy-guide.html"><span aria-hidden="true">🧱</span>GridSmash</a><a href="/blog/posts/patternpop-targets-and-decoy-guide.html"><span aria-hidden="true">🧠</span>PatternPop</a><a href="/blog/posts/the-math-behind-sortstack.html"><span aria-hidden="true">📚</span>SortStack</a><a href="/blog/posts/quickcalc-accuracy-and-duel-guide.html"><span aria-hidden="true">⚡</span>QuickCalc</a><a href="/blog/posts/tileturn-cross-and-cascade-guide.html"><span aria-hidden="true">🔄</span>TileTurn</a><a href="/blog/posts/colorflow-advanced-pathing-strategies.html"><span aria-hidden="true">🎨</span>ColorFlow</a><a href="/blog/posts/pipelink-connections-and-rotation-guide.html"><span aria-hidden="true">🔧</span>PipeLink</a><a href="/blog/posts/mergechain-drop-and-merge-guide.html"><span aria-hidden="true">🔮</span>MergeChain</a><a href="/blog/posts/hexmatch-chains-and-special-gems-guide.html"><span aria-hidden="true">⬡</span>HexMatch</a></nav></section><div class="blog-tabs" id="blog-tabs" hidden><button type="button" data-category="" aria-pressed="true">All</button><button type="button" data-category="strategy" aria-pressed="false">Game guides</button><button type="button" data-category="tips" aria-pressed="false">Play tips</button><button type="button" data-category="updates" aria-pressed="false">Project notes</button></div><p id="blog-result-count" class="blog-result-count" aria-live="polite" data-template="{count} articles">15 articles</p><div class="blog-grid" id="blog-grid"><a class="blog-card" data-category="strategy" href="/blog/posts/tileturn-cross-and-cascade-guide.html"><span class="blog-card-category">Game guides</span><h2>TileTurn: solve the cross before following the cascade</h2><p class="blog-card-desc">Compare a correct center tap with a tempting corner move, trace Cascade&#x27;s diagonal effects, and learn Spectrum&#x27;s three states and TileTurn&#x27;s star targets.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/quickcalc-accuracy-and-duel-guide.html"><span class="blog-card-category">Game guides</span><h2>QuickCalc: protect your streak before racing the clock</h2><p class="blog-card-desc">Check worked QuickCalc arithmetic and scoring examples, understand the three-second penalty, and send a friend the same 30-second duel course.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/pipelink-connections-and-rotation-guide.html"><span class="blog-card-category">Game guides</span><h2>PipeLink: read the ports before rotating a tile</h2><p class="blog-card-desc">A worked PipeLink circuit shows how reciprocal ports, clockwise turns and isolated crossings work, with a three-tap example and honest star-score limits.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/patternpop-targets-and-decoy-guide.html"><span class="blog-card-category">Game guides</span><h2>PatternPop: remember the targets, ignore the decoy</h2><p class="blog-card-desc">Work through a six-target PatternPop board, separate blue diamonds from red decoys, and understand recall order, lives, replay hints, and scoring.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/mergechain-drop-and-merge-guide.html"><span class="blog-card-category">Game guides</span><h2>MergeChain: choose a landing target and read the chain score</h2><p class="blog-card-desc">Compare two constructed MergeChain drops, calculate a 20-point chain, and learn what the first-contact guide, cooldown and danger line can actually tell you.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/hexmatch-chains-and-special-gems-guide.html"><span class="blog-card-category">Game guides</span><h2>HexMatch: trace a real chain and use special gems correctly</h2><p class="blog-card-desc">Follow a five-gem HexMatch example to learn adjacency, rainbow limits, bomb placement and exact scoring, then practise avoiding branches you cannot trace.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html"><span class="blog-card-category">Project notes</span><h2>Why PuzzleVault Uses Vanilla JavaScript</h2><p class="blog-card-desc">A look at PuzzleVault’s HTML, CSS and JavaScript architecture: direct drawing, small modules, browser storage, and the work required to keep games responsive.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/the-math-behind-sortstack.html"><span class="blog-card-category">Game guides</span><h2>SortStack: use completed tubes to create working space</h2><p class="blog-card-desc">Follow a four-move SortStack example and see how matching tops, single-ball moves and newly unlocked empty tubes change the order of your decisions.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/posts/the-evolution-of-browser-puzzles.html"><span class="blog-card-category">Project notes</span><h2>From Flash to today&#x27;s browser puzzles: what players should expect</h2><p class="blog-card-desc">Understand how PuzzleVault loads games, starts sound, stores local records and caches files, with a practical distinction between offline access and saved progress.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/colorflow-advanced-pathing-strategies.html"><span class="blog-card-category">Game guides</span><h2>ColorFlow: plan coverage before connecting the final pair</h2><p class="blog-card-desc">Compare two valid routes on a 5×5 ColorFlow board and see why connecting every pair can still leave unused cells and fewer stars.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="tips" href="/blog/posts/5-tips-to-boost-your-brain-with-puzzles.html"><span class="blog-card-category">Play tips</span><h2>Five Practical Ways to Enjoy PuzzleVault</h2><p class="blog-card-desc">Choose a clear goal, read the feedback, leave room for your next move, and build a puzzle session that feels satisfying.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 5 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/numvault-tips-and-strategy.html"><span class="blog-card-category">Game guides</span><h2>NumVault: read the clues before spending another guess</h2><p class="blog-card-desc">Follow a four-guess NumVault example, distinguish digit clues from position clues, and learn why repeated digits need careful counting.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/posts/gridsmash-beginner-strategy-guide.html"><span class="blog-card-category">Game guides</span><h2>GridSmash: plan a tray, not just the next block</h2><p class="blog-card-desc">Use a marked 10×10 board to compare two placements, calculate a two-line clear, and preserve useful space for the pieces still in your tray.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="tips" href="/blog/posts/daily-challenge-streak-tips.html"><span class="blog-card-category">Play tips</span><h2>How to Build a 30-Day Daily Challenge Streak</h2><p class="blog-card-desc">Choose an optional puzzle routine, understand UTC daily resets and local records, and practice at your own pace.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 5 min read</span><span class="blog-card-read">Read the guide →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/posts/welcome-to-puzzlevault.html"><span class="blog-card-category">Project notes</span><h2>Choose your first PuzzleVault game</h2><p class="blog-card-desc">Compare all ten PuzzleVault games by play style, first action, and a manageable first goal, then choose a calm puzzle or a short timed challenge.</p><span class="blog-card-meta">Updated <time datetime="2026-09-26">2026-09-26</time> · 6 min read</span><span class="blog-card-read">Read the guide →</span></a></div></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Guides & notes</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

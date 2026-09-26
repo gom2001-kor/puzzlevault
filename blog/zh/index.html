@@ -1,305 +1,37 @@
 <!DOCTYPE html>
 <html lang="zh" translate="no" class="notranslate">
-
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-
-  <!-- Google tag (gtag.js) -->
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PuzzleVault 博客 — 益智技巧、策略与脑科学</title>
-    <meta name="description" content="技巧、策略、脑科学 — PuzzleVault博客帮助你成为更出色的益智玩家。">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="PuzzleVault 博客 — 益智技巧、策略与脑科学">
-    <meta property="og:description" content="技巧、策略、脑科学 — PuzzleVault博客帮助你成为更出色的益智玩家。">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/">
-
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/">
-
-    <style>
-        .blog-page-header {
-            text-align: center;
-            padding: 40px 0 16px;
-        }
-
-        .blog-page-header h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .blog-page-header p {
-            color: var(--pv-text-secondary);
-            max-width: 500px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .pv-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 24px auto;
-            max-width: 500px;
-        }
-
-        .pv-tab {
-            padding: 8px 18px;
-            border: 1px solid var(--pv-border);
-            border-radius: 100px;
-            background: var(--pv-card-bg);
-            color: var(--pv-text-secondary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .pv-tab:hover {
-            border-color: var(--pv-blue);
-            color: var(--pv-blue);
-        }
-
-        .pv-tab.active {
-            background: var(--pv-blue);
-            color: #fff;
-            border-color: var(--pv-blue);
-        }
-
-        .blog-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 600px) {
-            .blog-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 900px) {
-            .blog-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        .blog-card {
-            display: flex;
-            flex-direction: column;
-            background: var(--pv-card-bg);
-            border: 1px solid var(--pv-border);
-            border-radius: var(--pv-radius);
-            padding: 24px 20px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.25s ease;
-        }
-
-        .blog-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--pv-shadow-lg);
-            border-color: var(--pv-blue);
-        }
-
-        .blog-card-category {
-            display: inline-block;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--pv-blue);
-            background: rgba(37, 99, 235, 0.08);
-            padding: 4px 10px;
-            border-radius: 100px;
-            margin-bottom: 12px;
-            align-self: flex-start;
-        }
-
-        .blog-card-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            line-height: 1.4;
-            color: var(--pv-text);
-        }
-
-        .blog-card-desc {
-            font-size: 0.85rem;
-            color: var(--pv-text-secondary);
-            line-height: 1.5;
-            margin-bottom: 16px;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .blog-card-meta {
-            font-size: 0.75rem;
-            color: var(--pv-text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .blog-card-read {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--pv-blue);
-            margin-top: auto;
-        }
-
-        .blog-card:hover .blog-card-read {
-            text-decoration: underline;
-        }
-
-        .load-more-wrap {
-            text-align: center;
-            margin: 32px 0;
-        }
-
-        .load-more-btn {
-            padding: 12px 32px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            background: var(--pv-card-bg);
-            color: var(--pv-blue);
-            border: 2px solid var(--pv-blue);
-            border-radius: var(--pv-radius);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .load-more-btn:hover {
-            background: var(--pv-blue);
-            color: #fff;
-        }
-
-        .blog-empty {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--pv-text-secondary);
-        }
-    </style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">博客</a><a href="/zh/about.html">关于</a></nav></header>
-
-    <main class="pv-container">
-        <div class="blog-page-header">
-            <h1>📝 PuzzleVault 博客</h1>
-            <p>技巧、策略、脑科学和更新，帮助你成为更出色的益智玩家。</p>
-        </div>
-
-        <div class="pv-tabs" id="blog-tabs">
-            <button class="pv-tab active" data-category="">全部</button>
-            <button class="pv-tab" data-category="tips">技巧</button>
-            <button class="pv-tab" data-category="strategy">策略</button>
-            <button class="pv-tab" data-category="updates">更新</button>
-            <button class="pv-tab" data-category="science">科学</button>
-        </div>
-
-        <div class="blog-grid" id="blog-grid"></div>
-
-        <div class="load-more-wrap" id="load-more-wrap" style="display: none;">
-            <button class="load-more-btn" id="load-more-btn">加载更多</button>
-        </div>
-    </main>
-
-    <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
-
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私政策</a><a href="/zh/terms.html">使用条款</a><a href="/zh/contact.html">联系我们</a><a href="/blog/zh/">博客</a></nav></footer>
-
-    <script src="/js/blog-data.js?v=14"></script>
-    <script src="/js/i18n.js?v=14"></script>
-    <script src="/js/common.js?v=14"></script>
-    <script>
-        const POSTS_PER_PAGE = 9;
-        let currentCategory = '';
-        let visibleCount = POSTS_PER_PAGE;
-
-        function renderBlogGrid() {
-            const grid = document.getElementById('blog-grid');
-            const loadMoreWrap = document.getElementById('load-more-wrap');
-            if (!grid) return;
-
-            const allPosts = getBlogPosts(undefined, currentCategory || undefined);
-            const postsToShow = allPosts.slice(0, visibleCount);
-
-            grid.innerHTML = '';
-
-            if (allPosts.length === 0) {
-                grid.innerHTML = '<p class="blog-empty">此分类暂无文章。</p>';
-                loadMoreWrap.style.display = 'none';
-                return;
-            }
-
-            postsToShow.forEach(post => {
-                const card = document.createElement('a');
-                card.className = 'blog-card';
-                card.href = post.url || `/blog/zh/${post.slug}.html`;
-                const catText = (typeof I18n !== 'undefined') ? I18n.t('blog.' + post.category) : post.category;
-                const readTime = (typeof I18n !== 'undefined') ? I18n.t('common.minuteRead', { min: post.readTime }) : post.readTime + ' min';
-                card.innerHTML = `
-                    <span class="blog-card-category">${catText}</span>
-                    <h3 class="blog-card-title">${post.title}</h3>
-                    <p class="blog-card-desc">${post.description}</p>
-                    <span class="blog-card-meta">${post.date} · ${readTime}</span>
-                    <span class="blog-card-read">阅读 →</span>
-                `;
-                grid.appendChild(card);
-            });
-
-            loadMoreWrap.style.display = visibleCount < allPosts.length ? 'block' : 'none';
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderBlogGrid();
-            document.getElementById('blog-tabs').addEventListener('click', e => {
-                const tab = e.target.closest('.pv-tab');
-                if (!tab) return;
-                document.querySelectorAll('#blog-tabs .pv-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentCategory = tab.dataset.category;
-                visibleCount = POSTS_PER_PAGE;
-                renderBlogGrid();
-            });
-            document.getElementById('load-more-btn').addEventListener('click', () => {
-                visibleCount += POSTS_PER_PAGE;
-                renderBlogGrid();
-            });
-        });
-    </script>
-    <script>
-        window.addEventListener('langchange', (e) => {
-            const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
-            window.location.href = newLang === 'en' ? '/blog/' : '/blog/' + newLang + '/';
-        });
-    </script>
-    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
-</body>
-
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>PuzzleVault游戏攻略：通过实例理解每一步</title><meta name="description" content="一步操作会改变什么？用图解比较不同选择，再到游戏中亲手试一试。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/zh/"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PuzzleVault游戏攻略：通过实例理解每一步"><meta property="og:description" content="一步操作会改变什么？用图解比较不同选择，再到游戏中亲手试一试。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/zh/">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="PuzzleVault游戏攻略：通过实例理解每一步"><meta name="twitter:description" content="一步操作会改变什么？用图解比较不同选择，再到游戏中亲手试一试。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "CollectionPage", "name": "PuzzleVault游戏攻略：通过实例理解每一步", "inLanguage": "zh", "url": "https://puzzlevault.pages.dev/blog/zh/"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="首页"><a href="/zh/">🧩 PuzzleVault</a><a href="/zh/#games">游戏</a><a href="/blog/zh/">攻略与随笔</a><a href="/zh/about.html">关于</a></nav></header>
+<main class="blog-shell"><header class="blog-hero"><p class="blog-eyebrow">PUZZLEVAULT / PLAY & LEARN</p><h1>PuzzleVault游戏攻略：通过实例理解每一步</h1><p>一步操作会改变什么？用图解比较不同选择，再到游戏中亲手试一试。</p><a class="blog-editorial-link" href="/blog/zh/editorial.html">攻略的编写与核对方法 →</a></header><section class="guide-directory"><h2>按游戏查找攻略</h2><p>为10款游戏分别讲解规则与判断方法。选择你正在玩的游戏，查看具体示例。</p><nav aria-label="按游戏查找攻略"><a href="/blog/zh/numvault-tips-and-strategy.html"><span aria-hidden="true">🔢</span>NumVault</a><a href="/blog/zh/gridsmash-beginner-strategy-guide.html"><span aria-hidden="true">🧱</span>GridSmash</a><a href="/blog/zh/patternpop-targets-and-decoy-guide.html"><span aria-hidden="true">🧠</span>PatternPop</a><a href="/blog/zh/the-math-behind-sortstack.html"><span aria-hidden="true">📚</span>SortStack</a><a href="/blog/zh/quickcalc-accuracy-and-duel-guide.html"><span aria-hidden="true">⚡</span>QuickCalc</a><a href="/blog/zh/tileturn-cross-and-cascade-guide.html"><span aria-hidden="true">🔄</span>TileTurn</a><a href="/blog/zh/colorflow-advanced-pathing-strategies.html"><span aria-hidden="true">🎨</span>ColorFlow</a><a href="/blog/zh/pipelink-connections-and-rotation-guide.html"><span aria-hidden="true">🔧</span>PipeLink</a><a href="/blog/zh/mergechain-drop-and-merge-guide.html"><span aria-hidden="true">🔮</span>MergeChain</a><a href="/blog/zh/hexmatch-chains-and-special-gems-guide.html"><span aria-hidden="true">⬡</span>HexMatch</a></nav></section><div class="blog-tabs" id="blog-tabs" hidden><button type="button" data-category="" aria-pressed="true">全部</button><button type="button" data-category="strategy" aria-pressed="false">游戏攻略</button><button type="button" data-category="tips" aria-pressed="false">游玩建议</button><button type="button" data-category="updates" aria-pressed="false">项目随笔</button></div><p id="blog-result-count" class="blog-result-count" aria-live="polite" data-template="{count}篇文章">15篇文章</p><div class="blog-grid" id="blog-grid"><a class="blog-card" data-category="strategy" href="/blog/zh/tileturn-cross-and-cascade-guide.html"><span class="blog-card-category">游戏攻略</span><h2>TileTurn 攻略：先看十字范围，再算连锁变化</h2><p class="blog-card-desc">比较中心一步完成与角落误选的结果，弄清 Cascade 的对角变化及重叠抵消、Spectrum 的三种状态和星级目标。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/quickcalc-accuracy-and-duel-guide.html"><span class="blog-card-category">游戏攻略</span><h2>QuickCalc 攻略：抢时间之前，先保住连续答对</h2><p class="blog-card-desc">通过计算顺序和具体计分例子了解 QuickCalc，掌握答错扣三秒的代价，以及用同一套题目进行30秒好友对决的方法。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/pipelink-connections-and-rotation-guide.html"><span class="blog-card-category">游戏攻略</span><h2>PipeLink 攻略：旋转之前，先看入口和出口</h2><p class="blog-card-desc">用一个专门设计的教学电路，理解 PipeLink 的双向接口、顺时针旋转和独立交叉通道，并看懂三次点击的解法与星级评分。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/patternpop-targets-and-decoy-guide.html"><span class="blog-card-category">游戏攻略</span><h2>PatternPop 攻略：记住目标位置，分清干扰闪光</h2><p class="blog-card-desc">用一个含六个目标的示例棋盘练习 PatternPop，了解选择顺序、红色干扰、生命、慢速重播提示及计分规则。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/mergechain-drop-and-merge-guide.html"><span class="blog-card-category">游戏攻略</span><h2>MergeChain 攻略：选对落点，算清连锁得分</h2><p class="blog-card-desc">比较两条专门构造的落球路线，计算一次20分连锁，并理解MergeChain的首次接触提示、投放间隔和危险线。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/hexmatch-chains-and-special-gems-guide.html"><span class="blog-card-category">游戏攻略</span><h2>HexMatch 攻略：画出有效连线，用对特殊宝石</h2><p class="blog-card-desc">通过含彩虹的五颗宝石示例，理解HexMatch的相邻规则、颜色限制、炸弹位置和准确分数，避免无法一笔经过的分叉路线。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html"><span class="blog-card-category">项目随笔</span><h2>PuzzleVault为何使用原生JavaScript</h2><p class="blog-card-desc">了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/the-math-behind-sortstack.html"><span class="blog-card-category">游戏攻略</span><h2>SortStack攻略：利用完成的管子增加操作空间</h2><p class="blog-card-desc">通过四步整理的例子，理解顶层匹配、每次只移动一球以及完成后新增空管如何影响下一步选择。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/zh/the-evolution-of-browser-puzzles.html"><span class="blog-card-category">项目随笔</span><h2>Flash之后的浏览器益智游戏：加载、记录与离线的区别</h2><p class="blog-card-desc">了解PuzzleVault如何加载游戏、播放声音、保存本地记录和缓存文件，通过具体场景区分离线打开游戏与恢复游戏进度。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/colorflow-advanced-pathing-strategies.html"><span class="blog-card-category">游戏攻略</span><h2>ColorFlow攻略：连上最后一对前，先检查空格</h2><p class="blog-card-desc">比较5×5示意棋盘上的两种合法路线，了解为何全部配对成功后，仍可能留下空格并获得不同星数。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="tips" href="/blog/zh/5-tips-to-boost-your-brain-with-puzzles.html"><span class="blog-card-category">游玩建议</span><h2>更愉快地玩PuzzleVault的五个实用方法</h2><p class="blog-card-desc">设定小目标，读懂反馈，为下一步留空间，用相同条件练习，并在自己选择的节点休息。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 5 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/numvault-tips-and-strategy.html"><span class="blog-card-category">游戏攻略</span><h2>NumVault攻略：先读懂线索，再输入下一组数字</h2><p class="blog-card-desc">通过四次猜测的完整例子，区分数字和位置线索，理解重复数字为何可能同时出现绿色和灰色提示。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="strategy" href="/blog/zh/gridsmash-beginner-strategy-guide.html"><span class="blog-card-category">游戏攻略</span><h2>GridSmash攻略：规划三块的顺序，而不只看眼前一块</h2><p class="blog-card-desc">用10×10示意棋盘比较两种摆法，计算双行消除得分，并为托盘中剩余的形状保留可用空间。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="tips" href="/blog/zh/daily-challenge-streak-tips.html"><span class="blog-card-category">游玩建议</span><h2>如何建立30天每日挑战连胜记录</h2><p class="blog-card-desc">了解UTC每日更新和浏览器本地记录，按自己的节奏选择练习与休息。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 5 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a>
+<a class="blog-card" data-category="updates" href="/blog/zh/welcome-to-puzzlevault.html"><span class="blog-card-category">项目随笔</span><h2>选择你的第一款 PuzzleVault 游戏</h2><p class="blog-card-desc">按玩法、第一步操作和小目标比较 PuzzleVault 的十款游戏，从安静推理到30秒对决，找到适合这次休息的开始方式。</p><span class="blog-card-meta">内容更新 <time datetime="2026-09-26">2026-09-26</time> · 6 分钟阅读</span><span class="blog-card-read">阅读攻略 →</span></a></div></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/zh/about.html">关于</a><a href="/zh/privacy.html">隐私</a><a href="/zh/terms.html">条款</a><a href="/zh/contact.html">联系</a><a href="/blog/zh/">攻略与随笔</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

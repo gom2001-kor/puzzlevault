@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" translate="no" class="notranslate">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>TileTurn 공략: 십자 범위를 읽고 연쇄 반응까지 계산하기 | PuzzleVault</title><meta name="description" content="가운데 한 번으로 끝나는 예제와 모서리 오답을 비교하고, Cascade의 대각선·겹침 효과, Spectrum의 세 상태, 별 점수 조건을 알아보세요.">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/ko/tileturn-cross-and-cascade-guide.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/tileturn-cross-and-cascade-guide.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/tileturn-cross-and-cascade-guide.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TileTurn 공략: 십자 범위를 읽고 연쇄 반응까지 계산하기 | PuzzleVault"><meta property="og:description" content="가운데 한 번으로 끝나는 예제와 모서리 오답을 비교하고, Cascade의 대각선·겹침 효과, Spectrum의 세 상태, 별 점수 조건을 알아보세요."><meta property="og:url" content="https://puzzlevault.pages.dev/blog/ko/tileturn-cross-and-cascade-guide.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="TileTurn 공략: 십자 범위를 읽고 연쇄 반응까지 계산하기 | PuzzleVault"><meta name="twitter:description" content="가운데 한 번으로 끝나는 예제와 모서리 오답을 비교하고, Cascade의 대각선·겹침 효과, Spectrum의 세 상태, 별 점수 조건을 알아보세요.">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "TileTurn 공략: 십자 범위를 읽고 연쇄 반응까지 계산하기", "description": "가운데 한 번으로 끝나는 예제와 모서리 오답을 비교하고, Cascade의 대각선·겹침 효과, Spectrum의 세 상태, 별 점수 조건을 알아보세요.", "inLanguage": "ko", "datePublished": "2026-09-26", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/ko/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/ko/tileturn-cross-and-cascade-guide.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="홈"><a href="/ko/">🧩 PuzzleVault</a><a href="/ko/#games">게임</a><a href="/blog/ko/">공략과 이야기</a><a href="/ko/about.html">소개</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="공략과 이야기"><a href="/blog/ko/">← 공략과 이야기</a></nav><span class="blog-card-category">게임 공략</span><h1>TileTurn 공략: 십자 범위를 읽고 연쇄 반응까지 계산하기</h1><p class="blog-post-description">가운데 한 번으로 끝나는 예제와 모서리 오답을 비교하고, Cascade의 대각선·겹침 효과, Spectrum의 세 상태, 별 점수 조건을 알아보세요.</p><p class="blog-post-meta">게시: PuzzleVault · 6 분 읽기<br>처음 게시 <time datetime="2026-09-26">2026-09-26</time> · 내용 수정 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/ko/editorial.html">공략 작성·검토 방법</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="이 글에서 살펴볼 내용"><h2>이 글에서 살펴볼 내용</h2><ol><li><a href="#section-1">세 모드 모두 첫 범위는 십자입니다</a></li><li><a href="#section-2">Classic: 한 번으로 끝낼 수 있는 판</a></li><li><a href="#section-3">Cascade에서는 왜 대각선이 바뀔까요?</a></li><li><a href="#section-4">Spectrum은 켜짐과 꺼짐만으로 계산하지 않습니다</a></li><li><a href="#section-5">되돌리기로 비교하고 목표 수는 참고하기</a></li><li><a href="#section-6">마지막으로 범위를 확인해 보세요</a></li></ol></nav>
+
+<p>TileTurn에서는 꺼진 타일이 곧 눌러야 할 타일이라는 뜻은 아닙니다. 한 번 누르면 여러 칸이 함께 바뀌므로 <strong>어떤 칸들의 묶음이 바뀌어야 하는지</strong>를 봐야 합니다. 먼저 선택한 칸 주변의 십자 범위를 살피고, 그다음 모드별 추가 효과를 계산해 보세요. 아래 게임판은 규칙을 설명하려고 구성한 예제이며, 실제 일일 배치나 특정 번호 레벨의 정답을 약속하는 자료가 아닙니다.</p>
+<p><a href="/games/tileturn.html?lang=ko">TileTurn</a>의 Starter 팩에서 작은 Classic 게임판으로 시작할 수 있습니다. 전체는 7개 팩, 140개 레벨이며 모든 팩을 선택할 수 있지만 각 팩 안의 레벨은 순서대로 열립니다. 타일을 직접 누르거나, 키보드로 타일 버튼에 초점을 옮긴 뒤 버튼을 실행해도 됩니다.</p>
+<h2 id="section-1">세 모드 모두 첫 범위는 십자입니다</h2>
+<table class="guide-table"><caption>한 번 눌렀을 때의 변화</caption><thead><tr><th scope="col">모드</th><th scope="col">효과</th><th scope="col">완료 목표</th></tr></thead><tbody><tr><th scope="row">Classic</th><td>선택한 칸과 상하좌우 이웃의 켜짐·꺼짐 전환</td><td>모든 타일이 켜짐 ●</td></tr><tr><th scope="row">Cascade</th><td>같은 십자 전환 후, 새로 켜진 칸이 이웃을 다시 전환</td><td>모든 타일이 켜짐 ●</td></tr><tr><th scope="row">Spectrum</th><td>십자 범위의 상태를 ○ → ◆ → ✓ → ○로 진행</td><td>모든 타일이 초록 ✓</td></tr></tbody></table>
+<p>상하좌우에는 대각선이 포함되지 않습니다. 3×3 판에서 가운데를 누르면 5칸, 모서리가 아닌 가장자리는 4칸, 모서리는 3칸이 첫 영향을 받습니다. 판 밖으로 나간 효과가 반대편으로 이어지지는 않습니다.</p>
+<h2 id="section-2">Classic: 한 번으로 끝낼 수 있는 판</h2>
+<p>A~C는 위에서 아래로 내려가는 행, 1~3은 왼쪽에서 오른쪽으로 가는 열입니다. ●는 켜짐, ○는 꺼짐입니다. 먼저 꺼진 칸을 적어보세요. A2, B1, B2, B3, C2입니다. 이 다섯 칸은 B2를 중심으로 한 십자와 정확히 같습니다.</p>
+<figure class="guide-figure"><table class="guide-table"><caption>누르기 전: 가운데 십자의 다섯 칸이 꺼져 있습니다</caption><thead><tr><th scope="col"> </th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th></tr></thead><tbody><tr><th scope="row">A</th><td>●</td><td>○</td><td>●</td></tr><tr><th scope="row">B</th><td>○</td><td>○</td><td>○</td></tr><tr><th scope="row">C</th><td>●</td><td>○</td><td>●</td></tr></tbody></table><figcaption>● = 1 · ○ = 0</figcaption></figure>
+<ol class="guide-steps"><li>꺼진 칸이 여러 개여도 후보로 B2를 고릅니다.</li><li>B2가 바꾸는 전체 범위인 B2, A2, C2, B1, B3를 확인합니다.</li><li>영향받는 다섯 칸은 모두 꺼져 있으므로 모두 켜집니다.</li><li>이미 켜진 네 모서리는 십자 밖에 있으므로 그대로 유지됩니다.</li></ol>
+<figure class="guide-figure"><table class="guide-table"><caption>B2를 누른 후: 아홉 칸이 모두 켜집니다</caption><thead><tr><th scope="col"> </th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th></tr></thead><tbody><tr><th scope="row">A</th><td>●</td><td>●</td><td>●</td></tr><tr><th scope="row">B</th><td>●</td><td>●</td><td>●</td></tr><tr><th scope="row">C</th><td>●</td><td>●</td><td>●</td></tr></tbody></table><figcaption>● = 1 · ○ = 0</figcaption></figure>
+<p><strong>그럴듯하지만 끝내지 못하는 선택</strong>은 A1입니다. A1은 꺼진 A2와 B1을 켜지만 자신은 꺼지고, B2·B3·C2도 계속 꺼진 상태입니다. 켜진 칸 수는 4개에서 5개로 늘어나도 완료가 되지 않습니다. <strong>이 판에 맞는 선택</strong>은 바꿔야 할 다섯 칸을 한꺼번에 바꾸는 B2입니다. 한 수 뒤에 켜진 칸이 늘었다는 사실만으로 좋은 계획이라고 판단할 수 없다는 예제입니다.</p>
+<h2 id="section-3">Cascade에서는 왜 대각선이 바뀔까요?</h2>
+<p>Cascade도 먼저 같은 십자를 뒤집습니다. 300밀리초 뒤에는 첫 단계에서 <strong>꺼짐에서 켜짐으로 바뀐 칸만</strong> 자신의 상하좌우 이웃을 뒤집습니다. 이 두 번째 효과는 출발점 자신을 뒤집지 않으며, 그 결과 켜진 칸이 끝없이 새 연쇄를 일으키지도 않습니다.</p>
+<p>이번에는 별도의 4×4 예제를 생각해 보겠습니다. B1만 꺼져 있고 나머지는 모두 켜져 있습니다. B2를 누르면 첫 단계에서 B1만 새로 켜지고 B2, A2, B3, C2는 꺼집니다. 이어 B1이 A1, C1, B2에 두 번째 효과를 보냅니다. A1과 C1은 꺼지고 B2는 다시 켜집니다. 처음 누른 B2에서 보면 A1과 C1은 대각선에 있지만, 직접 대각선을 뒤집은 것이 아니라 B1을 거쳐 바뀐 것입니다. 별도의 대각선 모드가 있는 것은 아닙니다.</p>
+<p>겹치는 효과도 세어야 합니다. 같은 상황에서 A2와 B1이 둘 다 처음에 꺼져 있었다면, 두 칸이 모두 새로 켜져 두 번째 효과의 출발점이 됩니다. A1은 A2와 B1에서 한 번씩, 총 두 번 뒤집히므로 원래 상태로 돌아갑니다. 누르기 전에 어떤 칸이 출발점이 되는지 표시하고, 같은 이웃에 몇 번의 효과가 도착하는지 확인하세요. 미리보기의 강조 표시는 관련 범위를 뜻하며, 강조된 모든 칸이 최종적으로 다른 상태가 된다는 뜻은 아닙니다.</p>
+<h2 id="section-4">Spectrum은 켜짐과 꺼짐만으로 계산하지 않습니다</h2>
+<p>Spectrum의 순환은 어두운 ○ → 파란 ◆ → 초록 ✓ → 어두운 ○입니다. 파란 칸은 한 단계, 어두운 칸은 두 단계 진행하면 목표인 초록이 됩니다. 이미 초록인 칸도 십자에 들어가면 어두운 상태로 바뀝니다. 선택한 한 칸만 보고 누르면 이웃의 변화를 놓치기 쉽습니다.</p>
+<p>Classic에서 같은 위치를 두 번 누르면 게임판에 준 변화가 상쇄됩니다. Spectrum에서는 같은 위치를 세 번 눌러야 상쇄됩니다. Cascade는 현재 판에 따라 두 번째 효과의 출발점이 달라지므로 이 규칙을 그대로 적용하면 안 됩니다.</p>
+<h2 id="section-5">되돌리기로 비교하고 목표 수는 참고하기</h2>
+<p>두 후보를 비교할 때는 무료 되돌리기로 직전 판으로 돌아가세요. 원상 복구를 하려고 같은 타일을 반복해서 누르면 이동 수가 늘어나고, Cascade에서는 원래 판으로 돌아가지 않을 수도 있습니다. 연쇄 모드에서는 두 단계의 표시가 끝난 뒤 결과를 판단합니다.</p>
+<p>화면의 목표 이동 수는 퍼즐을 만드는 과정에서 나온 기준이며, 수학적으로 증명한 최소 이동 수는 아닙니다. 목표 이하로 끝내면 별 3개, 목표보다 두 수까지 더 써서 끝내면 별 2개, 그 밖에는 완료하면 별 1개입니다. 점수에도 효율 보상이 반영되고, 팩 완료 보너스를 더하기 전에는 힌트를 쓰지 않은 경우 20%가 추가됩니다. 더 짧은 다른 풀이가 없다는 뜻으로 해석하지 마세요.</p>
+<h2 id="section-6">마지막으로 범위를 확인해 보세요</h2>
+<p>처음의 3×3 Classic 예제에서 B2를 누르면 A1도 바뀔까요? Spectrum에서 처음에 어두운 칸은 몇 단계 진행해야 초록이 될까요?</p>
+<details><summary>정답 보기</summary><p>A1은 B2의 대각선이므로 Classic의 십자 범위에 포함되지 않고 그대로입니다. Spectrum의 어두운 칸은 ○ → ◆ → ✓, 두 단계가 필요합니다. 이것은 한 칸의 상태 변화에 대한 답입니다. 실제 전체 풀이에서는 매번 함께 바뀌는 이웃 칸까지 계산해야 합니다.</p></details>
+<p><a class="pv-btn pv-btn-primary" href="/games/tileturn.html?lang=ko">TileTurn 플레이하기</a></p>
+<aside class="blog-review-note"><p>특정 레벨이라고 밝힌 경우를 제외하면, 예제는 설명을 위해 구성한 게임판입니다. 규칙과 풀이 결과는 현재 게임 구현과 대조했으며, 무작위·데일리 게임판은 예제와 다를 수 있습니다.</p><p><a href="/ko/contact.html">게임과 설명이 다르면 문의 페이지에 게임명, 모드, 글 주소와 재현 순서를 알려 주세요.</a></p></aside></article>
+<section class="blog-related"><h2>게임에서 직접 해보기</h2><div class="related-games-grid"><a class="related-game-card" href="/games/tileturn.html?lang=ko"><span class="related-game-name">🔄 TileTurn →</span></a><a class="related-game-card" href="/games/numvault.html?lang=ko"><span class="related-game-name">🔢 NumVault →</span></a></div></section><section class="blog-related"><h2>함께 읽으면 좋은 글</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/ko/colorflow-advanced-pathing-strategies.html"><div class="related-post-title">ColorFlow 공략: 마지막 연결 전에 빈칸을 확인하세요</div><p class="related-post-desc">5×5 설명용 보드의 두 경로를 비교하며, 모든 쌍을 연결해도 빈칸과 별 점수가 달라지는 이유를 알아보세요.</p></a><a class="related-post-card" href="/blog/ko/gridsmash-beginner-strategy-guide.html"><div class="related-post-title">GridSmash 공략: 블록 하나보다 세 조각의 순서를 보세요</div><p class="related-post-desc">10×10 설명용 보드에서 두 배치를 비교하고 두 줄을 지웠을 때의 점수를 계산하며, 남은 조각이 들어갈 공간을 지키는 방법을 익혀 보세요.</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/ko/about.html">소개</a><a href="/ko/privacy.html">개인정보</a><a href="/ko/terms.html">이용약관</a><a href="/ko/contact.html">문의</a><a href="/blog/ko/">공략과 이야기</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>

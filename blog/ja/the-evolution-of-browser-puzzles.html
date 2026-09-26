@@ -1,84 +1,44 @@
 <!DOCTYPE html>
 <html lang="ja" translate="no" class="notranslate">
 <head>
-    <meta name="google" content="notranslate">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
-    <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate"><meta name="google-adsense-account" content="ca-pub-6035096210993315">
+<title>Flash以後のブラウザパズル：起動・記録・オフラインの違い | PuzzleVault</title><meta name="description" content="PuzzleVaultがゲームを読み込み、音を鳴らし、記録やファイルを保存する仕組みを解説。オフライン起動と進行保存を具体例で区別します。">
+<link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html"><link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html">
+<link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html">
+<meta name="theme-color" content="#2563EB"><link rel="icon" href="/favicon.ico?v=2"><link rel="manifest" href="/manifest.json">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flash以後のブラウザパズル：起動・記録・オフラインの違い | PuzzleVault"><meta property="og:description" content="PuzzleVaultがゲームを読み込み、音を鳴らし、記録やファイルを保存する仕組みを解説。オフライン起動と進行保存を具体例で区別します。"><meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Flash以後のブラウザパズル：起動・記録・オフラインの違い | PuzzleVault"><meta name="twitter:description" content="PuzzleVaultがゲームを読み込み、音を鳴らし、記録やファイルを保存する仕組みを解説。オフライン起動と進行保存を具体例で区別します。">
+<link rel="stylesheet" href="/css/global.css?v=15"><link rel="stylesheet" href="/css/site-quality.css?v=15"><link rel="stylesheet" href="/css/blog.css?v=15">
+<script defer src="/js/privacy-controls.js?v=15"></script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Flash以後のブラウザパズル：起動・記録・オフラインの違い", "description": "PuzzleVaultがゲームを読み込み、音を鳴らし、記録やファイルを保存する仕組みを解説。オフライン起動と進行保存を具体例で区別します。", "inLanguage": "ja", "datePublished": "2026-03-29", "dateModified": "2026-09-26", "author": {"@type": "Organization", "name": "PuzzleVault", "url": "https://puzzlevault.pages.dev/ja/about.html"}, "publisher": {"@type": "Organization", "name": "PuzzleVault"}, "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html"}</script>
+</head><body>
+<header id="pv-header"><nav class="pv-static-nav" aria-label="ホーム"><a href="/ja/">🧩 PuzzleVault</a><a href="/ja/#games">ゲーム</a><a href="/blog/ja/">攻略と読みもの</a><a href="/ja/about.html">紹介</a></nav></header>
+<main><header class="blog-post-header"><nav class="blog-breadcrumb" aria-label="攻略と読みもの"><a href="/blog/ja/">← 攻略と読みもの</a></nav><span class="blog-card-category">プロジェクトの話</span><h1>Flash以後のブラウザパズル：起動・記録・オフラインの違い</h1><p class="blog-post-description">PuzzleVaultがゲームを読み込み、音を鳴らし、記録やファイルを保存する仕組みを解説。オフライン起動と進行保存を具体例で区別します。</p><p class="blog-post-meta">発行：PuzzleVault · 6 分で読めます<br>公開 <time datetime="2026-03-29">2026-03-29</time> · 更新 <time datetime="2026-09-26">2026-09-26</time><br><a href="/blog/ja/editorial.html">記事の作成と確認について</a></p></header>
+<article class="blog-content"><nav class="blog-toc" aria-label="この記事の内容"><h2>この記事の内容</h2><ol><li><a href="#section-1">Flash以後、起動方法はどう変わった？</a></li><li><a href="#section-2">画面の準備と音の準備は別</a></li><li><a href="#section-3">ゲームファイル、保存記録、現在の盤面</a></li><li><a href="#section-4">オフラインには必要なファイルが必要</a></li><li><a href="#section-5">更新時の再読み込みはタイミングを選ぶ</a></li></ol></nav>
 
-
-
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ブラウザパズルゲームの進化：FlashからHTML5へ | PuzzleVault Blog</title>
-    <meta name="description" content="ウェブベースのパズルゲームの魅力的な歴史を探ります。Flash時代から現代の高性能HTML5 Canvasゲームへの進化を学びます。">
-    <link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="stylesheet" href="/css/global.css?v=14">
-    <link rel="manifest" href="/manifest.json">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="ブラウザパズルゲームの進化：FlashからHTML5へ">
-    <meta property="og:description" content="ウェブベースのパズルゲームの魅力的な歴史を探ります。Flash時代から現代の高性能HTML5 Canvasゲームへの進化を学びます。">
-    <meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="ブラウザパズルゲームの進化：FlashからHTML5へ">
-    <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-evolution-of-browser-puzzles.html">
-    <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-evolution-of-browser-puzzles.html">
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": "ブラウザパズルゲームの進化：FlashからHTML5へ",
-  "inLanguage": "ja",
-  "datePublished": "2026-03-29",
-  "dateModified": "2026-09-26",
-  "author": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "PuzzleVault"
-  },
-  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/ja/the-evolution-of-browser-puzzles.html"
-}
-</script>
-    <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=14">
-    <script defer src="/js/privacy-controls.js?v=14"></script>
-</head>
-<body>
-    <header id="pv-header"><nav class="pv-static-nav" aria-label="ホーム"><a href="/ja/">🧩 PuzzleVault</a><a href="/ja/#games">ゲーム</a><a href="/blog/ja/">ブログ</a><a href="/ja/about.html">サイト情報</a></nav></header>
-    <div class="blog-post-header">
-        <span class="blog-post-category">アップデート</span>
-        <h1>ブラウザパズルゲームの進化：FlashからHTML5へ</h1>
-        <div class="blog-post-meta">2026年3月29日 · 5分で読める</div>
-    </div>
-    <article class="blog-content">
-        <p>90年代後半から2000年代初頭に育った方なら、コンピュータ室でゲームポータルにこっそりアクセスしてブラウザゲームをプレイした思い出があるでしょう。10年以上にわたり、ブラウザゲームは一つの技術に完全に支配されていました：Adobe Flashです。</p>
-<h2>Flashゲームの黄金時代</h2>
-<p>2000年代初頭、ブラウザの非互換性と貧弱なネイティブAPIのため、ウェブでインタラクティブな体験を構築することは非常に困難でした。Adobe Flashは統一されたプラグインベースのランタイム環境を提供してこの問題を解決しました。この時代に数千もの象徴的なパズルゲームが誕生しました。</p>
-<p>しかしFlashには致命的な弱点がありました。リソースを大量に消費し、バッテリーを急速に消耗させ、深刻なセキュリティ脆弱性の温床となりました。</p>
-<h2>厄介な過渡期</h2>
-<p>Flashのサポート終了に伴い、開発者はブラウザゲームを作る別の方法を必要としました。Canvas描画とJavaScriptの性能はブラウザや端末によって異なるため、移植時にはアニメーション、入力処理、描画の負荷を確認する必要がありました。</p>
-<h2>HTML5 Canvasルネサンス</h2>
-<p><strong>HTML5 Canvas API</strong>を使うと、別のプラグインを入れずにブラウザ上で盤面を描画できます。<strong>GridSmash</strong>や<strong>HexMatch</strong>もCanvasでボードやアニメーションを描いています。実際のフレームレートは端末、ブラウザ、処理の負荷によって変わります。</p>
-<h2>PuzzleVault：モダンウェブアーキテクチャの採用</h2>
-<p>PuzzleVaultはHTML、CSS、JavaScriptで10種類のパズルを提供しています。<strong>NumVault</strong>や<strong>TileTurn</strong>を、別のアプリをインストールせずに対応ブラウザで開けます。読み込み時間とアニメーションの性能は通信環境、ブラウザ、端末によって異なります。</p>
-    </article>
-    <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
-    <section class="blog-related"><h2>🎮 ゲームを試す</h2><div class="related-games-grid" id="related-games"></div></section>
-    <section class="blog-related"><h2>📖 もっと読む</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/ja/" class="back-link">← ブログに戻る</a></section>
-    <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
-    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/ja/about.html">サイト情報</a><a href="/ja/privacy.html">プライバシー</a><a href="/ja/terms.html">利用規約</a><a href="/ja/contact.html">お問い合わせ</a><a href="/blog/ja/">ブログ</a></nav></footer>
-    <script src="/js/blog-data.js?v=14"></script><script src="/js/i18n.js?v=14"></script><script src="/js/common.js?v=14"></script>
-    <script>const POST_SLUG='the-evolution-of-browser-puzzles';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['numvault','gridsmash','hexmatch'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/ja/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
-    <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/the-evolution-of-browser-puzzles.html':'/blog/'+nl+'/the-evolution-of-browser-puzzles.html'});</script>
-    <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
-</body>
-</html>
+<p>ブラウザでパズルを始める操作は簡単です。ゲームを選び、一手進めれば結果が見えます。その間には、ファイルの読み込み、ルールの実行、描画、音、対応する記録の保存という別々の処理があります。役割を分けて理解すると、音が出ない、得点が見えない、接続なしで遊びたいといった場面で確認すべきことがわかります。</p>
+<h2 id="section-1">Flash以後、起動方法はどう変わった？</h2>
+<p>Adobeは2020年12月31日にFlash Playerのサポートを終了し、2021年1月12日からFlashコンテンツの実行をブロックしました。日付は<a href="https://www.adobe.com/products/flashplayer/end-of-life.html">Adobeの終了案内</a>で確認できます。現在のPuzzleVaultはFlashプラグインではなくHTML、CSS、JavaScript、Canvasを使います。対応するページを開く際に、PuzzleVaultアカウントや別のゲームアプリのインストールは必要ありません。</p>
+<p>これは配信方法の説明で、特定のフレームレートや全ブラウザで同一の動作を保証するものではありません。たとえば<a href="/games/mergechain.html?lang=ja">MergeChain</a>では描画と同時に動く玉や衝突を更新します。一手ずつ進む数字推理画面とは処理内容が違います。すべてのブラウザパズルが同じ速度だと考えず、使う端末で反応を確かめましょう。</p>
+<h2 id="section-2">画面の準備と音の準備は別</h2>
+<p>PuzzleVaultの短い効果音はコードで生成します。共通の入力処理は最初のポインター操作で音声を初期化し、音ボタンはオン・オフの設定を保存します。盤面が見えていて最初だけ静かな場合は、普通のゲーム操作をしてから、音ボタンと端末の音量を確認してください。無音だけで盤面の読み込み失敗とは判断できません。</p>
+<p>操作が効かないときは、盤面と周辺ページのどちらを操作しているか確認します。MergeChainの矢印キーは盤面にフォーカスが必要です。ブラウザの戻る操作とゲームの再スタートも別物です。慣れない端末では、時間制限や記録を狙う前に練習操作を一度済ませると確実です。</p>
+<h2 id="section-3">ゲームファイル、保存記録、現在の盤面</h2>
+<p>ブラウザのローカルストレージはセッションをまたいでデータを保持でき、プライベート閲覧では扱いが異なります。<a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">MDNのlocalStorage説明</a>を参照できます。PuzzleVaultは対応する統計、最高得点、設定、進行記録をここに保存します。現在の実装は端末間で同期するアカウントに記録をアップロードしていません。</p>
+<div class="guide-table"><table><caption>混同しやすい3つの状態</caption><thead><tr><th scope="col">見えること</th><th scope="col">保存されているもの</th><th scope="col">それだけではわからないこと</th></tr></thead><tbody><tr><td>オフラインでゲームが開く</td><td>以前にキャッシュされたページとファイル</td><td>未訪問の別ページも開くか</td></tr><tr><td>最高得点が戻る</td><td>このブラウザのローカル記録</td><td>別のスマートフォンにも同じ記録があるか</td></tr><tr><td>盤面が開いている</td><td>そのページで進行中の状態</td><td>閉じた後にすべての途中ゲームを再開できるか</td></tr></tbody></table></div>
+<p>説明用の場面を考えてみましょう。ノートパソコンで一局を終え、後からスマートフォンで同じURLを開きます。同じゲームは表示できても、スマートフォンの統計は別の新しい記録かもしれません。それはパソコンの得点が消えた証拠ではありません。逆に、サイトデータの削除後にキャッシュからゲームが開いても、以前の記録まで残っているとは限りません。比べる前に同じブラウザプロファイル、同じサイトアドレスかを確認しましょう。</p>
+<h2 id="section-4">オフラインには必要なファイルが必要</h2>
+<p>サービスワーカーはリクエストを処理し、キャッシュ済みリソースを利用できます。<a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API">MDNのService Worker API説明</a>が参考になります。PuzzleVaultのワーカーは主要ゲームのページ、スクリプト、スタイル、言語ファイルを保存しようとします。ページ移動ではネットワークを先に試し、失敗時にキャッシュへ戻ります。ゲームのスクリプトとスタイルはキャッシュを先に見ます。</p>
+<p>一度短くオンラインで開けば全ページが永久に使える、という保証ではありません。インストールが完了し、必要なファイルが保存され、その後も残っている必要があります。利用可能なキャッシュがないページを最高得点の記録だけから再現することはできません。旅行で使う前には対象のゲームをオンラインで十分に読み込み、短時間接続を切って同じゲームを開き直してみましょう。大事な途中のプレイではなく練習用の回で確認してください。</p>
+<h2 id="section-5">更新時の再読み込みはタイミングを選ぶ</h2>
+<p>新しいワーカーが利用可能になると、PuzzleVaultが再読み込みの案内を出す場合があります。再読み込みはページを開き直す操作なので、進行中の時間制限プレイを残したいなら先にその回を終えましょう。コンテンツ更新と個人の得点は別のデータです。更新案内や見た目の変更は、端末間の記録同期を示しません。</p>
+<p>使っている操作、記録の保存先、必要なページが実際に開くかを区別すると、ブラウザで遊びやすくなります。最初は時間制限のない論理パズルで操作を確認してください。 <a class="pv-btn pv-btn-primary" href="/games/numvault.html?lang=ja">NumVaultを試す</a></p>
+</article>
+<section class="blog-related"><h2>ゲームで試す</h2><div class="related-games-grid"><a class="related-game-card" href="/games/numvault.html?lang=ja"><span class="related-game-name">🔢 NumVault →</span></a><a class="related-game-card" href="/games/gridsmash.html?lang=ja"><span class="related-game-name">🧱 GridSmash →</span></a></div></section><section class="blog-related"><h2>あわせて読む</h2><div class="related-posts-grid"><a class="related-post-card" href="/blog/ja/welcome-to-puzzlevault.html"><div class="related-post-title">最初のPuzzleVaultゲームを選ぶ：遊びたい操作から始めよう</div><p class="related-post-desc">PuzzleVaultの全10ゲームを遊び方、最初の操作、小さな目標で比較。落ち着いた推理から30秒対決まで、自分に合う入口を見つけましょう。</p></a><a class="related-post-card" href="/blog/ja/5-tips-to-boost-your-brain-with-puzzles.html"><div class="related-post-title">PuzzleVaultを楽しく遊ぶための5つのヒント</div><p class="related-post-desc">小さな目標、フィードバック、次の一手の空間、同じ条件での再挑戦を使う実用的な遊び方。</p></a></div></section></main><footer id="pv-footer"><nav class="pv-static-footer"><a href="/ja/about.html">紹介</a><a href="/ja/privacy.html">プライバシー</a><a href="/ja/terms.html">利用規約</a><a href="/ja/contact.html">お問い合わせ</a><a href="/blog/ja/">攻略と読みもの</a></nav></footer>
+<script src="/js/i18n.js?v=15"></script><script src="/js/common.js?v=15"></script><script src="/js/blog-ui.js?v=15"></script>
+</body></html>
