@@ -39,7 +39,9 @@
         s.maxHP = 6 + s.upgrades.filter(x => x === 'root').length * 2;
         s.player = { x: 0, z: 7.4, hp: s.maxHP, facingX: 0, facingZ: -1, invuln: 0, dash: 0 };
         s.attackCD = 0; s.dashCD = 0; s.gardenCD = 0; s.gardenCharges = 2; s.gardenRegen = 0; s.pulse = 0; s.pulseRange = 0; s.gardens = []; s.collected = 0; s.beacon = { x: 0, z: -1, restored: false }; s.seeds = spec.seeds.map(([x,z], i) => ({ x, z, id: i, taken: false }));
-        s.enemies = spec.enemies.map(([x,z,boss],i) => ({ id:i, x,z, boss:!!boss, hp:boss ? 18 : 3 + s.zone, maxHP:boss ? 18 : 3 + s.zone, phase:'stalk', timer:0.7+random(), aimX:0, aimZ:0, hit:false, alive:true, flash:0 }));
+        s.energy=25; s.combo=0; s.comboTimer=0; s.bloom=0; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
+        s.shrine={x:-7,z:-6,used:false};
+        s.enemies = spec.enemies.map(([x,z,boss],i) => {const type=boss?'boss':['stalker','caster','brute'][i%3],hp=boss?26:type==='brute'?5+s.zone:3+s.zone;return {id:i,x,z,type,boss:!!boss,hp,maxHP:hp,phase:'stalk',timer:1+random(),aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0};});
         s.phase = 'playing'; event(s, 'enter');
     }
     function event(s, name) { s.event = name; s.eventId++; }
@@ -52,15 +54,31 @@
         if (canStand(s, actor.x, actor.z+dz)) actor.z += dz;
     }
     function inGarden(s) { return s.gardens.some(g => g.life > 0 && distance(g,s.player) < g.radius); }
+    function strike(s,e,power) {
+        e.hp=Math.max(0,e.hp-power);e.flash=.2;
+        if(e.hp===0&&e.alive){e.alive=false;s.kills++;s.zoneKills++;s.score+=e.boss?600:90+s.zone*30;s.energy=clamp(s.energy+12,0,100);}
+    }
     function attack(s) {
         if (s.phase !== 'playing' || s.attackCD > 0) return false;
-        const charged = inGarden(s), power = 1 + (charged ? 1 : 0) + s.upgrades.filter(x=>x==='pulse').length;
-        s.attackCD = charged ? .48 : .62; s.pulse = .24; s.pulseRange = charged ? 3 : 2.15;
-        for (const e of s.enemies) if (e.alive && distance(e,s.player) <= s.pulseRange + (e.boss ? .5 : .2)) {
-            e.hp -= power; e.flash=.2;
-            if (e.hp <= 0) { e.hp=0; e.alive=false; s.kills++; s.score += e.boss ? 600 : 90 + s.zone * 30; }
-        }
-        event(s,charged ? 'charged' : 'pulse'); return true;
+        const charged=inGarden(s),finisher=s.combo===2;
+        const power=1+(charged?1:0)+(finisher?1:0)+s.upgrades.filter(x=>x==='pulse').length;
+        s.attackCD=charged?.48:.62;s.pulse=.3;s.pulseRange=(charged?3:2.15)+(finisher?.65:0);s.pulseFinisher=finisher;
+        let hit=false;
+        for(const e of s.enemies)if(e.alive&&distance(e,s.player)<=s.pulseRange+(e.boss?.5:.2)){strike(s,e,power);hit=true;s.energy=clamp(s.energy+10,0,100);}
+        if(hit){s.combo=(s.combo+1)%3;s.comboTimer=2.2;}else{s.combo=0;s.comboTimer=0;}
+        event(s,finisher&&hit?'combo':charged?'charged':'pulse');return true;
+    }
+    function bloom(s){
+        if(s.phase!=='playing'||s.energy<100)return false;
+        s.energy=0;s.bloom=.9;s.player.invuln=Math.max(s.player.invuln,1);s.projectiles=[];
+        for(const e of s.enemies)if(e.alive&&distance(e,s.player)<6.5){strike(s,e,s.boon==='flare'?6:4);e.phase='rest';e.timer=2;}
+        s.player.hp=Math.min(s.maxHP,s.player.hp+1);event(s,'bloom');return true;
+    }
+    function chooseBoon(s,boon){
+        if(s.phase!=='shrine'||s.shrine.used||!['renewal','flare'].includes(boon))return false;
+        s.boon=boon;s.shrine.used=true;s.phase='playing';s.score+=150;s.energy=clamp(s.energy+35,0,100);
+        if(boon==='renewal'){s.player.hp=Math.min(s.maxHP,s.player.hp+2);s.gardenCharges=Math.min(3,s.gardenCharges+1);}
+        event(s,'blessing');return true;
     }
     function dash(s) {
         if (s.phase !== 'playing' || s.dashCD > 0) return false;
@@ -71,7 +89,9 @@
         s.gardenCharges--; s.gardenCD=1; s.gardens.push({x:s.player.x,z:s.player.z,life:14,radius:2.3}); event(s,'garden'); return true;
     }
     function interact(s) {
-        if (s.phase !== 'playing' || distance(s.player,s.beacon) > 2.2) return false;
+        if(s.phase!=='playing')return false;
+        if(!s.shrine.used&&distance(s.player,s.shrine)<1.8){if(s.zoneKills<3){event(s,'shrineLocked');return false;}s.phase='shrine';event(s,'shrine');return true;}
+        if(distance(s.player,s.beacon)>2.2)return false;
         if (s.collected < 5 || s.enemies.some(e=>e.alive)) { event(s,'locked'); return false; }
         s.beacon.restored=true; s.restored++; s.score+=500; s.phase=s.zone===2 ? 'won' : 'upgrade'; event(s,s.phase); return true;
     }
@@ -79,33 +99,52 @@
         if (s.phase !== 'upgrade' || !['root','pulse','wind'].includes(upgrade) || (upgrade === 'wind' && s.upgrades.includes('wind'))) return false;
         s.upgrades.push(upgrade); s.zone++; loadZone(s); return true;
     }
-    function tick(s, input = {}, dt = 0) {
-        if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0) return;
-        dt=Math.min(dt,.05); s.elapsed+=dt;
-        for (const key of ['attackCD','dashCD','gardenCD','pulse']) s[key]=Math.max(0,s[key]-dt);
-        s.player.invuln=Math.max(0,s.player.invuln-dt);
-        s.gardenRegen+=dt; if(s.gardenRegen>=18){s.gardenRegen-=18;s.gardenCharges=Math.min(3,s.gardenCharges+1);}
+    function hurt(s,amount){if(s.player.invuln>0)return false;s.player.hp-=amount;s.player.invuln=1.1;s.combo=0;event(s,'hurt');return true;}
+    function volley(s,e,count=1){
+        const base=Math.atan2(e.aimZ,e.aimX);
+        for(let i=0;i<count;i++){const a=base+(i-(count-1)/2)*.23;s.projectiles.push({x:e.x,z:e.z,vx:Math.cos(a)*4.8,vz:Math.sin(a)*4.8,life:4.2,boss:e.boss});}
+    }
+    function tick(s,input={},dt=0){
+        if(s.phase!=='playing'||!Number.isFinite(dt)||dt<=0)return;
+        dt=Math.min(dt,.05);s.elapsed+=dt;
+        for(const key of ['attackCD','dashCD','gardenCD','pulse','bloom','comboTimer'])s[key]=Math.max(0,s[key]-dt);
+        if(s.comboTimer===0)s.combo=0;s.player.invuln=Math.max(0,s.player.invuln-dt);
+        const regen=s.boon==='renewal'?12:18;s.gardenRegen+=dt;if(s.gardenRegen>=regen){s.gardenRegen-=regen;s.gardenCharges=Math.min(3,s.gardenCharges+1);}
         s.gardens=s.gardens.filter(g=>{g.life-=dt;return g.life>0;});
-        if (inGarden(s)) s.player.hp=Math.min(s.maxHP,s.player.hp+dt*.48);
-        let x=Number(input.x)||0,z=Number(input.z)||0,n=Math.hypot(x,z);
+        if(inGarden(s))s.player.hp=Math.min(s.maxHP,s.player.hp+dt*.48);
+        let x=Number(input.x)||0,z=Number(input.z)||0,n=Math.hypot(x,z);s.moving=n>0;
         if(n>0){x/=n;z/=n;s.player.facingX=x;s.player.facingZ=z;}
         if(s.player.dash>0){s.player.dash=Math.max(0,s.player.dash-dt);move(s,s.player,s.player.facingX*11*dt,s.player.facingZ*11*dt);}
         else move(s,s.player,x*3.8*dt,z*3.8*dt);
-        for(const seed of s.seeds) if(!seed.taken&&distance(seed,s.player)<.85){seed.taken=true;s.collected++;s.score+=45;event(s,'seed');}
+        for(const seed of s.seeds)if(!seed.taken&&distance(seed,s.player)<.85){seed.taken=true;s.collected++;s.score+=45;s.energy=clamp(s.energy+8,0,100);event(s,'seed');}
         for(const e of s.enemies){
-            if(!e.alive)continue; e.flash=Math.max(0,e.flash-dt);e.timer-=dt;
-            const d=distance(e,s.player),dx=(s.player.x-e.x)/(d||1),dz=(s.player.z-e.z)/(d||1);
+            if(!e.alive)continue;e.flash=Math.max(0,e.flash-dt);e.timer-=dt;
+            const d=distance(e,s.player),dx=(s.player.x-e.x)/(d||1),dz=(s.player.z-e.z)/(d||1),type=e.type||'stalker';
+            if(e.boss&&!e.rage&&e.hp<=e.maxHP/2){e.rage=true;e.phase='rest';e.timer=1.4;event(s,'rage');}
             if(e.phase==='stalk'){
-                if(d<8 && d>1.65)move(s,e,dx*dt*(e.boss?.95:1.35),dz*dt*(e.boss?.95:1.35));
-                if(e.timer<=0&&d<4.3){e.phase='warn';e.timer=e.boss?1.1:.85;e.aimX=dx;e.aimZ=dz;e.hit=false;}
-            }else if(e.phase==='warn'){
-                if(e.timer<=0){e.phase='rush';e.timer=e.boss?.65:.42;}
+                const reach=type==='caster'?6.7:type==='brute'?3.6:4.3;
+                if(d<10&&d>(type==='caster'?5:1.65))move(s,e,dx*dt*(e.boss?.95:type==='brute'?.85:1.35),dz*dt*(e.boss?.95:type==='brute'?.85:1.35));
+                if(type==='caster'&&d<3.2)move(s,e,-dx*dt*1.1,-dz*dt*1.1);
+                if(e.timer<=0&&d<reach){
+                    e.phase='warn';e.timer=e.boss?1.05:type==='brute'?1.15:.85;e.aimX=dx;e.aimZ=dz;e.hit=false;
+                    e.attackType=type==='caster'?'cast':type==='brute'||(e.boss&&e.rage&&e.cycle%2===0)?'slam':'rush';
+                    if(e.attackType==='slam'){
+                        s.hazards.push({x:e.x,z:e.z,radius:e.boss?3.4:2.4,delay:e.timer,life:.55,hit:false});
+                        if(e.boss&&e.rage)s.hazards.push({x:s.player.x,z:s.player.z,radius:1.6,delay:e.timer+.45,life:.55,hit:false});
+                    }
+                }
+            }else if(e.phase==='warn'&&e.timer<=0){
+                if(e.attackType==='cast'){volley(s,e,3);e.phase='rest';e.timer=1.6;}
+                else if(e.attackType==='slam'){e.phase='rest';e.timer=e.boss?1.5:2;if(e.boss&&e.rage)volley(s,e,5);e.cycle=(e.cycle||0)+1;}
+                else{e.phase='rush';e.timer=e.boss?.65:.42;}
             }else if(e.phase==='rush'){
                 move(s,e,e.aimX*(e.boss?5:6)*dt,e.aimZ*(e.boss?5:6)*dt);
-                if(!e.hit&&d<(e.boss?1.45:.92)&&s.player.invuln<=0){s.player.hp-=e.boss?1.5:1;s.player.invuln=1.15;e.hit=true;event(s,'hurt');}
-                if(e.timer<=0){e.phase='rest';e.timer=e.boss?1.8:1.4;}
-            }else if(e.timer<=0){e.phase='stalk';e.timer=.2;}
+                if(!e.hit&&distance(e,s.player)<(e.boss?1.45:.92)&&hurt(s,e.boss?1.5:1))e.hit=true;
+                if(e.timer<=0){e.phase='rest';e.timer=e.boss?1.5:1.4;e.cycle=(e.cycle||0)+1;}
+            }else if(e.phase==='rest'&&e.timer<=0){e.phase='stalk';e.timer=.2;}
         }
+        s.projectiles=s.projectiles.filter(p=>{p.life-=dt;p.x+=p.vx*dt;p.z+=p.vz*dt;if(distance(p,s.player)<.5){hurt(s,p.boss?1.5:1);return false;}return p.life>0&&Math.abs(p.x)<10&&Math.abs(p.z)<10;});
+        s.hazards=s.hazards.filter(h=>{if(h.delay>0){h.delay-=dt;return true;}h.life-=dt;if(!h.hit&&distance(h,s.player)<h.radius&&hurt(s,1.5))h.hit=true;return h.life>0;});
         if(s.player.hp<=0){s.player.hp=0;s.phase='lost';event(s,'lost');}
     }
     function checkpoint(s) { return { version:1,zone:s.zone,upgrades:s.upgrades.slice(),seed:s.seed,score:s.score,kills:s.kills,elapsed:s.elapsed,mode:s.mode }; }
@@ -116,7 +155,7 @@
         return { ...value,upgrades:value.upgrades.slice() };
     }
     function markRecorded(s){if(!['won','lost'].includes(s.phase)||s.recorded)return false;s.recorded=true;return true;}
-    const Core={ZONES,makeRun,loadZone,canStand,move,inGarden,attack,dash,plant,interact,chooseUpgrade,tick,checkpoint,validCheckpoint,markRecorded,distance,validDailyDate,dailySeedForDate,dailyRequest,resultURL};
+    const Core={ZONES,makeRun,loadZone,canStand,move,inGarden,attack,dash,plant,bloom,chooseBoon,interact,chooseUpgrade,tick,checkpoint,validCheckpoint,markRecorded,distance,validDailyDate,dailySeedForDate,dailyRequest,resultURL};
     if(typeof module!=='undefined'&&module.exports)module.exports=Core;
     root.MosslightCore=Core;
     if(typeof document==='undefined')return;
@@ -130,7 +169,16 @@
     };
     for(const [code,labels] of Object.entries({en:['Dated expedition','Today’s daily expedition'],ko:['날짜 지정 탐험','오늘의 탐험'],ja:['日付指定の探検','今日の探検'],zh:['指定日期探险','今日探险'],es:['Expedición por fecha','Expedición de hoy']})){TEXT[code].sharedDaily=labels[0];TEXT[code].todayDaily=labels[1];}
     for(const [code,note] of Object.entries({en:' A dated shared link reopens that UTC day’s course, even on a later day.',ko:' 날짜가 포함된 공유 링크는 나중에 열어도 해당 UTC 날짜의 탐험을 재현합니다.',ja:' 日付付きの共有リンクでは、後日でもそのUTC日付の探検を再現します。',zh:' 带日期的分享链接，即使以后打开，也会重现该UTC日期的路线。',es:' Un enlace compartido con fecha reproduce la ruta de ese día UTC, incluso más adelante.'}))TEXT[code].faq2a+=note;
-    let state=null,renderer=null,last=0,frame=0,seenEvent=0,seenPhase='',overlayKind='start',soundEnabled=true,camera=[0,15,18],lastHud=0,adPending=false,contextLost=false;
+    const EXPANSION={
+        en:{intro:'The forest remembers its keeper. Follow lantern-lit paths, chain three pulses into a stronger finish, and awaken Bloom to turn a dangerous fight. Three islands, a hidden shrine on each, and a two-phase guardian await.',bloom:'Bloom',bloomReady:'Ready · R',combo:'Pulse chain',shrine:'The whispering shrine',shrineText:'Three defeated creatures have awakened this optional shrine. Choose a blessing for this island. Both grant 35 Bloom energy.',renewal:'Renewal',renewalDesc:'Heal 2 · gain a garden · gardens regrow in 12s',flare:'Wildflare',flareDesc:'Bloom damage 4 → 6',shrineLocked:'Defeat three creatures to awaken the hidden shrine in the northwest.',sidequest:'Optional shrine · defeat 3 creatures · visit the northwest',shrineDone:'Shrine blessing',blessing:'The shrine answers. Your blessing lasts until the next island.',bloomEvent:'Bloom clears incoming bolts, restores 1 vitality and staggers nearby creatures.',comboEvent:'Third pulse! Wider reach and +1 damage.',rage:'The guardian awakens: watch the marked ground and the crystal volleys.',enter:'Follow the lanterns. Amber lines warn of a rush; circles mark a ground strike.',restore:'Attune',controls:'Move: WASD / arrows · Pulse: Space / J · Dash: Shift / K · Garden: Q / L · Bloom: R · Attune beacon / shrine: E · Pause: P / Esc',touchHelp:'Hold a direction and Pulse to fight. Every third successful pulse within 2.2 seconds is stronger. Collect seeds and land hits to fill Bloom. Tap it at 100%.',guide:'You are a lantern keeper crossing three forest islands. Collect the five floating glowseeds, defeat the creatures and attune the central beacon with E. The optional shrine lies in the northwest: after defeating three creatures, visit it and choose Renewal or Wildflare. Renewal heals and speeds garden recovery; Wildflare makes your Bloom stronger. These blessings last for the current island.\nMove with WASD, arrows or the touch pad. Hold Pulse near a creature. Land three pulses without a gap longer than 2.2 seconds: the third reaches farther and deals extra damage. A missed pulse or taking damage breaks the chain. Stalkers warn with an amber trail before rushing. Crystal casters launch a spreading volley; move sideways. Brutes mark a circle before a ground strike. The final guardian changes its attack pattern below half vitality, combining ground marks with crystal bolts.\nGardens last 14 seconds, heal you and add one pulse damage while you stand inside. Charges regrow every 18 seconds, or 12 with Renewal. Landing hits, defeating foes and collecting seeds charge Bloom. At 100 energy, press R: it strikes nearby creatures, removes all flying bolts, briefly protects you and restores one vitality.\nChoose a lasting upgrade after each of the first two beacons. Expedition saves at island entrances; older saves remain usable. Daily begins from the same UTC-date seed for everyone. Pause freezes combat, cooldowns and hazards. Explore alternative blessings and builds, then share your local result.'},
+        ko:{intro:'등불을 따라 오래된 숲의 수호자가 되어 보세요. 파동 세 번을 연결해 강하게 마무리하고, 개화의 힘으로 전세를 바꾸세요. 세 섬과 숨은 성소, 두 단계로 싸우는 마지막 수호자가 기다립니다.',bloom:'개화',bloomReady:'준비 완료 · R',combo:'파동 연계',shrine:'속삭이는 성소',shrineText:'생물 셋을 물리쳐 성소가 깨어났어요. 이 섬에서 사용할 축복을 고르세요. 둘 다 개화 에너지를 35 채워 줍니다.',renewal:'재생의 축복',renewalDesc:'생명력 2 회복 · 정원 +1 · 정원 충전 12초',flare:'야생의 불꽃',flareDesc:'개화 피해 4 → 6',shrineLocked:'수정 생물 셋을 물리치면 북서쪽의 숨은 성소가 깨어나요.',sidequest:'선택 목표 · 생물 3마리 처치 후 북서쪽 성소 방문',shrineDone:'성소의 축복',blessing:'성소가 응답했어요. 축복은 이 섬에서 유지됩니다.',bloomEvent:'개화! 날아오는 수정탄을 지우고 주변 적을 멈추며 생명력 1을 회복해요.',comboEvent:'세 번째 파동! 범위와 피해가 늘어나요.',rage:'수호자가 깨어나요! 바닥에 표시된 위험 지역과 수정탄을 피하세요.',enter:'등불을 따라가세요. 주황색 선은 돌진, 원은 내려찍기 경고예요.',restore:'조율',controls:'이동: WASD / 방향키 · 파동: Space / J · 돌진: Shift / K · 정원: Q / L · 개화: R · 봉화·성소 조율: E · 정지: P / Esc',touchHelp:'방향과 파동 버튼을 길게 누르세요. 2.2초 안에 세 번 명중하면 세 번째 파동이 강해집니다. 씨앗 수집과 공격으로 에너지를 채우고 100%일 때 개화를 누르세요.',guide:'등불지기가 되어 숲의 세 섬을 탐험하세요. 떠 있는 빛씨앗 다섯 개를 모으고 수정 생물을 모두 물리친 뒤 중앙 봉화 옆에서 E 또는 조율을 누르면 다음 섬으로 이어집니다. 북서쪽에는 선택 목표인 성소가 있습니다. 생물 셋을 처치한 뒤 방문해 회복과 정원 충전에 유리한 재생, 또는 개화 피해를 높이는 야생의 불꽃을 고르세요. 축복은 현재 섬에서만 유지됩니다.\nWASD, 방향키 또는 방향 버튼으로 이동합니다. 가까이에서 파동 버튼을 누르거나 길게 누르세요. 2.2초보다 긴 간격 없이 세 번 명중하면 세 번째 파동은 범위가 넓어지고 피해가 1 늘어납니다. 빗맞히거나 피해를 받으면 연계가 끊깁니다. 추적자는 주황색 길을 따라 돌진하고, 마법 생물은 부채꼴 수정탄을 쏘며, 거구는 원으로 표시한 지역을 내려찍습니다. 마지막 수호자는 생명력이 절반 아래가 되면 바닥 공격과 수정탄을 함께 사용합니다.\n정원은 14초 동안 생명력을 회복하고 안에서 사용하는 파동 피해를 1 높여 줍니다. 정원은 18초마다 충전되며 재생 축복을 받으면 12초로 줄어듭니다. 명중, 처치와 씨앗 수집으로 개화 에너지를 채우세요. 100이 되면 R 또는 개화로 넓은 범위를 공격하고 수정탄을 지우며 잠시 보호받고 생명력 1을 회복합니다.\n첫 두 봉화에서는 탐험이 끝날 때까지 유지되는 능력을 고릅니다. 일반 탐험은 섬 입구를 저장하며 기존 저장도 이어 할 수 있습니다. 오늘의 탐험은 UTC 날짜별 같은 시드에서 시작합니다. 일시정지는 적, 위험 지역과 모든 대기시간을 멈춥니다. 다른 축복과 능력 조합으로 다시 도전하고 결과를 공유해 보세요.'},
+        ja:{intro:'灯りに導かれ、森の守り手へ。3連続のパルスと開花の力で戦況を変えましょう。3つの島、隠れた祠、2段階で戦う最後の守護者が待っています。',bloom:'開花',bloomReady:'準備完了 · R',combo:'パルス連携',shrine:'ささやく祠',shrineText:'3体を倒して祠が目覚めました。この島の祝福を選びます。どちらも開花エネルギーを35獲得。',renewal:'再生',renewalDesc:'生命+2 · 庭+1 · 庭の回復12秒',flare:'野生の炎',flareDesc:'開花ダメージ 4 → 6',shrineLocked:'3体を倒すと北西の祠が目覚めます。',sidequest:'任意の祠 · 3体を倒して北西へ',shrineDone:'祠の祝福',blessing:'祝福はこの島で有効です。',bloomEvent:'開花！飛び道具を消し、近くの敵を止め、生命を1回復。',comboEvent:'3発目！範囲とダメージが上昇。',rage:'守護者が覚醒！地面の印と水晶弾を避けましょう。',enter:'灯りをたどろう。琥珀色の線は突進、円は地面攻撃の予告。',restore:'調律',controls:'移動: WASD / 矢印 · パルス: Space / J · ダッシュ: Shift / K · 庭: Q / L · 開花: R · 灯台・祠: E · 停止: P / Esc',touchHelp:'方向とパルスを長押し。2.2秒以内に3回命中させると3発目が強化。種と命中で開花を100%にし、タップで発動。',guide:'3つの森の島を巡る灯りの守り手です。各島の5つの種を集め、敵を全て倒し、中央の灯台でEまたは調律を押します。北西の祠は任意の目標です。3体を倒して訪れ、回復と庭の再生を助ける「再生」か、開花を強める「野生の炎」を選びます。祝福はその島でのみ有効です。\nWASD、矢印、方向ボタンで移動。パルスは長押し可能。2.2秒以上空けず3回命中すると3発目は範囲が広がりダメージ+1。空振りと被弾で連携が切れます。追跡者は線に沿って突進し、術師は扇状の水晶弾、巨体は円形の地面攻撃を使います。最後の守護者は生命半分以下で地面攻撃と弾を組み合わせます。\n庭は14秒間回復とパルスダメージ+1を与えます。18秒ごとに1回分回復し、再生の祝福で12秒になります。命中・撃破・種の回収で開花を充填。100でRを押すと範囲攻撃、飛び道具消去、短い無敵と生命1回復を得ます。\n最初の2つの灯台で探検中に続く能力を選択。通常探検は島の入口を保存し、以前のセーブも使えます。毎日はUTC日付の共通シードで開始。一時停止は敵、危険範囲、待ち時間も止めます。違う祝福を試し、結果を共有しましょう。'},
+        zh:{intro:'循着灯火，成为森林守护者。连续三次脉冲与绽放之力让战局改变。三座岛、隐藏圣所和分两阶段作战的最终守护者等待探索。',bloom:'绽放',bloomReady:'就绪 · R',combo:'脉冲连击',shrine:'低语圣所',shrineText:'击败三只生物后圣所苏醒。选择本岛祝福，两种都提供35点绽放能量。',renewal:'复苏',renewalDesc:'回复2生命 · 花园+1 · 花园12秒充能',flare:'野火',flareDesc:'绽放伤害 4 → 6',shrineLocked:'击败三只生物，唤醒西北角的圣所。',sidequest:'可选圣所 · 击败3只生物后前往西北',shrineDone:'圣所祝福',blessing:'圣所回应了，祝福持续到下一座岛。',bloomEvent:'绽放清除飞弹，震慑附近敌人并恢复1生命。',comboEvent:'第三次脉冲！范围和伤害提高。',rage:'守护者觉醒！避开地面标记和水晶弹。',enter:'循着灯火。琥珀色线预告冲刺，圆圈预告砸地。',restore:'调律',controls:'移动: WASD / 方向键 · 脉冲: Space / J · 冲刺: Shift / K · 花园: Q / L · 绽放: R · 灯塔/圣所: E · 暂停: P / Esc',touchHelp:'长按方向和脉冲。2.2秒内连续命中三次，第三次更强。收集种子和攻击充能，100%时点击绽放。',guide:'扮演灯火守护者，穿越三座森林岛。每岛收集五颗光种、击败所有生物，再到中央灯塔按E或调律。西北圣所是可选目标，击败三只生物后可选择复苏或野火。复苏治疗并加快花园充能，野火提高绽放伤害。祝福仅在当前岛屿有效。\n使用WASD、方向键或触控方向盘移动。可长按脉冲。每次间隔不超过2.2秒连续命中三次，第三次范围更广且伤害+1。打空或受伤会中断连击。追踪者沿预警线冲刺，施法者发射扇形水晶弹，巨兽攻击地面圆形区域。最终守护者在生命低于一半时组合地面攻击与飞弹。\n花园持续14秒，范围内恢复生命并增加1脉冲伤害。每18秒恢复一次使用次数，复苏祝福缩短到12秒。命中、击败敌人和光种为绽放充能。达到100后按R，攻击附近敌人、清除飞弹、短暂无敌并恢复1生命。\n前两座灯塔提供持续整场探险的升级。普通模式保存岛屿入口，旧存档仍可使用。每日模式使用UTC日期的共同种子。暂停会冻结敌人、危险区域与冷却。尝试不同组合并分享本地成绩。'},
+        es:{intro:'Sigue los faroles y conviértete en guardián del bosque. Encadena tres pulsos y desata Floración. Te esperan tres islas, un santuario oculto en cada una y un guardián de dos fases.',bloom:'Floración',bloomReady:'Lista · R',combo:'Cadena de pulsos',shrine:'Santuario susurrante',shrineText:'Tres criaturas derrotadas han despertado el santuario. Elige una bendición para esta isla; ambas dan 35 de energía.',renewal:'Renovación',renewalDesc:'Cura 2 · jardín +1 · recarga en 12 s',flare:'Llama silvestre',flareDesc:'Daño de Floración 4 → 6',shrineLocked:'Vence a tres criaturas para despertar el santuario del noroeste.',sidequest:'Opcional · vence a 3 criaturas y visita el noroeste',shrineDone:'Bendición',blessing:'La bendición dura hasta la siguiente isla.',bloomEvent:'Floración elimina proyectiles, detiene enemigos cercanos y cura 1 de vitalidad.',comboEvent:'¡Tercer pulso! Más alcance y daño.',rage:'¡El guardián despierta! Evita las marcas del suelo y los cristales.',enter:'Sigue los faroles. Las líneas ámbar avisan de cargas; los círculos, de golpes al suelo.',restore:'Sintonizar',controls:'Mover: WASD / flechas · Pulso: Espacio / J · Impulso: Mayús / K · Jardín: Q / L · Floración: R · Faro / santuario: E · Pausa: P / Esc',touchHelp:'Mantén dirección y Pulso. Tres aciertos separados por menos de 2,2 s potencian el tercero. Carga Floración con semillas y golpes; úsala al 100%.',guide:'Cruza tres islas como guardián de faroles. Recoge cinco semillas, derrota a las criaturas y pulsa E junto al faro central. El santuario del noroeste es opcional: tras vencer a tres criaturas, elige Renovación para curarte y recuperar jardines antes, o Llama silvestre para potenciar Floración. La bendición dura esta isla.\nMuévete con WASD, flechas o el panel táctil. Puedes mantener Pulso. Tres aciertos sin más de 2,2 segundos entre ellos potencian el alcance y daño del tercero. Fallar o recibir daño rompe la cadena. Los acechadores cargan siguiendo una línea, los lanzadores disparan cristales en abanico y los brutos golpean círculos marcados. Por debajo de media vitalidad, el guardián final combina golpes al suelo y proyectiles.\nLos jardines duran 14 segundos, curan y añaden un punto de daño al pulso. Recuperas una carga cada 18 segundos, o 12 con Renovación. Los aciertos, las bajas y las semillas cargan Floración. Al llegar a 100 pulsa R: golpea alrededor, borra los proyectiles, protege brevemente y cura un punto de vitalidad.\nLos dos primeros faros ofrecen mejoras para toda la expedición. Se guarda la entrada de cada isla y las partidas antiguas siguen funcionando. Diaria usa la misma semilla UTC. La pausa congela combate, peligros y esperas. Prueba otras combinaciones y comparte tu resultado local.'}
+    };
+    for(const code of Object.keys(EXPANSION))Object.assign(TEXT[code],EXPANSION[code]);
+    for(const [code,note]of Object.entries({en:' The optional Renewal shrine blessing reduces garden recovery to 12 seconds for that island.',ko:' 선택 목표인 성소에서 재생 축복을 받으면 해당 섬에서는 정원 충전이 12초로 줄어듭니다.',ja:' 祠で再生を選ぶと、その島では庭の回復が12秒になります。',zh:' 在圣所选择复苏祝福，可将本岛花园充能缩短到12秒。',es:' La bendición opcional Renovación reduce la recarga a 12 segundos durante esa isla.'}))TEXT[code].faq1a+=note;
+    let state=null,renderer=null,last=0,frame=0,seenEvent=0,seenPhase='',overlayKind='start',soundEnabled=true,camera=[0,11.8,17],lastHud=0,adPending=false,contextLost=false,lastEnvironment=-1;
     const keys=new Set(),held=new Set(),$=id=>document.getElementById(id),lang=()=>typeof I18n!=='undefined'&&TEXT[I18n.currentLang]?I18n.currentLang:'en',t=key=>TEXT[lang()][key]||TEXT.en[key]||key;
     const storage={get(k,fallback=null){try{const v=localStorage.getItem('pv_mosslight_'+k);return v===null?fallback:JSON.parse(v);}catch(_){return fallback;}},set(k,v){try{localStorage.setItem('pv_mosslight_'+k,JSON.stringify(v));}catch(_){}},remove(k){try{localStorage.removeItem('pv_mosslight_'+k);}catch(_){}}};
     const clock=n=>`${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`;
@@ -142,7 +190,7 @@
         const date=mode==='daily'&&validDailyDate(courseDate)?courseDate:new Date().toISOString().slice(0,10),cp=resume&&mode==='story'?saved():null;
         const seed=mode==='daily'?dailySeedForDate(date):(Date.now()>>>0)||1;
         state=makeRun(cp?{...cp,roundId:makeId()}:{seed,mode,date,roundId:makeId()});
-        seenEvent=0;seenPhase='';clearInput();camera=[0,15,18];hideOverlay();$('ml-canvas').focus({preventScroll:true});saveCheckpoint();updateHUD(true);sfx('tap');if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
+        seenEvent=0;seenPhase='';clearInput();camera=[0,11.8,17];hideOverlay();$('ml-canvas').focus({preventScroll:true});saveCheckpoint();updateHUD(true);sfx('tap');if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
     }
     function saveCheckpoint(){if(state&&state.mode==='story'&&state.phase==='playing')storage.set('checkpoint',checkpoint(state));}
     function clearInput(){keys.clear();held.clear();document.querySelectorAll('[data-dir]').forEach(b=>b.classList.remove('pressed'));}
@@ -161,6 +209,9 @@
             const note=document.createElement('small');note.textContent=t('dailyNote')+' '+t('checkpoint');actions.append(note);
         }else if(overlayKind==='pause'){
             title.textContent=t('paused');p.textContent=t('pausedText');actions.append(button(t('resumePlay'),pause,'ml-primary'),button(t('back'),()=>{state=null;showOverlay('start');updateHUD(true);}));
+        }else if(overlayKind==='shrine'){
+            title.textContent=t('shrine');p.textContent=t('shrineText');
+            for(const id of ['renewal','flare']){const b=button('',()=>{if(chooseBoon(state,id)){hideOverlay();updateHUD(true);sfx('clear');}});const strong=document.createElement('strong'),small=document.createElement('span');strong.textContent=t(id);small.textContent=t(id+'Desc');b.append(strong,small);actions.append(b);}
         }else if(overlayKind==='upgrade'){
             title.textContent=t('upgrade');p.textContent=t('upgradeText');
             for(const [id,label,desc] of [['root','root','rootDesc'],['pulse','pulseUpgrade','pulseDesc'],['wind','wind','windDesc']]){
@@ -185,28 +236,82 @@
             $('ml-zone').textContent=`${t('zone')} ${state.zone+1} / 3 · ${t(ZONES[state.zone].name)}${state.mode==='daily'?' · '+state.date+' UTC':''}`;
             const left=state.enemies.filter(e=>e.alive).length;$('ml-objective').textContent=t(left===0&&state.collected===5?'readyBeacon':'objective');$('ml-vitality').textContent=`${Math.ceil(state.player.hp*10)/10} / ${state.maxHP}`;$('ml-healthbar').style.width=(state.player.hp/state.maxHP*100)+'%';$('ml-seeds').textContent=state.collected+' / 5';$('ml-foes').textContent=left;$('ml-score').textContent=state.score;$('ml-build').textContent=state.upgrades.length?state.upgrades.map(x=>t(x==='pulse'?'pulseUpgrade':x)).join(' + '):t('none');
         }
-        const play=state&&state.phase==='playing';for(const id of ['pulse','dash','garden','restore'])$('ml-'+id).disabled=!play||(id==='pulse'&&state.attackCD>0)||(id==='dash'&&state.dashCD>0)||(id==='garden'&&(state.gardenCharges===0||state.gardenCD>0))||(id==='restore'&&distance(state.player,state.beacon)>2.2);
+        $('ml-bloom-cd').textContent=state&&state.energy>=100?t('bloomReady'):`${Math.floor(state?state.energy:25)} / 100 · R`;$('ml-bloom').style.setProperty('--charge',(state?state.energy:25)+'%');$('ml-combo').textContent=t('combo')+' '+(state?state.combo:0)+'/3';$('ml-sidequest').textContent=state&&state.shrine.used?t('shrineDone')+' · '+t(state.boon):t('sidequest')+(state?' ('+Math.min(3,state.zoneKills)+'/3)':'');
+        const play=state&&state.phase==='playing';$('ml-bloom').disabled=!play||state.energy<100;for(const id of ['pulse','dash','garden','restore'])$('ml-'+id).disabled=!play||(id==='pulse'&&state.attackCD>0)||(id==='dash'&&state.dashCD>0)||(id==='garden'&&(state.gardenCharges===0||state.gardenCD>0))||(id==='restore'&&distance(state.player,state.beacon)>2.2&&(state.shrine.used||distance(state.player,state.shrine)>1.8));
         $('ml-pulse-cd').textContent=state&&state.attackCD>0?state.attackCD.toFixed(1)+'s':'Space / J';$('ml-dash-cd').textContent=state&&state.dashCD>0?state.dashCD.toFixed(1)+'s':'Shift / K';$('ml-garden-cd').textContent=state?`${state.gardenCharges}/3 · Q / L`:'2/3 · Q / L';$('ml-pause').disabled=!state||!['playing','paused'].includes(state.phase);$('ml-pause').textContent=t(state&&state.phase==='paused'?'resumePlay':'pause');
     }
     function finish(){if(!markRecorded(state))return;storage.set('best',Math.max(Number(storage.get('best',0))||0,state.score));if(state.phase==='won'){storage.set('wins',Math.max(0,Number(storage.get('wins',0))||0)+1);if(state.mode==='story')storage.remove('checkpoint');}if(state.mode==='daily')storage.set('daily_'+state.date,{score:state.score,won:state.phase==='won',seconds:Math.floor(state.elapsed)});if(typeof updateStats==='function')updateStats('mosslight',state.score,{roundId:state.roundId});sfx(state.phase==='won'?'win':'gameover');showOverlay('result');if(typeof AdController!=='undefined'){adPending=true;renderOverlay();Promise.resolve().then(()=>AdController.showInterstitial()).catch(()=>{}).finally(()=>{adPending=false;if(overlayKind==='result')renderOverlay();});}}
-    function action(name){if(!state)return;const fn={pulse:attack,dash,garden:plant,restore:interact}[name];if(fn)fn(state);updateHUD(true);}
-    const obj=(shape,x,y,z,sx,sy,sz,color,ry=0,opacity=1)=>({shape,x,y,z,sx,sy,sz,color,ry,opacity});
-    function ring(objects,x,z,r,color,y=.12){for(let i=0;i<28;i++){const a=i*Math.PI*2/28;objects.push(obj('box',x+Math.sin(a)*r,y,z+Math.cos(a)*r,.17,.035,.38,color,a));}}
-    function scene(s,time){
-        const spec=ZONES[s.zone],objects=[];objects.push(obj('box',0,-.65,0,19,1.2,19,spec.ground));objects.push(obj('box',0,-1.7,0,17,1,17,'#1e293b'));objects.push(obj('box',0,-2.6,0,12,1,12,'#0f172a'));
-        // Hand-placed stepping stones, roots and carved trail markers make the map legible.
-        for(let i=0;i<9;i++)objects.push(obj('box',Math.sin(i*1.7)*.35,.02,7-i*1.7,.85,.07,.8,'#64748b',i*.23));
-        for(const [x,z,r] of spec.obstacles){objects.push(obj('cylinder',x,.75,z,r*.68,1.5,r*.68,'#735b43'));objects.push(obj('cone',x,2.1,z,r*2.25,2.4,r*2.25,s.zone===1?'#059669':'#65a30d'));objects.push(obj('cone',x,3,z,r*1.65,1.8,r*1.65,'#86efac'));}
-        for(let i=0;i<24;i++){const a=i*Math.PI/12,x=Math.sin(a)*9.05,z=Math.cos(a)*9.05;objects.push(obj('octa',x,.2,z,.5,.55,.5,i%3===0?spec.accent:'#475569',a));}
-        for(const [x,z] of [[-7,7],[7,7],[-7,-7],[7,-7],[-8,2],[8,1]]){objects.push(obj('box',x,.15,z,.55,.3,.6,'#475569'));for(let i=0;i<3;i++)objects.push(obj('cone',x+(i-1)*.22,.52,z,.15,.55,.15,spec.accent));}
-        const b=s.beacon;objects.push(obj('cylinder',b.x,.16,b.z,2,.3,2,'#64748b'));objects.push(obj('cylinder',b.x,.65,b.z,.8,1.2,.8,'#d97706'));objects.push(obj('octa',b.x,1.62,b.z,.8,1,.8,b.restored?'#fef3c7':spec.accent,time*.35));ring(objects,b.x,b.z,1.45,b.restored?'#fde68a':'#94a3b8');
-        for(const seed of s.seeds)if(!seed.taken){objects.push(obj('octa',seed.x,.8+Math.sin(time*2+seed.id)*.13,seed.z,.42,.65,.42,'#fde68a',time));objects.push(obj('cylinder',seed.x,.045,seed.z,.55,.04,.55,'#d97706'));}
-        for(const g of s.gardens){ring(objects,g.x,g.z,g.radius,g.life>3?'#86efac':'#fde68a');for(let i=0;i<8;i++){const a=i*Math.PI/4;objects.push(obj('cone',g.x+Math.cos(a)*1.65,.22,g.z+Math.sin(a)*1.65,.35,.45,.35,'#65a30d'));}}
-        for(const e of s.enemies){if(!e.alive)continue;const scale=e.boss?1.5:1,col=e.flash>0?'#ffffff':e.phase==='warn'?'#f59e0b':e.phase==='rest'?'#94a3b8':s.zone===1?'#0891b2':'#7c3aed';objects.push(obj('octa',e.x,.55*scale,e.z,.85*scale,1.05*scale,.85*scale,col,time*.25+e.id));objects.push(obj('cone',e.x-.36*scale,.93*scale,e.z,.24*scale,.55*scale,.24*scale,spec.accent));objects.push(obj('cone',e.x+.36*scale,.93*scale,e.z,.24*scale,.55*scale,.24*scale,spec.accent));objects.push(obj('box',e.x,1.6*scale,e.z,1.15*scale,.075,.12,'#1e293b'));objects.push(obj('box',e.x-(1-e.hp/e.maxHP)*.575*scale,1.605*scale,e.z,1.15*scale*e.hp/e.maxHP,.08,.14,'#fca5a5'));
-            if(e.phase==='warn'){ring(objects,e.x,e.z,e.boss?1.6:1,'#f59e0b');for(let i=1;i<5;i++)objects.push(obj('box',e.x+e.aimX*i*.55,.09,e.z+e.aimZ*i*.55,.25,.08,.35,'#fde68a',Math.atan2(e.aimX,e.aimZ)));}
+    function action(name){if(!state)return;const fn={pulse:attack,dash,garden:plant,bloom,restore:interact}[name];if(fn)fn(state);updateHUD(true);}
+    const obj=(shape,x,y,z,sx,sy,sz,color,ry=0,opacity=1,emissive=0)=>({shape,x,y,z,sx,sy,sz,color,ry,opacity,emissive,roughness:.78});
+    function ring(objects,x,z,r,color,y=.12,opacity=1){objects.push(obj('torus',x,y,z,r*2,.16,r*2,color,0,opacity,.35));}
+    const terrainCache=new Map();
+    function terrain(zone){
+        if(terrainCache.has(zone))return terrainCache.get(zone);
+        const a=[],spec=ZONES[zone],random=rng(812+zone*56),greens=[['#4c7651','#6f9558','#87a96b'],['#3f776f','#60938a','#80b19b'],['#49635e','#668377','#8b9d78']][zone];
+        a.push(obj('bevelbox',0,-.55,0,19,1.1,19,greens[0]),obj('bevelbox',0,-1.5,0,17.8,1.2,17.8,'#354e45'),obj('bevelbox',0,-2.3,0,14.6,1.1,14.6,'#293b37'));
+        // Individually shaped rock shelves and moss pillows soften the island silhouette.
+        for(let i=0;i<32;i++){const side=i%4,n=Math.floor(i/4),v=-8.4+n*2.4,x=side<2?(side===0?-9:9):v,z=side<2?v:(side===2?-9:9);a.push(obj('sphere',x,-.68-random()*.6,z,2.3+random(),1.6,2.5, i%3?'#526753':'#748866',random()*3));if(i%3===0)a.push(obj('sphere',x*.96,-.08,z*.96,1.8,.35,1.7,greens[1]));}
+        for(let i=0;i<13;i++){const z=7.7-i*1.35,x=Math.sin(i*.75)*.55;a.push(obj('sphere',x,.024,z,1.4,.08,1.15,'#9d9c7c',i*.3),obj('bevelbox',x+.27,.04,z-.12,.6,.055,.48,'#b0ad8b',i*.21));}
+        for(const [x,z,r]of spec.obstacles){
+            a.push(obj('disk',x,.016,z,r*3.3,1,r*3.3,'#213d32',0,.14),obj('cylinder',x,1.15,z,r*.67,2.3,r*.67,'#806b4c'));
+            for(let k=0;k<5;k++){const angle=k*Math.PI*.4;a.push(obj('bevelbox',x+Math.cos(angle)*.42,.15,z+Math.sin(angle)*.42,.3,.27,1.25,'#806b4c',Math.PI/2-angle));}
+            const clusters=[[0,3.3,0,2.5],[-.85,2.7,.25,1.9],[.82,2.85,.3,2],[.1,2.9,-.85,2.1],[-.35,3.8,-.12,1.8]];
+            for(const [dx,y,dz,size]of clusters){const leaf=obj('sphere',x+dx*r,y*r,z+dz*r,size*r,size*.78*r,size*r,greens[Math.floor(random()*3)]);leaf.treeX=x;leaf.treeZ=z;a.push(leaf);}
+            a.push(obj('sphere',x-.25,1.08,z+.34,.16,.2,.1,'#c0ad83'),obj('sphere',x+.08,1.23,z+.35,.12,.13,.09,'#c0ad83'));
         }
-        const p=s.player,angle=Math.atan2(p.facingX,p.facingZ);objects.push(obj('cylinder',p.x,.045,p.z,.9,.04,.9,'#102f2a'));const blink=p.invuln>0&&Math.floor(time*16)%2===0;objects.push(obj('cone',p.x,.49,p.z,.76,.95,.76,blink?'#fef3c7':'#059669',angle));objects.push(obj('octa',p.x,1.04,p.z,.6,.66,.6,'#fde68a'));objects.push(obj('cone',p.x,1.38,p.z,.75,.5,.75,'#65a30d'));objects.push(obj('box',p.x+p.facingX*.36,1.08,p.z+p.facingZ*.36,.27,.1,.2,'#1e293b',angle));objects.push(obj('octa',p.x+.5,.6,p.z,.25,.38,.25,'#fef3c7',time));
-        if(s.pulse>0)ring(objects,p.x,p.z,s.pulseRange*(1-s.pulse/.24),'#fef3c7',.25);
+        for(let i=0;i<100;i++){
+            const x=(random()-.5)*17.5,z=(random()-.5)*17.5;
+            if(Math.abs(x)<1.1||spec.obstacles.some(([ox,oz,r])=>Math.hypot(x-ox,z-oz)<r+.2))continue;
+            if(i%4===0){a.push(obj('sphere',x,.14,z,.5+random()*.4,.3,.6,'#9b9d82',random()*3));}
+            else if(i%5===0){a.push(obj('cylinder',x,.16,z,.1,.3,.1,'#e7d8ad'),obj('sphere',x,.31,z,.4,.2,.38,zone===2?'#c4b5fd':'#fca5a5'));a.push(obj('sphere',x+.08,.39,z,.055,.03,.055,'#fff4df'));}
+            else{a.push(obj('cone',x,.17,z,.16,.36,.15,greens[2]),obj('cone',x+.13,.12,z+.06,.14,.27,.15,greens[1]));}
+        }
+        for(const [x,z]of[[-7,6.5],[7,6.5],[-7,-2],[7,-4]]){a.push(obj('bevelbox',x,.08,z,.8,.16,.8,'#778470'),obj('cylinder',x,.66,z,.12,1.2,.12,'#6b5d44'),obj('bevelbox',x,1.22,z,.4,.53,.4,'#ffe8a3',0,1,.8),obj('bevelbox',x,1.54,z,.55,.13,.55,'#806b4c'));
+        }
+        // Distant islands make a complete forest world rather than an isolated game board.
+        for(const [x,z,scale]of[[-17,-13,1],[16,-18,1.4],[-21,7,.8],[21,4,.8]]){a.push(obj('sphere',x,-2.3,z,8*scale,3*scale,7*scale,'#294c43'));for(let j=0;j<3;j++)a.push(obj('sphere',x+(j-1)*1.8*scale,.1*scale,z,3.2*scale,3.5*scale,3*scale,'#3d6e59'));}
+        terrainCache.set(zone,a);return a;
+    }
+    function scene(s,time){
+        const spec=ZONES[s.zone],p=s.player,objects=terrain(s.zone).map(o=>o.treeZ>p.z-1&&Math.hypot(o.treeX-p.x,o.treeZ-p.z)<3?{...o,opacity:.28}:o);
+        const glow=(shape,x,y,z,sx,sy,sz,color,ry=0,opacity=1)=>({...obj(shape,x,y,z,sx,sy,sz,color,ry,opacity,.7),castShadow:false});
+        const shadow=(x,z,r)=>objects.push(obj('disk',x,.022,z,r,1,r,'#102f2a',0,.15));
+        const b=s.beacon,ready=s.collected===5&&!s.enemies.some(e=>e.alive);shadow(b.x,b.z,2.5);
+        objects.push(obj('cylinder',b.x,.12,b.z,2.3,.23,2.3,'#9a9d7b'),obj('cylinder',b.x,.33,b.z,1.6,.23,1.6,'#657c67'),obj('bevelbox',b.x,.82,b.z,.62,.96,.62,'#dbcb96',Math.PI/4));
+        for(let i=0;i<4;i++){const a=i*Math.PI/2;objects.push(obj('bevelbox',b.x+Math.cos(a)*.56,.8,b.z+Math.sin(a)*.56,.2,1,.2,'#8c9c77',a));}
+        objects.push(glow('sphere',b.x,1.68+Math.sin(time)*.05,b.z,.53,.75,.53,ready?'#fff1af':spec.accent),obj('torus',b.x,1.68,b.z,1.1,.12,1.1,'#d8b45b',time*.3));ring(objects,b.x,b.z,1.45,ready?'#fde68a':'#86a186',.035,.8);
+        const shrine=s.shrine;shadow(shrine.x,shrine.z,1.8);objects.push(obj('cylinder',shrine.x,.19,shrine.z,1.4,.4,1.4,'#767966'),obj('torus',shrine.x,.44,shrine.z,1.2,.12,1.2,'#b59b60'));
+        for(let i=0;i<3;i++){const angle=time*.3+i*Math.PI*2/3;objects.push(glow('sphere',shrine.x+Math.cos(angle)*.35,.93+Math.sin(time+i)*.12,shrine.z+Math.sin(angle)*.35,.22,.35,.22,s.shrine.used?'#6e8075':s.zoneKills>=3?'#fde68a':'#c4b5fd'));}
+        if(!s.shrine.used)ring(objects,shrine.x,shrine.z,1.05,s.zoneKills>=3?'#fde68a':'#c4b5fd',.03,.65);
+        for(const seed of s.seeds)if(!seed.taken){const y=.7+Math.sin(time*2+seed.id)*.13;shadow(seed.x,seed.z,.6);objects.push(glow('sphere',seed.x,y,seed.z,.32,.48,.32,'#ffe49a'),obj('sphere',seed.x-.15,y+.22,seed.z,.28,.12,.15,'#86efac',-.4),obj('torus',seed.x,.1,seed.z,.65,.035,.65,'#d3c47c'));}
+        for(const g of s.gardens){objects.push(obj('disk',g.x,.03,g.z,g.radius*2,1,g.radius*2,'#86efac',0,.13,.3));ring(objects,g.x,g.z,g.radius,g.life>3?'#b5efb5':'#fde68a',.07,.8);for(let i=0;i<9;i++){const a=i*Math.PI*2/9,x=g.x+Math.cos(a)*1.65,z=g.z+Math.sin(a)*1.65;objects.push(obj('sphere',x,.13,z,.44,.17,.35,'#659b67'),glow('sphere',x,.34+Math.sin(time*2+i)*.05,z,.15,.16,.15,'#e9f5b4'));}}
+        for(const h of s.hazards){const warning=h.delay>0;objects.push(obj('disk',h.x,.055,h.z,h.radius*2,1,h.radius*2,warning?'#fbbf24':'#f43f5e',0,warning?.12:.4,.5));ring(objects,h.x,h.z,h.radius,warning?'#fbbf24':'#fb7185',.08);if(warning)ring(objects,h.x,h.z,h.radius*clamp(1-h.delay/1.2,.1,1),'#fde68a',.085,.6);}
+        for(const bolt of s.projectiles){objects.push(glow('sphere',bolt.x,.64,bolt.z,.28,.28,.28,'#e9bcff'));objects.push(glow('sphere',bolt.x-bolt.vx*.035,.64,bolt.z-bolt.vz*.035,.18,.18,.18,'#c4b5fd',0,.6));}
+        for(const e of s.enemies){
+            if(!e.alive)continue;const type=e.type||'stalker',scale=e.boss?1.65:type==='brute'?1.25:1,angle=Math.atan2(p.x-e.x,p.z-e.z),bob=Math.sin(time*3+e.id)*.05,col=e.flash>0?'#fff7df':e.phase==='warn'?'#d9a345':type==='caster'?'#697ea6':type==='brute'?'#796b88':'#81957b';
+            shadow(e.x,e.z,scale*1.35);
+            if(type==='caster'){
+                objects.push(obj('sphere',e.x,.85+bob,e.z,.73,.83,.73,col),obj('torus',e.x,.67+bob,e.z,1.1,.16,1.1,'#b9a6d7',time),glow('sphere',e.x,.96+bob,e.z+.36,.24,.16,.12,'#eed5ff'));
+                for(let i=0;i<3;i++){const a=time+i*Math.PI*2/3;objects.push(obj('octa',e.x+Math.cos(a)*.6,1.1+bob,e.z+Math.sin(a)*.6,.18,.35,.18,'#bcaee7',a));}
+            }else{
+                objects.push(obj('bevelbox',e.x,.63*scale,e.z,.83*scale,.94*scale,.73*scale,col,angle),obj('sphere',e.x,1.12*scale+bob,e.z,.67*scale,.57*scale,.61*scale,col,angle));
+                for(const side of[-1,1]){const lx=Math.cos(angle)*side*.46*scale,lz=-Math.sin(angle)*side*.46*scale;objects.push(obj('sphere',e.x+lx,.56*scale,e.z+lz,.37*scale,.7*scale,.4*scale,col),obj('bevelbox',e.x+lx*.55,.16,e.z+lz*.55,.28*scale,.25,.42*scale,'#3d4a47',angle));objects.push(obj('octa',e.x+lx*.65,1.5*scale,e.z+lz*.65,.24*scale,.58*scale,.23*scale,e.rage?'#fb7185':'#b9c2a9',angle));}
+                objects.push(glow('bevelbox',e.x+Math.sin(angle)*.35*scale,1.13*scale,e.z+Math.cos(angle)*.35*scale,.35*scale,.09,.07,e.rage?'#fb7185':'#e3f4bd',angle));
+            }
+            if(e.hp<e.maxHP||e.boss){const width=1.2*scale,y=1.88*scale;objects.push(obj('bevelbox',e.x,y,e.z,width,.075,.1,'#263c36'),obj('bevelbox',e.x-(1-e.hp/e.maxHP)*width/2,y+.005,e.z,width*e.hp/e.maxHP,.08,.12,e.rage?'#fb7185':'#e9bd92'));}
+            if(e.phase==='warn'&&e.attackType!=='slam'){ring(objects,e.x,e.z,scale*.9,'#fbbf24',.065);for(let i=1;i<5;i++)objects.push(glow('bevelbox',e.x+e.aimX*i*.55,.08,e.z+e.aimZ*i*.55,.14,.04,.25,'#fde68a',Math.atan2(e.aimX,e.aimZ)));}
+        }
+        const angle=Math.atan2(p.facingX,p.facingZ),walk=s.moving?Math.sin(time*13)*.11:0,bob=s.moving?Math.abs(walk)*.4:Math.sin(time*2)*.018,skin=p.invuln>0&&Math.floor(time*16)%2===0?'#fff2cd':'#e8c797';shadow(p.x,p.z,1.15);
+        const part=(shape,lx,y,lz,sx,sy,sz,color,emissive=0)=>{objects.push(obj(shape,p.x+Math.cos(angle)*lx+Math.sin(angle)*lz,y+bob,p.z-Math.sin(angle)*lx+Math.cos(angle)*lz,sx,sy,sz,color,angle,1,emissive));};
+        part('bevelbox',-.18,.16+walk,.02,.25,.3,.42,'#624f3e');part('bevelbox',.18,.16-walk,.02,.25,.3,.42,'#624f3e');
+        part('sphere',0,.65,0,.72,.83,.62,'#27785b');part('bevelbox',0,.7,-.34,.47,.56,.28,'#9c7747');part('bevelbox',0,.62,.03,.74,.14,.6,'#ac8950');
+        part('sphere',0,1.2,.03,.68,.65,.65,skin);part('sphere',0,1.39,-.1,.79,.58,.77,'#37734e');part('bevelbox',0,1.54,.11,.85,.11,.75,'#4d8755');
+        part('sphere',-.13,1.23,.34,.078,.105,.04,'#293f3a');part('sphere',.13,1.23,.34,.078,.105,.04,'#293f3a');part('sphere',0,1.13,.36,.11,.065,.09,'#d6ab7f');
+        part('sphere',-.4,.7+walk,0,.24,.43,.24,'#377c58');part('sphere',.4,.7-walk,0,.24,.43,.24,'#377c58');part('sphere',-.41,.47+walk,.06,.21,.22,.21,skin);part('sphere',.41,.47-walk,.06,.21,.22,.21,skin);
+        part('torus',.55,.62-walk,.15,.25,.26,.25,'#c6a25d');part('bevelbox',.55,.4-walk,.15,.3,.36,.3,'#ffe8a3',.8);part('bevelbox',.55,.64-walk,.15,.38,.08,.38,'#9d7950');
+        if(s.pulse>0){const radius=s.pulseRange*(1-s.pulse/.3);ring(objects,p.x,p.z,radius,s.pulseFinisher?'#fde68a':'#d8f5cf',.35,s.pulse/.3);}
+        if(s.bloom>0){const radius=(1-s.bloom/.9)*6.5;ring(objects,p.x,p.z,radius,'#fff0ae',.3,s.bloom/.9);for(let i=0;i<12;i++){const a=i*Math.PI/6;objects.push(glow('sphere',p.x+Math.cos(a)*radius,.5+Math.sin(s.bloom*6)*.3,p.z+Math.sin(a)*radius,.25,.45,.25,'#eaf7b7',a,s.bloom));}}
+        for(let i=0;i<12;i++){const a=time*.15+i*2.4;objects.push(glow('sphere',Math.sin(a+i)*7,.7+(i%3)*.5+Math.sin(time+i)*.15,Math.cos(a*.7+i)*7,.065,.065,.065,'#e0ecb0',0,.75));}
         return objects;
     }
     const preview=makeRun({seed:812});
@@ -215,22 +320,22 @@
             const west=keys.has('a')||keys.has('arrowleft')||held.has('west'),east=keys.has('d')||keys.has('arrowright')||held.has('east'),north=keys.has('w')||keys.has('arrowup')||held.has('north'),south=keys.has('s')||keys.has('arrowdown')||held.has('south');
             tick(state,{x:Number(east)-Number(west),z:Number(south)-Number(north)},dt);
             if(keys.has(' ')||keys.has('j')||held.has('pulse'))attack(state);
-            if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',locked:'locked'}[state.event];if(eventKey)$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='hurt')sfx('wrong');else if(state.event==='pulse'||state.event==='charged')sfx('tap');else if(state.event==='garden')sfx('hint');}
+            if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',locked:'locked',bloom:'bloomEvent',combo:'comboEvent',rage:'rage',shrineLocked:'shrineLocked',blessing:'blessing'}[state.event];if(eventKey)$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='hurt')sfx('wrong');else if(state.event==='pulse'||state.event==='charged'||state.event==='combo')sfx('tap');else if(state.event==='garden')sfx('hint');else if(state.event==='bloom')sfx('combo');}
         }
-        if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(['won','lost'].includes(state.phase))finish();}
-        if(renderer&&!contextLost){const active=state||preview,p=active.player;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const target=[p.x*.42,0,p.z*.42];camera[0]+=(target[0]-camera[0])*smoothing;camera[1]=17;camera[2]+=(target[2]+17-camera[2])*smoothing;renderer.render(scene(active,reduced?0:now/1000),{eye:camera,target:[camera[0],0,camera[2]-17],fov:49});}
+        if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='shrine'){sfx('hint');showOverlay('shrine');}else if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(['won','lost'].includes(state.phase))finish();}
+        if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const target=[p.x*.78,0,p.z*.78];camera[0]+=(target[0]-camera[0])*smoothing;camera[1]=11.8;camera[2]+=(target[2]+12.5-camera[2])*smoothing;renderer.render(scene(active,reduced?0:now/1000),{eye:camera,target:[camera[0],.25,camera[2]-13.5],fov:49});}
         updateHUD();
     }
     function boot(){
-        if(!$('ml-canvas'))return;try{renderer=new PV3D.Renderer($('ml-canvas'),{clear:'#102b2c'});}catch(_){$('ml-webgl').hidden=false;}
+        if(!$('ml-canvas'))return;try{renderer=new PV3D.Renderer($('ml-canvas'),{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce',fogNear:24,fogFar:64});}catch(_){$('ml-webgl').hidden=false;}
         $('ml-canvas').addEventListener('webglcontextlost',e=>{e.preventDefault();contextLost=true;clearInput();if(state&&state.phase==='playing')pause();else if(overlayKind)renderOverlay();});$('ml-canvas').addEventListener('webglcontextrestored',()=>{contextLost=false;last=0;if(overlayKind)renderOverlay();});
         try{soundEnabled=localStorage.getItem('pv_sound')!=='off';}catch(_){};
         $('ml-pause').addEventListener('click',pause);$('ml-sound').addEventListener('click',()=>{soundEnabled=!soundEnabled;try{localStorage.setItem('pv_sound',soundEnabled?'on':'off');}catch(_){}if(typeof SFX!=='undefined')SFX.enabled=soundEnabled;updateHUD(true);});
-        for(const name of ['pulse','dash','garden','restore'])$('ml-'+name).addEventListener('click',()=>action(name));
+        for(const name of ['pulse','dash','garden','bloom','restore'])$('ml-'+name).addEventListener('click',()=>action(name));
         for(const b of document.querySelectorAll('[data-dir]')){const dir=b.dataset.dir;b.addEventListener('pointerdown',e=>{if(!state||state.phase!=='playing')return;e.preventDefault();held.add(dir);b.classList.add('pressed');b.setPointerCapture(e.pointerId);});for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>{held.delete(dir);b.classList.remove('pressed');});}
         $('ml-pulse').addEventListener('pointerdown',e=>{if(!state||state.phase!=='playing')return;held.add('pulse');e.currentTarget.setPointerCapture(e.pointerId);});for(const ev of ['pointerup','pointercancel','lostpointercapture'])$('ml-pulse').addEventListener(ev,()=>held.delete('pulse'));
-        document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;const k=e.key.toLowerCase();if(['p','escape'].includes(k)){if(state&&['playing','paused'].includes(state.phase)){e.preventDefault();if(!e.repeat)pause();}return;}if(!state||state.phase!=='playing')return;if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' ','j','shift','k','q','l','e'].includes(k)){e.preventDefault();keys.add(k);if(!e.repeat){if(['shift','k'].includes(k))action('dash');if(['q','l'].includes(k))action('garden');if(k==='e')action('restore');}}});
-        document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));document.addEventListener('visibilitychange',()=>{clearInput();if(document.hidden&&state&&state.phase==='playing')pause();});root.addEventListener('blur',()=>{clearInput();if(state&&state.phase==='playing')pause();});root.addEventListener('pagehide',()=>{clearInput();if(state&&state.phase==='playing')pause();cancelAnimationFrame(frame);if(renderer&&renderer.dispose)renderer.dispose();});root.addEventListener('pageshow',e=>{if(!e.persisted)return;last=0;contextLost=false;try{renderer=new PV3D.Renderer($('ml-canvas'),{clear:'#102b2c'});}catch(_){renderer=null;$('ml-webgl').hidden=false;}if(overlayKind)renderOverlay();frame=requestAnimationFrame(loop);});
+        document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;const k=e.key.toLowerCase();if(['p','escape'].includes(k)){if(state&&['playing','paused'].includes(state.phase)){e.preventDefault();if(!e.repeat)pause();}return;}if(!state||state.phase!=='playing')return;if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' ','j','shift','k','q','l','e','r'].includes(k)){e.preventDefault();keys.add(k);if(!e.repeat){if(['shift','k'].includes(k))action('dash');if(['q','l'].includes(k))action('garden');if(k==='e')action('restore');if(k==='r')action('bloom');}}});
+        document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));document.addEventListener('visibilitychange',()=>{clearInput();if(document.hidden&&state&&state.phase==='playing')pause();});root.addEventListener('blur',()=>{clearInput();if(state&&state.phase==='playing')pause();});root.addEventListener('pagehide',()=>{clearInput();if(state&&state.phase==='playing')pause();cancelAnimationFrame(frame);if(renderer&&renderer.dispose)renderer.dispose();});root.addEventListener('pageshow',e=>{if(!e.persisted)return;last=0;contextLost=false;lastEnvironment=-1;try{renderer=new PV3D.Renderer($('ml-canvas'),{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce',fogNear:24,fogFar:64});}catch(_){renderer=null;$('ml-webgl').hidden=false;}if(overlayKind)renderOverlay();frame=requestAnimationFrame(loop);});
         root.addEventListener('langchange',translate);root.addEventListener('pvReady',translate);translate();showOverlay('start');frame=requestAnimationFrame(loop);
         root.PVMosslight=Object.freeze({getState:()=>state?JSON.parse(JSON.stringify(state)):null,start,pause});
     }

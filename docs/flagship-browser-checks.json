@@ -1,5 +1,5 @@
 {
-  "date": "2026-09-26",
+  "date": "2026-09-27",
   "browser": "Microsoft Edge / Chromium, headless WebGL",
   "checks": [
     "mosslight/en: boot, readable guide, layout320/390dark/1280",
@@ -16,10 +16,10 @@
     "cloudweft/es: boot, readable guide, layout320/390dark/1280",
     "cloudweft: keyboard/pointer hold/cancel, special action, pause clock, WebGL loss and explicit resume",
     "cloudweft: dated daily invitation retains original course",
+    "Dated Cloudweft links also allow a fresh daily course and a normal campaign",
     "Cloudweft recovers from malformed progress JSON",
     "Both games show a readable WebGL fallback and keep guides accessible",
-    "Version16 cache starts both 3D games offline with localized URLs",
-    "Dated Cloudweft links also allow a fresh daily course and a normal campaign"
+    "Version17 cache starts both 3D games offline with localized URLs"
   ],
   "errors": [],
   "externalRequests": []

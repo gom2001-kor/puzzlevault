@@ -1,34 +1,39 @@
-# Cloudweft Passage
+# Cloudweft Passage — expedition update
 
-An original, self-contained 3D sky-courier adventure. The public game id is `cloudweft` and its Korean subtitle is `구름결 여정`.
+An original, self-contained 3D sky-courier adventure. Public id: `cloudweft`; Korean title: `구름결 여정`.
 
 ## Play loop
 
-- Collect three dawn glyphs and reach the final portal in each of three handcrafted chapters.
-- Switch between sun and moon to make alternating bridges solid. All seven islands (six main, one side branch) are permanent safe checkpoints.
-- Chapter 2 introduces jumps over missing bridge segments and a moving sentry light. Chapter 3 widens the two gaps, adds another sentry and a small airborne wind nudge.
-- Optional exploration finds four mint relics per chapter, including two on the side branch.
-- Falling returns the courier to the latest island, retains collections and increments the rescue count once. There are no lives, purchases or ad requirements.
+- Three chapters now have different island layouts, palettes and architecture: Apricot Dawn, Azure Gardens, Violet Observatory.
+- Each chapter has six main islands and an optional relic island. Switch between SUN and MOON to make alternating bridges solid. Circle marks identify SUN; paired strokes identify MOON, so color is not the only cue.
+- Attune three shrines, on main islands 2, 4 and 5. Stand nearby on the ground, match the shrine's phase, then use Attune. Merely touching a shrine does not activate it. The exit opens after all three are attuned.
+- Jump, air dash once, and hold Jump on descent to glide for up to 1.5 seconds. Landing restores both abilities. White wind motes above broken crossings restore both in midair and return after eight active seconds. This allows chained movement across the more difficult optional branches.
+- Chapter 1 teaches traversal and attunement. Chapter 2 adds broken bridges and a moving sentry. Chapter 3 has wider gaps, a crosswind, another sentry and an extended optional gap. Optional relic exploration rewards route planning.
+- Falling returns the courier to the latest island with runes/relics intact and restores flight energy. There are no life limits, purchases or ad requirements.
 - Completed chapters unlock practice. Campaign and daily expeditions finish after chapter 3; practice finishes after one chapter.
 
-## Controls and technical approach
+## Controls and lifecycle
 
-WASD/arrows move along screen-aligned world X/Z axes. Space jumps; E switches world; Escape pauses. Touch controls support independent captured pointers for movement, jump and phase. Pointer cancellation, focus loss and document visibility changes clear held inputs. A lost WebGL context pauses; restoration still requires explicit resume.
+WASD/arrows move along world X/Z axes. Space jumps; holding Space while descending glides. Shift performs an air dash. E switches the world, F attunes a nearby matching shrine, and Escape pauses. Touch controls support independent captured pointers for movement and a held jump button, plus dash, phase and attunement buttons. Pointer cancellation, lost capture, focus loss and document visibility changes clear held inputs. A lost WebGL context pauses; restoration still requires explicit resume. A BFCache page remains paused until the user continues.
 
-The shared, original `/js/pv3d.js` renderer draws real 3D primitive meshes. Courier, foliage, islands, bridge sections, collectibles and portals are constructed from code. No third-party character, music, model, font, texture or game code is included. Sound uses the project's existing oscillator effects. The camera follows a fixed perspective; reduced-motion mode removes idle bobbing and camera easing without removing gameplay hazards.
+The HUD shows rune/relic totals, active time, rescues, phase, remaining flight energy and dash availability. Nearby shrines show their required phase and highlight Attune. Brief contextual instructions progress from walking to shrine interaction, dash and glide; the full guide is available in five languages.
 
-`cloudweft-logic.js` exports pure level generation, stepping, support tests, checkpoint rescue, validated save restoration and scoring for Node tests. Physics uses fixed 60 Hz steps, normalized diagonal movement, a coyote jump window and jump buffering. A documented read-only `Cloudweft.inspect()` snapshot helps browser QA without granting a teleport/complete shortcut.
+## Art and rendering
 
-## Honest progression and sharing
+The original shared `/js/pv3d.js` renderer draws real 3D primitive meshes. The world now combines beveled grass terraces, asymmetrical rock strata, stepping stones, sphere-cluster trees, flowers, lantern posts, marked rail bridges, ruined arches, observatory orreries, drifting cloud volumes and a circular portal. The courier has an articulated hooded body, backpack, boots, scarf, lantern and deployable fabric glider. Contact shadows, warm lighting, atmospheric fog and distinct chapter sky gradients come from the renderer. Distant scenery is visibly separate from playable surfaces.
 
-Score = max(100, round(2200 + relics × 250 − active seconds × 3 − rescues × 100)). Gold needs all four relics, zero rescues and under 160 seconds; otherwise up to three rescues earns silver, then bronze. The final expedition medal is the lowest of its three chapter medals. Records are local and shared scores are self-reported, not verified online rankings. Regular chapter best scores are shown with a star in the practice menu.
+All character models, world geometry, props and animation are generated by original game code. No external game characters, music, models, fonts or textures are included. Sound uses the project's oscillator effects. Reduced motion removes idle animation and camera easing while preserving gameplay hazards. Clouds and glowing particles do not cast shadows. Scene distance filtering limits draw work around the player.
 
-Daily seeds follow the shared `gameId:YYYY-MM-DD` hash convention. They mirror all relevant island/bridge/pickup coordinates together on some days and change hazard phase, preserving the hand-built route. The starting UTC date is saved with the run and used in the result and share link even if midnight passes. Shared daily links retain date, mode and language.
+## Progression, storage and fairness
 
-Active runs save checkpoint, world, collections and elapsed statistics locally. A completed campaign chapter saves the next chapter immediately, so refreshing its results cannot resubmit that completion. Only a complete campaign/daily expedition or completed practice chapter calls `updateStats('cloudweft', score, {roundId})`; round IDs are retained across restoration. The normal disabled ad-provider boundary is invoked only after final results. Result buttons are held while that call is pending; starting another run during an ad is blocked.
+Score = max(100, round(2200 + relics × 250 − active seconds × 3 − rescues × 100)). Gold requires all four relics, zero rescues and under 160 seconds; otherwise up to three rescues earns silver, then bronze. The final expedition medal is the lowest chapter medal. Records are local; shared scores are self-reported.
+
+Daily seeds mirror all island, bridge, shrine and pickup coordinates together and change sentry phase. They do not grant statistical advantages. The starting UTC date stays attached to the run and share link. Ability resources reset fairly at checkpoints rather than carrying power between runs.
+
+Existing version-1 saves remain valid: collected glyph ids become already-attuned shrine ids, checkpoints map to the same island identities in the revised courses, and flight resources refill on restore. Saved data is validated before use. A completed campaign chapter saves the next chapter immediately. Only a whole expedition or completed practice chapter submits `updateStats` once for its retained round id. The disabled ad-provider boundary is called only at terminal results and blocks starting another run while pending.
 
 ## Validation
 
-`node --test tests/cloudweft.test.js` covers full ordinary-input traversal of all three courses and daily mirrors, the optional branch round trip, real bridge support changes, coyote jump/no midair double jump, collection-preserving rescue, portal prerequisites/frozen victory, invalid and duplicate save data, course connectivity under mirroring, score/medal rules and five-language string coverage. This tests route reachability through movement rather than teleporting directly to a winning state.
+`node --test tests/cloudweft.test.js`: 17 tests cover ordinary-input completion of all three courses and daily mirrors; every optional branch and all four relics; phase support; coyote jump/no double jump; one-charge air dash; equal diagonal dash distance; bounded glide energy; wind-mote recharge/cooldown; grounded matching-phase shrine interaction; rescue; portal rules; malformed and legacy saves; scoring; and five-language guidance parity.
 
-The game includes a crawlable English guide and three FAQs, plus matching Korean, Japanese, Chinese and Spanish runtime guidance. It makes no AdSense approval, revenue or verified-player-count claim. A code originality review is not a worldwide trademark clearance; maintain that distinction when promoting the game.
+Initial desktop 1365 px and mobile 390 px browser checks found no uncaught exceptions or horizontal overflow. Visual inspection confirmed the rebuilt world and HUD. The root task performs the final integrated renderer, input, lifecycle and multilingual browser QA.

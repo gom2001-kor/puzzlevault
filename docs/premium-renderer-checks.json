@@ -1,0 +1,135 @@
+{
+  "selfShadow": [
+    {
+      "eye": [
+        9,
+        8,
+        12
+      ],
+      "target": [
+        0,
+        0.5,
+        0
+      ],
+      "difference": {
+        "differing": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "error": 0
+    },
+    {
+      "eye": [
+        1,
+        14,
+        16
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "difference": {
+        "differing": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "error": 0
+    },
+    {
+      "eye": [
+        -8,
+        7,
+        11
+      ],
+      "target": [
+        2,
+        0,
+        1
+      ],
+      "difference": {
+        "differing": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "error": 0
+    }
+  ],
+  "instancingSupported": true,
+  "instanced": {
+    "hash": 2612365802,
+    "stats": {
+      "drawCalls": 18,
+      "instances": 11,
+      "triangles": 1060,
+      "instanced": true
+    },
+    "error": 0
+  },
+  "fallback": {
+    "hash": 2612365802,
+    "stats": {
+      "drawCalls": 22,
+      "instances": 11,
+      "triangles": 1060,
+      "instanced": false
+    },
+    "error": 0
+  },
+  "parity": {
+    "differing": 0,
+    "max": 0,
+    "mean": 0
+  },
+  "repeatDifference": {
+    "differing": 0,
+    "max": 0,
+    "mean": 0
+  },
+  "orderDifference": {
+    "differing": 0,
+    "max": 0,
+    "mean": 0
+  },
+  "shadowsDisabled": {
+    "targetIsNull": true,
+    "error": 0,
+    "pixelsDiffer": 5596
+  },
+  "resize": {
+    "width": 333,
+    "height": 217,
+    "error": 0,
+    "oldFramebufferDeleted": true,
+    "oldTextureDeleted": true,
+    "oldDepthDeleted": true
+  },
+  "disposal": {
+    "programDeleted": true,
+    "meshDeleted": true,
+    "framebufferDeleted": true,
+    "textureDeleted": true,
+    "error": 0
+  },
+  "contextRestore": {
+    "error": 0,
+    "drawCalls": 18,
+    "width": 333,
+    "height": 217,
+    "shadowReady": true,
+    "sceneReady": true
+  },
+  "fragmentHighpFallback": {
+    "method": "Per-context getShaderPrecisionFormat capability simulation; not physical legacy hardware",
+    "nativeHighpPrecision": 23,
+    "simulatedHighpPrecision": 0,
+    "simulatedQueries": 1,
+    "matchingMediumpVaryings": true,
+    "created": true,
+    "shadowTargetIsNull": true,
+    "error": 0,
+    "drawCalls": 11,
+    "instances": 11
+  },
+  "pageErrors": []
+}

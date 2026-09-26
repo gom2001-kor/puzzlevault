@@ -1,23 +1,31 @@
-# Mosslight Wardens
+# Mosslight Wardens design and validation
 
-An original small-scope WebGL action RPG built for PuzzleVault. The player is a lantern keeper restoring a forest across three deliberately placed 19×19-unit islands. All geometry is generated in source with the shared PV3D primitive renderer; sound uses the existing synthesized SFX. There are no downloaded models, textures, characters, music or external engine dependencies.
+Updated 2026-09-27 for the premium forest revision.
 
-## Complete run
+## World and rendering
 
-Each island contains five visible glowseeds, a central beacon and 5–6 crystal creatures. Collect all seeds and defeat all creatures, then interact within 2.2 units of the beacon. The first two beacons present three build choices; the third concludes the run. The final island includes an 18-vitality guardian with a longer warning/rush cycle. Failure produces a result screen and retry route. Local scores are personal, never represented as a verified ranking.
+Three original island layouts now use layered beveled earth, individually shaped rock shelves, clustered tree canopies, exposed roots, stepping stones, mushrooms, grass and lantern posts. A closer tracking camera follows a rounded lantern keeper with a backpack, boots, face, hands and a moving lantern. Enemies have distinguishable silhouettes: grounded stalkers, floating ringed casters, larger brutes and a horned final guardian. The shared PV3D renderer supplies shadow-map lighting, fog and bloom; the scene contains no external artwork, models or audio. Particle geometry does not cast shadows. Foreground canopies fade when close enough to obscure the player. Static terrain arrays are cached by island.
 
-## Distinctive rule
+The interface uses forest greens, warm brass controls, a cinematic translucent camp menu, explicit cooldowns and a visible Bloom meter. The mobile control deck preserves touch movement and five distinct actions. Reduced motion disables decorative world animation and camera smoothing. WebGL loss pauses the game; local saves and the fallback message remain supported.
 
-The keeper plants a temporary living garden. It lasts 14 seconds, heals 0.48 vitality/second and adds one pulse damage while the keeper stands within its 2.3-unit radius. A garden also increases pulse reach from 2.15 to 3 units. Each island supplies two charges, and one regrows every 18 seconds, capped at three. Quest seeds are separate, so healing can never soft-lock beacon completion. Choosing where to stand matters more than repeated attack inputs alone.
+## Combat and choices
 
-Enemies warn in amber before a fixed-direction rush and recover afterward. They cannot hurt the player merely by touching during stalking or recovery. A dash grants 0.35 seconds of protection. Damage has a 1.15-second grace period to prevent overlapping creatures from instantly exhausting vitality. Trees and boundaries collide with both sides; all collectible and enemy locations are reachable (tested by flood fill).
+- Pulse: automatic radial targeting, 0.62-second cooldown (0.48 in a garden). Three successful attacks with no gap above 2.2 seconds produce a wider third pulse with +1 damage. A miss or damage breaks the chain.
+- Stalkers: amber directional warning, then a fixed-direction rush and recovery window.
+- Casters: keep range, warn, then shoot a three-bolt fan. Bolts move through space and can be sidestepped or dashed through.
+- Brutes: clearly marked ground circle before a damaging slam.
+- Final guardian: at half vitality, changes into a second phase, alternating rushes with ground slams and a five-bolt fan. The second slam marker warns at the player's previous position.
+- Bloom: starts at 25/100 per island. Hits (+10), defeats (+12), seeds (+8) and a shrine (+35) build energy. At 100, R/the Bloom button clears flying bolts, damages enemies within 6.5 world units, staggers survivors for 2 seconds, restores 1 vitality and grants 1 second of invulnerability. Damage is 4, or 6 with Wildflare. A defeat from Bloom can contribute normal defeat energy toward the next charge.
+- Garden: remains 14 seconds, heals 0.48 vitality/second, adds 1 pulse damage, recovers a charge every 18 seconds up to three. Quest seeds are never consumed.
+- Optional northwest shrine: after three island victories, attune it with E and select one blessing for this island. Renewal heals 2, grants a garden charge and reduces regeneration to 12 seconds. Wildflare strengthens Bloom. Both grant 35 energy. Selection pauses combat, is single-use and resets on the next island.
+- Beacon progression retains the earlier root/pulse/wind build choices and three-island ending.
 
-## Controls and persistence
+## State and localization
 
-WASD/arrows move; Space/J pulses; Shift/K dashes; Q/L plants; E restores; P/Escape pauses. Touch provides persistent direction controls and four reachable actions. Movement supports multiple simultaneous pointers and clears on cancellation, focus loss and tab hiding. Both focus loss and hidden tabs pause gameplay. WebGL context loss pauses play; after restoration the player explicitly resumes.
-
-Expedition stores an island-entry checkpoint (seed, zone, earned score, time and upgrades). Continue restarts that island with full vitality and its original seeds/enemies. Starting fresh replaces the checkpoint. Daily always starts from island one using getDailySeed('mosslight'); it is replayable and does not inherit an expedition build. A shared result uses the actual game URL and language, plus daily mode when applicable. No mid-combat advertising or pay-to-win mechanics. The disabled-by-default provider gets a single interstitial opportunity after a genuine terminal result; controls stay disabled while that promise settles.
+The v1 checkpoint format remains compatible. Checkpoints intentionally represent island entrances, so shrine choices and momentary combat state are reset on Continue. Daily seeds and dated share links keep the exact shared UTC hash algorithm. All new UI, onboarding, guides, shrine choices and messages are translated into English, Korean, Japanese, Chinese and Spanish. Statistics are written once for a genuine win/loss. Ads remain delegated to the existing terminal-result controller; no new ad provider or in-combat ad is introduced.
 
 ## Validation
 
-`node --test tests/mosslight.test.js` covers deterministic encounters, directional movement, obstacles and world bounds, reachability of every objective, garden resources/healing/damage, telegraphed enemy attacks, invulnerability, pause freezing, three-island victory, nonstacking upgrade rejection, save validation and completion deduplication. Page copy and the gameplay interface include English, Korean, Japanese, Chinese and Spanish.
+`node --test tests/mosslight.test.js`: 18 passing tests. Coverage includes deterministic dates, all quest/shrine reachability, collision bounds, garden economics, telegraph-before-damage, combo timing, caster volleys, brute warning delays, Bloom charging/clearing/staggering, shrine eligibility/single-use/reset, boss phase transition, pause freezing, full three-island completion, v1 save validation and result de-duplication.
+
+Headless Edge desktop and Korean mobile previews reported no JavaScript errors and no horizontal overflow. Desktop and mobile visual screenshots were inspected. Root integration performs the final cross-game browser/renderer checks.

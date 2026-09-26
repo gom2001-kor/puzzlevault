@@ -44,7 +44,7 @@ test('all island seeds, beacons and enemy starts are reachable through the colli
         const s=C.makeRun({zone,upgrades:Array(zone).fill('root')});
         const seen=new Set(),queue=[[0,14]],step=.5;
         while(queue.length){const [x,z]=queue.shift(),key=x+','+z;if(seen.has(key)||!C.canStand(s,x*step,z*step))continue;seen.add(key);for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]])queue.push([x+dx,z+dz]);}
-        for(const point of [...s.seeds,s.beacon,...s.enemies])assert.ok([...seen].some(k=>{const [x,z]=k.split(',').map(Number);return Math.hypot(x*step-point.x,z*step-point.z)<.8;}),`zone ${zone}: ${point.x},${point.z}`);
+        for(const point of [...s.seeds,s.beacon,s.shrine,...s.enemies])assert.ok([...seen].some(k=>{const [x,z]=k.split(',').map(Number);return Math.hypot(x*step-point.x,z*step-point.z)<.8;}),`zone ${zone}: ${point.x},${point.z}`);
     }
 });
 test('gardens consume their own charges, heal, increase pulse damage and expire',()=>{
@@ -84,4 +84,38 @@ test('checkpoint parser rejects malformed values and rebuilds a clean island ent
 });
 test('only genuine end states can be recorded and each end records once',()=>{
     const s=C.makeRun();assert.equal(C.markRecorded(s),false);s.phase='paused';assert.equal(C.markRecorded(s),false);s.phase='upgrade';assert.equal(C.markRecorded(s),false);s.phase='lost';assert.equal(C.markRecorded(s),true);assert.equal(C.markRecorded(s),false);
+});
+
+test('three landed pulses form a stronger finisher; missing or waiting breaks the chain',()=>{
+    const s=C.makeRun();s.player.x=0;s.player.z=0;s.enemies=[{id:0,x:1,z:0,hp:20,maxHP:20,alive:true,phase:'rest',timer:100,flash:0}];
+    for(let i=0;i<3;i++){s.attackCD=0;C.attack(s);}assert.equal(s.enemies[0].hp,16);assert.equal(s.combo,0);assert.equal(s.pulseFinisher,true);assert.ok(s.pulseRange>2.15);
+    s.attackCD=0;C.attack(s);assert.equal(s.combo,1);advance(s,2.3);assert.equal(s.combo,0);
+    s.attackCD=0;C.attack(s);s.enemies[0].x=7;s.attackCD=0;C.attack(s);assert.equal(s.combo,0);
+});
+test('casters warn then fire three aimed bolts; pausing freezes the volley',()=>{
+    const s=C.makeRun();s.player.x=0;s.player.z=0;const e={id:1,x:0,z:-5,hp:4,maxHP:4,alive:true,type:'caster',phase:'stalk',timer:0,flash:0};s.enemies=[e];
+    C.tick(s,{},.05);assert.equal(e.phase,'warn');assert.equal(s.projectiles.length,0);advance(s,.9);assert.equal(s.projectiles.length,3);assert.equal(s.player.hp,6);
+    assert.ok(s.projectiles.some(p=>Math.abs(p.vx)<.01&&p.vz>0));s.phase='paused';const before=JSON.stringify(s);advance(s,4);assert.equal(JSON.stringify(s),before);
+});
+test('brute ground strikes have a visible delay and only damage within the marked circle',()=>{
+    const s=C.makeRun();s.player.x=0;s.player.z=0;const e={id:0,x:1.5,z:0,hp:8,maxHP:8,alive:true,type:'brute',phase:'stalk',timer:0,flash:0};s.enemies=[e];
+    C.tick(s,{},.05);assert.equal(e.attackType,'slam');assert.equal(s.hazards.length,1);assert.ok(s.hazards[0].delay>1);assert.equal(s.player.hp,6);advance(s,.7);assert.equal(s.player.hp,6);
+    s.player.x=-4;advance(s,.7);assert.equal(s.player.hp,6);
+    s.hazards=[{x:s.player.x,z:s.player.z,radius:2,delay:0,life:.5,hit:false}];C.tick(s,{},.05);assert.equal(s.player.hp,4.5);advance(s,.3);assert.equal(s.player.hp,4.5);
+});
+test('Bloom requires full energy, clears bolts, heals and staggers targets exactly once',()=>{
+    const s=C.makeRun();s.player.x=0;s.player.z=0;s.player.hp=3;s.enemies=[{id:0,x:2,z:0,hp:20,maxHP:20,alive:true,phase:'warn',timer:.4,flash:0}];s.projectiles=[{x:4,z:0,vx:-2,vz:0,life:3}];
+    assert.equal(C.bloom(s),false);s.energy=100;assert.equal(C.bloom(s),true);assert.equal(s.energy,0);assert.equal(s.enemies[0].hp,16);assert.equal(s.enemies[0].phase,'rest');assert.equal(s.projectiles.length,0);assert.equal(s.player.hp,4);assert.ok(s.player.invuln>0);assert.equal(C.bloom(s),false);
+});
+test('optional shrine needs three victories, offers one blessing and resets on the next island',()=>{
+    const s=C.makeRun();s.player.x=s.shrine.x;s.player.z=s.shrine.z;assert.equal(C.interact(s),false);assert.equal(s.phase,'playing');
+    s.zoneKills=3;assert.equal(C.interact(s),true);assert.equal(s.phase,'shrine');const before=JSON.stringify(s);advance(s,10);assert.equal(JSON.stringify(s),before);assert.equal(C.chooseBoon(s,'fake'),false);
+    s.player.hp=2;assert.equal(C.chooseBoon(s,'renewal'),true);assert.equal(s.player.hp,4);assert.equal(s.gardenCharges,3);assert.equal(s.energy,60);assert.equal(C.chooseBoon(s,'flare'),false);
+    s.gardenCharges=0;s.enemies=[];advance(s,12.1);assert.equal(s.gardenCharges,1);s.phase='upgrade';C.chooseUpgrade(s,'pulse');assert.equal(s.boon,'');assert.equal(s.shrine.used,false);assert.equal(s.zoneKills,0);
+});
+test('Wildflare improves Bloom damage and the final guardian changes attack below half health',()=>{
+    const s=C.makeRun({zone:2,upgrades:['root','pulse']});s.phase='shrine';assert.equal(C.chooseBoon(s,'flare'),true);s.energy=100;
+    const boss=s.enemies.find(e=>e.boss);s.enemies=[boss];s.player.x=boss.x;s.player.z=boss.z+2;const hp=boss.hp;C.bloom(s);assert.equal(boss.hp,hp-6);
+    boss.hp=boss.maxHP/2;boss.phase='stalk';C.tick(s,{},.05);assert.equal(boss.rage,true);assert.equal(boss.phase,'rest');assert.equal(s.event,'rage');
+    advance(s,1.75);C.tick(s,{},.05);assert.equal(boss.attackType,'slam');assert.equal(s.hazards.length,2);advance(s,1.1);assert.equal(s.projectiles.length,5);
 });

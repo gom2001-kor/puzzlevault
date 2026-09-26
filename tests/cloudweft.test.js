@@ -13,7 +13,8 @@ function walkTo(state, level, target, phase) {
             const pos = game.hazardAt(h, state.elapsed);
             return Math.hypot(pos.x - state.x, pos.z - state.z) < 1.6;
         });
-        game.step(state, level, { x: ux, z: uz, jump: state.grounded && (!ahead || nearLight),
+        game.step(state, level, { x: ux, z: uz, jump: state.grounded && (!ahead || nearLight), glide: !state.grounded,
+            dash: !state.grounded && state.vy < 1.5 && !ahead && state.dashCharge > 0,
             phase: phase !== undefined && state.phase !== phase }, 1 / 60);
         count++;
     }
@@ -27,7 +28,11 @@ test('all three designed chapters and their daily mirrors can be completed throu
             for (let island = 1; island <= 5; island++) {
                 walkTo(state, level, level.islands[island], (island - 1) % 2);
                 const glyph = level.glyphs.find(g => Math.hypot(g.x - level.islands[island].x, g.z - level.islands[island].z) < 2);
-                if (glyph && !state.glyphs.includes(glyph.id)) walkTo(state, level, glyph);
+                if (glyph && !state.glyphs.includes(glyph.id)) {
+                    walkTo(state, level, glyph);
+                    for(let frame=0;frame<30;frame++)game.step(state,level,{phase:state.phase!==glyph.phase,interact:true});
+                    assert.ok(state.glyphs.includes(glyph.id),'a shrine attunes with matching phase and interaction');
+                }
                 if (island < 5) walkTo(state, level, level.islands[island]);
             }
             assert.equal(state.won, true, `chapter ${chapter} seed ${seed}`);
@@ -129,4 +134,62 @@ test('truthy primitive progress and malformed campaign results recover without c
     const good = { chapter: 0, score: 2200, elapsed: 30, falls: 0, relics: 1, medal: 'silver' };
     assert.deepEqual(game.normalizeResults([null, 'bad', good], 1), [good]);
     assert.deepEqual(game.normalizeResults([good, { ...good, chapter: 2 }], 1), [good]);
+});
+
+
+test('runes require an explicit grounded interaction in their matching phase', () => {
+    const level=game.createLevel(),state=game.createState(),rune=level.glyphs[0];
+    Object.assign(state,{x:rune.x,z:rune.z,y:rune.y-.9,phase:1-rune.phase});
+    game.step(state,level,{interact:true});assert.equal(state.glyphs.length,0);
+    game.step(state,level,{phase:true});assert.equal(state.glyphs.length,0,'walking over a matched rune does not attune it');
+    game.step(state,level,{interact:true});assert.deepEqual(state.glyphs,[rune.id]);
+    game.step(state,level,{interact:true});assert.equal(state.glyphs.length,1);
+});
+
+test('air dash spends one charge, cannot repeat in air, and refills on landing', () => {
+    const level=game.createLevel(),state=game.createState();
+    game.step(state,level,{jump:true,z:-1});
+    game.step(state,level,{dash:true,z:-1});
+    assert.equal(state.dashCharge,0);assert.ok(state.dashTimer>0);const first=state.dashTimer;
+    game.step(state,level,{dash:true,z:-1});assert.ok(state.dashTimer<first);
+    game.rescue(state,level,false);assert.equal(state.dashCharge,1);
+    game.step(state,level,{dash:true});assert.equal(state.dashTimer,0,'a grounded button press does not spend the charge');
+});
+
+test('gliding limits descent only while energy remains and wind motes refill both abilities', () => {
+    const level=game.createLevel(1),state=game.createState(1);
+    Object.assign(state,{x:30,y:5,z:-20,vy:-5,grounded:false,coyote:0,dashCharge:0});
+    game.step(state,level,{glide:true});assert.ok(state.vy>=-1.7);assert.ok(state.glideEnergy<1.5);
+    state.glideEnergy=0;game.step(state,level,{glide:true});assert.ok(state.vy < -1.7);
+    const mote=level.motes[0];Object.assign(state,{x:mote.x,z:mote.z,y:mote.y-.6,vy:0});
+    game.step(state,level);assert.equal(state.dashCharge,1);assert.equal(state.glideEnergy,1.5);assert.ok(state.events.includes('recharge'));
+    state.dashCharge=0;game.step(state,level);assert.equal(state.dashCharge,0,'mote has an eight-second cooldown');
+    state.elapsed+=8;game.step(state,level);assert.equal(state.dashCharge,1);
+});
+
+test('each chapter has its own geometry while legacy checkpoint saves keep attuned runes', () => {
+    assert.notDeepEqual(game.createLevel(0).islands.map(i=>[i.x,i.z]),game.createLevel(1).islands.map(i=>[i.x,i.z]));
+    assert.notDeepEqual(game.createLevel(1).islands.map(i=>[i.x,i.z]),game.createLevel(2).islands.map(i=>[i.x,i.z]));
+    const saved={version:1,chapter:1,seed:0,checkpoint:'i4',phase:1,glyphs:['g0','g1'],relics:['r0'],elapsed:51,falls:1};
+    const resumed=game.restore(saved);assert.ok(resumed);assert.deepEqual(resumed.state.glyphs,['g0','g1']);assert.equal(resumed.state.dashCharge,1);
+});
+
+test('the optional traversal branch and all four relics are reachable in every chapter and mirror', () => {
+    for(const seed of [0,31])for(let chapter=0;chapter<3;chapter++){
+        const level=game.createLevel(chapter,seed),state=game.createState(chapter,seed);
+        walkTo(state,level,level.islands[1],0);walkTo(state,level,level.islands[2],1);
+        walkTo(state,level,level.relics[0]);walkTo(state,level,level.islands[2]);
+        walkTo(state,level,level.islands[6],1);walkTo(state,level,level.relics[1]);walkTo(state,level,level.relics[2]);
+        walkTo(state,level,level.islands[6]);walkTo(state,level,level.islands[2],1);
+        walkTo(state,level,level.islands[3],0);walkTo(state,level,level.islands[4],1);walkTo(state,level,level.islands[5],0);
+        walkTo(state,level,level.relics[3]);assert.equal(state.relics.length,4,`chapter ${chapter} mirror ${seed}`);
+    }
+});
+
+
+test('air dashes preserve distance for diagonal and straight input', () => {
+    const level=game.createLevel(),straight=game.createState(),diagonal=game.createState();
+    for(const state of [straight,diagonal])Object.assign(state,{x:20,z:10,y:5,grounded:false,coyote:0});
+    game.step(straight,level,{dash:true,x:1},1/60);game.step(diagonal,level,{dash:true,x:1,z:1},1/60);
+    assert.ok(Math.abs(Math.hypot(straight.x-20,straight.z-10)-Math.hypot(diagonal.x-20,diagonal.z-10))<1e-10);
 });

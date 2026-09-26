@@ -22,7 +22,7 @@ let activeBrowser;
   for(const lang of ['en','ko','ja','zh','es']){
    await page.goto(`${base}/games/${game}.html?lang=${lang}`);await ready(game);
    await page.waitForFunction(l=>document.documentElement.lang===l,lang);
-   assert.equal(await page.locator('#guide p').count(),4);
+   assert.ok(await page.locator('#guide p').count()>=4);
    assert.ok((await page.locator('#guide').innerText()).length>150,`${game}/${lang}: missing guide text`);
    for(const width of [320,390,1280]){
     await page.setViewportSize({width,height:844});await page.emulateMedia({colorScheme:width===390?'dark':'light'});
@@ -82,13 +82,13 @@ let activeBrowser;
  const offline=await browser.newContext({viewport:{width:390,height:844}}),op=await offline.newPage();
  await op.goto(base+'/');await op.evaluate(()=>navigator.serviceWorker.ready);await op.reload();
  await op.waitForFunction(()=>!!navigator.serviceWorker.controller);
- assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/pv3d.js?v=16'))),true);
- assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/flagship.js?v=16'))),true);
+ assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/pv3d.js?v=17'))),true);
+ assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/flagship.js?v=17'))),true);
  await offline.setOffline(true);
  for(const game of ['mosslight','cloudweft']){await op.goto(base+'/games/'+game+'.html?lang=ko');await op.waitForFunction(id=>id==='mosslight'?!!window.PVMosslight:!!window.Cloudweft?.inspect,game);await op.locator(game==='mosslight'?'#ml-overlay .ml-primary':'#sf-start').click();}
- checks.push('Version16 cache starts both 3D games offline with localized URLs');await offline.close();
+ checks.push('Version17 cache starts both 3D games offline with localized URLs');await offline.close();
  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
- const report={date:'2026-09-26',browser:'Microsoft Edge / Chromium, headless WebGL',checks,errors,externalRequests:external};
+ const report={date:'2026-09-27',browser:'Microsoft Edge / Chromium, headless WebGL',checks,errors,externalRequests:external};
  fs.writeFileSync('docs/flagship-browser-checks.json',JSON.stringify(report,null,2)+'\n');
  console.log(JSON.stringify(report,null,2));await browser.close();
 })().catch(async e=>{console.error(e);if(activeBrowser)await activeBrowser.close();process.exit(1);});

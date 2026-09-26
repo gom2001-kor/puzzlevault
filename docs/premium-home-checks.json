@@ -1,0 +1,76 @@
+[
+  {
+    "lang": "en",
+    "actualLang": "en",
+    "overflow": false,
+    "links": [
+      "/games/mosslight.html?lang=en",
+      "/games/cloudweft.html?lang=en"
+    ],
+    "covers": 2,
+    "reducedMotionTransition": "0s",
+    "errors": []
+  },
+  {
+    "lang": "ko",
+    "actualLang": "ko",
+    "overflow": false,
+    "links": [
+      "/games/mosslight.html?lang=ko",
+      "/games/cloudweft.html?lang=ko"
+    ],
+    "covers": 2,
+    "reducedMotionTransition": "0s",
+    "errors": []
+  },
+  {
+    "lang": "ja",
+    "actualLang": "ja",
+    "overflow": false,
+    "links": [
+      "/games/mosslight.html?lang=ja",
+      "/games/cloudweft.html?lang=ja"
+    ],
+    "covers": 2,
+    "reducedMotionTransition": "0s",
+    "errors": []
+  },
+  {
+    "lang": "zh",
+    "actualLang": "zh",
+    "overflow": false,
+    "links": [
+      "/games/mosslight.html?lang=zh",
+      "/games/cloudweft.html?lang=zh"
+    ],
+    "covers": 2,
+    "reducedMotionTransition": "0s",
+    "errors": []
+  },
+  {
+    "lang": "es",
+    "actualLang": "es",
+    "overflow": false,
+    "links": [
+      "/games/mosslight.html?lang=es",
+      "/games/cloudweft.html?lang=es"
+    ],
+    "covers": 2,
+    "reducedMotionTransition": "0s",
+    "errors": []
+  },
+  {
+    "width": 320,
+    "dark": true,
+    "overflow": false
+  },
+  {
+    "noJavaScript": true,
+    "locale": "ja",
+    "links": [
+      "/games/mosslight.html?lang=ja",
+      "/games/cloudweft.html?lang=ja"
+    ],
+    "covers": 2
+  }
+]
