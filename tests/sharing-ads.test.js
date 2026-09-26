@@ -203,6 +203,7 @@ test('every legacy game calls the controller once only while its result is still
         const resultElement = { classList: { contains: () => visible } };
         const context = vm.createContext({
             setTimeout: value => { callback = value; },
+            schedulePP: value => { callback = value; },
             AdController: { showInterstitial: () => calls++ },
             state: { isPlaying: false }, G: { mode: 'classic' },
             H: { state: 'over' }, GameState: { GAMEOVER: 'over' }, M: { isPlaying: false },

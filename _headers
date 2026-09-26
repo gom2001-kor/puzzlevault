@@ -1,0 +1,10 @@
+/docs/*
+  X-Robots-Tag: noindex
+/tests/*
+  X-Robots-Tag: noindex
+/scripts/*
+  X-Robots-Tag: noindex
+/solution.html
+  X-Robots-Tag: noindex
+/blog/posts/_template.html
+  X-Robots-Tag: noindex

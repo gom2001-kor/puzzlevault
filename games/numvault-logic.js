@@ -11,6 +11,33 @@ const DIFFICULTIES = {
     expert: { digits: 5, maxAttempts: 8, allowDuplicates: true, label: 'Expert', multiplier: 3.0 },
 };
 
+const NV_DEPTH_COPY = {
+    en: ['{n} / {total} positions found', 'Attempt {n} / {total}', 'Vault unlocked', 'Right spot', 'Move it', 'Not used', 'Enter digits, then press Enter. Use each clue for your next guess.', 'Check code', 'Delete digit', 'Reveal one digit'],
+    ko: ['{total}자리 중 {n}자리 확인', '{total}번 중 {n}번째 시도', '금고가 열렸어요', '자리도 정답', '자리 이동', '사용 안 됨', '숫자를 입력하고 확인을 누르세요. 단서로 다음 추측을 좁혀 보세요.', '확인', '숫자 지우기', '숫자 하나 공개'],
+    ja: ['{total}桁中{n}桁を確認', '{total}回中{n}回目', '金庫が開いた！', '正しい位置', '位置を移動', '使われていない', '数字を入力して確認。ヒントから次の答えを絞り込みましょう。', '確認', '数字を削除', '数字を1つ公開'],
+    zh: ['已确认{n} / {total}位', '第{n} / {total}次尝试', '保险库已打开', '位置正确', '换个位置', '未使用', '输入数字后确认。利用线索逐步缩小答案范围。', '确认', '删除数字', '揭示一位数字'],
+    es: ['{n} / {total} posiciones halladas', 'Intento {n} / {total}', 'Caja abierta', 'Lugar correcto', 'Muévelo', 'No se usa', 'Introduce los dígitos y pulsa Intro. Usa las pistas para tu siguiente intento.', 'Comprobar', 'Borrar dígito', 'Revelar un dígito']
+};
+function nvCopy(index, values = {}) {
+    const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+    return (NV_DEPTH_COPY[lang] || NV_DEPTH_COPY.en)[index].replace(/\{(\w+)\}/g, (_, key) => values[key]);
+}
+function getVaultConfirmedPositions(feedback, digits) {
+    return Array.from({ length: digits }, (_, index) => feedback.some(row => row[index] === 'green'));
+}
+function updateVaultFace() {
+    const label = document.getElementById('nv-vault-progress');
+    if (!label || !G.difficulty) return;
+    const pins = getVaultConfirmedPositions(G.feedback, G.difficulty.digits);
+    label.textContent = G.gameState === 'won' ? nvCopy(2) : nvCopy(0, { n: pins.filter(Boolean).length, total: pins.length });
+    document.getElementById('nv-attempt-progress').textContent = nvCopy(1, { n: Math.min(G.guesses.length + 1, G.difficulty.maxAttempts), total: G.difficulty.maxAttempts });
+    document.getElementById('nv-pin-meter').innerHTML = pins.map(found => `<i${found ? ' class="solved"' : ''}></i>`).join('');
+    const face = document.getElementById('nv-vault-face');
+    if (G.gameState === 'won') face.classList.add('is-unlocked'); else face.classList.remove('is-unlocked');
+    ['nv-legend-correct', 'nv-legend-move', 'nv-legend-out', 'nv-brief'].forEach((id, index) => { document.getElementById(id).textContent = nvCopy(index + 3); });
+}
+window.addEventListener('langchange', () => { if (G.difficulty) { updateVaultFace(); renderNumpad(); } });
+
 /* === GAME STATE === */
 let G = {};
 function resetState() {
@@ -158,6 +185,8 @@ function renderGrid() {
             if (r < G.guesses.length) {
                 cell.textContent = G.guesses[r][c];
                 const fb = G.feedback[r][c];
+                cell.dataset.feedback = fb;
+                cell.setAttribute('aria-label', `${G.guesses[r][c]} · ${nvCopy(fb === 'green' ? 3 : fb === 'yellow' ? 4 : 5)}`);
                 cell.classList.add(fb === 'green' ? 'green' : fb === 'yellow' ? 'yellow' : 'gray');
             } else if (r === G.guesses.length) {
                 // Current input row
@@ -171,6 +200,7 @@ function renderGrid() {
         }
         grid.appendChild(row);
     }
+    updateVaultFace();
 }
 
 /* === RENDER TRACKER === */
@@ -206,6 +236,7 @@ function renderNumpad() {
     hint.className = 'nv-key key-hint';
     hint.textContent = '💡';
     hint.id = 'nv-hint-btn';
+    hint.setAttribute('aria-label', nvCopy(9));
     hint.onclick = useHint;
     pad.appendChild(hint);
 
@@ -218,12 +249,13 @@ function renderNumpad() {
     const del = document.createElement('button');
     del.className = 'nv-key key-del';
     del.textContent = '⌫';
+    del.setAttribute('aria-label', nvCopy(8));
     del.onclick = inputBackspace;
     pad.appendChild(del);
 
     const ent = document.createElement('button');
     ent.className = 'nv-key key-enter';
-    ent.textContent = 'Enter';
+    ent.textContent = nvCopy(7);
     ent.onclick = submitGuess;
     pad.appendChild(ent);
 
@@ -273,9 +305,11 @@ function submitGuess() {
         if (G !== round || G.code !== code || G.gameState !== 'playing' || !G.submitting || G.completed) return;
         G.submitting = false;
         renderTracker();
+        updateVaultFace();
         // Check win
         if (fb.every(f => f === 'green')) {
             G.gameState = 'won';
+            updateVaultFace();
             G.endTime = Date.now();
             onGameEnd(true);
         } else if (G.guesses.length >= G.difficulty.maxAttempts) {
@@ -308,6 +342,7 @@ function animateFlip(rowIdx, fb, callback) {
                 if (!isCurrent()) return;
                 const cls = fb[c] === 'green' ? 'green' : fb[c] === 'yellow' ? 'yellow' : 'gray';
                 cell.classList.add(cls);
+                if (cell.dataset) cell.dataset.feedback = cls;
             }, 250);
         }, c * 150);
     }
@@ -706,6 +741,7 @@ function showStatsModal() {
 /* === KEYBOARD INPUT === */
 document.addEventListener('keydown', (e) => {
     if (G.gameState !== 'playing') return;
+    if (e.ctrlKey || e.metaKey || e.altKey || (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))) return;
     if (document.querySelector('.pv-modal.open')) return;
     if (e.key >= '0' && e.key <= '9') {
         inputDigit(parseInt(e.key));

@@ -57,6 +57,12 @@
     Object.assign(copy.zh, { save: '保存成绩卡', rouletteHelp: '第11题起，部分题目会隐藏一个运算符。从+、−、×、÷中选择，答对得双倍分。对决以外的模式可以使用提示。' });
     Object.assign(copy.es, { save: 'Guardar tarjeta', rouletteHelp: 'Desde la pregunta 11, algunas preguntas ocultan un operador. Elige +, −, × o ÷ para ganar el doble de puntos. Puedes usar pistas fuera de los duelos.' });
 
+    Object.assign(copy.en, { comboGoal: 'Build a {n}-answer streak', comboReached: '{n} in a row · keep going!', answerKey: 'Answer {answer} · key {key}' });
+    Object.assign(copy.ko, { comboGoal: '{n}연속 정답에 도전하세요', comboReached: '{n}연속 정답 · 계속 이어가요!', answerKey: '답 {answer} · {key}번 키' });
+    Object.assign(copy.ja, { comboGoal: '{n}連続正解を目指そう', comboReached: '{n}連続正解 · その調子！', answerKey: '答え{answer} · キー{key}' });
+    Object.assign(copy.zh, { comboGoal: '挑战连续答对{n}题', comboReached: '连续答对{n}题 · 继续加油！', answerKey: '答案{answer} · 按键{key}' });
+    Object.assign(copy.es, { comboGoal: 'Encadena {n} aciertos', comboReached: '{n} seguidos · ¡sigue así!', answerKey: 'Respuesta {answer} · tecla {key}' });
+
     function integer(value, min, max) {
         if (typeof value !== 'string' || !/^(0|[1-9]\d{0,9})$/.test(value)) return null;
         const n = Number(value);

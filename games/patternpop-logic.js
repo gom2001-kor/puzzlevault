@@ -5,7 +5,28 @@
 
 /* === GAME STATE === */
 let G = {};
+const PP_DEPTH_COPY = {
+    en: ['Remember the blue diamonds. Ignore the red crosses. Then tap the remembered pads in any order.', 'I’m ready', 'Remember', 'Ignore', 'Tap the pads, or use arrow keys + Enter / Space.', 'Watch the diamonds', 'Your turn · {n} / {total} found', 'Round {n}', 'Round complete', 'Ready when you are', 'Memory board. Row {r}, column {c}.', 'Next board: {n} × {n}', 'Keep the pattern in mind'],
+    ko: ['파란 마름모를 기억하고 빨간 ×는 무시하세요. 불이 꺼지면 기억한 패드를 순서와 상관없이 누르세요.', '준비됐어요', '기억하세요', '무시하세요', '패드를 누르거나 방향키 + Enter / Space를 사용하세요.', '마름모 위치를 기억하세요', '찾은 패드 · {n} / {total}', '{n}라운드', '라운드 성공', '준비되면 시작하세요', '기억 보드. {r}행 {c}열.', '다음 보드: {n} × {n}', '패턴을 머릿속에 담아 보세요'],
+    ja: ['青いひし形を覚えて、赤い×は無視。消えたら覚えたパッドを好きな順番で押しましょう。', '準備できた', '覚える', '無視する', 'タップ、または矢印キー + Enter / Space。', 'ひし形の位置を覚えよう', '見つけた数 · {n} / {total}', 'ラウンド{n}', 'ラウンド完了', '準備ができたら開始', '記憶ボード。{r}行{c}列。', '次のボード: {n} × {n}', 'パターンを覚えよう'],
+    zh: ['记住蓝色菱形，忽略红色×。灯光熄灭后，以任意顺序点击记住的位置。', '准备好了', '记住', '忽略', '点击方块，或用方向键 + Enter / Space。', '记住菱形的位置', '已找到 · {n} / {total}', '第{n}轮', '本轮完成', '准备好后开始', '记忆棋盘。第{r}行第{c}列。', '下一棋盘: {n} × {n}', '记住这个图案'],
+    es: ['Recuerda los rombos azules. Ignora las cruces rojas. Después toca los pads recordados en cualquier orden.', 'Estoy listo', 'Recuerda', 'Ignora', 'Toca los pads, o usa flechas + Intro / Espacio.', 'Observa los rombos', 'Tu turno · {n} / {total} encontrados', 'Ronda {n}', 'Ronda completada', 'Empieza cuando quieras', 'Tablero. Fila {r}, columna {c}.', 'Siguiente tablero: {n} × {n}', 'Memoriza el patrón']
+};
+function ppCopy(index, values = {}) {
+    const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+    return (PP_DEPTH_COPY[lang] || PP_DEPTH_COPY.en)[index].replace(/\{(\w+)\}/g, (_, key) => values[key]);
+}
+function schedulePP(callback, delay) {
+    const game = G, round = G.round;
+    const id = setTimeout(() => {
+        game.timers.delete(id);
+        if (G === game && G.round === round) callback();
+    }, delay);
+    G.timers.add(id);
+    return id;
+}
 function resetState() {
+    if (G.timers) G.timers.forEach(clearTimeout);
     G = {
         mode: 'endless',
         round: 1,
@@ -26,12 +47,16 @@ function resetState() {
         canvas: null,
         ctx: null,
         cellSize: 0,
-        gap: 4,
+        gap: 12,
         animFrame: null,
         rng: null,
         rewardUsed: false,
         roundStartTime: 0,
         gameState: 'playing',
+        timers: new Set(),
+        focusedCell: { r: 0, c: 0 },
+        keyboardFocus: false,
+        completed: false,
     };
 }
 
@@ -87,7 +112,7 @@ function generateDecoys(gridSize, count, targets, rng) {
 function resizeCanvas() {
     const canvas = G.canvas;
     const wrap = canvas.parentElement;
-    const w = Math.min(wrap.clientWidth, 500);
+    const w = Math.min(Math.max(160, wrap.clientWidth - 24), 476);
     canvas.width = w * (window.devicePixelRatio || 1);
     canvas.height = canvas.width;
     canvas.style.width = w + 'px';
@@ -104,8 +129,9 @@ function drawGrid() {
     const w = G.canvas.width / (window.devicePixelRatio || 1);
     ctx.clearRect(0, 0, w, w);
 
-    // Background
-    ctx.fillStyle = '#E2E8F0';
+    const dark = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches;
+    // A recessed tray; pad fronts remain in the same touch coordinate system.
+    ctx.fillStyle = dark ? '#0F172A' : '#CBD5E1';
     ctx.beginPath();
     ctx.roundRect(0, 0, w, w, 12);
     ctx.fill();
@@ -116,58 +142,84 @@ function drawGrid() {
             const y = G.gap + r * (G.cellSize + G.gap);
             const state = G.cellStates[r] ? G.cellStates[r][c] : null;
 
-            let fillColor = '#FFFFFF';
-            let borderColor = '#CBD5E1';
+            let fillColor = dark ? '#334155' : '#FFFFFF';
+            let borderColor = dark ? '#475569' : '#CBD5E1';
+            let sideColor = dark ? '#1E293B' : '#94A3B8';
 
             if (state === 'target') {
                 fillColor = '#2563EB';
                 borderColor = '#1D4ED8';
+                sideColor = '#1D4ED8';
             } else if (state === 'decoy') {
-                fillColor = '#FCA5A5'; // red tint for decoys
-                borderColor = '#F43F5E';
+                fillColor = '#F43F5E';
+                borderColor = '#BE123C';
+                sideColor = '#BE123C';
             } else if (state === 'correct') {
                 fillColor = '#059669';
                 borderColor = '#047857';
+                sideColor = '#047857';
             } else if (state === 'wrong') {
                 fillColor = '#F43F5E';
                 borderColor = '#E11D48';
+                sideColor = '#BE123C';
             } else if (state === 'missed') {
                 fillColor = '#FDE68A';
                 borderColor = '#D97706';
+                sideColor = '#B45309';
             }
 
-            // Cell shadow
-            ctx.fillStyle = 'rgba(0,0,0,0.06)';
+            const pressed = state === 'correct' || state === 'wrong';
+            const depth = Math.max(4, Math.min(9, G.cellSize * .12));
+            const topY = y + (pressed ? depth * .65 : 0);
+            const faceHeight = G.cellSize - depth;
+            const radius = Math.min(10, G.cellSize * .14);
+            // Contact shadow and the solid front face provide depth without distorting the grid.
+            ctx.fillStyle = 'rgba(15,23,42,.22)';
             ctx.beginPath();
-            ctx.roundRect(x, y + 2, G.cellSize, G.cellSize, 4);
+            ctx.roundRect(x + 1, y + depth * .5, G.cellSize - 2, G.cellSize, radius);
             ctx.fill();
-
-            // Cell body
-            ctx.fillStyle = fillColor;
+            ctx.fillStyle = sideColor;
             ctx.beginPath();
-            ctx.roundRect(x, y, G.cellSize, G.cellSize, 4);
+            ctx.roundRect(x, topY, G.cellSize, G.cellSize - (pressed ? depth * .65 : 0), radius);
             ctx.fill();
-
-            // Cell border
+            const face = ctx.createLinearGradient(0, topY, 0, topY + faceHeight);
+            face.addColorStop(0, fillColor);
+            face.addColorStop(1, state ? fillColor : dark ? '#1E293B' : '#E2E8F0');
+            ctx.fillStyle = face;
+            ctx.beginPath();
+            ctx.roundRect(x, topY, G.cellSize, faceHeight, radius);
+            ctx.fill();
             ctx.strokeStyle = borderColor;
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.roundRect(x, y, G.cellSize, G.cellSize, 4);
+            ctx.roundRect(x + .5, topY + .5, G.cellSize - 1, faceHeight - 1, radius);
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(255,255,255,.35)';
+            ctx.beginPath();
+            ctx.moveTo(x + radius, topY + 2);
+            ctx.lineTo(x + G.cellSize - radius, topY + 2);
             ctx.stroke();
 
-            // Icons for special states
-            if (state === 'correct') {
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = `bold ${G.cellSize * 0.4}px sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('✓', x + G.cellSize / 2, y + G.cellSize / 2);
-            } else if (state === 'wrong') {
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = `bold ${G.cellSize * 0.4}px sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('✕', x + G.cellSize / 2, y + G.cellSize / 2);
+            const symbols = { target: '◆', decoy: '×', correct: '✓', wrong: '×', missed: '◇' };
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            if (symbols[state]) {
+                ctx.fillStyle = state === 'missed' ? '#92400E' : '#FFFFFF';
+                ctx.font = `800 ${G.cellSize * .37}px system-ui, sans-serif`;
+                ctx.fillText(symbols[state], x + G.cellSize / 2, topY + faceHeight / 2);
+            } else {
+                // Small locator marks help players orient without hinting at hidden targets.
+                ctx.fillStyle = dark ? '#64748B' : '#CBD5E1';
+                ctx.beginPath();
+                ctx.arc(x + G.cellSize / 2, topY + faceHeight / 2, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            if (G.keyboardFocus && G.focusedCell.r === r && G.focusedCell.c === c) {
+                ctx.strokeStyle = dark ? '#C4B5FD' : '#7C3AED';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.roundRect(x + 4, topY + 4, G.cellSize - 8, faceHeight - 8, Math.max(3, radius - 3));
+                ctx.stroke();
             }
         }
     }
@@ -195,21 +247,37 @@ function updateUI() {
         hearts = '♾️';
     }
     document.getElementById('pp-lives').textContent = hearts;
+    updatePatternProgress();
 }
+
+function updatePatternProgress() {
+    const count = G.targets.length;
+    document.getElementById('pp-progress-label').textContent = G.phase === 'recall' || G.phase === 'feedback'
+        ? ppCopy(6, { n: G.tappedCorrect, total: count }) : G.round === 4 || G.round === 8 || G.round === 14
+            ? ppCopy(11, { n: getGridSize(G.round + 1) }) : ppCopy(12);
+    document.getElementById('pp-recall-pips').innerHTML = Array.from({ length: count }, (_, i) => `<i${i < G.tappedCorrect ? ' class="found"' : ''}></i>`).join('');
+}
+
+function refreshPatternLanguage() {
+    ['pp-ready-copy', 'pp-start-btn', 'pp-target-label', 'pp-decoy-label', 'pp-keyboard-note'].forEach((id, i) => { document.getElementById(id).textContent = ppCopy(i); });
+    setPhaseBanner(G.phase);
+    updatePatternProgress();
+}
+window.addEventListener('langchange', () => { if (G.canvas) refreshPatternLanguage(); });
 
 function setPhaseBanner(phase) {
     const el = document.getElementById('pp-phase');
     if (phase === 'memorize') {
-        el.textContent = '👀 MEMORIZE';
+        el.textContent = '◆ ' + ppCopy(5);
         el.className = 'pp-phase-banner memorize';
     } else if (phase === 'recall') {
-        el.textContent = '🎯 RECALL — Tap the cells!';
+        el.textContent = ppCopy(6, { n: G.tappedCorrect, total: G.targets.length });
         el.className = 'pp-phase-banner recall';
     } else if (phase === 'feedback') {
-        el.textContent = '📊 RESULTS';
+        el.textContent = '✓ ' + ppCopy(8);
         el.className = 'pp-phase-banner feedback';
     } else {
-        el.textContent = '';
+        el.textContent = ppCopy(9);
         el.className = 'pp-phase-banner';
     }
 }
@@ -218,12 +286,12 @@ function setPhaseBanner(phase) {
 function showRoundOverlay(round, callback) {
     const overlay = document.getElementById('pp-round-overlay');
     const text = document.getElementById('pp-round-text');
-    text.textContent = `Round ${round}`;
+    text.textContent = ppCopy(7, { n: round });
     text.style.animation = 'none';
     void text.offsetWidth;
     text.style.animation = 'ppSlideUp .6s ease';
     overlay.classList.add('show');
-    setTimeout(() => {
+    schedulePP(() => {
         overlay.classList.remove('show');
         if (callback) callback();
     }, 900);
@@ -231,6 +299,7 @@ function showRoundOverlay(round, callback) {
 
 /* === START ROUND === */
 function startRound() {
+    G.phase = 'idle';
     G.gridSize = getGridSize(G.round);
     const targetCount = getTargetCount(G.round);
     const decoyCount = getDecoyCount(G.round);
@@ -240,6 +309,7 @@ function startRound() {
     G.tappedCorrect = 0;
     G.tappedWrong = 0;
     G.showDecoys = false;
+    G.focusedCell = { r: 0, c: 0 };
 
     initCellStates();
     resizeCanvas();
@@ -267,7 +337,7 @@ function startMemorizePhase() {
     // Schedule decoy flash if applicable
     if (G.decoys.length > 0) {
         const decoyStartDelay = Math.max(200, memTime * 0.3 + Math.random() * memTime * 0.3);
-        setTimeout(() => {
+        schedulePP(() => {
             if (G.phase !== 'memorize') return;
             G.decoys.forEach(d => {
                 G.cellStates[d.r][d.c] = 'decoy';
@@ -275,7 +345,7 @@ function startMemorizePhase() {
             G.showDecoys = true;
             drawGrid();
             // Remove decoys after 0.3s
-            setTimeout(() => {
+            schedulePP(() => {
                 if (G.phase !== 'memorize') return;
                 G.decoys.forEach(d => {
                     G.cellStates[d.r][d.c] = null;
@@ -287,7 +357,7 @@ function startMemorizePhase() {
     }
 
     // End memorize phase
-    setTimeout(() => {
+    schedulePP(() => {
         if (G.phase !== 'memorize') return;
         startRecallPhase();
     }, memTime);
@@ -299,6 +369,9 @@ function startRecallPhase() {
     G.roundStartTime = Date.now();
     setPhaseBanner('recall');
     initCellStates();
+    // Replayed hints retain found pads; otherwise a selected pad disappears but cannot be selected again.
+    G.tapped.forEach(t => { G.cellStates[t.r][t.c] = G.targets.some(target => target.r === t.r && target.c === t.c) ? 'correct' : 'wrong'; });
+    updatePatternProgress();
     drawGrid();
     SFX.play('correct');
 }
@@ -308,14 +381,24 @@ function handleTap(clientX, clientY) {
     if (G.phase !== 'recall') return;
 
     const rect = G.canvas.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const logicalWidth = G.canvas.width / (window.devicePixelRatio || 1);
+    const x = (clientX - rect.left) * logicalWidth / rect.width;
+    const y = (clientY - rect.top) * logicalWidth / rect.height;
 
     // Find which cell was tapped
     const col = Math.floor((x - G.gap) / (G.cellSize + G.gap));
     const row = Math.floor((y - G.gap) / (G.cellSize + G.gap));
 
     if (row < 0 || row >= G.gridSize || col < 0 || col >= G.gridSize) return;
+    const localX = x - (G.gap + col * (G.cellSize + G.gap));
+    const localY = y - (G.gap + row * (G.cellSize + G.gap));
+    if (localX < 0 || localY < 0 || localX > G.cellSize || localY > G.cellSize) return;
+    G.keyboardFocus = false;
+    choosePatternCell(row, col);
+}
+
+function choosePatternCell(row, col) {
+    if (G.phase !== 'recall' || row < 0 || row >= G.gridSize || col < 0 || col >= G.gridSize) return;
 
     // Already tapped?
     if (G.tapped.some(t => t.r === row && t.c === col)) return;
@@ -328,12 +411,15 @@ function handleTap(clientX, clientY) {
     if (isTarget) {
         G.cellStates[row][col] = 'correct';
         G.tappedCorrect++;
+        setPhaseBanner('recall');
+        updatePatternProgress();
         SFX.play('correct');
         drawGrid();
 
         // Check if all targets tapped
         if (G.tappedCorrect >= G.targets.length) {
-            setTimeout(() => endRound(true), 300);
+            G.phase = 'settling'; // Lock the board while the last raised pad settles.
+            schedulePP(() => endRound(true), 300);
         }
     } else {
         G.cellStates[row][col] = 'wrong';
@@ -348,12 +434,12 @@ function handleTap(clientX, clientY) {
 
         // Shake animation
         G.canvas.style.animation = 'ppShake .4s ease';
-        setTimeout(() => G.canvas.style.animation = '', 400);
+        schedulePP(() => G.canvas.style.animation = '', 400);
 
         if (G.lives <= 0) {
             G.phase = 'gameover';
             G.gameState = 'lost';
-            setTimeout(() => endGame(), 500);
+            schedulePP(() => endGame(), 500);
         }
     }
 }
@@ -391,7 +477,7 @@ function endRound(success) {
         }
 
         // Next round
-        setTimeout(() => {
+        schedulePP(() => {
             G.round++;
             updateUI();
             startRound();
@@ -401,6 +487,8 @@ function endRound(success) {
 
 /* === END GAME === */
 function endGame() {
+    if (G.completed) return;
+    G.completed = true;
     G.phase = 'gameover';
     G.gameState = 'lost';
 
@@ -422,7 +510,7 @@ function endGame() {
     if (typeof updateStats === 'function') updateStats('patternpop', G.score);
 
     SFX.play('gameover');
-    setTimeout(() => showGameOver(), 400);
+    schedulePP(() => showGameOver(), 400);
 }
 
 /* === GAME OVER POPUP === */
@@ -452,7 +540,7 @@ function showGameOver() {
     popup.classList.add('open');
 
     // Show interstitial after 2s delay
-    setTimeout(() => {
+    schedulePP(() => {
         if (typeof AdController !== 'undefined' && popup.classList.contains('open')) {
             AdController.showInterstitial();
         }
@@ -512,7 +600,7 @@ function switchMode(mode) {
         document.getElementById('pp-daily-tag').style.display = 'none';
     } else if (mode === 'endless') {
         G.rng = null;
-        G.lives = 999;
+        G.lives = Infinity;
         G.maxLives = 0; // hide hearts
         document.getElementById('pp-daily-tag').style.display = 'none';
     } else if (mode === 'speed') {
@@ -526,8 +614,34 @@ function switchMode(mode) {
     }
 
     G.gameState = 'playing';
+    G.phase = 'ready';
+    initCellStates();
+    resizeCanvas();
     updateUI();
+    refreshPatternLanguage();
+    document.getElementById('pp-ready').hidden = false;
+}
+
+function startPatternPop() {
+    if (G.phase !== 'ready') return;
+    document.getElementById('pp-ready').hidden = true;
     startRound();
+    G.canvas.focus({ preventScroll: true });
+}
+
+function handlePatternKeyboard(event) {
+    if (event.ctrlKey || event.metaKey || event.altKey || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' '].includes(event.key)) return;
+    event.preventDefault();
+    if (G.phase !== 'recall') return;
+    G.keyboardFocus = true;
+    const cell = G.focusedCell;
+    if (event.key === 'ArrowUp') cell.r = Math.max(0, cell.r - 1);
+    if (event.key === 'ArrowDown') cell.r = Math.min(G.gridSize - 1, cell.r + 1);
+    if (event.key === 'ArrowLeft') cell.c = Math.max(0, cell.c - 1);
+    if (event.key === 'ArrowRight') cell.c = Math.min(G.gridSize - 1, cell.c + 1);
+    if ((event.key === 'Enter' || event.key === ' ') && !event.repeat) choosePatternCell(cell.r, cell.c);
+    G.canvas.setAttribute('aria-label', ppCopy(10, { r: cell.r + 1, c: cell.c + 1 }));
+    drawGrid();
 }
 
 /* === INIT === */
@@ -541,6 +655,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Canvas tap
     const canvas = document.getElementById('pp-canvas');
+    canvas.addEventListener('keydown', handlePatternKeyboard);
+    canvas.addEventListener('blur', () => { G.keyboardFocus = false; if (G.ctx) drawGrid(); });
+    document.getElementById('pp-start-btn').addEventListener('click', startPatternPop);
     canvas.addEventListener('pointerdown', e => {
         e.preventDefault();
         handleTap(e.clientX, e.clientY);
@@ -575,14 +692,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize HintManager
     if (typeof HintManager !== 'undefined') HintManager.init('patternpop');
 
-    switchMode('classic');
+    const requested = new URLSearchParams(window.location.search).get('mode');
+    switchMode(['classic', 'daily', 'endless', 'speed'].includes(requested) ? requested : 'classic');
 });
 
 /* === HINT SYSTEM: Replay pattern at 50% slower speed === */
 function usePatternPopHint() {
     if (G.phase !== 'recall') return;
 
+    const game = G, round = G.round;
     const replayHint = () => {
+        if (G !== game || G.round !== round || G.phase !== 'recall') return;
         G.phase = 'memorize'; // Briefly switch to show pattern
         setPhaseBanner('memorize');
 
@@ -598,13 +718,13 @@ function usePatternPopHint() {
         // Show decoys if applicable
         if (G.decoys.length > 0) {
             const decoyDelay = slowTime * 0.4;
-            setTimeout(() => {
+            schedulePP(() => {
                 if (G.phase !== 'memorize') return;
                 G.decoys.forEach(d => {
                     G.cellStates[d.r][d.c] = 'decoy';
                 });
                 drawGrid();
-                setTimeout(() => {
+                schedulePP(() => {
                     if (G.phase !== 'memorize') return;
                     G.decoys.forEach(d => {
                         G.cellStates[d.r][d.c] = null;
@@ -614,7 +734,7 @@ function usePatternPopHint() {
             }, decoyDelay);
         }
 
-        setTimeout(() => {
+        schedulePP(() => {
             if (G.phase !== 'memorize') return;
             startRecallPhase();
         }, slowTime);

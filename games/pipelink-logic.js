@@ -941,6 +941,13 @@ const PipeLink = {
     },
 
     updateUI() {
+        const goal = document.getElementById('pl-goal');
+        if (goal) {
+            const powered = this.grid.flat().filter(cell => cell.colorA || cell.colorB).length;
+            const ko = typeof I18n !== 'undefined' && I18n.currentLang === 'ko';
+            goal.textContent = (ko ? 'A끼리' : 'Connect A → A') + (this.dualMode ? (ko ? ', B끼리 연결' : ' and B → B') : (ko ? ' 연결' : '')) +
+                (ko ? ' · 전력 도달 ' + powered + '칸 · 한 번 탭하면 90° 회전' : ' · ' + powered + ' tiles powered · Tap to rotate 90°');
+        }
         this.ui.movesLbl.textContent = this.moves;
         this.ui.levelLbl.textContent = `${this.size}×${this.size} Level ${this.levelId}`;
 
@@ -1140,11 +1147,15 @@ const PipeLink = {
     },
 
     drawBoard(timestamp = 0) {
-        if (!this.ctx || !this.cellSize) return;
+        if (!this.ctx || !this.canvas || !this.cellSize) return;
+        // The RAF loop starts on the pack selector, before generateBoard creates cells.
+        if (!Array.isArray(this.grid) || this.grid.length !== this.size ||
+            this.grid.some(row => !Array.isArray(row) || row.length !== this.size || row.some(cell => !cell))) return;
 
         const w = this.canvas.width;
         const h = this.canvas.height;
         const ctx = this.ctx;
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // Clear
         ctx.fillStyle = this.colors.bg;
@@ -1172,7 +1183,7 @@ const PipeLink = {
 
                 // Check for active animations
                 const activeAnim = this.animations.find(a => a.r === r && a.c === c);
-                if (activeAnim) {
+                if (activeAnim && !reduceMotion) {
                     const norm = Math.min(1, activeAnim.progress / activeAnim.duration);
 
                     if (activeAnim.type === 'rotate') {
@@ -1197,20 +1208,23 @@ const PipeLink = {
                 ctx.save();
                 ctx.translate(x + mid + offsetX, y + mid + offsetY);
 
-                // Draw Base Cell Box
-                ctx.fillStyle = this.colors.grid;
-                ctx.beginPath();
-                ctx.roundRect(-mid + mg, -mid + mg, inner, inner, inner * 0.1);
-                ctx.fill();
-
-                // Draw Lock Icon
-                if (cell.locked) {
-                    ctx.fillStyle = this.colors.slate;
-                    ctx.globalAlpha = 0.3;
-                    ctx.beginPath();
-                    ctx.arc(-mid + mg + 8, -mid + mg + 8, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.globalAlpha = 1.0;
+                // Machined tile: dark sidewall, bevel, and inset screw heads.
+                ctx.fillStyle = '#07111e';
+                ctx.beginPath(); ctx.roundRect(-mid+mg,-mid+mg+inner*.065,inner,inner,inner*.14); ctx.fill();
+                const plate = ctx.createLinearGradient(-mid,-mid,mid,mid);
+                plate.addColorStop(0,'#415873'); plate.addColorStop(.45,'#273a52'); plate.addColorStop(1,'#17283d');
+                ctx.fillStyle = plate;
+                ctx.beginPath(); ctx.roundRect(-mid+mg,-mid+mg,inner,inner*.94,inner*.13); ctx.fill();
+                ctx.strokeStyle = '#8196b449'; ctx.lineWidth = Math.max(1,inner*.012); ctx.stroke();
+                const screw = inner*.035;
+                for (const sx of [-1,1]) {
+                    ctx.fillStyle = '#0c1a2c'; ctx.beginPath(); ctx.arc(sx*inner*.37,-inner*.35,screw,0,Math.PI*2); ctx.fill();
+                    ctx.strokeStyle = '#7388a4'; ctx.lineWidth = Math.max(1,inner*.012);
+                    ctx.beginPath(); ctx.moveTo(sx*inner*.37-screw*.65,-inner*.35); ctx.lineTo(sx*inner*.37+screw*.65,-inner*.35); ctx.stroke();
+                }
+                if (cell.locked && cell.type < 5) {
+                    ctx.font = 'bold '+inner*.16+'px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillStyle = '#ced9e7'; ctx.fillText('×',inner*.34,inner*.32);
                 }
 
                 // Empty cell handling
@@ -1225,83 +1239,54 @@ const PipeLink = {
                 // Setup Colors based on Connectivity
                 const def = this.TILE_DEFS[cell.type];
 
-                // Drawing paths
-                let strokeColor = this.colors.slate; // disconnected
-                let pulsePulse = false;
-
-                // Which axis is active?
-                const isVerticalA = cell.colorA && (cell.type !== 4 || (cell.type === 4 && cell.colorA)); // logic simplified visually
-
-                if (cell.colorA) {
-                    strokeColor = this.colors.amber;
-                    pulsePulse = true;
-                } else if (cell.colorB) {
-                    strokeColor = this.colors.cyan;
-                    pulsePulse = true;
-                }
-
-                // --- Begin Drawing Path Vectors ---
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-
-                const drawLine = (fromX, fromY, toX, toY, color) => {
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = lineThickness;
-                    ctx.beginPath();
-                    ctx.moveTo(fromX, fromY);
-                    ctx.lineTo(toX, toY);
-                    ctx.stroke();
-
-                    // Pulse FX
-                    if (pulsePulse) {
-                        ctx.save();
-                        const glowCycle = (Math.sin(timestamp / 200) + 1) / 2; // 0 to 1
-                        ctx.shadowBlur = 10 + (10 * glowCycle);
-                        ctx.shadowColor = cell.colorA ? this.colors.amber : this.colors.cyan;
-                        ctx.strokeStyle = '#FFFFFF';
-                        ctx.lineWidth = lineThickness * 0.4;
-                        ctx.stroke();
-                        ctx.restore();
+                // Layered metal channels; bright cores show actual energized branches.
+                const active = cell.colorA || cell.colorB;
+                const baseColor = cell.colorA ? '#fbbf24' : cell.colorB ? '#22d3ee' : '#758da6';
+                const half = inner / 2;
+                const connects = def.connects;
+                ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                const endpoints = [[0,-half],[half,0],[0,half],[-half,0]];
+                connects.forEach((connected, dir) => {
+                    if (!connected) return;
+                    let color = baseColor;
+                    if (cell.colorA && cell.colorB) {
+                        const worldDir = (dir+cell.rot)%4;
+                        const nr = r+[-1,0,1,0][worldDir], nc = c+[0,1,0,-1][worldDir];
+                        const next = this.grid[nr] && this.grid[nr][nc];
+                        color = next && next.colorB && !next.colorA ? '#22d3ee' : '#fbbf24';
                     }
-                };
+                    const [ex,ey] = endpoints[dir];
+                    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(ex,ey);
+                    ctx.strokeStyle='#091624'; ctx.lineWidth=lineThickness*2; ctx.stroke();
+                    ctx.strokeStyle='#b2c4d3'; ctx.lineWidth=lineThickness*1.55; ctx.stroke();
+                    ctx.strokeStyle=color; ctx.lineWidth=lineThickness; ctx.stroke();
+                    ctx.save();
+                    ctx.strokeStyle=active ? '#fffbe4' : '#d5e0ed80'; ctx.lineWidth=lineThickness*.22;
+                    if (active) {
+                        ctx.shadowColor=color; ctx.shadowBlur=inner*.14;
+                        ctx.setLineDash([lineThickness*.65,lineThickness*1.6]);
+                        ctx.lineDashOffset=reduceMotion ? 0 : -timestamp/90;
+                    }
+                    ctx.stroke(); ctx.restore();
+                });
+                // Raised central connector hides seams between the pipe arms.
+                ctx.fillStyle='#101f30'; ctx.beginPath(); ctx.arc(0,0,lineThickness*.92,0,Math.PI*2); ctx.fill();
+                ctx.strokeStyle='#a5bad0'; ctx.lineWidth=lineThickness*.18; ctx.stroke();
+                ctx.fillStyle=baseColor; ctx.beginPath(); ctx.arc(0,0,lineThickness*.58,0,Math.PI*2); ctx.fill();
+                ctx.fillStyle=active ? '#fff' : '#d3dfed'; ctx.beginPath(); ctx.arc(-lineThickness*.16,-lineThickness*.18,lineThickness*.16,0,Math.PI*2); ctx.fill();
 
-                const half = (inner / 2);
-                const connects = def.connects; // Base connections [Top, Right, Bottom, Left] unrotated
-
-                // Center Node
-                ctx.fillStyle = strokeColor;
-                ctx.beginPath();
-                ctx.arc(0, 0, lineThickness * 0.8, 0, Math.PI * 2);
-                ctx.fill();
-                if (pulsePulse) {
-                    ctx.fillStyle = '#FFF';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, lineThickness * 0.4, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                // Legs
-                // Top
-                if (connects[0]) drawLine(0, 0, 0, -half, strokeColor);
-                // Right
-                if (connects[1]) drawLine(0, 0, half, 0, strokeColor);
-                // Bottom
-                if (connects[2]) drawLine(0, 0, 0, half, strokeColor);
-                // Left
-                if (connects[3]) drawLine(0, 0, -half, 0, strokeColor);
-
-
-                // UI Decorators for Source/Dest (rendered on top, inverted matrix rotation to keep upright)
                 if (cell.type >= 5) {
-                    ctx.rotate(-drawRot * Math.PI / 2); // un-rotate texto
-                    ctx.font = 'bold ' + (inner * 0.4) + 'px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    let t = cell.type === 5 ? '⚡' : '🔋';
-                    // Apply shadow for visibility
-                    ctx.shadowBlur = 5;
-                    ctx.shadowColor = '#000';
-                    ctx.fillText(t, 0, 0);
+                    ctx.rotate(-drawRot*Math.PI/2);
+                    const terminal = [...this.sources,...this.dests].find(point=>point.r===r && point.c===c);
+                    const letter = terminal ? terminal.t : 'A';
+                    const terminalColor = letter==='B' ? '#22d3ee' : '#fbbf24';
+                    ctx.fillStyle='#101d2c'; ctx.strokeStyle=terminalColor; ctx.lineWidth=inner*.045;
+                    ctx.beginPath();
+                    if (cell.type===5) ctx.arc(0,0,inner*.24,0,Math.PI*2);
+                    else ctx.roundRect(-inner*.24,-inner*.24,inner*.48,inner*.48,inner*.065);
+                    ctx.fill(); ctx.stroke();
+                    ctx.font='900 '+inner*.29+'px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                    ctx.fillStyle=terminalColor; ctx.fillText(letter,0,inner*.015);
                 }
 
                 ctx.restore();

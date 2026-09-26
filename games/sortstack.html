@@ -7,22 +7,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
+
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-K90N7DX7S6');
-  </script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "vtmy819a2e");
-  </script>
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SortStack — Free Online Color Sorting Puzzle | PuzzleVault</title>
     <meta name="description"
@@ -37,11 +26,26 @@
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
     <meta property="og:url" content="https://puzzlevault.pages.dev/games/sortstack">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/arcade.css?v=12">
+    <link rel="stylesheet" href="/css/global.css?v=14">
+    <link rel="stylesheet" href="/css/arcade.css?v=14">
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"VideoGame","name":"SortStack","description":"A color sorting puzzle game where you organize blocks into matching stacks.","url":"https://puzzlevault.pages.dev/games/sortstack","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
-    </script>
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "SortStack",
+  "description": "A color sorting puzzle game where you organize blocks into matching stacks.",
+  "url": "https://puzzlevault.pages.dev/games/sortstack",
+  "genre": "Puzzle",
+  "playMode": "SinglePlayer",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
     <style>
         .ss-page {
             display: flex;
@@ -382,11 +386,19 @@
             color: var(--pv-text-secondary);
             text-transform: uppercase;
         }
+        /* Glass shelf: no CSS transform between drawing and touch coordinates. */
+        .ss-game-area { background: linear-gradient(145deg,var(--pv-card-bg),var(--pv-grid-bg)); border: 1px solid var(--pv-border); border-radius: 22px; box-shadow: inset 0 2px 1px #ffffff55,0 14px 30px #13274314; min-height: 312px; }
+        #ss-canvas { height: 302px; max-width: none; flex: 0 0 auto; }
+        .ss-goal { padding: 12px 15px; margin: 0 0 10px; border: 1px solid var(--pv-border); border-radius: 12px; background: var(--pv-card-bg); font-size: .85rem; font-weight: 700; color: var(--pv-text); }
+        @media (prefers-reduced-motion: reduce) { .ss-game-area { scroll-behavior: auto; } }
+        .ss-main { min-width: 0; }
     </style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
 
     <main>
         <div class="ss-page">
@@ -398,7 +410,7 @@
                     </div>
                     <div class="ss-icons">
                         <button class="hint-btn" onclick="useSortStackHint()" aria-label="Hint" title="Hint">💡 Hint
-                            <span class="hint-sublabel">(Ad)</span></button>
+                            <span class="hint-sublabel"></span></button>
                         <button class="ss-icon-btn" id="ss-btn-help" aria-label="Help">❓</button>
                         <button class="ss-icon-btn" id="ss-btn-stats" aria-label="Stats">📊</button>
                         <button class="ss-icon-btn" id="ss-btn-settings" aria-label="Sound">🔊</button>
@@ -427,6 +439,7 @@
                         </button>
                     </div>
 
+                    <p class="ss-goal" id="ss-goal" role="status" aria-live="polite">Match four balls with the same number.</p>
                     <div class="ss-game-area" id="ss-game-area">
                         <canvas id="ss-canvas" width="500" height="400"></canvas>
                     </div>
@@ -450,46 +463,27 @@
         </div>
 
         <section class="game-guide pv-container">
-            <h2>How to Play SortStack</h2>
-            <p data-i18n="games.sortstack.guide">SortStack is a relaxing yet challenging color sorting puzzle. Your goal
-                is to sort all the scattered colored blocks so that each stack contains exactly 4 blocks of the same
-                color. Tap a stack to select its top block, then tap another stack to move the block there. You can only
-                place a block onto an empty stack or onto a stack where the top block matches its color. Lock &
-                Expansion: completing a stack locks it into place, and a new empty stack appears. Undo Freely: use the
-                Undo button as many times as you like without penalties. Hint System: use the 💡 Hint button to see the
-                optimal next move. Scoring: clear a level for 500 base points with bonus for efficiency. Move Limits:
-                Easy mode has unlimited moves, Medium 50, Hard 40, Expert 35.</p>
+            <h2 data-i18n="games.sortstack.guideTitle">How to Play SortStack</h2>
+            <p data-i18n="games.sortstack.guide">Sort the numbered, colored balls into glass tubes containing four matching balls each. Select a tube’s top ball, then a destination with a matching top ball or an empty space. Green rims show legal destinations. A completed tube locks and adds an empty tube for more working room. The ball numbers also identify colors. Scroll sideways to reach more tubes on a narrow screen. Undo is free and unlimited; hints suggest a useful next move rather than proving an optimal solution. Classic offers Easy with unlimited moves, Medium with 50, Hard with 40, and Expert with 35. Relaxed removes move limits. Start by protecting empty tubes so you have space to rearrange mixed colors.</p>
         </section>
 
         <section class="pv-faq pv-container">
-            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <h2 class="text-center mb-lg" data-i18n="common.faq">Frequently Asked Questions</h2>
             <details>
-                <summary data-i18n="games.sortstack.faq1q">How is SortStack different from other sorting games?
-                </summary>
-                <p data-i18n="games.sortstack.faq1a">Instead of the typical test tubes and round balls, SortStack uses a
-                    clean rectangular drawer
-                    aesthetic with square blocks. Additionally, its unique "Lock & Expand" mechanic rewards you with a
-                    new empty stack every time you complete a color, creating a satisfying progression as you play.</p>
+                <summary data-i18n="games.sortstack.faq1q">What is Lock &amp; Expand?</summary>
+                <p data-i18n="games.sortstack.faq1a">Four matching balls complete a tube. It locks, and a new empty tube gives you more room to sort.</p>
             </details>
             <details>
-                <summary data-i18n="games.sortstack.faq2q">Do I have to watch an ad to undo a move?</summary>
-                <p data-i18n="games.sortstack.faq2a">No! SortStack provides unlimited undos completely free. We believe
-                    puzzle games should be relaxing
-                    and forgiving of simple misclicks.</p>
+                <summary data-i18n="games.sortstack.faq2q">Is Undo free?</summary>
+                <p data-i18n="games.sortstack.faq2a">Yes. Undo is free and unlimited.</p>
             </details>
             <details>
-                <summary data-i18n="games.sortstack.faq3q">What are the different difficulty levels?</summary>
-                <p data-i18n="games.sortstack.faq3a">SortStack offers four difficulties in Classic mode: Easy (3 colors,
-                    5 tubes, unlimited moves),
-                    Medium (5 colors, 7 tubes, 50 moves), Hard (7 colors, 9 tubes, 40 moves), and Expert (10 colors,
-                    12 tubes, 35 moves). Relaxed mode removes move limits entirely. Daily Challenge uses a pre-selected
-                    difficulty that changes every day.</p>
+                <summary data-i18n="games.sortstack.faq3q">What are the difficulty limits?</summary>
+                <p data-i18n="games.sortstack.faq3a">Easy: 3 colors, 5 tubes, unlimited moves. Medium: 5 colors, 7 tubes, 50 moves. Hard: 7 colors, 9 tubes, 40 moves. Expert: 10 colors, 12 tubes, 35 moves. Relaxed removes limits; Daily selects a difficulty for the day.</p>
             </details>
             <details>
-                <summary data-i18n="games.sortstack.faq4q">Are all puzzles solvable?</summary>
-                <p data-i18n="games.sortstack.faq4a">Yes. Every single puzzle in SortStack is generated by starting from
-                    a perfectly solved state and
-                    applying random reverse-moves. This guarantees that every layout is 100% solvable.</p>
+                <summary data-i18n="games.sortstack.faq4q">How are puzzles made?</summary>
+                <p data-i18n="games.sortstack.faq4a">Boards are constructed by scrambling a solved arrangement with reverse moves. This does not prove the shortest solution or guarantee completion within a difficulty’s move limit. Use Undo or Relaxed to explore.</p>
             </details>
         </section>
 
@@ -498,7 +492,7 @@
 
     </main>
 
-    <footer id="pv-footer"></footer>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
 
     <!-- Help Modal -->
     <div class="pv-modal" id="ss-help-modal">
@@ -507,11 +501,11 @@
         <div class="pv-modal-content">
             <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
             <h3 style="margin-bottom:12px">How to Play</h3>
-            <p style="font-size:0.9rem;margin-bottom:8px">Sort all colors so each stack has 4 blocks of the same color.
+            <p style="font-size:0.9rem;margin-bottom:8px">Sort all colors so each stack has 4 balls of the same color.
             </p>
             <ul style="font-size:0.85rem; padding-left: 20px; color: var(--pv-text-secondary); line-height: 1.5;">
-                <li>Tap a stack to lift its top block.</li>
-                <li>Tap another stack to drop the block.</li>
+                <li>Tap a stack to lift its top ball.</li>
+                <li>Tap another stack to drop the ball.</li>
                 <li>You can only drop on the SAME color or an EMPTY stack.</li>
                 <li>Complete a stack (4 matching) to LOCK it and get an extra empty stack!</li>
                 <li>Hard/Expert levels have Move Limits.</li>
@@ -533,15 +527,15 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/js/i18n.js?v=12"></script>
-    <script src="/js/progression.js?v=12"></script>
-    <script src="/js/common.js?v=12"></script>
-    <script src="/js/arcade.js?v=12"></script>
-    <script src="/js/adsense.js?v=12"></script>
-    <script src="/js/seed.js"></script>
-    <script src="/js/sfx.js"></script>
-    <script src="/js/share.js?v=12"></script>
-    <script src="/games/sortstack-logic.js?v=12"></script>
+    <script src="/js/i18n.js?v=14"></script>
+    <script src="/js/progression.js?v=14"></script>
+    <script src="/js/common.js?v=14"></script>
+    <script src="/js/arcade.js?v=14"></script>
+    <script src="/js/adsense.js?v=14"></script>
+    <script src="/js/seed.js?v=14"></script>
+    <script src="/js/sfx.js?v=14"></script>
+    <script src="/js/share.js?v=14"></script>
+    <script src="/games/sortstack-logic.js?v=14"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

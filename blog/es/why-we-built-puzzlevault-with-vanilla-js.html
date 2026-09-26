@@ -6,58 +6,83 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-K90N7DX7S6');</script>
-  <script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","vtmy819a2e");</script>
+
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks) | PuzzleVault Blog</title>
-    <meta name="description" content="Descubre por qué PuzzleVault rechazó frameworks modernos como React y Vue, optando por puro Vanilla JS para rendimiento máximo.">
+    <title>Por qué PuzzleVault usa JavaScript sin frameworks | PuzzleVault Blog</title>
+    <meta name="description" content="Así se organiza PuzzleVault con HTML, CSS y JavaScript: dibujo directo, módulos por juego, almacenamiento del navegador y pruebas de respuesta.">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html">
     <meta name="theme-color" content="#2563EB">
-    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/global.css?v=14">
     <link rel="manifest" href="/manifest.json">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)">
-    <meta property="og:description" content="Descubre por qué PuzzleVault rechazó frameworks modernos como React y Vue, optando por puro Vanilla JS para rendimiento máximo.">
+    <meta property="og:title" content="Por qué PuzzleVault usa JavaScript sin frameworks | PuzzleVault Blog">
+    <meta property="og:description" content="Así se organiza PuzzleVault con HTML, CSS y JavaScript: dibujo directo, módulos por juego, almacenamiento del navegador y pruebas de respuesta.">
     <meta property="og:url" content="https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)">
+    <meta name="twitter:title" content="Por qué PuzzleVault usa JavaScript sin frameworks | PuzzleVault Blog">
     <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html">
     <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/why-we-built-puzzlevault-with-vanilla-js.html">
     <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/why-we-built-puzzlevault-with-vanilla-js.html">
     <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/why-we-built-puzzlevault-with-vanilla-js.html">
     <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html">
     <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html">
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)","inLanguage":"es","datePublished":"2026-03-29","dateModified":"2026-03-29","author":{"@type":"Organization","name":"PuzzleVault"},"publisher":{"@type":"Organization","name":"PuzzleVault"},"mainEntityOfPage":"https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html"}</script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Por qué PuzzleVault usa JavaScript sin frameworks",
+  "inLanguage": "es",
+  "datePublished": "2026-03-29",
+  "dateModified": "2026-09-26",
+  "author": {
+    "@type": "Organization",
+    "name": "PuzzleVault"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PuzzleVault"
+  },
+  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/es/why-we-built-puzzlevault-with-vanilla-js.html",
+  "description": "Así se organiza PuzzleVault con HTML, CSS y JavaScript: dibujo directo, módulos por juego, almacenamiento del navegador y pruebas de respuesta."
+}
+</script>
     <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Inicio"><a href="/es/">🧩 PuzzleVault</a><a href="/es/#games">Juegos</a><a href="/blog/es/">Blog</a><a href="/es/about.html">Acerca de</a></nav></header>
     <div class="blog-post-header">
         <span class="blog-post-category">Actualización</span>
-        <h1>Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)</h1>
-        <div class="blog-post-meta">29 de Marzo de 2026 · 6min de lectura</div>
+        <h1>Por qué PuzzleVault usa JavaScript sin frameworks</h1>
+        <div class="blog-post-meta">29 de Marzo de 2026 · 6min de lectura · <time datetime="2026-09-26">Actualizado el 26 de septiembre de 2026</time></div>
     </div>
     <article class="blog-content">
-        <p>Si miras bajo el capó de la mayoría de las aplicaciones web modernas, casi seguro encontrarás un framework JavaScript pesado. Entonces, ¿por qué PuzzleVault se construyó con puro <strong>Vanilla JavaScript, HTML5 y CSS3</strong>?</p>
-<h2>1. Cero Tiempos de Carga</h2>
-<p>Un SPA de React requiere descargar varios megabytes de JavaScript. El payload de PuzzleVault es de menos de 100KB. <strong>SortStack</strong> o <strong>PatternPop</strong> se inicializan en 50 milisegundos.</p>
-<h2>2. Control Total del Ciclo de Renderizado</h2>
-<p>El DOM Virtual de React es genial para tablas de datos, pero causa micro-stutters en juegos a 60 FPS. Vanilla JS permite acceso directo a <code>requestAnimationFrame()</code> y la API Canvas.</p>
-<h2>3. Evitando el Infierno de Dependencias</h2>
-<p>Al depender solo de APIs Web nativas del estándar W3C, nuestro código no se deteriora. Sin herramientas de build, Webpack ni módulos Node.</p>
-<h2>4. Maximizando la Vida de la Batería</h2>
-<p>La lógica vanilla pura no tiene la sobrecarga de asignación de memoria de stores de estado reactivos, reduciendo la actividad del recolector de basura y conservando batería.</p>
-<h2>Conclusión</h2>
-<p>Los frameworks son herramientas increíbles para software empresarial, pero para puzzles interactivos instantáneos y de alto rendimiento, agregan peso innecesario. Vanilla JS garantiza la velocidad y accesibilidad de PuzzleVault.</p>
+<p>PuzzleVault utiliza HTML, CSS y JavaScript para ofrecer sus juegos en el navegador. Cada página carga funciones compartidas de navegación, idiomas y resultados, además del código que controla su propio tablero. Algunos juegos dibujan en Canvas; otros utilizan botones y elementos del documento. Esta organización encaja con una colección de puzzles pequeños cuyas reglas se pueden estudiar por separado.</p>
+<p>La elección responde a este proyecto, no a una superioridad universal. Un framework también puede servir para crear juegos rápidos y accesibles. Actualmente no necesitamos un sistema de componentes para actualizar un número, mover una pieza o redibujar un tablero. Mantener esas operaciones explícitas facilita seguir el recorrido desde la entrada del jugador hasta el siguiente estado visible.</p>
+<h2>1. El navegador todavía descarga archivos</h2>
+<p>El juego necesita HTML, estilos, scripts y los datos del idioma correspondiente. La conexión, la caché, el dispositivo y otros recursos influyen en cuánto tarda en estar disponible. Evitar el código de ejecución de un framework elimina una dependencia posible; no vuelve instantáneos la descarga ni el procesamiento. Lo útil es comprobar qué aporta cada recurso a la página que se está abriendo.</p>
+<p>Por ejemplo, las reglas de <a href="/games/numvault.html">NumVault</a> están en su propio script. La selección de idioma y las opciones para compartir pertenecen a código común. Así, una corrección compartida puede beneficiar a varios juegos. A cambio, hay que vigilar las duplicaciones y mantener comprensible el orden de carga de los archivos.</p>
+<h2>2. Elegir cómo dibujar cada juego</h2>
+<p><a href="/games/patternpop.html">PatternPop</a> dibuja su tablero y sus pads con profundidad en Canvas. QuickCalc utiliza botones reales para las respuestas, aprovechando sus mecanismos de foco y activación. Canvas exige definir zonas de interacción y controles de teclado; una interfaz con elementos del documento exige cuidar el diseño y las actualizaciones. Ninguna opción resuelve automáticamente todos esos problemas.</p>
+<p>La función <code>requestAnimationFrame</code> permite programar trabajo siguiendo el ciclo de dibujo del navegador. No promete una cantidad fija de fotogramas por segundo. La carga del dispositivo, la pantalla y las pestañas en segundo plano cambian los intervalos. Por eso un juego cronometrado debe medir el tiempo transcurrido, en lugar de asumir que todos los fotogramas duran lo mismo.</p>
+<h2>3. Menos dependencias también necesitan mantenimiento</h2>
+<p>El proyecto puede servir archivos estáticos sin pasar el código del juego por un proceso de compilación de un framework. Esto facilita inspeccionar lo que se publica. Sin embargo, la aplicación sigue siendo responsable de cancelar tareas pendientes, validar enlaces de reto, manejar errores de almacenamiento y comprobar su comportamiento en distintos navegadores. Usar API nativas no significa que el código quede libre de mantenimiento.</p>
+<p>La caché del service worker también requiere atención. Los archivos guardados pueden ayudar en visitas posteriores, pero una actualización debe sustituir el código antiguo. Evitar que se mezclen scripts de versiones distintas importa tanto como mostrar rápidamente la primera pantalla. La fiabilidad de la actualización forma parte del diseño.</p>
+<h2>4. Comprobar la respuesta mientras se juega</h2>
+<p>Una revisión práctica incluye pantallas estrechas, entrada táctil, uso exclusivo del teclado y preferencias de movimiento reducido. También conviene reiniciar durante una animación y regresar a un juego con temporizador después de cambiar de pestaña. Estas situaciones revelan fallos que una demostración rápida en un ordenador puede pasar por alto.</p>
+<p>El consumo de batería no se deduce de la ausencia de un framework. Depende de la frecuencia de dibujo, los efectos, la actividad en segundo plano y el dispositivo. Podemos reducir trabajo innecesario y medir condiciones concretas; aquí no presentamos una comparación medida de batería o carga. El motivo de esta arquitectura es que sus piezas resultan manejables para examinarlas, adaptarlas y probarlas junto con los juegos.</p>
+<p>Prueba los pads de PatternPop y el teclado de NumVault. Sus herramientas visuales son distintas, pero ambos buscan que la siguiente acción y su resultado sean fáciles de comprender.</p>
     </article>
     <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
     <section class="blog-related"><h2>🎮 Prueba Estos Juegos</h2><div class="related-games-grid" id="related-games"></div></section>
     <section class="blog-related"><h2>📖 Leer Más</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/es/" class="back-link">← Volver al Blog</a></section>
     <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
-    <footer id="pv-footer"></footer>
-    <script src="/js/blog-data.js"></script><script src="/js/i18n.js"></script><script src="/js/common.js"></script>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/es/about.html">Acerca de</a><a href="/es/privacy.html">Privacidad</a><a href="/es/terms.html">Términos</a><a href="/es/contact.html">Contacto</a><a href="/blog/es/">Blog</a></nav></footer>
+    <script src="/js/blog-data.js?v=14"></script><script src="/js/i18n.js?v=14"></script><script src="/js/common.js?v=14"></script>
     <script>const POST_SLUG='why-we-built-puzzlevault-with-vanilla-js';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['mergechain','sortstack','patternpop'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/es/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
     <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/why-we-built-puzzlevault-with-vanilla-js.html':'/blog/'+nl+'/why-we-built-puzzlevault-with-vanilla-js.html'});</script>
     <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>

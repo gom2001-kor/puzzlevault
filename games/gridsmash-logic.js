@@ -34,6 +34,7 @@ const CELL_PAD = 2;
 let G = {};
 function resetState() {
     if (G && G.timerInterval !== null) clearInterval(G.timerInterval);
+    if (G.feedbackRAF) cancelAnimationFrame(G.feedbackRAF);
     G = {
         mode: 'classic',
         grid: Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(null)),
@@ -55,6 +56,7 @@ function resetState() {
         // Canvas
         canvas: null, ctx: null, cellSize: 0,
         animating: false, clearAnims: [],
+        feedback: [], feedbackRAF: null, keyboardPreview: false,
     };
 }
 
@@ -66,6 +68,7 @@ function initGame() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     setupDragListeners();
+    G.canvas.addEventListener('keydown', handleBoardKey);
     document.getElementById('gs-tabs').addEventListener('click', e => {
         const tab = e.target.closest('.pv-tab');
         if (tab) switchMode(tab.dataset.mode);
@@ -88,7 +91,7 @@ function initGame() {
 function resizeCanvas() {
     const wrap = document.getElementById('gs-canvas-wrap');
     const w = Math.min(500, wrap.clientWidth);
-    G.canvas.width = w; G.canvas.height = w;
+    G.ctx = PVDepth.setupCanvas(G.canvas, w, w);
     G.cellSize = w / GRID_SIZE;
     drawGrid();
 }
@@ -257,19 +260,7 @@ function getPieceBounds(cells) {
 
 /* === DRAW HELPERS === */
 function drawRoundedRect(ctx, x, y, w, h, r, color, special) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath(); ctx.fill();
-    // Inner shadow
-    ctx.save(); ctx.globalAlpha = 0.15; ctx.fillStyle = '#000';
-    ctx.fillRect(x + 2, y + h - 4, w - 4, 3);
-    ctx.globalAlpha = 0.1; ctx.fillStyle = '#fff';
-    ctx.fillRect(x + 2, y + 1, w - 4, 3);
-    ctx.restore();
+    PVDepth.block(ctx, x, y, w, h, color);
     if (special === 'frost') {
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
         ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
@@ -287,7 +278,7 @@ function drawSpecialIcon(ctx, x, y, emoji) {
 /* === DRAW GRID === */
 function drawGrid() {
     const { ctx, cellSize: cs } = G;
-    const w = G.canvas.width;
+    const w = cs * GRID_SIZE;
     ctx.clearRect(0, 0, w, w);
     // Background
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--pv-grid-bg').trim() || '#E2E8F0';
@@ -299,11 +290,13 @@ function drawGrid() {
             ctx.fillRect(0, r * cs, w, cs);
         }
     }
-    // Grid lines
-    ctx.strokeStyle = '#CBD5E1'; ctx.lineWidth = 0.5;
-    for (let i = 0; i <= GRID_SIZE; i++) {
-        ctx.beginPath(); ctx.moveTo(i * cs, 0); ctx.lineTo(i * cs, w); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, i * cs); ctx.lineTo(w, i * cs); ctx.stroke();
+    // Recessed sockets keep the exact 10 × 10 hit geometry visible.
+    for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+            PVDepth.rounded(ctx, c * cs + 2, r * cs + 2, cs - 4, cs - 4, 5);
+            ctx.fillStyle = G.shatterZone && G.shatterZone.active && r >= G.shatterZone.rowStart ? 'rgba(217,119,6,.16)' : 'rgba(71,85,105,.12)';
+            ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.24)'; ctx.lineWidth = 1; ctx.stroke();
+        }
     }
     // Filled cells
     for (let r = 0; r < GRID_SIZE; r++) {
@@ -340,6 +333,88 @@ function drawGrid() {
             }
         });
     }
+    const preview = G.dragPiece && G.dragGridPos ? getPlacementPreview(G.dragPiece, G.dragGridPos.row, G.dragGridPos.col) : null;
+    if (preview && preview.valid) {
+        ctx.save(); ctx.strokeStyle = '#059669'; ctx.lineWidth = 3;
+        preview.rows.forEach(r => { PVDepth.rounded(ctx, 2, r * cs + 2, w - 4, cs - 4, 5); ctx.stroke(); });
+        preview.cols.forEach(c => { PVDepth.rounded(ctx, c * cs + 2, 2, cs - 4, w - 4, 5); ctx.stroke(); });
+        ctx.restore();
+    }
+    const status = document.getElementById('gs-placement-status');
+    if (status) {
+        const text = !preview ? PVDepth.t('blocks') : !preview.valid ? PVDepth.t('blocked') : preview.rows.length + preview.cols.length ? PVDepth.t('lines', preview.rows.length + preview.cols.length) : PVDepth.t('place');
+        if (status.textContent !== text) status.textContent = text;
+        status.dataset.ready = String(Boolean(preview && preview.valid));
+    }
+    drawPlacementFeedback();
+}
+
+/* Predict only ordinary placements: special pieces alter neighbors first. */
+function getPlacementPreview(piece, row, col) {
+    if (!piece || !canPlace(piece, row, col)) return { valid: false, rows: [], cols: [] };
+    if (piece.special) return { valid: true, rows: [], cols: [] };
+    const additions = new Set(piece.cells.map(([dr, dc]) => `${row + dr},${col + dc}`));
+    const occupied = (r, c) => Boolean(G.grid[r][c]) || additions.has(`${r},${c}`);
+    const rows = [], cols = [];
+    for (let i = 0; i < GRID_SIZE; i++) {
+        if (Array.from({ length: GRID_SIZE }, (_, c) => occupied(i, c)).every(Boolean)) rows.push(i);
+        if (Array.from({ length: GRID_SIZE }, (_, r) => occupied(r, i)).every(Boolean)) cols.push(i);
+    }
+    return { valid: true, rows, cols };
+}
+
+function addPlacementFeedback(cells, clearing) {
+    if (PVDepth.reduced()) return;
+    const round = G;
+    const start = Date.now();
+    G.feedback.push(...cells.map(([r, c]) => ({ r, c, start, clearing })));
+    G.feedback = G.feedback.slice(-140);
+    if (G.feedbackRAF) return;
+    const animate = () => {
+        if (G !== round) return;
+        G.feedback = G.feedback.filter(effect => Date.now() - effect.start < 360);
+        drawGrid();
+        G.feedbackRAF = G.feedback.length ? requestAnimationFrame(animate) : null;
+    };
+    G.feedbackRAF = requestAnimationFrame(animate);
+}
+
+function drawPlacementFeedback() {
+    if (PVDepth.reduced()) return;
+    const ctx = G.ctx, cs = G.cellSize;
+    for (const effect of G.feedback) {
+        const progress = Math.min(1, (Date.now() - effect.start) / 360);
+        const inset = effect.clearing ? 2 + progress * cs * .35 : 2 + (1 - progress) * 3;
+        ctx.save(); ctx.globalAlpha = (1 - progress) * .85;
+        PVDepth.rounded(ctx, effect.c * cs + inset, effect.r * cs + inset, cs - inset * 2, cs - inset * 2, 4);
+        ctx.strokeStyle = effect.clearing ? '#059669' : '#FFFFFF'; ctx.lineWidth = 2.5; ctx.stroke(); ctx.restore();
+    }
+}
+
+function handleBoardKey(event) {
+    if (G.gameState !== 'playing' || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (/^[1-3]$/.test(event.key)) {
+        const index = Number(event.key) - 1;
+        if (G.piecesPlaced[index]) return;
+        G.dragPiece = G.pieces[index]; G.dragIdx = index;
+        G.dragGridPos = { row: 3, col: 3 }; G.keyboardPreview = true;
+    } else if (G.keyboardPreview && G.dragPiece) {
+        const pos = G.dragGridPos;
+        if (event.key === 'ArrowLeft') pos.col--;
+        else if (event.key === 'ArrowRight') pos.col++;
+        else if (event.key === 'ArrowUp') pos.row--;
+        else if (event.key === 'ArrowDown') pos.row++;
+        else if (event.key.toLowerCase() === 'r') { rotatePiece(G.dragPiece); renderDock(); }
+        else if (event.key === 'Enter') { event.preventDefault(); onDragEnd(); G.keyboardPreview = false; return; }
+        else if (event.key === 'Escape') { G.dragPiece = null; G.dragGridPos = null; G.keyboardPreview = false; drawGrid(); return; }
+        else return;
+        const bounds = getPieceBounds(G.dragPiece.cells);
+        pos.row = Math.max(0, Math.min(GRID_SIZE - bounds.rows, pos.row));
+        pos.col = Math.max(0, Math.min(GRID_SIZE - bounds.cols, pos.col));
+    } else return;
+    event.preventDefault();
+    G.dragValid = canPlace(G.dragPiece, G.dragGridPos.row, G.dragGridPos.col);
+    drawGrid();
 }
 
 /* === DRAG & DROP === */
@@ -361,6 +436,7 @@ function setupDragListeners() {
     dock.addEventListener('pointerdown', e => {
         const pc = e.target.closest('canvas');
         if (!pc || pc.classList.contains('placed')) return;
+        if (G.keyboardPreview) { G.keyboardPreview = false; G.dragPiece = null; G.dragGridPos = null; }
         e.preventDefault();
         const idx = parseInt(pc.dataset.idx);
         tapStartTime = Date.now();
@@ -402,7 +478,7 @@ function setupDragListeners() {
             }
             tapIdx = -1;
         }
-        onDragEnd(e);
+        if (!G.keyboardPreview) onDragEnd(e);
     });
     // Wild piece
     wildSlot.addEventListener('pointerdown', e => {
@@ -428,14 +504,15 @@ function startDrag(idx, piece, e) {
     if (G.gameState !== 'playing' || G.animating) return;
     G.dragIdx = idx;
     G.dragPiece = piece;
+    G.keyboardPreview = false;
     G.dragOffset = { x: 0, y: 0 };
     e.preventDefault();
 }
 
 function onDragMove(e) {
-    if (!G.dragPiece) return;
+    if (!G.dragPiece || G.keyboardPreview) return;
     const rect = G.canvas.getBoundingClientRect();
-    const scaleX = G.canvas.width / rect.width;
+    const scaleX = (G.cellSize * GRID_SIZE) / rect.width;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleX;
     const cs = G.cellSize;
@@ -468,6 +545,7 @@ function canPlace(piece, row, col) {
 
 /* === PLACE PIECE === */
 function placePiece(piece, row, col, idx) {
+    if (G.gameState !== 'playing' || !canPlace(piece, row, col)) return;
     // Save undo state
     G.undoState = {
         grid: G.grid.map(r => r.map(c => c ? { ...c } : null)),
@@ -480,6 +558,7 @@ function placePiece(piece, row, col, idx) {
         cellsPlaced++;
     });
     G.score += cellsPlaced * 10; // 10 points per cell placed
+    addPlacementFeedback(piece.cells.map(([dr, dc]) => [row + dr, col + dc]), false);
     SFX.play('tap');
 
     // Special block effects
@@ -506,6 +585,7 @@ function placePiece(piece, row, col, idx) {
     checkLineClears();
     updateUI();
     drawGrid();
+    if (G.gameState !== 'playing') return;
 
     // Check if all 3 placed → next turn
     const regularPlaced = G.piecesPlaced.every(p => p);
@@ -599,6 +679,7 @@ function checkLineClears() {
     const cellsToClear = new Set();
     toClear.rows.forEach(r => { for (let c = 0; c < GRID_SIZE; c++) cellsToClear.add(`${r},${c}`); });
     toClear.cols.forEach(c => { for (let r = 0; r < GRID_SIZE; r++) cellsToClear.add(`${r},${c}`); });
+    addPlacementFeedback([...cellsToClear].map(key => key.split(',').map(Number)), true);
     cellsToClear.forEach(key => {
         const [r, c] = key.split(',').map(Number);
         const cell = G.grid[r][c];
@@ -716,10 +797,14 @@ function canAnyPieceFit() {
 }
 
 function canPieceFitAnywhere(piece) {
-    for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0; c < GRID_SIZE; c++) {
-            if (canPlace(piece, r, c)) return true;
+    const candidate = { ...piece, cells: piece.cells.map(cell => cell.slice()) };
+    for (let rotation = 0; rotation < 4; rotation++) {
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
+                if (canPlace(candidate, r, c)) return true;
+            }
         }
+        rotatePiece(candidate);
     }
     return false;
 }
@@ -738,18 +823,8 @@ function endGame() {
     setTimeout(() => showGameOver(), 400);
 }
 
-function getPercentile(score) {
-    if (score >= 30000) return 1;
-    if (score >= 20000) return 5;
-    if (score >= 15000) return 10;
-    if (score >= 8000) return 25;
-    if (score >= 4000) return 50;
-    return 100;
-}
-
 /* === GAME OVER POPUP === */
 function showGameOver() {
-    const pct = getPercentile(G.score);
     const isSprint = G.mode === 'sprint' && G.gameState === 'won';
     const elapsed = isSprint ? ((Date.now() - G.sprintStartTime) / 1000).toFixed(1) + 's' : '';
     const statsEl = document.getElementById('gs-gameover-stats');

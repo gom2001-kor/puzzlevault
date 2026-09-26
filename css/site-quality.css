@@ -1,0 +1,39 @@
+/* Readable editorial content and explicit optional-analytics controls. */
+.pv-editorial { max-width: 840px; margin: 48px auto; padding: 0 24px 32px; line-height: 1.85; }
+.pv-editorial h1 { font-size: clamp(1.8rem, 4vw, 2.7rem); letter-spacing: -.04em; margin-bottom: 16px; }
+.pv-editorial h2 { font-size: 1.22rem; margin: 30px 0 12px; }
+.pv-editorial p, .pv-editorial ul, .pv-editorial ol { margin-bottom: 16px; }
+.pv-editorial ul { list-style: disc; padding-left: 22px; }
+.pv-editorial ol { list-style: decimal; padding-left: 22px; }
+.pv-editorial a { color: var(--pv-blue); text-decoration: underline; text-underline-offset: 3px; }
+.pv-editorial .pv-btn { text-decoration: none; }
+.pv-editorial-meta { font-size: .82rem; color: var(--pv-text-secondary); }
+.pv-editorial-callout { background: var(--pv-card-bg); border: 1px solid var(--pv-border); border-left: 4px solid var(--pv-blue); padding: 22px; border-radius: 12px; margin: 24px 0; }
+.pv-static-nav { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; max-width: 1160px; padding: 18px 24px; margin: auto; }
+.pv-static-nav a:first-child { font-weight: 800; margin-right: auto; }
+.pv-static-footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 26px 20px; }
+.pv-privacy-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; padding: 0 20px 24px; font-size: .78rem; color: var(--pv-text-secondary); }
+.pv-privacy-controls button { border: 0; background: none; color: inherit; text-decoration: underline; cursor: pointer; min-height: 44px; padding: 8px; }
+.pv-privacy-overlay { position: fixed; inset: 0; z-index: 20000; background: #0f172a80; display: grid; place-items: center; padding: 20px; }
+.pv-privacy-panel { width: min(520px,100%); max-height: calc(100dvh - 40px); overflow: auto; background: var(--pv-card-bg); color: var(--pv-text); border-radius: 20px; padding: 28px; box-shadow: 0 20px 80px #0003; }
+.pv-privacy-panel h2 { font-size: 1.4rem; line-height: 1.4; }
+.pv-privacy-panel p { color: var(--pv-text-secondary); margin: 16px 0; line-height: 1.8; font-size: .9rem; }
+.pv-privacy-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+.pv-privacy-actions button { white-space: normal; word-break: keep-all; min-height: 48px; }
+.pv-privacy-panel > a { color: var(--pv-blue); font-size: .82rem; text-decoration: underline; }
+.pv-privacy-close { display: block; margin-top: 16px; padding: 8px 0; background: none; border: 0; color: var(--pv-text-secondary); cursor: pointer; min-height: 44px; }
+.pv-privacy-panel :focus-visible, .pv-privacy-controls :focus-visible { outline: 3px solid var(--pv-blue); outline-offset: 3px; }
+.ad-slot:empty { display: none; }
+:is(.nv-sidebar, .gs-sidebar, .pp-sidebar, .ss-sidebar, .qc-sidebar,
+    .tt-sidebar, .cf-sidebar, .pl-sidebar, .mc-sidebar, .hx-sidebar):has(> .ad-slot:empty) { display: none; }
+/* Keep every game action reachable on narrow screens. Tube shelves scroll internally. */
+@media (max-width: 600px) {
+    .nv-top-bar, .pp-top-bar, .qc-top-bar, .ss-top-bar,
+    .tt-header, .cf-header, .pl-header { flex-wrap: wrap; gap: 8px; }
+    .nv-icons, .pp-icons, .qc-icons, .ss-icons,
+    .tt-icons, .cf-icons, .pl-icons { flex-wrap: wrap; margin-left: auto; max-width: 100%; }
+    .nv-icons button, .pp-icons button, .qc-icons button, .ss-icons button,
+    .tt-icons button, .cf-icons button, .pl-icons button { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+@media (max-width: 480px) { .pv-editorial { padding-inline: 20px; margin-top: 28px; } .pv-privacy-panel { padding: 22px; } }

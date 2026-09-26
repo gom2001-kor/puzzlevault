@@ -6,57 +6,84 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-K90N7DX7S6');</script>
-  <script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","vtmy819a2e");</script>
+
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SortStackの背後にある数学：すべてのパズルが解けることを保証する方法 | PuzzleVault Blog</title>
-    <meta name="description" content="並べ替えパズルが本当に不可能だと疑問に思ったことはありませんか？100%解けることを保証するリバースムーブアルゴリズムを発見してください。">
+    <title>SortStackのパズル生成と手数制限 | PuzzleVault Blog</title>
+    <meta name="description" content="逆向きの移動で盤面を作る仕組みと、最短解や手数制限との違いを説明。空のチューブを使う判断にも役立ちます。">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
     <meta name="theme-color" content="#2563EB">
-    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/global.css?v=14">
     <link rel="manifest" href="/manifest.json">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="SortStackの背後にある数学：すべてのパズルが解けることを保証する方法">
-    <meta property="og:description" content="並べ替えパズルが本当に不可能だと疑問に思ったことはありませんか？100%解けることを保証するリバースムーブアルゴリズムを発見してください。">
+    <meta property="og:title" content="SortStackのパズル生成と手数制限 | PuzzleVault Blog">
+    <meta property="og:description" content="逆向きの移動で盤面を作る仕組みと、最短解や手数制限との違いを説明。空のチューブを使う判断にも役立ちます。">
     <meta property="og:url" content="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="SortStackの背後にある数学：すべてのパズルが解けることを保証する方法">
+    <meta name="twitter:title" content="SortStackのパズル生成と手数制限 | PuzzleVault Blog">
     <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
     <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/blog/ko/the-math-behind-sortstack.html">
     <link rel="alternate" hreflang="ja" href="https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html">
     <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
     <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html">
     <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"SortStackの背後にある数学：すべてのパズルが解けることを保証する方法","inLanguage":"ja","datePublished":"2026-03-29","dateModified":"2026-03-29","author":{"@type":"Organization","name":"PuzzleVault"},"publisher":{"@type":"Organization","name":"PuzzleVault"},"mainEntityOfPage":"https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html"}</script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "SortStackのパズル生成と手数制限",
+  "inLanguage": "ja",
+  "datePublished": "2026-03-29",
+  "dateModified": "2026-09-26",
+  "author": {
+    "@type": "Organization",
+    "name": "PuzzleVault"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PuzzleVault"
+  },
+  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/ja/the-math-behind-sortstack.html",
+  "description": "逆向きの移動で盤面を作る仕組みと、最短解や手数制限との違いを説明。空のチューブを使う判断にも役立ちます。"
+}
+</script>
     <style>.blog-post-header{max-width:700px;margin:40px auto 0;padding:0 20px}.blog-post-category{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pv-blue);background:rgba(37,99,235,.08);padding:4px 12px;border-radius:100px;margin-bottom:16px}.blog-post-header h1{font-size:2rem;font-weight:800;line-height:1.3;margin-bottom:12px;color:var(--pv-text)}.blog-post-meta{font-size:.85rem;color:var(--pv-text-secondary);margin-bottom:32px}.blog-content{max-width:700px;margin:0 auto;padding:0 20px;color:var(--pv-text);font-size:1.05rem;line-height:1.8}.blog-content p{margin-bottom:20px}.blog-content h2{font-size:1.4rem;font-weight:700;margin-top:40px;margin-bottom:16px;color:var(--pv-text)}.blog-content ul,.blog-content ol{margin-bottom:20px;padding-left:28px}.blog-content li{margin-bottom:8px}.blog-content blockquote{border-left:4px solid var(--pv-blue);margin:24px 0;padding:16px 20px;background:rgba(37,99,235,.04);border-radius:0 var(--pv-radius-sm) var(--pv-radius-sm) 0;color:var(--pv-text-secondary);font-style:italic}.blog-content a{color:var(--pv-blue);text-decoration:none;font-weight:500}.blog-content a:hover{text-decoration:underline}.blog-content strong{font-weight:700;color:var(--pv-text)}.blog-content code{font-family:'Consolas','Monaco',monospace;background:rgba(37,99,235,.06);padding:2px 6px;border-radius:4px;font-size:.9em}.blog-related{max-width:700px;margin:48px auto;padding:0 20px}.blog-related h2{font-size:1.3rem;font-weight:700;margin-bottom:20px}.related-games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}.related-game-card{display:flex;align-items:center;gap:12px;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-game-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-game-icon{font-size:2rem}.related-game-info{flex:1}.related-game-name{font-weight:700;font-size:.95rem}.related-game-tagline{font-size:.75rem;color:var(--pv-text-secondary)}.related-posts-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:600px){.related-posts-grid{grid-template-columns:repeat(2,1fr)}}.related-post-card{display:block;background:var(--pv-card-bg);border:1px solid var(--pv-border);border-radius:var(--pv-radius);padding:16px;text-decoration:none;color:inherit;transition:all .2s ease}.related-post-card:hover{transform:translateY(-2px);box-shadow:var(--pv-shadow-lg);border-color:var(--pv-blue)}.related-post-title{font-weight:700;font-size:.95rem;margin-bottom:4px;color:var(--pv-text)}.related-post-desc{font-size:.8rem;color:var(--pv-text-secondary);line-height:1.4}.back-link{display:inline-block;margin-top:32px;font-size:.9rem;font-weight:600;color:var(--pv-blue);text-decoration:none}.back-link:hover{text-decoration:underline}</style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="ホーム"><a href="/ja/">🧩 PuzzleVault</a><a href="/ja/#games">ゲーム</a><a href="/blog/ja/">ブログ</a><a href="/ja/about.html">サイト情報</a></nav></header>
     <div class="blog-post-header">
         <span class="blog-post-category">サイエンス</span>
-        <h1>SortStackの背後にある数学：すべてのパズルが解けることを保証する方法</h1>
-        <div class="blog-post-meta">2026年3月29日 · 6分で読める</div>
+        <h1>SortStackのパズル生成と手数制限</h1>
+        <div class="blog-post-meta">2026年3月29日 · 6分で読める · <time datetime="2026-09-26">2026年9月26日更新</time></div>
     </div>
     <article class="blog-content">
-        <p>ロジックゲームで30分間パズルを凝視した後、数学的に不可能なシナリオだと気づくほど最悪な気分はありません。PuzzleVaultの<strong>SortStack</strong>を構築する際、厳格な約束をしました：<strong>プレイヤーに生成されるすべてのパズルは100%数学的に解けなければなりません。</strong></p>
-<h2>ナイーブなランダム化の欠陥</h2>
-<p>5色の20個のブロックを6つの空きスタックにランダムに配置すると、解けないレイアウトが生成される確率は驚くほど高いです。特定の色の組み合わせが必須ブロックを他のブロックの下に閉じ込め、永久的なデッドロックを作り出す可能性があります。</p>
-<h2>リバースムーブパラダイム</h2>
-<p>SortStackはパズルを<strong>逆方向</strong>に生成します。JavaScriptエンジンがまず完璧な勝利状態を作成します。次にアルゴリズムがゲームを逆方向にプレイし、正しく整列されたスタックのトップブロックを別のスタックに「逆移動」させます。</p>
-<p>このプロセスを数百回、時には数千回繰り返してボードを複雑にスクランブルします。成功状態から逆方向にたどったため、数学的に少なくとも1つの解決パスが必ず存在します。</p>
-<h2>複雑さとプレイアビリティの確保</h2>
-<p>アルゴリズムはスクランブル段階で高度なヒューリスティックチェックを実行します。逆移動が「明白すぎる」シナリオを作成した場合、その分岐を拒否し、別の順列を試みます。</p>
-<h2>数学的公平性が重要な理由</h2>
-<p>プレイヤーがSortStackで失敗した時、それは自分の戦略的ミスによるものだと感じる必要があります。Expertレベルで行き詰まっても、確認された数学的解決策が必ず存在します。</p>
+<p><a href="/games/sortstack.html">SortStack</a>の一手は、同じ色を重ねるだけではありません。下のブロックを出し、空のチューブを確保し、完成によって作業場所を増やすこともできます。盤面の生成方法を知ると、整列した状態に戻る道と、制限手数内で短い道を見つける課題を区別できます。</p>
+<h2>1. 移動の基本ルール</h2>
+<p>チューブの容量は4個です。一番上のブロック1個を、空のチューブか一番上が同じ色のチューブへ動かします。移動先には空きが必要で、下に埋まったブロックを直接取り出すことはできません。同じ色が4個そろうと完成して固定され、新しい空のチューブが追加されます。</p>
+<p>空き容量は資源です。同じ色数の盤面でも、表面に見える色によって次の選択は変わります。移動先だけでなく、動かした後に元のチューブから何色が現れるかを確認しましょう。</p>
+<h2>2. 完成した状態から逆向きに混ぜる</h2>
+<p>生成器は各色4個がそろったチューブと空のチューブから始めます。逆向きの移動では、取り出し元が1個だけ、または一番上とその下が同じ色のときに取り出せます。生成中の移動先は、容量が残っていれば色が違っていても構いません。</p>
+<p>この条件が重要です。直前の移動を逆にすると、ブロックは空になった場所か、同じ色が残った場所へ戻れます。生成順を逆にたどれば、基本の色合わせルールに沿って戻れるように設計されています。現在のコードは色数に比例した回数の移動で混ぜており、全ブロックを無条件に配る方法ではありません。</p>
+<h2>3. 最短解の証明とは異なる</h2>
+<p>生成後に最短経路を探索したり、選んだ手数制限内に収まるか検証したりする処理はありません。現在はMediumが50手、Hardが40手、Expertが35手で、Easyには手数制限がありません。Relaxedは選択した難易度の手数制限を外します。</p>
+<p>そのため、逆向きに生成する設計は、すべての制限付きの盤面を必ず手数内で解けるという約束にはなりません。混ぜた回数も最短手数ではありません。生成中に同じ状態へ戻ったり、互いに打ち消す移動を含んだりするためです。基本ルールでの復帰経路を設計することと、最適な難易度の証明は別の作業です。</p>
+<h2>4. 空のチューブを目的を持って使う</h2>
+<p>できれば空のチューブを残し、そこを埋めることで何を取り出せるか考えましょう。同じ色を集めると下の色を出せますが、一色を多くの場所へ分散すると後から整理しにくくなる場合があります。色を出す、まとめる、新しくできた空間で次の邪魔なブロックを動かす、という短い順序を探します。</p>
+<p>完成すると空のチューブが追加されるので、その後の選択肢が増えます。ただし、一色に多くの手数を使う前に、ほかの完成候補も確認してください。進行中の取り消しは別の道を試すのに便利で、制限付きのモードでは手数も戻ります。</p>
+<h2>5. 経路を理解してから短くする</h2>
+<p>Relaxedでは手数を気にせず、各移動が何に役立つか考えられます。下を出す、同じ色をまとめる、空間を作る、完成させる、のどれにも役立たない移動なら再検討しましょう。限られた手数では万能な手順を求めるより、不要な往復を減らす方針が実用的です。</p>
+<p>この記事は現在の<a href="/games/sortstack-logic.js?v=14">生成コードと移動判定</a>を基にしています。次の一手では、動かすブロックのすぐ下にも注目してみてください。</p>
     </article>
     <div class="ad-slot" id="ad-mid" style="max-width:700px;margin:32px auto"></div>
     <section class="blog-related"><h2>🎮 ゲームを試す</h2><div class="related-games-grid" id="related-games"></div></section>
     <section class="blog-related"><h2>📖 もっと読む</h2><div class="related-posts-grid" id="related-posts"></div><a href="/blog/ja/" class="back-link">← ブログに戻る</a></section>
     <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:0 auto"></div>
-    <footer id="pv-footer"></footer>
-    <script src="/js/blog-data.js"></script><script src="/js/i18n.js"></script><script src="/js/common.js"></script>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/ja/about.html">サイト情報</a><a href="/ja/privacy.html">プライバシー</a><a href="/ja/terms.html">利用規約</a><a href="/ja/contact.html">お問い合わせ</a><a href="/blog/ja/">ブログ</a></nav></footer>
+    <script src="/js/blog-data.js?v=14"></script><script src="/js/i18n.js?v=14"></script><script src="/js/common.js?v=14"></script>
     <script>const POST_SLUG='the-math-behind-sortstack';document.addEventListener('DOMContentLoaded',()=>{const post=BLOG_POSTS.find(p=>p.slug===POST_SLUG);if(post){const gc=document.getElementById('related-games');const games=getRelatedGames(post.tags)||[];if(games.length===0&&typeof PV_GAMES!=='undefined'){['sortstack','gridsmash','mergechain'].forEach(id=>{if(PV_GAMES[id])games.push({id,...PV_GAMES[id]})})};games.forEach(g=>{const c=document.createElement('a');c.className='related-game-card';c.href=g.path;c.innerHTML=`<span class="related-game-icon">${g.emoji}</span><div class="related-game-info"><div class="related-game-name">${g.name}</div><div class="related-game-tagline">${g.tagline}</div></div>`;gc.appendChild(c)})}const rpc=document.getElementById('related-posts');getRelatedPosts(POST_SLUG,3).forEach(rp=>{const c=document.createElement('a');c.className='related-post-card';c.href=rp.url||'/blog/ja/'+rp.slug+'.html';c.innerHTML=`<div class="related-post-title">${rp.title}</div><div class="related-post-desc">${rp.description}</div>`;rpc.appendChild(c)})});</script>
     <script>window.addEventListener('langchange',(e)=>{const nl=e.detail?e.detail.lang:(typeof I18n!=='undefined'?I18n.currentLang:'en');window.location.href=nl==='en'?'/blog/posts/the-math-behind-sortstack.html':'/blog/'+nl+'/the-math-behind-sortstack.html'});</script>
     <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>

@@ -7,22 +7,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
+
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-K90N7DX7S6');
-  </script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "vtmy819a2e");
-  </script>
+
+
+
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, touch-action=none">
     <title>PipeLink — Circuit Connection Puzzle | PuzzleVault</title>
@@ -38,12 +27,27 @@
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
 
     <!-- Shared Global Styles -->
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/arcade.css?v=12">
+    <link rel="stylesheet" href="/css/global.css?v=14">
+    <link rel="stylesheet" href="/css/arcade.css?v=14">
 
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"VideoGame","name":"PipeLink","description":"Rotate circuit tiles to connect power sources to their destinations.","url":"https://puzzlevault.pages.dev/games/pipelink","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
-    </script>
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "PipeLink",
+  "description": "Rotate circuit tiles to connect power sources to their destinations.",
+  "url": "https://puzzlevault.pages.dev/games/pipelink",
+  "genre": "Puzzle",
+  "playMode": "SinglePlayer",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
     <style>
         body {
             overscroll-behavior-y: contain;
@@ -465,11 +469,21 @@
             border-color: var(--pv-slate) !important;
             background-color: var(--pv-grid-dark) !important;
         }
+        .pl-board-container { padding: 18px 14px 16px; border-radius: 24px; background: linear-gradient(145deg,#31445c,#111f32 70%); border: 1px solid #75899f; box-shadow: inset 0 2px 1px #ffffff55,0 7px 0 #0a1526,0 17px 30px #07172933; }
+        #pl-canvas { border: 0; border-radius: 13px; box-shadow: 0 0 0 3px #0b1728,0 2px 0 4px #ffffff20; }
+        .pl-status-A,.pl-status-B { font-size: .83rem; color: #d7e1ef; background: #0d1a2a; border: 1px solid #71869e66; border-radius: 9px; padding: 7px 11px; }
+        .pl-status-A.active { color: #fcd34d; border-color: #fbbf24; }
+        .pl-status-B.active { color: #67e8f9; border-color: #22d3ee; }
+        .pl-goal { width: 100%; margin: 14px 0 0; color: #c0d2e7; font-size: .76rem; font-weight: 650; line-height: 1.6; text-align: center; }
+        @media (prefers-reduced-motion: reduce) { .pl-status-A,.pl-status-B { animation: none; transition: none; } }
+        .pl-main { min-width: 0; }
     </style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
 
     <main>
         <div class="pl-page">
@@ -516,10 +530,11 @@
 
                     <div class="pl-board-container">
                         <div class="pl-status-strip">
-                            <div class="pl-status-A" id="pl-status-A">⚡ <span id="pl-conn-lbl-A">OFF</span> 🔋</div>
-                            <div class="pl-status-B" id="pl-status-B">⚡ <span id="pl-conn-lbl-B">OFF</span> 🔋</div>
+                            <div class="pl-status-A" id="pl-status-A">A ⚡ <span id="pl-conn-lbl-A">OFF</span> 🔋</div>
+                            <div class="pl-status-B" id="pl-status-B">B ⚡ <span id="pl-conn-lbl-B">OFF</span> 🔋</div>
                         </div>
-                        <canvas id="pl-canvas" width="400" height="400"></canvas>
+                        <canvas id="pl-canvas" width="400" height="400" aria-label="PipeLink circuit. Tap a tile to rotate it. Connect each circular source to the square target with the same letter."></canvas>
+                        <p class="pl-goal" id="pl-goal" role="status" aria-live="polite">Connect A → A. Tap to rotate 90°.</p>
                     </div>
 
                     <div class="pl-controls">
@@ -527,7 +542,7 @@
                         <div style="display:flex; gap:8px;">
                             <button class="pl-btn" id="pl-btn-hint" aria-label="Hint">💡 Hint <span
                                     class="hint-sublabel"
-                                    style="font-size:0.75em;color:var(--pv-text-secondary)">(Ad)</span></button>
+                                    style="font-size:0.75em;color:var(--pv-text-secondary)"></span></button>
                             <button class="pl-btn" id="pl-btn-reset">🔄 Reset</button>
                         </div>
                     </div>
@@ -555,7 +570,7 @@
                         180°.</li>
                     <li><strong>Energy Flow:</strong> The line will glow amber when it's actively connected to the
                         source ⚡. Your goal is to chart the flow all the way to 🔋.</li>
-                    <li><strong>Perfect:</strong> Complete the circuit using every single tile on the grid for a ⭐⭐⭐
+                    <li><strong>Perfect:</strong> Connect the matching terminals with fewer taps for a ⭐⭐⭐
                         rating!</li>
                     <li><strong>Locks:</strong> Tiles with a 🔒 cannot be rotated. You must build your circuit around
                         them.</li>
@@ -613,7 +628,7 @@
                 <p style="margin-bottom: 24px; color: var(--pv-slate); font-size: 0.95rem;">
                     The circuit has been completed automatically via Hint. Would you like to restart this puzzle?
                 </p>
-                <button class="btn-primary" id="pl-btn-hint-restart">🔄 Restart Puzzle (Ad)</button>
+                <button class="btn-primary" id="pl-btn-hint-restart">🔄 Restart Puzzle </button>
                 <button class="btn-secondary" id="pl-btn-hint-view">View Board</button>
             </div>
         </div>
@@ -627,40 +642,27 @@
         </div>
 
         <section class="game-guide pv-container" style="margin-top:40px;">
-            <h2>How to Play PipeLink 🔧</h2>
-            <p data-i18n="games.pipelink.guide">PipeLink is a circuit connection puzzle with a sleek circuit-board
-                theme. Your job is to rotate tile pieces so that the energy source (⚡) connects to the destination (🔋)
-                through a complete path. Tap any tile to rotate it 90° clockwise. Double-tap for 180°. From Pack 4, Dual
-                Source puzzles introduce two separate paths that must both be connected simultaneously. From Pack 5,
-                some tiles are locked and cannot be rotated — you must work around them. Connect all tiles for a Perfect
-                rating!</p>
+            <h2 data-i18n="games.pipelink.guideTitle">How to Play PipeLink</h2>
+            <p data-i18n="games.pipelink.guide">Rotate the raised circuit tiles to connect the circular energy source to the square destination with the same letter. Tap an unlocked tile for a clockwise quarter-turn; a double tap turns it halfway. Lit channels show which cells receive power. From pack 4, both A→A and B→B must connect at once. Cross tiles can carry the routes independently. Pack 5 adds locked tiles that cannot rotate. Completing the required connections wins; you do not need to power every tile. Stars depend on rotations compared with a target derived from the rotatable tile count, not a proven shortest solution. Plan before turning and use Undo to compare routes. Five packs contain 125 levels.</p>
         </section>
 
         <section class="pv-faq pv-container">
-            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <h2 class="text-center mb-lg" data-i18n="common.faq">Frequently Asked Questions</h2>
             <details>
-                <summary data-i18n="games.pipelink.faq1q">What do locked (🔒) tiles mean?</summary>
-                <p data-i18n="games.pipelink.faq1a">Locked tiles (Pack 5+) cannot be rotated. You must solve the circuit
-                    around
-                    these fixed constraints.</p>
+                <summary data-i18n="games.pipelink.faq1q">What are locked tiles?</summary>
+                <p data-i18n="games.pipelink.faq1a">Pack 5 includes locked tiles. Their orientation is fixed, so rotate the surrounding circuit instead.</p>
             </details>
             <details>
-                <summary data-i18n="games.pipelink.faq2q">What is Dual Source mode?</summary>
-                <p data-i18n="games.pipelink.faq2a">From Pack 4+, two Source-Target pairs (A→A and B→B) must both
-                    connect
-                    simultaneously. Cross (╋) tiles can carry both energy paths independently.</p>
+                <summary data-i18n="games.pipelink.faq2q">What is Dual Source?</summary>
+                <p data-i18n="games.pipelink.faq2a">From pack 4, connect A→A and B→B simultaneously. Cross tiles keep the two channels independent.</p>
             </details>
             <details>
-                <summary data-i18n="games.pipelink.faq3q">How many levels are there?</summary>
-                <p data-i18n="games.pipelink.faq3a">5 packs with 25 levels each = 125 levels total. Grid sizes: 4×4,
-                    5×5, 6×6,
-                    5×5 (dual), 6×6 (dual + locked).</p>
+                <summary data-i18n="games.pipelink.faq3q">How do levels and stars work?</summary>
+                <p data-i18n="games.pipelink.faq3a">There are 125 levels in five packs. Let N be the number of unlocked tiles excluding empty and cross tiles: at most 1.5×N rotations earns three stars, at most 2×N earns two, otherwise one. This is a scoring target, not a proven optimum.</p>
             </details>
             <details>
-                <summary data-i18n="games.pipelink.faq4q">Does using hints affect scoring?</summary>
-                <p data-i18n="games.pipelink.faq4a">Yes! Completing without hints earns a ×1.2 score multiplier. First
-                    hint is
-                    free, subsequent ones require a reward ad.</p>
+                <summary data-i18n="games.pipelink.faq4q">Do hints affect the score?</summary>
+                <p data-i18n="games.pipelink.faq4a">Finishing without hints earns a ×1.2 multiplier. Help is currently free; if a reward ad provider is connected, it will ask before showing an ad.</p>
             </details>
         </section>
 
@@ -668,18 +670,18 @@
         <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
     </main>
 
-    <footer id="pv-footer"></footer>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
 
     <!-- Scripts -->
-    <script src="/js/i18n.js?v=12"></script>
-    <script src="/js/progression.js?v=12"></script>
-    <script src="/js/common.js?v=12"></script>
-    <script src="/js/arcade.js?v=12"></script>
-    <script src="/js/adsense.js?v=12"></script>
-    <script src="/js/seed.js"></script>
-    <script src="/js/sfx.js"></script>
-    <script src="/js/share.js?v=12"></script>
-    <script src="/games/pipelink-logic.js?v=12"></script>
+    <script src="/js/i18n.js?v=14"></script>
+    <script src="/js/progression.js?v=14"></script>
+    <script src="/js/common.js?v=14"></script>
+    <script src="/js/arcade.js?v=14"></script>
+    <script src="/js/adsense.js?v=14"></script>
+    <script src="/js/seed.js?v=14"></script>
+    <script src="/js/sfx.js?v=14"></script>
+    <script src="/js/share.js?v=14"></script>
+    <script src="/games/pipelink-logic.js?v=14"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

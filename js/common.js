@@ -452,14 +452,16 @@ const HintManager = {
      * @returns {boolean}
      */
     isFirstHintFree() {
-        return !sessionStorage.getItem(`pv_${this.gameId}_freeHintUsed`);
+        try { return !sessionStorage.getItem(`pv_${this.gameId}_freeHintUsed`); }
+        catch (_) { return true; }
     },
 
     /**
      * Mark the free hint as consumed for this session.
      */
     markFreeHintUsed() {
-        sessionStorage.setItem(`pv_${this.gameId}_freeHintUsed`, '1');
+        try { sessionStorage.setItem(`pv_${this.gameId}_freeHintUsed`, '1'); }
+        catch (_) { /* Hints remain usable when browser storage is blocked. */ }
     },
 
     /**
@@ -495,7 +497,9 @@ const HintManager = {
         const btn = document.createElement('button');
         btn.className = 'hint-btn';
         btn.id = 'hint-btn';
-        btn.innerHTML = '💡 Hint <span class="hint-sublabel">(Ad)</span>';
+        const labels = { en: 'Hint', ko: '힌트', ja: 'ヒント', zh: '提示', es: 'Pista' };
+        const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+        btn.textContent = '💡 ' + (labels[lang] || labels.en);
         btn.addEventListener('click', () => {
             this.requestHint(hintCallback);
         });
@@ -533,6 +537,7 @@ async function initPage() {
 
     // Register Service Worker
     if ('serviceWorker' in navigator) {
+        const alreadyControlled = !!navigator.serviceWorker.controller;
         navigator.serviceWorker.register('/sw.js').then(reg => {
             // Listen for update available
             reg.addEventListener('updatefound', () => {
@@ -545,11 +550,11 @@ async function initPage() {
                     });
                 }
             });
-        });
+        }).catch(() => { /* Online games remain usable when offline caching is unavailable. */ });
 
         // Listen for SW update notification
         navigator.serviceWorker.addEventListener('message', event => {
-            if (event.data && event.data.type === 'SW_UPDATED') {
+            if (alreadyControlled && event.data && event.data.type === 'SW_UPDATED') {
                 // Show subtle update banner
                 const banner = document.createElement('div');
                 banner.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--pv-blue,#2563EB);color:#fff;padding:12px 24px;border-radius:12px;font-size:0.9rem;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);cursor:pointer;display:flex;align-items:center;gap:8px';

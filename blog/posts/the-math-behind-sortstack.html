@@ -7,13 +7,13 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-K90N7DX7S6');</script>
-  <script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","vtmy819a2e");</script>
+
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Math Behind SortStack: How We Guarantee Every Puzzle is Solvable | PuzzleVault Blog</title>
-    <meta name="description" content="Ever wonder if a sorting puzzle is actually impossible? Discover the mathematical 'reverse-moves' algorithm PuzzleVault utilizes to ensure every SortStack level is 100% solvable.">
+    <title>SortStack Puzzle Generation and Move Limits | PuzzleVault Blog</title>
+    <meta name="description" content="How SortStack builds a starting board with reverse moves, why that differs from finding a shortest solution, and how to use spare tubes effectively.">
     <link rel="canonical" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
     <meta name="theme-color" content="#2563EB">
         <!-- hreflang -->
@@ -23,34 +23,40 @@
     <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/the-math-behind-sortstack.html">
     <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/the-math-behind-sortstack.html">
     <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
-    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/global.css?v=14">
     <link rel="manifest" href="/manifest.json">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
-    <meta property="og:title" content="The Math Behind SortStack: How We Guarantee Every Puzzle is Solvable | PuzzleVault Blog">
-    <meta property="og:description" content="Ever wonder if a sorting puzzle is actually impossible? Discover the mathematical 'reverse-moves' algorithm PuzzleVault utilizes to ensure every SortStack level is 100% solvable.">
+    <meta property="og:title" content="SortStack Puzzle Generation and Move Limits | PuzzleVault Blog">
+    <meta property="og:description" content="How SortStack builds a starting board with reverse moves, why that differs from finding a shortest solution, and how to use spare tubes effectively.">
     <meta property="og:url" content="https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="The Math Behind SortStack: How We Guarantee Every Puzzle is Solvable | PuzzleVault Blog">
-    <meta name="twitter:description" content="Ever wonder if a sorting puzzle is actually impossible? Discover the mathematical 'reverse-moves' algorithm PuzzleVault utilizes to ensure every SortStack level is 100% solvable.">
+    <meta name="twitter:title" content="SortStack Puzzle Generation and Move Limits | PuzzleVault Blog">
+    <meta name="twitter:description" content="How SortStack builds a starting board with reverse moves, why that differs from finding a shortest solution, and how to use spare tubes effectively.">
 
     <!-- Schema.org BlogPosting -->
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        "headline": "The Math Behind SortStack: How We Guarantee Every Puzzle is Solvable",
-        "description": "Ever wonder if a sorting puzzle is actually impossible? Discover the mathematical 'reverse-moves' algorithm PuzzleVault utilizes to ensure every SortStack level is 100% solvable.",
-        "datePublished": "2026-03-29",
-        "dateModified": "2026-03-29",
-        "author": { "@type": "Organization", "name": "PuzzleVault" },
-        "publisher": { "@type": "Organization", "name": "PuzzleVault" },
-        "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html"
-    }
-    </script>
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "SortStack Puzzle Generation and Move Limits",
+  "description": "How SortStack builds a starting board with reverse moves, why that differs from finding a shortest solution, and how to use spare tubes effectively.",
+  "datePublished": "2026-03-29",
+  "dateModified": "2026-09-26",
+  "author": {
+    "@type": "Organization",
+    "name": "PuzzleVault"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PuzzleVault"
+  },
+  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/posts/the-math-behind-sortstack.html"
+}
+</script>
 
     <style>
         .blog-post-header {
@@ -299,40 +305,38 @@
             text-decoration: underline;
         }
     </style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
 
     <!-- Post Header -->
     <div class="blog-post-header">
         <span class="blog-post-category">Science</span>
-        <h1>The Math Behind SortStack: Guaranteeing Every Puzzle is Solvable</h1>
-        <div class="blog-post-meta">March 29, 2026 · 6 min read</div>
+        <h1>SortStack Puzzle Generation and Move Limits</h1>
+        <div class="blog-post-meta">March 29, 2026 · 6 min read · <time datetime="2026-09-26">Updated September 26, 2026</time></div>
     </div>
 
     <!-- Post Body -->
     <article class="blog-content">
-        <p>There is no worse feeling in logic gaming than staring intensely at a puzzle for thirty minutes, only to slowly realize that the scenario presented to you is mathematically impossible to complete. This is notoriously common in heavily randomized color-sorting games available on mobile app stores, where naive algorithms simply scatter colorful blocks completely at random across tubes or stacks.</p>
-        
-        <p>When we built <strong>SortStack</strong> for PuzzleVault, we made a strict developmental promise: <strong>Every single puzzle generated to our players must be 100% mathematically solvable.</strong> Period. To uphold this promise, we couldn't rely on random generation. Instead, we implemented a sophisticated procedural generation technique known in computer science as the "Reverse-Moves Algorithm."</p>
-
-        <h2>The Flaw of Naive Randomization</h2>
-        <p>If you were to design a sorting game by simply taking 20 blocks composed of 5 different colors and randomly distributing them into 6 empty stacks, the odds are terrifyingly high that you will generate an unsolvable layout. Certain color combinations might trap essential blocks beneath others inherently creating a permanent deadlock. An unsolvable puzzle immediately ruins player trust.</p>
-
-        <h2>The Reverse-Moves Paradigm</h2>
-        <p>To eliminate this fundamentally broken issue, SortStack generates its puzzles backwards. Our underlying JavaScript engine begins by creating the ultimate, perfect winning state. Imagine a board where every single stack contains exactly four blocks of the exact same color, perfectly separated. By definition, this state is perfectly "solved."</p>
-        
-        <p>From here, our algorithmic generator begins playing the game in reverse. It selects the top block of a correctly sorted stack and artificially "un-solves" it by moving it to an entirely different stack (assuming there is vertical space available). This reverse-move constitutes one step deeper into chaos. The algorithm systematically performs hundreds—sometimes thousands—of these completely valid reverse moves, effectively shuffling the board into an extremely complex, scrambled mess.</p>
-
-        <h2>Ensuring Complexity and Playability</h2>
-        <p>By tracing the path natively backwards from a pure success state, mathematical certainty guarantees that there inherently must be at least one direct path forwards to solve it—following the exact footprints back to the origin. But simply scrambling randomly backward isn't enough to make a <em>fun</em> puzzle.</p>
-        <p>Our algorithm implements advanced heuristic checks during the scrambling phase. If a reverse move accidentally creates a scenario that is "too obvious" (such as accidentally sorting a stack prematurely before the player has begun), the algorithm rejects that branch and tries a different permutation. This enforces a high skill ceiling for Hard and Expert difficulties, while guaranteeing the puzzle remains inherently fair.</p>
-
-        <h2>Why Mathematical Fairness Matters</h2>
-        <p>Puzzle games are ultimately a delicate contract of trust heavily relying on psychological motivation. When a player fails a level in SortStack and runs abruptly out of moves on the final turn, they need to feel that it was due strictly to their own flawed strategic planning, rather than an unfair, randomly generated trap. </p>
-        
-        <p>By implementing strict algorithmic reverse-shuffling, we ensure that the "Aha!" moment of finally locking the last color stack is purely the result of your own intellectual perseverance, unhindered by algorithmic impossibilities. The next time you find yourself stuck on an Expert level of SortStack, rest easy knowing that a confirmed, mathematical solution absolutely exists. You just have to find it.</p>
+<p>In <a href="/games/sortstack.html">SortStack</a>, a useful move does more than put two matching colors together. It can uncover a buried block, release an empty tube or finish a stack that creates extra workspace. Understanding how the starting board is built helps explain why these choices matter. It also separates two different questions: whether a route back to a sorted arrangement exists, and whether a player can find a short enough route for the selected move limit.</p>
+<h2>1. Start with the rules a move must obey</h2>
+<p>Each tube holds up to four blocks. A normal move takes one block from the top of a source tube and places it in an empty tube or on a matching top color, provided there is room. Blocks below the top cannot move directly. A tube containing four blocks of one color is complete. In the current game, completing a tube locks it and adds another empty tube to the workspace.</p>
+<p>This makes empty capacity a resource. Two arrangements with the same colors can offer very different options depending on which blocks are exposed. Before moving, look at both the destination and the block that will become visible in the source. A matching destination is useful, but uncovering a needed color can be the more important consequence.</p>
+<h2>2. The generator works outward from a sorted board</h2>
+<p>The generator begins with four blocks of each color together, plus empty tubes. It then performs a series of reverse moves. A source is eligible when it contains only one block, or when the block immediately below its top has the same color. The destination needs spare capacity, but its top color does not have to match during generation.</p>
+<p>That source condition is the key. Imagine reversing one generated move immediately: the moved block can return either to an empty source or to the matching color left underneath it. Reversing the recorded construction order would therefore respect the basic top-color rule. The current implementation attempts a number of mixing moves proportional to the number of colors; it does not simply distribute every block independently.</p>
+<h2>3. A construction route is not a shortest-route certificate</h2>
+<p>The game does not run a shortest-path solver after generating the board. It also does not check that a solution fits the selected move allowance. Medium, Hard and Expert currently use limits of 50, 40 and 35 moves respectively, while Easy has no move cap. Relaxed mode removes the move limit for the selected difficulty. These settings add a separate challenge to the underlying arrangement.</p>
+<p>For that reason, the reverse-move design should not be read as a promise that every limited round can be completed within its allowance. Mixing length is not a measure of minimum solution length either: a construction may revisit earlier states or include moves that cancel each other. The algorithm explains how a return route is designed under the basic rules, rather than proving an optimal difficulty rating.</p>
+<h2>4. Spend workspace deliberately</h2>
+<p>Keep an empty tube available when possible, and ask what it will unlock before filling it. Consolidating a color can reveal a new top block, but splitting a color across several destinations may make later access harder. Look for a short sequence: expose a color, place it with its matches, then use the released capacity for another obstructing block.</p>
+<p>Completed stacks provide additional empty tubes, so finishing one can improve later options. Still, inspect the whole board before committing several moves to a single color. A different stack may offer an earlier completion or reveal the color you need. Undo is useful for inspecting an alternative while a round remains active; it restores a move in capped modes.</p>
+<h2>5. Practice the decisions, then compare routes</h2>
+<p>Use Relaxed mode to explore a difficult arrangement without a move countdown. Describe why each move helps: it exposes a block, groups matching colors, opens a tube or completes a stack. If a move achieves none of those, reconsider it. When you return to a limited mode, focus on reducing unnecessary transfers rather than expecting one universal recipe to solve every board.</p>
+<p>The current <a href="/games/sortstack-logic.js?v=14">generator and move checks</a> are the basis for this explanation. Try a round and pay attention to the block underneath the one you intend to move: that small observation often changes which destination is most useful.</p>
     </article>
 
     <!-- Mid-Content Ad -->
@@ -354,11 +358,11 @@
     <!-- Bottom Ad -->
     <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
 
-    <footer id="pv-footer"></footer>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
 
-    <script src="/js/blog-data.js"></script>
-    <script src="/js/i18n.js"></script>
-    <script src="/js/common.js"></script>
+    <script src="/js/blog-data.js?v=14"></script>
+    <script src="/js/i18n.js?v=14"></script>
+    <script src="/js/common.js?v=14"></script>
     <script>
         const POST_SLUG = 'the-math-behind-sortstack';
 

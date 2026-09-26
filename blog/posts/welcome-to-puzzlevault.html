@@ -7,22 +7,11 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
+
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-K90N7DX7S6');
-  </script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "vtmy819a2e");
-  </script>
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to PuzzleVault — 10 Free Brain Games | PuzzleVault Blog</title>
     <meta name="description"
@@ -36,7 +25,7 @@
     <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/blog/zh/welcome-to-puzzlevault.html">
     <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/blog/es/welcome-to-puzzlevault.html">
     <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html">
-    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/global.css?v=14">
     <link rel="manifest" href="/manifest.json">
 
     <meta property="og:type" content="article">
@@ -51,18 +40,24 @@
         content="Introducing PuzzleVault: 10 unique, free browser-based puzzle games for everyone.">
 
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        "headline": "Welcome to PuzzleVault — 10 Free Brain Games",
-        "description": "Introducing PuzzleVault: 10 unique, free browser-based puzzle games. From number deduction to hexagonal matching, discover your next brain challenge.",
-        "datePublished": "2026-02-15",
-        "dateModified": "2026-02-15",
-        "author": { "@type": "Organization", "name": "PuzzleVault" },
-        "publisher": { "@type": "Organization", "name": "PuzzleVault" },
-        "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html"
-    }
-    </script>
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Welcome to PuzzleVault — 10 Free Brain Games",
+  "description": "Introducing PuzzleVault: 10 unique, free browser-based puzzle games. From number deduction to hexagonal matching, discover your next brain challenge.",
+  "datePublished": "2026-02-15",
+  "dateModified": "2026-09-26",
+  "author": {
+    "@type": "Organization",
+    "name": "PuzzleVault"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PuzzleVault"
+  },
+  "mainEntityOfPage": "https://puzzlevault.pages.dev/blog/posts/welcome-to-puzzlevault.html"
+}
+</script>
 
     <style>
         .blog-post-header {
@@ -299,10 +294,12 @@
             text-decoration: underline
         }
     </style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
 
     <div class="blog-post-header">
         <span class="blog-post-category">Updates</span>
@@ -321,8 +318,7 @@
 
         <h2>Meet the Games</h2>
 
-        <p>Each game features its own unique mechanic that you won't find anywhere else. Here's a quick tour of
-            all 10 games in the vault:</p>
+        <p>Each game offers a different puzzle mechanic. Here's a quick tour of all 10 games in the vault:</p>
 
         <div class="game-grid">
             <a href="/games/numvault.html" class="game-card-link">
@@ -399,19 +395,13 @@
 
         <h2>Daily Challenges for Everyone</h2>
 
-        <p>Every game features a <strong>Daily Challenge</strong> mode. Each day, a new puzzle is generated from a
-            global seed — meaning every player worldwide gets the exact same puzzle. Complete your daily challenge,
-            share your results, and see how your strategy compares to others.</p>
+        <p>Games that offer a <strong>Daily Challenge</strong> mode use a date-based seed so players can compare attempts in the same game and mode. Other games, such as ColorFlow and PipeLink, offer level packs. Choose the mode that interests you, then share a result if you wish.</p>
 
-        <p>Daily challenges reset at midnight UTC, and your streak is tracked automatically. Can you keep a 30-day
-            streak alive?</p>
+        <p>Daily challenges reset at midnight UTC. Supported completion and streak records are kept in your current browser; you can play at your own pace without maintaining a streak.</p>
 
         <h2>Built for the Modern Web</h2>
 
-        <p>PuzzleVault is a fully static Progressive Web App (PWA). All games are built with vanilla HTML5 Canvas
-            and JavaScript — no heavy frameworks, no app store installations. Games load instantly, work offline,
-            and your progress is saved locally on your device. Add PuzzleVault to your home screen and it works
-            just like a native app.</p>
+        <p>PuzzleVault is a static Progressive Web App (PWA), built with HTML, CSS, JavaScript, and Canvas where needed. No app-store installation is required. Loading and rendering depend on your connection, browser, and device. A supported browser can cache game files for later offline use after a successful online visit. Game records stay in the current browser and may be lost if its data is cleared.</p>
 
         <p>We believe puzzle games should be <strong>accessible, free, and beautiful</strong>. That's the promise of
             PuzzleVault. Pick a game, challenge yourself, and enjoy the vault.</p>
@@ -432,11 +422,11 @@
 
     <div class="ad-slot" id="ad-bottom" style="max-width: 728px; margin: 0 auto;"></div>
 
-    <footer id="pv-footer"></footer>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
 
-    <script src="/js/blog-data.js"></script>
-    <script src="/js/i18n.js"></script>
-    <script src="/js/common.js"></script>
+    <script src="/js/blog-data.js?v=14"></script>
+    <script src="/js/i18n.js?v=14"></script>
+    <script src="/js/common.js?v=14"></script>
     <script>
         const POST_SLUG = 'welcome-to-puzzlevault';
         document.addEventListener('DOMContentLoaded', () => {

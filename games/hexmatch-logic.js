@@ -188,7 +188,7 @@ function fillEmpty() {
 
 // ─── Animation System ───
 function updateAnimations() {
-    const decay = 0.15;
+    const decay = PVDepth.reduced() ? 1 : 0.15;
     let anyActive = false;
     for (const c of H.validCells) {
         const g = H.grid[Kc(c)];
@@ -351,6 +351,7 @@ function spawnRainbow() {
 
 // ─── Particles ───
 function createParticles(q, r, color, count) {
+    if (PVDepth.reduced()) return;
     const pos = hexToPixel(q, r);
     for (let i = 0; i < (count || 8); i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -365,12 +366,14 @@ function createParticles(q, r, color, count) {
             decay: Math.random() * 0.03 + 0.02
         });
     }
+    H.particles = H.particles.slice(-140);
 }
 
 let scorePopups = [];
 function showScorePopup(q, r, pts) {
     const pos = hexToPixel(q, r);
     scorePopups.push({ x: pos.x, y: pos.y, text: '+' + pts, life: 1.0 });
+    scorePopups = scorePopups.slice(-8);
 }
 
 // ─── Match Availability Check ───
@@ -449,34 +452,42 @@ function showShufflePrompt() {
 
 // ─── Hint System ───
 function findHint() {
-    // Find first group of 3+ adjacent same-color tiles
-    for (const color of COLORS) {
-        for (const c of H.validCells) {
-            const g = H.grid[Kc(c)];
-            if (!g || g.isBomb) continue;
-            if (g.color !== color && !g.isRainbow) continue;
-
-            const queue = [c];
-            const group = [c];
-            const seen = new Set([Kc(c)]);
-            while (queue.length > 0) {
-                const cur = queue.shift();
-                for (const n of getNeighbors(cur.q, cur.r)) {
-                    const nk = Kc(n);
-                    if (seen.has(nk)) continue;
-                    const ng = H.grid[nk];
-                    if (!ng || ng.isBomb) continue;
-                    if (ng.color === color || ng.isRainbow) {
-                        seen.add(nk);
-                        queue.push(n);
-                        group.push(n);
-                    }
+    // A connected group can branch. Return a traceable path with no reused cell.
+    for (const target of [4, 3]) {
+        for (const color of COLORS) {
+            const visit = (cell, path, seen) => {
+                const tile = H.grid[Kc(cell)];
+                if (!tile || tile.isBomb || (!tile.isRainbow && tile.color !== color) || seen.has(Kc(cell))) return null;
+                const nextPath = path.concat(cell);
+                if (nextPath.length === target) return nextPath;
+                const nextSeen = new Set(seen); nextSeen.add(Kc(cell));
+                for (const neighbor of getNeighbors(cell.q, cell.r)) {
+                    const found = visit(neighbor, nextPath, nextSeen);
+                    if (found) return found;
                 }
+                return null;
+            };
+            for (const cell of H.validCells) {
+                const found = visit(cell, [], new Set());
+                if (found) return found;
             }
-            if (group.length >= 4) return group;
         }
     }
     return null;
+}
+
+function chainPoints(count) {
+    return count < 3 ? 0 : count >= 7 ? 600 : SCORE_TABLE[count];
+}
+
+function selectionColor(cells) {
+    const tile = cells.map(cell => H.grid[Kc(cell)]).find(value => value && !value.isRainbow);
+    return tile ? tile.color : null;
+}
+
+function cancelSelection() {
+    H.selection = []; H.selColor = null;
+    if (H.state === GameState.SELECTING) H.state = GameState.IDLE;
 }
 
 function showHint() {
@@ -507,9 +518,7 @@ function processTurn(selectedCells) {
     const count = selectedCells.length;
 
     // Score
-    let pts;
-    if (count >= 7) pts = 600;
-    else pts = SCORE_TABLE[count] || 30;
+    const pts = chainPoints(count);
     H.score += pts;
     H.bestChain = Math.max(H.bestChain, count);
 
@@ -570,8 +579,8 @@ function processTurn(selectedCells) {
 function setupInput() {
     const getHexFromEvent = (e) => {
         const rect = H.canvas.getBoundingClientRect();
-        const scaleX = H.canvas.width / rect.width;
-        const scaleY = H.canvas.height / rect.height;
+        const scaleX = CANVAS_W / rect.width;
+        const scaleY = CANVAS_H / rect.height;
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         const px = (clientX - rect.left) * scaleX;
@@ -608,6 +617,7 @@ function setupInput() {
         H.state = GameState.SELECTING;
         H.selection = [hex];
         H.selColor = cell.isRainbow ? null : cell.color;
+        if (H.canvas.setPointerCapture && e.pointerId !== undefined) H.canvas.setPointerCapture(e.pointerId);
     };
 
     const onMove = (e) => {
@@ -622,6 +632,7 @@ function setupInput() {
                 const prev = H.selection[H.selection.length - 2];
                 if (prev.q === hex.q && prev.r === hex.r) {
                     H.selection.pop();
+                    H.selColor = selectionColor(H.selection);
                 }
             }
             return;
@@ -662,7 +673,7 @@ function setupInput() {
     H.canvas.addEventListener('pointerdown', onDown);
     H.canvas.addEventListener('pointermove', onMove);
     H.canvas.addEventListener('pointerup', onUp);
-    H.canvas.addEventListener('pointerleave', onUp);
+    H.canvas.addEventListener('pointercancel', cancelSelection);
     H.canvas.style.touchAction = 'none';
 }
 
@@ -686,14 +697,16 @@ function render() {
     ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
     // Background
-    ctx.fillStyle = '#0F172A';
+    const background = ctx.createRadialGradient(150, 100, 15, GRID_CX, GRID_CY, 300);
+    background.addColorStop(0, '#334155'); background.addColorStop(1, '#0F172A');
+    ctx.fillStyle = background;
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
     // Subtle hex grid background pattern
     ctx.strokeStyle = 'rgba(255,255,255,0.03)';
     for (const c of H.validCells) {
         const pos = hexToPixel(c.q, c.r);
-        drawHex(ctx, pos.x, pos.y, HEX_SIZE, null, 'rgba(255,255,255,0.05)', 1);
+        drawHex(ctx, pos.x, pos.y + 2, HEX_SIZE - 1, 'rgba(2,6,23,.3)', 'rgba(148,163,184,.14)', 1);
     }
 
     // Rising Tide warning — highlight bottom row
@@ -713,7 +726,7 @@ function render() {
     const selReady = H.selection.length >= 3;
 
     // Draw tiles
-    H.rainbowTimer = (H.rainbowTimer + 1) % 360;
+    H.rainbowTimer = PVDepth.reduced() ? 0 : (H.rainbowTimer + 1) % 360;
     for (const c of H.validCells) {
         const g = H.grid[Kc(c)];
         if (!g) continue;
@@ -733,33 +746,35 @@ function render() {
             fillColor = '#1E293B';
             lightColor = '#475569';
         } else if (g.isRainbow) {
-            const hue = (H.rainbowTimer + c.q * 40 + c.r * 40) % 360;
-            fillColor = `hsl(${hue}, 80%, 55%)`;
-            lightColor = `hsl(${hue}, 80%, 75%)`;
+            const paletteIndex = Math.floor(H.rainbowTimer / 60) % COLORS.length;
+            fillColor = COLOR_HEX[COLORS[paletteIndex]];
+            lightColor = COLOR_LIGHT[COLORS[paletteIndex]];
         } else {
             fillColor = COLOR_HEX[g.color] || '#fff';
             lightColor = COLOR_LIGHT[g.color] || '#fff';
         }
 
-        // Gradient fill
-        const grd = ctx.createRadialGradient(
-            pos.x - drawSize * 0.2, pos.y - drawSize * 0.2, drawSize * 0.1,
-            pos.x, pos.y, drawSize * 0.9
-        );
-        grd.addColorStop(0, lightColor);
-        grd.addColorStop(1, fillColor);
-        drawHex(ctx, pos.x, pos.y, drawSize, grd, 'rgba(0,0,0,0.15)', 1.5);
+        PVDepth.crystal(ctx, pos.x, pos.y, drawSize, fillColor, isSelected);
+        if (!g.isBomb && !g.isRainbow) {
+            // Shape marks keep the colors distinguishable without relying on hue alone.
+            ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'rgba(255,255,255,.8)';
+            ctx.fillText(['●', '◆', '▲', '■', '✦', '═'][COLORS.indexOf(g.color)] || '●', pos.x, pos.y);
+        }
 
         // Selected highlight
         if (isSelected) {
-            const glowColor = selReady ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.25)';
-            drawHex(ctx, pos.x, pos.y, HEX_SIZE - 1, null, glowColor, 3);
+            const glowColor = selReady ? '#86EFAC' : '#FFFFFF';
+            drawHex(ctx, pos.x, pos.y, HEX_SIZE - 1, null, glowColor, 2.5);
         }
 
         // Hint highlight (pulsing golden glow)
         if (H.hintTimer > 0 && H.hintCells.some(hc => hc.q === c.q && hc.r === c.r)) {
-            const pulse = 0.35 + 0.25 * Math.sin(H.hintTimer * 0.15);
+            const pulse = PVDepth.reduced() ? .8 : 0.65 + 0.2 * Math.sin(H.hintTimer * 0.15);
             drawHex(ctx, pos.x, pos.y, HEX_SIZE + 2, null, `rgba(253,224,71,${pulse})`, 3.5);
+            ctx.beginPath(); ctx.arc(pos.x + 11, pos.y - 13, 8, 0, Math.PI * 2); ctx.fillStyle = '#FDE68A'; ctx.fill();
+            ctx.fillStyle = '#0F172A'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(H.hintCells.findIndex(hc => Kc(hc) === Kc(c)) + 1, pos.x + 11, pos.y - 13);
         }
 
         // Bomb icon
@@ -784,8 +799,8 @@ function render() {
     // Selection line
     if (H.selection.length >= 2) {
         ctx.beginPath();
-        ctx.strokeStyle = selReady ? '#FFFFFF' : 'rgba(255,255,255,0.5)';
-        ctx.lineWidth = selReady ? 4 : 2.5;
+        ctx.strokeStyle = '#0F172A';
+        ctx.lineWidth = 8;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         for (let i = 0; i < H.selection.length; i++) {
@@ -794,6 +809,12 @@ function render() {
             else ctx.lineTo(pos.x, pos.y);
         }
         ctx.stroke();
+        ctx.strokeStyle = selReady ? '#86EFAC' : '#FFFFFF'; ctx.lineWidth = 3.5; ctx.stroke();
+        H.selection.forEach((cell, index) => {
+            const pos = hexToPixel(cell.q, cell.r);
+            ctx.beginPath(); ctx.arc(pos.x, pos.y, 7, 0, Math.PI * 2); ctx.fillStyle = selReady ? '#86EFAC' : '#FFFFFF'; ctx.fill();
+            ctx.fillStyle = '#0F172A'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(index + 1, pos.x, pos.y);
+        });
     }
 
     // Selection count indicator
@@ -829,7 +850,7 @@ function render() {
     for (let i = scorePopups.length - 1; i >= 0; i--) {
         const sp = scorePopups[i];
         sp.life -= 0.02;
-        sp.y -= 1;
+        if (!PVDepth.reduced()) sp.y -= 1;
         if (sp.life <= 0) { scorePopups.splice(i, 1); continue; }
         ctx.globalAlpha = sp.life;
         ctx.fillStyle = '#FDE68A';
@@ -847,11 +868,12 @@ function render() {
         ctx.fillText('🌊 Rising Tide in 1 turn!', CANVAS_W / 2, 22);
     }
 
-    // Turn counter on canvas
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText('Turn ' + H.turn, CANVAS_W - 12, 22);
+    const message = H.selection.length ? selReady ? PVDepth.t(H.selection.length >= 5 ? 'bomb' : 'ready', chainPoints(H.selection.length)) : PVDepth.t('more', H.selection.length) : H.hintTimer > 0 ? PVDepth.t('hint') : PVDepth.t('chain');
+    const status = document.getElementById('hx-chain-status');
+    if (status && status.textContent !== message) status.textContent = message;
+    if (status) status.dataset.ready = String(selReady);
+    ctx.fillStyle = selReady ? '#86EFAC' : '#CBD5E1'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(PVDepth.t('tide', TIDE_INTERVAL - H.turn % TIDE_INTERVAL), CANVAS_W / 2, CANVAS_H - 23);
 }
 
 function gameLoop() {
@@ -950,7 +972,7 @@ function showResult() {
         </div>
         ${!H.continueUsed ? `<div id="ad-reward" style="text-align:center;margin-bottom:12px">
             <button class="pv-btn" onclick="continueGame()" style="background:var(--pv-emerald);color:#fff;width:100%;padding:12px;font-size:1rem;font-weight:700;border-radius:var(--pv-radius);border:none;cursor:pointer">
-                🎬 Watch Ad to Continue
+                ↻ Continue once
             </button>
             <p style="font-size:.7rem;color:var(--pv-text-secondary);margin-top:4px">Clears top rows (1 use)</p>
         </div>` : ''}
@@ -1001,6 +1023,7 @@ function startGame() {
     H.selection = [];
     H.selColor = null;
     H.particles = [];
+    scorePopups = [];
     H.bombs = [];
     H.tideWarning = false;
     H.continueUsed = false;
@@ -1023,9 +1046,7 @@ function startGame() {
 
 function initHexMatch() {
     H.canvas = document.getElementById('hx-canvas');
-    H.ctx = H.canvas.getContext('2d');
-    H.canvas.width = CANVAS_W;
-    H.canvas.height = CANVAS_H;
+    H.ctx = PVDepth.setupCanvas(H.canvas, CANVAS_W, CANVAS_H);
 
     generateValidCells();
     setupInput();

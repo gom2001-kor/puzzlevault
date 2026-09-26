@@ -7,22 +7,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
+
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-K90N7DX7S6');
-  </script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "vtmy819a2e");
-  </script>
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PatternPop — Free Online Pattern Memory Game | PuzzleVault</title>
     <meta name="description"
@@ -37,11 +26,26 @@
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
     <meta property="og:url" content="https://puzzlevault.pages.dev/games/patternpop">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/arcade.css?v=12">
+    <link rel="stylesheet" href="/css/global.css?v=14">
+    <link rel="stylesheet" href="/css/arcade.css?v=14">
     <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"VideoGame","name":"PatternPop","description":"A pattern memory puzzle game with decoy flashes.","url":"https://puzzlevault.pages.dev/games/patternpop","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
-  </script>
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "PatternPop",
+  "description": "A pattern memory puzzle game with decoy flashes.",
+  "url": "https://puzzlevault.pages.dev/games/patternpop",
+  "genre": "Puzzle",
+  "playMode": "SinglePlayer",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
     <style>
         .pp-page {
             display: flex;
@@ -238,11 +242,40 @@
                 transform: translateX(6px)
             }
         }
+        /* Raised pads sit in a recessed board; the face stays square for accurate taps. */
+        .pp-canvas-wrap { padding: 12px; border-radius: 24px; border: 1px solid var(--pv-border); background: linear-gradient(150deg, var(--pv-card-bg), var(--pv-grid-bg)); box-shadow: inset 0 2px 0 rgba(255,255,255,.7), 0 8px 0 var(--pv-border), 0 16px 24px rgba(15,23,42,.12); margin-bottom: 22px; }
+        #pp-canvas { border-radius: 14px; box-shadow: inset 0 3px 7px rgba(15,23,42,.16); touch-action: manipulation; }
+        #pp-canvas:focus-visible { outline: 3px solid var(--pv-violet); outline-offset: 4px; }
+        .pp-phase-banner { padding: 10px 14px; margin-bottom: 12px; border: 1px solid var(--pv-border); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); }
+        .pp-recall-progress { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: .76rem; font-weight: 700; color: var(--pv-text-secondary); margin: 10px 0 8px; }
+        .pp-recall-pips { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; max-width: 45%; }
+        .pp-recall-pips i { width: 8px; height: 8px; border-radius: 3px; background: var(--pv-border); box-shadow: inset 0 1px 2px rgba(15,23,42,.1); }
+        .pp-recall-pips i.found { background: var(--pv-emerald); }
+        .pp-legend { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; font-size: .75rem; color: var(--pv-text-secondary); margin-top: 10px; }
+        .pp-legend b { font-size: 1rem; padding-right: 4px; }
+        .pp-legend span:first-child b { color: var(--pv-blue); }
+        .pp-legend span:last-child b { color: var(--pv-coral); }
+        .pp-keyboard-note { text-align: center; font-size: .71rem; line-height: 1.6; color: var(--pv-text-secondary); margin: 8px 4px; }
+        .pp-ready { position: absolute; inset: 12px; border-radius: 14px; background: rgba(15,23,42,.94); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; gap: 18px; z-index: 3; }
+        .pp-ready[hidden] { display: none; }
+        .pp-ready-symbols { display: flex; gap: 14px; }
+        .pp-ready-symbols span { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 10px; font-size: 1.7rem; background: var(--pv-blue); box-shadow: inset 0 2px 0 rgba(255,255,255,.4), 0 6px 0 #1d4ed8, 0 11px 15px rgba(0,0,0,.3); }
+        .pp-ready-symbols span:last-child { background: var(--pv-coral); box-shadow: inset 0 2px 0 rgba(255,255,255,.4), 0 6px 0 #be123c, 0 11px 15px rgba(0,0,0,.3); transform: translateY(6px); }
+        .pp-ready p { margin: 0; font-size: .9rem; line-height: 1.65; max-width: 290px; color: #cbd5e1; }
+        .pp-ready button { min-height: 48px; min-width: 160px; box-shadow: 0 5px 0 #1d4ed8; }
+        .pp-ready button:active { transform: translateY(3px); box-shadow: 0 2px 0 #1d4ed8; }
+        .pp-round-text { background: var(--pv-card-bg); border: 1px solid var(--pv-border); border-radius: 16px; padding: 12px 22px; box-shadow: 0 6px 0 var(--pv-border), 0 12px 25px rgba(15,23,42,.2); }
+        @media (prefers-reduced-motion: reduce) { #pp-canvas, .pp-round-text, .pp-round-overlay { animation: none !important; transition: none !important; } }
+        @media (max-width: 360px) {
+            #pp-tabs .pv-tab { min-width: 0; padding-inline: 6px; font-size: .76rem; }
+        }
     </style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
     <main>
         <div class="pp-page">
             <div class="pp-main">
@@ -254,7 +287,7 @@
                             style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px"
                             aria-label="Restart">Restart</button>
                         <button class="hint-btn" onclick="usePatternPopHint()" aria-label="Hint" title="Hint">💡 Hint
-                            <span class="hint-sublabel">(Ad)</span></button>
+                            <span class="hint-sublabel"></span></button>
                         <button class="pp-icon-btn" id="pp-btn-sound" aria-label="Sound">🔊</button>
                     </div>
                 </div>
@@ -278,13 +311,21 @@
                     <button class="pv-tab" data-mode="endless">Endless</button>
                     <button class="pv-tab" data-mode="speed">Speed</button>
                 </div>
-                <div class="pp-phase-banner" id="pp-phase">MEMORIZE</div>
+                <div class="pp-phase-banner" id="pp-phase" aria-live="polite">MEMORIZE</div>
+                <div class="pp-recall-progress"><span id="pp-progress-label">Find the blue diamonds</span><div class="pp-recall-pips" id="pp-recall-pips" aria-hidden="true"></div></div>
                 <div class="pp-canvas-wrap">
-                    <canvas id="pp-canvas" width="500" height="500"></canvas>
+                    <canvas id="pp-canvas" width="500" height="500" tabindex="0" role="group" aria-label="Memory board. Arrow keys to move; Space or Enter to choose." aria-describedby="pp-keyboard-note"></canvas>
+                    <div class="pp-ready" id="pp-ready">
+                        <div class="pp-ready-symbols" aria-hidden="true"><span>◆</span><span>×</span></div>
+                        <p id="pp-ready-copy">Remember the blue diamonds. Ignore the red crosses. Then tap the remembered pads in any order.</p>
+                        <button class="pv-btn pv-btn-primary" id="pp-start-btn">I’m ready</button>
+                    </div>
                     <div class="pp-round-overlay" id="pp-round-overlay">
                         <div class="pp-round-text" id="pp-round-text">Round 1</div>
                     </div>
                 </div>
+                <div class="pp-legend"><span><b>◆</b><span id="pp-target-label">Remember</span></span><span><b>×</b><span id="pp-decoy-label">Ignore</span></span></div>
+                <p class="pp-keyboard-note" id="pp-keyboard-note">Tap the pads, or use arrow keys + Enter / Space.</p>
             </div>
             <div class="pp-sidebar">
                 <div class="ad-slot" id="ad-sidebar"></div>
@@ -316,66 +357,45 @@
             <div class="ad-slot" style="width:300px;min-height:250px"></div>
         </div>
         <section class="game-guide pv-container">
-            <h2>How to Play PatternPop</h2>
-            <p data-i18n="games.patternpop.guide">PatternPop challenges your visual memory with an ever-growing grid of
-                patterns. Each round, a set of cells lights up briefly — your job is to memorize their positions and tap
-                them from memory once the pattern disappears. The game starts easy with a small 3×3 grid and just a few
-                highlighted cells. As you progress, the grid expands to 4×4, 5×5, and eventually 6×6. Starting from
-                Round 5, PatternPop introduces its unique Decoy Flash mechanic — 1-2 extra cells flash briefly with a
-                red tint. These decoys are designed to trick your memory. Score 100 points per correct sequence,
-                multiplied by the sequence length. Choose from 4 modes: Classic, Daily, Endless, or Speed.</p>
+            <h2 data-i18n="games.patternpop.guideTitle">How to Play PatternPop</h2>
+            <p data-i18n="games.patternpop.guide">Press Ready, watch the blue ◆ pads, then select their remembered positions after they disappear. Order does not matter. The board grows from 3×3 to 6×6 as rounds advance. From round 5, brief red × decoys appear; ignore them. Use touch or focus the board and move with arrow keys, then Enter or Space to select. Each completed round scores 100 times its target count, doubled for an error-free round averaging under half a second per target. Classic and Daily start with three lives. Daily repeats the shared seeded layouts and can be replayed for practice. Endless has unlimited lives; Speed starts with just one. A hint replays the same pattern at a slower pace without changing the targets.</p>
         </section>
         <section class="pv-faq pv-container">
-            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <h2 class="text-center mb-lg" data-i18n="common.faq">Frequently Asked Questions</h2>
             <details>
-                <summary data-i18n="games.patternpop.faq1q">How does the grid size change?</summary>
-                <p data-i18n="games.patternpop.faq1a">The grid starts at 3×3 for rounds 1-4, grows to 4×4 for rounds
-                    5-8, expands to 5×5 for rounds 9-14,
-                    and reaches 6×6 from round 15 onward. Each size increase adds a new layer of challenge.</p>
+                <summary data-i18n="games.patternpop.faq1q">How does the grid grow?</summary>
+                <p data-i18n="games.patternpop.faq1a">Rounds 1–4 use 3×3, 5–8 use 4×4, 9–14 use 5×5, and round 15 onward uses 6×6.</p>
             </details>
             <details>
-                <summary data-i18n="games.patternpop.faq2q">What are decoy flashes?</summary>
-                <p data-i18n="games.patternpop.faq2a">Starting from Round 5, 1-2 extra cells flash briefly during the
-                    memorize phase with a red tint.
-                    These "decoys" must be ignored — only remember the blue flashes! If you tap a decoy during recall,
-                    you'll lose a life. Decoy count increases with difficulty.</p>
+                <summary data-i18n="games.patternpop.faq2q">What are decoys?</summary>
+                <p data-i18n="games.patternpop.faq2a">From round 5, red × pads flash for 0.3 seconds. Only the blue ◆ targets count. Selecting a decoy or another wrong pad costs a life. Decoys increase up to four.</p>
             </details>
             <details>
                 <summary data-i18n="games.patternpop.faq3q">How is the score calculated?</summary>
-                <p data-i18n="games.patternpop.faq3a">Each correct sequence earns 100 × sequence_length points. Complete
-                    a round with less than 0.5s per
-                    tap and no mistakes to get a Perfect Round (×2 bonus). Your longest streak is tracked across all
-                    games.</p>
+                <p data-i18n="games.patternpop.faq3a">A completed round earns 100 × target count. No mistakes and an average under 0.5 seconds per target doubles that round’s points.</p>
             </details>
             <details>
-                <summary data-i18n="games.patternpop.faq4q">Can I get more lives?</summary>
-                <p data-i18n="games.patternpop.faq4a">Use the 💡 Hint button to replay the pattern at 50% slower speed.
-                    Your first hint each session
-                    is free; subsequent hints require watching a reward ad. The hint does not add to the sequence or
-                    change difficulty.</p>
+                <summary data-i18n="games.patternpop.faq4q">Can I replay the pattern?</summary>
+                <p data-i18n="games.patternpop.faq4a">The hint replays the current pattern more slowly and keeps targets already found. Help is currently free. If a reward provider is connected, it will ask before showing an ad.</p>
             </details>
             <details>
-                <summary data-i18n="games.patternpop.faq5q">What's the difference between Daily and Endless modes?
-                </summary>
-                <p data-i18n="games.patternpop.faq5a">Classic: 3 lives, increasing difficulty. Daily: seeded sequence
-                    everyone shares, one attempt per day.
-                    Endless: no lives limit, see how far you can go. Speed: tiles flash faster each round, testing your
-                    reaction time.</p>
+                <summary data-i18n="games.patternpop.faq5q">How do the modes differ?</summary>
+                <p data-i18n="games.patternpop.faq5a">Classic and Daily start with three lives. Daily uses shared seeded layouts and allows replays. Endless has unlimited lives. Speed starts with one life; its memorization timing currently matches Classic.</p>
             </details>
         </section>
         <div class="cross-promo pv-container"></div>
         <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
     </main>
-    <footer id="pv-footer"></footer>
-    <script src="/js/i18n.js?v=12"></script>
-    <script src="/js/progression.js?v=12"></script>
-    <script src="/js/common.js?v=12"></script>
-    <script src="/js/arcade.js?v=12"></script>
-    <script src="/js/adsense.js?v=12"></script>
-    <script src="/js/seed.js"></script>
-    <script src="/js/sfx.js"></script>
-    <script src="/js/share.js?v=12"></script>
-    <script src="/games/patternpop-logic.js?v=12"></script>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
+    <script src="/js/i18n.js?v=14"></script>
+    <script src="/js/progression.js?v=14"></script>
+    <script src="/js/common.js?v=14"></script>
+    <script src="/js/arcade.js?v=14"></script>
+    <script src="/js/adsense.js?v=14"></script>
+    <script src="/js/seed.js?v=14"></script>
+    <script src="/js/sfx.js?v=14"></script>
+    <script src="/js/share.js?v=14"></script>
+    <script src="/games/patternpop-logic.js?v=14"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

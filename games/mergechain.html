@@ -7,22 +7,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
+
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-K90N7DX7S6');
-  </script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "vtmy819a2e");
-  </script>
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MergeChain — Free Online Number Merge Game | PuzzleVault</title>
     <meta name="description"
@@ -36,11 +25,26 @@
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
     <meta property="og:url" content="https://puzzlevault.pages.dev/games/mergechain">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/arcade.css?v=12">
+    <link rel="stylesheet" href="/css/global.css?v=14">
+    <link rel="stylesheet" href="/css/arcade.css?v=14">
     <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"VideoGame","name":"MergeChain","description":"Physics-based number merging puzzle game with chains and combos.","url":"https://puzzlevault.pages.dev/games/mergechain","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
-  </script>
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "MergeChain",
+  "description": "Physics-based number merging puzzle game with chains and combos.",
+  "url": "https://puzzlevault.pages.dev/games/mergechain",
+  "genre": "Puzzle",
+  "playMode": "SinglePlayer",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
     <style>
         .mc-page {
             display: flex;
@@ -241,11 +245,25 @@
             border-color: var(--pv-blue);
             color: #fff;
         }
+
+        .mc-canvas-wrap { border-radius: 24px; outline: 3px solid #64748B; box-shadow: 0 8px 0 #334155, 0 20px 32px rgba(15,23,42,.22); }
+        .mc-canvas-wrap canvas { border-radius: 22px; }
+        .mc-aim-panel { margin: 16px 0 10px; padding: 12px 14px; border: 1px solid var(--pv-border); border-radius: 14px; background: var(--pv-card-bg); text-align: center; }
+        .mc-aim-panel strong { display: block; font-size: .8rem; color: var(--pv-text); }
+        .mc-aim-panel small { display: block; margin-top: 5px; font-size: .72rem; color: var(--pv-text-secondary); }
+        #mc-canvas:focus-visible { outline: 3px solid var(--pv-amber); outline-offset: -5px; }
+        @media (prefers-reduced-motion: reduce) { .mc-canvas-wrap.danger, .mc-chain-popup { animation: none !important; transition: none !important; } .mc-canvas-wrap.danger { outline-color: var(--pv-coral); } }
+            /* Keep title and all controls visible on narrow phones. */
+        .mc-main { min-width: 0; }
+        .mc-top-bar { flex-wrap: wrap; gap: 8px; }
+        .mc-icons { flex-wrap: wrap; max-width: 100%; margin-left: auto; }
     </style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
     <main>
         <div class="mc-page">
             <div class="mc-main">
@@ -255,8 +273,7 @@
                         <button class="mc-icon-btn" id="mc-btn-restart" aria-label="Restart" title="Restart"
                             style="font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:6px">Restart</button>
                         <button class="mc-icon-btn" onclick="useMergeChainHint()" aria-label="Hint" title="Hint"
-                            style="color:var(--pv-amber);font-weight:700;font-size:.85rem">💡 Hint <span
-                                style="font-size:.7em;color:var(--pv-text-secondary)">(Ad)</span></button>
+                            style="color:var(--pv-amber);font-weight:700;font-size:.85rem">💡 Hint </button>
                         <button class="mc-icon-btn" id="mc-btn-help" aria-label="Help">❓</button>
                         <button class="mc-icon-btn" id="mc-btn-stats" aria-label="Stats">📊</button>
                         <button class="mc-icon-btn" id="mc-btn-settings" aria-label="Sound">🔊</button>
@@ -296,13 +313,11 @@
                 <div id="mc-timer" class="mc-timer"></div>
 
                 <div class="mc-canvas-wrap" id="mc-canvas-wrap">
-                    <canvas id="mc-canvas" width="300" height="500"></canvas>
+                    <canvas id="mc-canvas" width="300" height="500" tabindex="0" aria-label="MergeChain vessel. Aim with left or right arrow and press Space or Enter to drop."></canvas>
                     <div class="mc-chain-popup" id="mc-chain-popup"></div>
                 </div>
 
-                <p style="text-align:center; font-size:0.8rem; color:var(--pv-text-secondary); margin-top:12px;">
-                    Drag horizontally and release to drop!
-                </p>
+                <div class="mc-aim-panel"><strong data-depth-text="aim">Aim and release · match equal numbers</strong><small id="mc-aim-status" data-depth-text="landing">First contact guide · balls can roll after landing</small></div>
             </div>
             <div class="mc-sidebar">
                 <div class="ad-slot" id="ad-sidebar"></div>
@@ -320,57 +335,40 @@
         </div>
 
         <section class="game-guide pv-container">
-            <h2>How to Play MergeChain</h2>
-            <p data-i18n="games.mergechain.guide">MergeChain is a number-merging drop game. Position numbered balls
-                along the top and release them. When two balls with the same number touch, they merge into the next
-                number (2+2=4, 4+4=8, all the way to 2048). Chain reactions happen when a newly merged ball immediately
-                touches another of the same number — plan your drops to set up chains for massive points. Watch the
-                danger line at the top — if balls stack above it, the game is over. In Time Attack mode, you have 2
-                minutes to score as high as possible.</p>
+            <h2 data-i18n="games.mergechain.guideTitle">How to Play MergeChain</h2>
+            <p data-i18n="games.mergechain.guide">MergeChain turns number matching into a small physics puzzle. Aim the marble along the top, then release to drop it into the vessel. Two touching marbles with the same number combine into one larger marble: 2 becomes 4, then 8, 16, and beyond 2048. Bigger values take more space, so plan room for the marble that will appear after a merge. The number remains printed on each marble, making matching possible without relying on color.</p>
+            <p data-i18n="games.mergechain.guide2">While aiming, the dotted line and outlined circle mark the first contact along a straight drop. A green guide identifies an equal-number target. This is a planning aid, not a promise of the final resting place: moving marbles, collisions, and rolling can change the outcome. You can also focus the board, use the left and right arrow keys to aim, and press Space or Enter to drop. The short drop cooldown gives the pile time to settle.</p>
+            <p data-i18n="games.mergechain.guide3">Each merge scores the new value, multiplied by the current chain. Quick follow-up merges grow that multiplier; a new drop or a one-second gap ends the chain. Watch the dashed danger line. Settled marbles extending above it start a grace period of two to four seconds depending on difficulty. Freshly dropped marbles have a brief exclusion while falling. Easy has slow gravity and only 2s and 4s; higher difficulties add larger drops and increase pressure over time. Daily repeats its seeded drop sequence at the selected difficulty. Time Attack gives you two minutes. A hint suggests a matching column; it does not solve the physics for you.</p>
         </section>
 
         <section class="pv-faq pv-container">
-            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <h2 class="text-center mb-lg" data-i18n="common.faq">Frequently Asked Questions</h2>
             <details>
-                <summary data-i18n="games.mergechain.faq1q">How do the physics affect gameplay?</summary>
-                <p data-i18n="games.mergechain.faq1a">Balls fall with gravity and bounce off the walls, the floor, and
-                    other balls. Larger numbers have
-                    larger radii, taking up more space and bouncing differently. You can use the bouncy physics to
-                    squeeze balls into tight gaps or create chaotic chain reactions!</p>
+                <summary data-i18n="games.mergechain.faq1q">How does the physics work?</summary>
+                <p data-i18n="games.mergechain.faq1a">Marbles fall, bounce, and roll against walls, the floor, and each other. Larger values have larger radii. The aiming circle shows first contact, not the final resting place.</p>
             </details>
             <details>
-                <summary data-i18n="games.mergechain.faq2q">How is the score calculated?</summary>
-                <p data-i18n="games.mergechain.faq2a">Every time two balls merge, you earn points equal to the value of
-                    the new, larger ball. If the merge
-                    triggers a chain reaction (a merge immediately following another), a chain multiplier is applied to
-                    the score of the subsequent merges.</p>
+                <summary data-i18n="games.mergechain.faq2q">How are chains scored?</summary>
+                <p data-i18n="games.mergechain.faq2a">A merge earns the new value multiplied by the chain. Merges within one second grow it. A fresh drop or a longer gap ends the chain.</p>
             </details>
             <details>
-                <summary data-i18n="games.mergechain.faq3q">What happens if a ball crosses the top line?</summary>
-                <p data-i18n="games.mergechain.faq3a">There is a danger line near the top of the screen. If a ball rests
-                    above this line, a 3-second
-                    countdown begins (indicated by a pulsing red border). Merging balls to bring the pile down will stop
-                    the timer, but if 3 seconds pass, it's Game Over.</p>
+                <summary data-i18n="games.mergechain.faq3q">What happens above the danger line?</summary>
+                <p data-i18n="games.mergechain.faq3a">Settled marbles above the danger line start a grace period: Easy gives four seconds, Normal three, Hard two and a half, and Expert two. Newly dropped marbles are excluded briefly while falling. Bring the pile down before the timer ends.</p>
             </details>
             <details>
-                <summary data-i18n="games.mergechain.faq4q">What numbers will drop next?</summary>
-                <p data-i18n="games.mergechain.faq4a">The next ball to drop is always visible at the top of the screen.
-                    The dropped balls will randomly be
-                    either 2, 4, or 8, keeping the focus on merging them into larger numbers.</p>
+                <summary data-i18n="games.mergechain.faq4q">What numbers can drop?</summary>
+                <p data-i18n="games.mergechain.faq4a">The marble at the top is your next drop. Easy draws 2 or 4; Normal and Hard draw 2, 4, or 8; Expert can also draw 16. Equal numbers merge into larger ones.</p>
             </details>
             <details>
-                <summary data-i18n="games.mergechain.faq5q">How does the Hint system work?</summary>
-                <p data-i18n="games.mergechain.faq5a">The 💡 Hint button shows a ghost ball at the optimal drop column.
-                    The first hint per
-                    session is free. Subsequent hints require watching a reward ad. Hints don't affect scoring
-                    since MergeChain uses merge-based scoring rather than efficiency bonuses.</p>
+                <summary data-i18n="games.mergechain.faq5q">How do hints work?</summary>
+                <p data-i18n="games.mergechain.faq5a">The hint suggests a column above a matching marble. The aiming guide estimates the first contact only; bouncing and rolling can change the result. Help is currently available without an ad. If a reward provider is enabled later, it will ask before showing a reward ad.</p>
             </details>
         </section>
 
         <div class="cross-promo pv-container"></div>
         <div class="ad-slot" id="ad-bottom" style="max-width:728px;margin:24px auto"></div>
     </main>
-    <footer id="pv-footer"></footer>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
 
     <!-- Help Modal -->
     <div class="pv-modal" id="mc-help-modal">
@@ -388,10 +386,9 @@
                 again, you earn a huge score multiplier.</p>
             <h4 style="margin:12px 0 6px">Danger Line</h4>
             <p style="font-size:.85rem;margin-bottom:8px;color:var(--pv-coral)">If a ball stays above the dashed red
-                line for 3 seconds,
-                it's Game Over!</p>
-            <h4 style="margin:12px 0 6px">🎬 Continue (Reward Ad)</h4>
-            <p style="font-size:.85rem;margin-bottom:8px">On Game Over, you can watch an ad to continue! This removes
+                line beyond your difficulty’s grace period, the run ends.</p>
+            <h4 style="margin:12px 0 6px">↻ Continue once</h4>
+            <p style="font-size:.85rem;margin-bottom:8px">After the pile reaches the danger line, Continue removes
                 all balls above the danger line and resumes the game. Available once per game.</p>
             <h4 style="margin:12px 0 6px">Difficulty</h4>
             <table style="font-size:.78rem;width:100%;border-collapse:collapse;margin-bottom:8px">
@@ -419,13 +416,13 @@
                     <tr>
                         <td style="padding:4px">Hard</td>
                         <td>Fast</td>
-                        <td>4, 8</td>
+                        <td>2, 4, 8</td>
                         <td>Moderate</td>
                     </tr>
                     <tr>
                         <td style="padding:4px">Expert</td>
                         <td>Very Fast</td>
-                        <td>4, 8, 16</td>
+                        <td>2, 4, 8, 16</td>
                         <td>Aggressive</td>
                     </tr>
                 </tbody>
@@ -446,15 +443,16 @@
         </div>
     </div>
 
-    <script src="/js/i18n.js?v=12"></script>
-    <script src="/js/progression.js?v=12"></script>
-    <script src="/js/common.js?v=12"></script>
-    <script src="/js/arcade.js?v=12"></script>
-    <script src="/js/adsense.js?v=12"></script>
-    <script src="/js/seed.js"></script>
-    <script src="/js/sfx.js"></script>
-    <script src="/js/share.js?v=12"></script>
-    <script src="/games/mergechain-logic.js?v=12"></script>
+    <script src="/js/i18n.js?v=14"></script>
+    <script src="/js/progression.js?v=14"></script>
+    <script src="/js/common.js?v=14"></script>
+    <script src="/js/arcade.js?v=14"></script>
+    <script src="/js/adsense.js?v=14"></script>
+    <script src="/js/seed.js?v=14"></script>
+    <script src="/js/sfx.js?v=14"></script>
+    <script src="/js/share.js?v=14"></script>
+    <script src="/js/canvas-depth.js?v=14"></script>
+    <script src="/games/mergechain-logic.js?v=14"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

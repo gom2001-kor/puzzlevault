@@ -225,9 +225,6 @@ function buildBoardDOM() {
     grid.style.gridTemplateColumns = `repeat(${state.size}, 1fr)`;
     grid.style.gridTemplateRows = `repeat(${state.size}, 1fr)`;
 
-    const containerWidth = Math.min(window.innerWidth - 64, 450); // clamp for pc
-    const gap = 2; // match css
-    const cellSize = Math.floor((containerWidth - (gap * (state.size - 1))) / state.size);
 
     // Remove old listeners to prevent duplicates on level transitions
     grid.removeEventListener('pointerdown', handlePointerDown);
@@ -246,13 +243,18 @@ function buildBoardDOM() {
         cell.className = 'cf-cell';
         cell.id = `cf-cell-${i}`;
         cell.dataset.idx = i;
-        cell.style.width = `${cellSize}px`;
-        cell.style.height = `${cellSize}px`;
+        cell.style.width = '100%';
+        cell.style.aspectRatio = '1';
 
         const content = state.boardContent[i];
         if (content.type === 'marker') {
             const m = document.createElement('div');
             m.className = `cf-marker c-${content.color}`;
+            const label = document.createElement('span');
+            label.className = 'cf-marker-number';
+            label.textContent = String(content.color);
+            m.appendChild(label);
+            cell.setAttribute('aria-label', 'Pair ' + content.color);
             cell.appendChild(m);
         }
 
@@ -373,6 +375,7 @@ function handlePointerDown(e) {
         state._pendingClear = true; // Flag: clear on first move
         state.lastDrawnIdx = idx;
         SFX.play('tap');
+        updateMetaUI();
     }
 }
 
@@ -473,6 +476,7 @@ function handlePointerUp(e) {
         state.isDragging = false;
         state.activeColor = null;
         state.lastDrawnIdx = -1;
+        updateMetaUI();
         checkWinState();
     }
 }
@@ -612,6 +616,20 @@ function updateMetaUI() {
     bar.style.width = `${state.coverage}%`;
     if (state.coverage === 100) bar.style.backgroundColor = 'var(--pv-emerald)';
     else bar.style.backgroundColor = 'var(--pv-blue)';
+    const goal = document.getElementById('cf-goal');
+    if (goal) {
+        const ko = typeof I18n !== 'undefined' && I18n.currentLang === 'ko';
+        const remaining = state.colorsPresent - state.connectedPairs;
+        const empty = state.boardContent.length - occupiedCells;
+        const lead = state.isDragging && state.activeColor !== null
+            ? (ko ? state.activeColor + '번끼리 연결 · ' : 'Connect ' + state.activeColor + ' to ' + state.activeColor + ' · ')
+            : (ko ? '같은 번호를 연결하세요 · ' : 'Join matching numbers · ');
+        goal.textContent = lead + (ko ? remaining + '쌍 남음 · 빈칸 ' + empty + '개' : remaining + ' pairs left · ' + empty + ' empty cells');
+    }
+    document.querySelectorAll('.cf-marker').forEach(marker => {
+        const label = marker.querySelector('.cf-marker-number');
+        marker.classList.toggle('drawing-pair', state.isDragging && label && Number(label.textContent) === state.activeColor);
+    });
 }
 
 function getManhattanDist(p1r, p1c, p2r, p2c) {

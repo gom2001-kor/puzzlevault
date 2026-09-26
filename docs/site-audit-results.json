@@ -1,0 +1,18 @@
+{
+  "root": "C:\\dev\\puzzlevault",
+  "pages_checked": 85,
+  "games_checked": 10,
+  "blocker_count": 0,
+  "warning_count": 0,
+  "claim_review_count": 1,
+  "blockers": [],
+  "warnings": [],
+  "claims_to_review": [
+    {
+      "code": "solvability_guarantee",
+      "file": "blog/ko/numvault-tips-and-strategy.html",
+      "line": 265,
+      "excerpt": "중요합니다. 이런 습관은 선택을 분명하게 해 주지만 모든 코드를 정해진 추측 횟수 안에 푼다고 보장하지는 않습니다."
+    }
+  ]
+}

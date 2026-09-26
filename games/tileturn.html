@@ -7,22 +7,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
+
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-K90N7DX7S6');
-  </script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "vtmy819a2e");
-  </script>
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TileTurn — Free Online Tile Flip Puzzle | PuzzleVault</title>
     <meta name="description"
@@ -35,12 +24,27 @@
     <meta property="og:description"
         content="Can you flip them all? Challenge your brain with 3 modes and hundreds of levels.">
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/arcade.css?v=12">
+    <link rel="stylesheet" href="/css/global.css?v=14">
+    <link rel="stylesheet" href="/css/arcade.css?v=14">
 
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"VideoGame","name":"TileTurn","description":"A logic puzzle game where players flip tiles to reach the target state across 3 unique modes.","url":"https://puzzlevault.pages.dev/games/tileturn","genre":"Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
-    </script>
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "TileTurn",
+  "description": "A logic puzzle game where players flip tiles to reach the target state across 3 unique modes.",
+  "url": "https://puzzlevault.pages.dev/games/tileturn",
+  "genre": "Puzzle",
+  "playMode": "SinglePlayer",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
     <style>
         .tt-page {
             max-width: 800px;
@@ -468,11 +472,30 @@
             cursor: pointer;
             width: 100%;
         }
+        /* Raised keycaps keep the board flat for accurate touch and keyboard input. */
+        .tt-board-container { padding: 22px 18px 29px; border: 1px solid var(--pv-border); border-radius: 22px; background: linear-gradient(145deg,var(--pv-card-bg),var(--pv-grid-bg)); box-shadow: inset 0 2px 1px #ffffff55,0 15px 28px #13274318; }
+        .tt-grid { width: 100%; max-width: 400px; gap: 9px; }
+        .tt-tile { min-width: 0; border: 1px solid #ffffff29; padding: 0; font: 800 clamp(16px,4vw,27px)/1 system-ui,sans-serif; color: #a6b8cf; background: linear-gradient(145deg,#465672,#1c293f); box-shadow: 0 6px 0 #111e32,0 9px 12px #07182b35,inset 0 2px 1px #ffffff35; border-radius: 14px; isolation: isolate; touch-action: manipulation; }
+        .tt-tile::before { content: ''; position: absolute; inset: 9%; border: 1px solid #ffffff18; border-radius: 9px; pointer-events: none; }
+        .tt-tile.is-on { color: #71520d; background: linear-gradient(145deg,#fff7d3,#f8d564); box-shadow: 0 6px 0 #c29129,0 9px 15px #c59a3636,inset 0 2px 1px #fff; }
+        .tt-tile.spec-0 { background: linear-gradient(145deg,#667992,#35465e); }
+        .tt-tile.spec-1 { color: #fff; background: linear-gradient(145deg,#70acff,#2563eb); box-shadow: 0 6px 0 #184199,0 9px 15px #2563eb35,inset 0 2px 1px #ffffff90; }
+        .tt-tile.spec-2 { color: #fff; background: linear-gradient(145deg,#5ce5ae,#059669); box-shadow: 0 6px 0 #06664b,0 9px 15px #05966935,inset 0 2px 1px #ffffff90; }
+        .tt-tile.tt-preview { outline: 2px solid #38bdf8; outline-offset: 3px; }
+        .tt-tile:focus-visible { outline: 3px solid var(--pv-blue); outline-offset: 4px; }
+        .tt-tile:active { transform: translateY(4px); }
+        .tt-tile.anim-ripple { animation: tactileFlip .3s ease-out; }
+        .tt-goal { color: var(--pv-text); background: var(--pv-card-bg); border: 1px solid var(--pv-border); border-radius: 12px; padding: 11px 14px; margin-bottom: 12px; font-size: .84rem; font-weight: 700; }
+        @keyframes tactileFlip { 0% { transform: perspective(240px) rotateX(0); } 45% { transform: perspective(240px) rotateX(42deg) translateY(3px); } 100% { transform: perspective(240px) rotateX(0); } }
+        @media (prefers-reduced-motion: reduce) { .tt-tile,.tt-tile.anim-ripple { animation: none; transition: none; } }
+        .tt-main { min-width: 0; }
     </style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
 
     <main>
         <div class="tt-page">
@@ -484,7 +507,7 @@
                     </div>
                     <div class="tt-icons">
                         <button class="hint-btn" onclick="useTileTurnHint()" aria-label="Hint" title="Hint">💡 Hint
-                            <span class="hint-sublabel">(Ad)</span></button>
+                            <span class="hint-sublabel"></span></button>
                         <button class="tt-icon-btn" id="tt-btn-help" aria-label="Help">❓</button>
                         <button class="tt-icon-btn" id="tt-btn-settings" aria-label="Sound">🔊</button>
                         <button class="tt-icon-btn" id="tt-btn-stats" aria-label="Stats">📊</button>
@@ -523,6 +546,7 @@
                         </div>
                     </div>
 
+                    <p class="tt-goal" id="tt-goal" role="status" aria-live="polite">Light every tile.</p>
                     <div class="tt-board-container">
                         <div class="tt-grid" id="tt-grid">
                             <!-- Populated by JS -->
@@ -565,8 +589,8 @@
                         Tapping advances tiles by one state. Goal: all tiles to Green.</li>
                 </ul>
                 <p style="font-size:0.85rem; font-weight:700">Star Ratings:</p>
-                <p style="font-size:0.8rem; color:var(--pv-text-secondary);">Finish in the minimum required moves for
-                    ⭐⭐⭐. Taking slightly more moves earns ⭐⭐, and finishing with any amount earns ⭐.</p>
+                <p style="font-size:0.8rem; color:var(--pv-text-secondary);">Finish at or below the displayed move target for
+                    ⭐⭐⭐. Taking one or two more moves earns ⭐⭐, and finishing with any amount earns ⭐.</p>
             </div>
         </div>
 
@@ -578,7 +602,7 @@
                 <button class="pv-modal-close" onclick="this.closest('.pv-modal').classList.remove('open')">✕</button>
                 <h2 style="font-size:1.8rem; margin-bottom:8px;">Level Cleared!</h2>
                 <div class="tt-res-stars" id="tt-res-stars">⭐⭐⭐</div>
-                <div class="tt-res-msg" id="tt-res-msg">Perfect! Solved in minimum moves.</div>
+                <div class="tt-res-msg" id="tt-res-msg">Move target reached!</div>
 
                 <div class="tt-modal-btns">
                     <button class="btn-primary" id="tt-btn-next-level">Next Level</button>
@@ -615,7 +639,7 @@
                     The puzzle has been completed automatically via Hint. Would you like to restart this puzzle?
                 </p>
                 <div class="tt-modal-btns">
-                    <button class="btn-primary" id="tt-btn-hint-restart">🔄 Restart Puzzle (Ad)</button>
+                    <button class="btn-primary" id="tt-btn-hint-restart">🔄 Restart Puzzle </button>
                     <button class="btn-secondary" id="tt-btn-hint-view">View Board</button>
                 </div>
             </div>
@@ -627,49 +651,31 @@
         </div>
 
         <section class="game-guide pv-container" style="margin-top:40px;">
-            <h2>How to Play TileTurn 🔄</h2>
-            <p data-i18n="games.tileturn.guide">TileTurn is a strategic puzzle where every move causes a chain reaction.
-                In Classic mode, tap a tile to toggle it and its four neighbors between ON and OFF. Your goal is to turn
-                all tiles ON. Cascade mode adds a second layer — the toggle effect spreads two steps outward, affecting
-                up to 13 tiles per tap. In Spectrum mode, tiles cycle through three colors instead of two. Each level
-                has a minimum number of taps to solve. Achieve that minimum for 3 stars!</p>
+            <h2 data-i18n="games.tileturn.guideTitle">How to Play TileTurn</h2>
+            <p data-i18n="games.tileturn.guide">Every tap changes several tiles. In Classic, the selected tile and its up, down, left, and right neighbors toggle ON or OFF; light every tile to finish. Cascade starts the same way, then only first-step tiles that became ON toggle their own neighbors after a short delay. Spectrum cycles dark ○ → blue ◆ → green ✓; the goal is every tile green. Preview the affected area before tapping and use free Undo to compare ideas. Seven packs contain 140 levels. The displayed move target comes from puzzle construction, not a proof of the fewest possible moves. Finish at or below that target for three stars, within two extra moves for two stars, or complete the board for one.</p>
         </section>
 
         <section class="pv-faq pv-container">
-            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <h2 class="text-center mb-lg" data-i18n="common.faq">Frequently Asked Questions</h2>
             <details>
-                <summary data-i18n="games.tileturn.faq1q">Is every puzzle logically solvable?</summary>
-                <p data-i18n="games.tileturn.faq1a">Yes. Every single puzzle in the game is generated using the "Reverse
-                    Method." The game starts with a
-                    completed board and logically taps backwards to scramble it, guaranteeing that a solution always
-                    exists.</p>
+                <summary data-i18n="games.tileturn.faq1q">Is the move target a proven minimum?</summary>
+                <p data-i18n="games.tileturn.faq1a">No. Puzzles are constructed backwards from a completed board. The construction length sets the scoring target; a shorter solution may exist.</p>
             </details>
             <details>
-                <summary data-i18n="games.tileturn.faq2q">Does using the Undo button impact my star rating?</summary>
-                <p data-i18n="games.tileturn.faq2a">No! The Undo button actually subtracts a move from your total move
-                    counter, reverting you exactly to
-                    the state you were previously in. Feel free to use it constantly to test out different ripple
-                    patterns without penalty.</p>
+                <summary data-i18n="games.tileturn.faq2q">Does Undo affect stars?</summary>
+                <p data-i18n="games.tileturn.faq2a">Undo restores the previous board and subtracts that move from the counter. It is free.</p>
             </details>
             <details>
-                <summary data-i18n="games.tileturn.faq3q">Do I have to unlock earlier packs to play later ones?
-                </summary>
-                <p data-i18n="games.tileturn.faq3a">No, all 7 packs (140 levels total) are unlocked from the start.
-                    Within a pack, you must
-                    complete levels sequentially.</p>
+                <summary data-i18n="games.tileturn.faq3q">How are levels unlocked?</summary>
+                <p data-i18n="games.tileturn.faq3a">All seven packs are available. Within each pack, complete levels in sequence. There are 140 levels in total.</p>
             </details>
             <details>
-                <summary data-i18n="games.tileturn.faq4q">How does the Cascade mode work?</summary>
-                <p data-i18n="games.tileturn.faq4a">Cascade is a 2-step chain reaction. Step 1: tap toggles the target +
-                    adjacent tiles normally.
-                    After a 300ms delay, Step 2: tiles turned ON in Step 1 also toggle THEIR adjacent tiles.
-                    This creates ripple effects that require deeper planning.</p>
+                <summary data-i18n="games.tileturn.faq4q">How does Cascade work?</summary>
+                <p data-i18n="games.tileturn.faq4a">First, the target and its four neighbors toggle. After 300 ms, only those that became ON in that first step toggle their own adjacent cells. Overlapping effects can cancel.</p>
             </details>
             <details>
-                <summary data-i18n="games.tileturn.faq5q">What's Spectrum mode goal?</summary>
-                <p data-i18n="games.tileturn.faq5a">In Spectrum mode, tiles cycle through 3 states: OFF (dark) → Blue →
-                    Green. Tapping
-                    advances the target and its neighbors by one state. The goal is to get ALL tiles to Green.</p>
+                <summary data-i18n="games.tileturn.faq5q">What is the Spectrum goal?</summary>
+                <p data-i18n="games.tileturn.faq5a">Every tile must be green ✓. The cycle is dark ○ → blue ◆ → green ✓ → dark ○. A tap advances the target and its four neighbors.</p>
             </details>
         </section>
 
@@ -678,18 +684,18 @@
 
     </main>
 
-    <footer id="pv-footer"></footer>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
 
     <!-- Scripts -->
-    <script src="/js/i18n.js?v=12"></script>
-    <script src="/js/progression.js?v=12"></script>
-    <script src="/js/common.js?v=12"></script>
-    <script src="/js/arcade.js?v=12"></script>
-    <script src="/js/adsense.js?v=12"></script>
-    <script src="/js/seed.js"></script>
-    <script src="/js/sfx.js"></script>
-    <script src="/js/share.js?v=12"></script>
-    <script src="/games/tileturn-logic.js?v=12"></script>
+    <script src="/js/i18n.js?v=14"></script>
+    <script src="/js/progression.js?v=14"></script>
+    <script src="/js/common.js?v=14"></script>
+    <script src="/js/arcade.js?v=14"></script>
+    <script src="/js/adsense.js?v=14"></script>
+    <script src="/js/seed.js?v=14"></script>
+    <script src="/js/sfx.js?v=14"></script>
+    <script src="/js/share.js?v=14"></script>
+    <script src="/games/tileturn-logic.js?v=14"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

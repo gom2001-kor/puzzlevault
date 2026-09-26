@@ -161,6 +161,7 @@ function updateCanvasSize() {
     // Total width = stacks * (width + gap) + gap
     const totalWidth = state.stacks.length * (STACK_WIDTH + STACK_GAP) + STACK_GAP;
     canvas.width = Math.max(totalWidth, 500);
+    canvas.height = 302;
     // container should scroll if > max-width
 }
 
@@ -192,35 +193,40 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
     ctx.closePath();
 }
 
+function sortStackReducedMotion() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+function getLegalStackTargets(fromIdx) {
+    const source = state.stacks[fromIdx];
+    if (!source || !source.length || state.locked[fromIdx]) return [];
+    const color = source[source.length - 1];
+    return state.stacks.reduce((targets, stack, idx) => {
+        if (idx !== fromIdx && !state.locked[idx] && stack.length < STACK_CAP_SIZE &&
+            (stack.length === 0 || stack[stack.length - 1] === color)) targets.push(idx);
+        return targets;
+    }, []);
+}
+function getStackAtPoint(x, y) {
+    if (y < STACK_Y_BASE - STACK_HEIGHT - 36 || y > STACK_Y_BASE + 32) return -1;
+    const idx = Math.floor((x - STACK_GAP / 2) / (STACK_WIDTH + STACK_GAP));
+    if (idx < 0 || idx >= state.stacks.length) return -1;
+    return Math.abs(x - getStackX(idx)) <= (STACK_WIDTH + STACK_GAP) / 2 ? idx : -1;
+}
 function drawBlock(cx, cy, colorIdx, isSelected = false) {
-    const size = BLOCK_SIZE;
-    const radius = BLOCK_RADIUS;
-    const hc = size / 2;
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    if (isSelected) {
-        ctx.scale(1.05, 1.05);
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetY = 4;
-    }
-
-    ctx.fillStyle = PALETTE[colorIdx];
-    drawRoundedRect(ctx, -hc, -hc, size, size, radius);
-    ctx.fill();
-
-    // Highlight top
-    ctx.fillStyle = 'rgba(255,255,255,0.2)';
-    drawRoundedRect(ctx, -hc, -hc, size, size / 2, radius);
-    ctx.fill();
-
-    // Border
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-    ctx.stroke();
-
-    ctx.restore();
+    const radius = BLOCK_SIZE / 2 - 1;
+    ctx.save(); ctx.translate(cx, cy);
+    if (isSelected) ctx.scale(1.06, 1.06);
+    ctx.shadowColor = 'rgba(5,12,28,.38)'; ctx.shadowBlur = isSelected ? 12 : 5; ctx.shadowOffsetY = 5;
+    const sphere = ctx.createRadialGradient(-radius*.35,-radius*.45,2,0,0,radius);
+    sphere.addColorStop(0,'#ffffff'); sphere.addColorStop(.22,PALETTE[colorIdx]);
+    sphere.addColorStop(.72,PALETTE[colorIdx]); sphere.addColorStop(1,'#182338');
+    ctx.fillStyle=sphere; ctx.beginPath(); ctx.arc(0,0,radius,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0; ctx.shadowOffsetY=0; ctx.strokeStyle='rgba(255,255,255,.36)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.58)'; ctx.beginPath();
+    ctx.ellipse(-radius*.3,-radius*.43,radius*.25,radius*.1,-.45,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(8,18,35,.5)'; ctx.beginPath(); ctx.arc(1,3,10,0,Math.PI*2); ctx.fill();
+    ctx.font='800 12px system-ui, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#fff'; ctx.fillText(String(colorIdx+1),1,3); ctx.restore();
 }
 
 function render(time) {
@@ -235,6 +241,11 @@ function render(time) {
     updateAnimations(dt);
     updateParticles(dt);
 
+    const legalTargets = getLegalStackTargets(state.selectedStack);
+    const floor = ctx.createLinearGradient(0,30,0,STACK_Y_BASE+45);
+    floor.addColorStop(0,isDark ? '#142237' : '#f1f7ff');
+    floor.addColorStop(1,isDark ? '#0a1322' : '#dae7f6');
+    ctx.fillStyle=floor; ctx.fillRect(0,25,canvas.width,STACK_Y_BASE+38);
     // Draw stacks
     for (let i = 0; i < state.stacks.length; i++) {
         let cx = getStackX(i);
@@ -250,37 +261,27 @@ function render(time) {
             cx += shakeOffset;
         }
 
-        // Drawer background
-        ctx.fillStyle = isDark ? '#1E293B' : STACK_DRAW_BG;
-        ctx.fillRect(cx - STACK_WIDTH / 2, sy, STACK_WIDTH, STACK_HEIGHT);
-
-        // Drawer borders (U-shape)
-        ctx.lineWidth = STACK_DRAW_THICKNESS;
-        ctx.strokeStyle = isDark ? '#475569' : STACK_DRAW_COLOR;
-        ctx.beginPath();
-        ctx.moveTo(cx - STACK_WIDTH / 2, sy);
-        ctx.lineTo(cx - STACK_WIDTH / 2, sy + STACK_HEIGHT);
-        ctx.lineTo(cx + STACK_WIDTH / 2, sy + STACK_HEIGHT);
-        ctx.lineTo(cx + STACK_WIDTH / 2, sy);
-        ctx.stroke();
-
-        // Draw locked icon if locked
-        if (state.locked[i]) {
-            ctx.font = '24px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🔒', cx, STACK_Y_BASE + 24);
-        }
-
+        const canDrop = legalTargets.includes(i);
+        ctx.fillStyle='rgba(7,20,40,.16)'; ctx.beginPath();
+        ctx.ellipse(cx,STACK_Y_BASE+9,STACK_WIDTH*.58,9,0,0,Math.PI*2); ctx.fill();
+        const glass=ctx.createLinearGradient(cx-STACK_WIDTH/2,0,cx+STACK_WIDTH/2,0);
+        glass.addColorStop(0,'rgba(115,159,192,.45)'); glass.addColorStop(.15,'rgba(255,255,255,.3)');
+        glass.addColorStop(.5,'rgba(153,198,224,.08)'); glass.addColorStop(.87,'rgba(255,255,255,.38)');
+        glass.addColorStop(1,'rgba(80,119,155,.4)'); ctx.fillStyle=glass;
+        drawRoundedRect(ctx,cx-STACK_WIDTH/2,sy,STACK_WIDTH,STACK_HEIGHT,19); ctx.fill();
+        ctx.lineWidth=canDrop ? 3 : 2; ctx.strokeStyle=canDrop ? '#10b981' : 'rgba(124,160,190,.65)'; ctx.stroke();
+        ctx.strokeStyle=canDrop ? '#10b981' : 'rgba(230,248,255,.95)';
+        ctx.beginPath(); ctx.ellipse(cx,sy+2,STACK_WIDTH/2,6,0,0,Math.PI*2); ctx.stroke();
+        ctx.font='800 12px system-ui, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillStyle=isDark ? '#b6cce6' : '#405a76';
+        ctx.fillText(state.locked[i] ? '✓' : String(i+1),cx,STACK_Y_BASE+29);
+        if (canDrop) { ctx.fillStyle='#059669'; ctx.fillText('↓',cx,sy-19); }
         ctx.restore();
 
         // Draw blocks in stack
         let stackArr = state.stacks[i];
         for (let j = 0; j < stackArr.length; j++) {
-            // Skip drawing if block is currently animated moving FROM this stack
-            let movingAnim = state.animations.find(a => a.type === 'arc' && a.fromIdx === i && j === stackArr.length - 1 && a.moving);
-            if (movingAnim) continue;
-
+            // The moving ball has already been popped; draw every remaining ball.
             let bx = cx;
             let by = STACK_Y_BASE - STACK_DRAW_THICKNESS - (BLOCK_SIZE / 2) - j * (BLOCK_SIZE + 2);
 
@@ -303,7 +304,7 @@ function render(time) {
     for (const ha of hintAnims) {
         const hx = getStackX(ha.stackIdx);
         const hy = STACK_Y_BASE - STACK_HEIGHT;
-        const pulse = 0.4 + Math.sin(Date.now() * 0.008) * 0.3;
+        const pulse = sortStackReducedMotion() ? 0.7 : 0.4 + Math.sin(Date.now() * 0.008) * 0.3;
         ctx.save();
         ctx.strokeStyle = `rgba(217, 119, 6, ${pulse})`;
         ctx.lineWidth = 4;
@@ -340,7 +341,7 @@ function render(time) {
 function updateAnimations(dt) {
     for (let i = state.animations.length - 1; i >= 0; i--) {
         let a = state.animations[i];
-        a.elapsed += dt;
+        a.elapsed += sortStackReducedMotion() ? a.duration : dt;
         a.progress = Math.min(a.elapsed / a.duration, 1);
 
         if (a.type === 'arc') {
@@ -385,6 +386,7 @@ function updateParticles(dt) {
 }
 
 function spawnSparkles(x, y, color) {
+    if (sortStackReducedMotion()) return;
     for (let i = 0; i < 15; i++) {
         state.particles.push({
             x: x,
@@ -402,27 +404,26 @@ function spawnSparkles(x, y, color) {
 
 // ----------------- INTERACTION -----------------
 
-canvas.addEventListener('pointerdown', (e) => {
-    if (state.isGameOver) return;
+let sortStackPointerStart = null;
+canvas.addEventListener('pointerdown', e => {
+    sortStackPointerStart = { x: e.clientX, y: e.clientY, id: e.pointerId };
+});
+canvas.addEventListener('pointercancel', () => { sortStackPointerStart = null; });
+canvas.addEventListener('pointerup', (e) => {
+    const start = sortStackPointerStart;
+    sortStackPointerStart = null;
+    if (state.isGameOver || !start || start.id !== e.pointerId || Math.hypot(e.clientX-start.x,e.clientY-start.y) > 9) return;
 
     const rect = canvas.getBoundingClientRect();
     const sf = canvas.width / rect.width; // scale factor
     const x = (e.clientX - rect.left) * sf;
     const y = (e.clientY - rect.top) * sf;
 
-    // Find clicked stack
-    let clickedStack = -1;
-    for (let i = 0; i < state.stacks.length; i++) {
-        let cx = getStackX(i);
-        // Hitbox: +/- STACK_WIDTH
-        if (Math.abs(x - cx) < STACK_WIDTH) {
-            clickedStack = i;
-            break;
-        }
-    }
+    const clickedStack = getStackAtPoint(x, y);
 
     if (clickedStack !== -1 && !state.locked[clickedStack]) {
         handleStackClick(clickedStack);
+        updateUI();
     }
 });
 
@@ -520,6 +521,7 @@ function executeMove(fromIdx, toIdx, color, isUndo = false) {
         onComplete: () => {
             state.stacks[toIdx].push(color);
             checkStackCompletion(toIdx);
+            updateUI();
             checkGameOver();
             SFX.play('tap');
         }
@@ -673,6 +675,15 @@ function loseGame() {
 }
 
 function updateUI() {
+    const goal=document.getElementById('ss-goal');
+    if(goal) {
+        const ko=typeof I18n!=='undefined' && I18n.currentLang==='ko';
+        const done=state.stacks.filter(stack=>stack.length===STACK_CAP_SIZE && stack.every(c=>c===stack[0])).length;
+        const targets=getLegalStackTargets(state.selectedStack);
+        goal.textContent=state.selectedStack>=0
+            ? (ko ? '초록 테두리 튜브로 옮기세요 · 가능한 곳 '+targets.length+'개' : 'Move to a green-rimmed tube · '+targets.length+' available')
+            : (ko ? '완성 '+done+'/'+state.colorsCount+' · 같은 번호 구슬 4개를 모으세요' : done+'/'+state.colorsCount+' complete · Match four balls with the same number');
+    }
     const undoBtn = document.getElementById('ss-btn-undo');
     if (undoBtn) undoBtn.disabled = state.history.length === 0;
 

@@ -3,13 +3,16 @@
    Cache game HTML/CSS/JS for offline play
    =================================================== */
 
-const CACHE_VERSION = 12;
+const CACHE_VERSION = 14;
 const CACHE_NAME = 'puzzlevault-v' + CACHE_VERSION;
 const ASSETS = [
     '/',
     '/index.html',
     '/css/global.css',
     '/css/arcade.css',
+    '/css/site-quality.css',
+    '/js/canvas-depth.js',
+    '/js/privacy-controls.js',
     '/js/progression.js',
     '/js/arcade.js',
     '/js/duel.js',
@@ -56,6 +59,13 @@ const ASSETS = [
     '/games/mergechain-logic.js',
     '/games/hexmatch-logic.js',
 ];
+
+// Keep the same privacy and support information available with offline games.
+for (const language of ['ko', 'ja', 'zh', 'es']) {
+    for (const page of ['about', 'privacy', 'terms', 'contact']) {
+        ASSETS.push('/' + language + '/' + page + '.html');
+    }
+}
 
 // HTML references versioned assets so an older worker cannot serve stale game code.
 ASSETS.push(...ASSETS.filter(asset => /\.(css|js|json)$/.test(asset)).map(asset => asset + '?v=' + CACHE_VERSION));

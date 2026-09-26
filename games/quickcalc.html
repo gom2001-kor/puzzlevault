@@ -7,22 +7,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
     <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-6035096210993315">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6035096210993315" crossorigin="anonymous"></script>
+
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K90N7DX7S6"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-K90N7DX7S6');
-  </script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "vtmy819a2e");
-  </script>
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QuickCalc — Free Online Speed Math Arcade | PuzzleVault</title>
     <meta name="description"
@@ -35,11 +24,26 @@
     <meta property="og:description"
         content="How fast can you calculate? Race against the clock in this speed math arcade game!">
     <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/arcade.css?v=12">
+    <link rel="stylesheet" href="/css/global.css?v=14">
+    <link rel="stylesheet" href="/css/arcade.css?v=14">
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"VideoGame","name":"QuickCalc","description":"A speed math arcade game testing quick mental calculation.","url":"https://puzzlevault.pages.dev/games/quickcalc","genre":"Arcade, Puzzle","playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
-    </script>
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "QuickCalc",
+  "description": "A speed math arcade game testing quick mental calculation.",
+  "url": "https://puzzlevault.pages.dev/games/quickcalc",
+  "genre": "Arcade, Puzzle",
+  "playMode": "SinglePlayer",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
     <style>
         .qc-page {
             display: flex;
@@ -536,11 +540,49 @@
             color: var(--pv-text-secondary);
             text-transform: uppercase;
         }
+        /* A calculation console with tactile keycaps; question geometry stays unchanged. */
+        .qc-game-container { --qc-energy: var(--pv-blue); border: 1px solid var(--pv-border); border-radius: 22px; padding: 20px; background: linear-gradient(145deg, var(--pv-card-bg), var(--pv-grid-bg)); box-shadow: inset 0 2px 0 rgba(255,255,255,.7), 0 8px 0 var(--pv-border), 0 16px 26px rgba(15,23,42,.12); overflow: visible; }
+        .qc-game-container[data-combo-tier="1"] { --qc-energy: var(--pv-violet); }
+        .qc-game-container[data-combo-tier="2"], .qc-game-container[data-combo-tier="3"] { --qc-energy: var(--pv-orange); }
+        .qc-problem-area { height: 128px; border: 1px solid var(--pv-border); border-top: 4px solid var(--qc-energy); border-radius: 14px; background: var(--pv-card-bg); box-shadow: inset 0 4px 8px rgba(15,23,42,.1), 0 1px 0 rgba(255,255,255,.7); margin-bottom: 18px; }
+        .qc-problem-area::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(135deg, rgba(147,197,253,.1), transparent 55%); }
+        .qc-problem-text { font-variant-numeric: tabular-nums; font-size: clamp(2.1rem, 8vw, 3.5rem); padding: 0 8px; }
+        .qc-slide-in { animation: qcSettle .14s ease-out both; }
+        @keyframes qcSettle { from { opacity: .7; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        .qc-choices-grid { gap: 16px 12px; height: 176px; padding-bottom: 7px; }
+        .qc-choice-btn { position: relative; border-width: 1px; background: linear-gradient(180deg, var(--pv-card-bg), var(--pv-bg-light)); border-radius: 12px; box-shadow: inset 0 2px 0 rgba(255,255,255,.7), 0 6px 0 var(--pv-border), 0 9px 8px rgba(15,23,42,.14); transition: transform .09s, box-shadow .09s; touch-action: manipulation; font-variant-numeric: tabular-nums; }
+        .qc-choice-btn::before { content: attr(data-key); position: absolute; left: 10px; top: 8px; font-size: .64rem; font-weight: 600; opacity: .55; border: 1px solid currentColor; width: 17px; height: 17px; border-radius: 4px; display: grid; place-items: center; }
+        .qc-choice-btn:active { transform: translateY(5px); box-shadow: inset 0 2px 4px rgba(15,23,42,.1), 0 1px 0 var(--pv-border); }
+        .qc-choice-btn.correct { background: var(--pv-emerald); border-color: #047857; box-shadow: inset 0 2px 0 rgba(255,255,255,.3), 0 3px 0 #047857; transform: translateY(3px); }
+        .qc-choice-btn.wrong { background: var(--pv-coral); border-color: #be123c; box-shadow: inset 0 2px 0 rgba(255,255,255,.3), 0 3px 0 #be123c; transform: translateY(3px); }
+        .qc-choice-btn.correct::after, .qc-choice-btn.wrong::after { position: absolute; right: 10px; top: 7px; font-size: .86rem; }
+        .qc-choice-btn.correct::after { content: '✓'; }
+        .qc-choice-btn.wrong::after { content: '×'; }
+        .qc-score { font-size: 1.65rem; font-variant-numeric: tabular-nums; }
+        .qc-time { display: inline-block; width: fit-content; min-width: 70px; padding: 3px 8px; border-radius: 7px; background: var(--pv-card-bg); border: 1px solid var(--pv-border); box-shadow: inset 0 1px 3px rgba(15,23,42,.08); font-size: 1rem; }
+        .qc-time.is-urgent { color: var(--pv-coral); border-color: var(--pv-coral); }
+        .qc-timer-wrap { height: 9px; box-shadow: inset 0 2px 3px rgba(15,23,42,.18); margin-bottom: 14px; }
+        .qc-timer-bar, .qc-timer-bar.animating-change { transition: background-color .2s; box-shadow: inset 0 2px 0 rgba(255,255,255,.3); }
+        .qc-charge { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 14px; font-size: .72rem; font-weight: 700; color: var(--pv-text-secondary); }
+        .qc-charge-pips { display: flex; gap: 5px; }
+        .qc-charge-pips i { width: 18px; height: 6px; border-radius: 4px; background: var(--pv-border); box-shadow: inset 0 1px 2px rgba(15,23,42,.13); }
+        .qc-charge-pips i.filled { background: var(--qc-energy); box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+        .qc-charge.is-milestone { color: var(--qc-energy); }
+        .qc-start-overlay { border-radius: 21px; background: radial-gradient(ellipse at 50% 0, #1e3a5f, #0f172a 75%); }
+        .qc-start-emblem { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 0 22px; font-size: 1.5rem; background: var(--pv-blue); border-radius: 13px; transform: rotate(-7deg); box-shadow: inset 0 2px 0 rgba(255,255,255,.4), 0 6px 0 #1d4ed8, 0 12px 24px rgba(0,0,0,.25); }
+        .qc-start-overlay h2 { font-size: clamp(1.3rem, 4.7vw, 1.8rem); }
+        .qc-start-overlay p { margin-bottom: 22px; }
+        .qc-start-btn { box-shadow: inset 0 2px 0 rgba(255,255,255,.3), 0 6px 0 #1d4ed8, 0 9px 14px rgba(0,0,0,.3); padding: 12px 38px; font-size: 1.25rem; }
+        .qc-start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1d4ed8; }
+        @media (max-width: 380px) { .qc-game-container { padding: 14px; } .qc-charge-pips i { width: 13px; } }
+        @media (prefers-reduced-motion: reduce) { .qc-choice-btn, .qc-start-btn, .qc-problem-text { animation: none !important; transition: none !important; } }
     </style>
+    <link rel="stylesheet" href="/css/site-quality.css?v=14">
+    <script defer src="/js/privacy-controls.js?v=14"></script>
 </head>
 
 <body>
-    <header id="pv-header"></header>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
 
     <main>
         <div class="qc-page">
@@ -555,7 +597,7 @@
                             style="font-size: 0.75rem;">⏰ +5s</button>
                         <button class="hint-btn" onclick="useOperatorHint()" aria-label="Operator Hint"
                             title="Narrow Operators" style="font-size: 0.75rem;">💡 Hint <span
-                                class="hint-sublabel">(Ad)</span></button>
+                                class="hint-sublabel"></span></button>
                         <button class="qc-icon-btn" id="qc-btn-help" aria-label="Help">❓</button>
                         <button class="qc-icon-btn" id="qc-btn-stats" aria-label="Stats">📊</button>
                         <button class="qc-icon-btn" id="qc-btn-settings" aria-label="Sound">🔊</button>
@@ -581,6 +623,7 @@
                 <div class="qc-game-container" id="qc-container">
                     <!-- Overlays Start Screen inside container -->
                     <div class="qc-start-overlay" id="qc-start-screen">
+                        <div class="qc-start-emblem" id="qc-start-emblem" aria-hidden="true">⚡</div>
                         <h2 id="qc-start-title">Three hearts. How far can you go?</h2>
                         <p id="qc-start-description">Choose the answer. Build a streak. Each mistake costs a heart.</p>
                         <button class="qc-start-btn" id="qc-start-btn">START</button>
@@ -604,16 +647,17 @@
                         </div>
                     </div>
 
+                    <div class="qc-charge" id="qc-charge"><span id="qc-charge-label">Build a 5-answer streak</span><div class="qc-charge-pips" id="qc-charge-pips" aria-hidden="true"></div></div>
                     <div class="qc-problem-area" id="qc-problem-area">
                         <!-- Example: 17 + 6 = ? -->
                         <div class="qc-problem-text" id="qc-problem-text">Ready?</div>
                     </div>
 
                     <div class="qc-choices-grid">
-                        <button class="qc-choice-btn" id="qc-btn-0">A</button>
-                        <button class="qc-choice-btn" id="qc-btn-1">B</button>
-                        <button class="qc-choice-btn" id="qc-btn-2">C</button>
-                        <button class="qc-choice-btn" id="qc-btn-3">D</button>
+                        <button class="qc-choice-btn" id="qc-btn-0" data-key="1">A</button>
+                        <button class="qc-choice-btn" id="qc-btn-1" data-key="2">B</button>
+                        <button class="qc-choice-btn" id="qc-btn-2" data-key="3">C</button>
+                        <button class="qc-choice-btn" id="qc-btn-3" data-key="4">D</button>
                     </div>
                 </div>
             </div>
@@ -636,42 +680,27 @@
 
         <!-- HTML documentation below -->
         <section class="game-guide pv-container">
-            <h2 id="qc-guide-title">How to Play QuickCalc ⚡</h2>
-            <p id="qc-guide-text">Choose the correct answer, or use keys 1–4. Consecutive correct answers build a combo
-                for more points. Classic and Daily give you 3 hearts and a timer for each question. The daily course
-                changes at midnight UTC and can be replayed for practice. Timed modes subtract 3 seconds for each
-                wrong answer. A 30-second duel uses the same question sequence and answer positions for both friends,
-                with no hints or extra time. Share your result to send that exact course to a friend. Challenge scores
-                are self-reported and are not a verified leaderboard.</p>
+            <h2 id="qc-guide-title" data-i18n="games.quickcalc.guideTitle">How to Play QuickCalc</h2>
+            <p id="qc-guide-text" data-i18n="games.quickcalc.guide">Choose the correct answer, or use keys 1–4. Consecutive correct answers build a combo for more points. Classic and Daily give you 3 hearts and a timer for each question. The daily course changes at midnight UTC and can be replayed for practice. Timed modes subtract 3 seconds for each wrong answer. A 30-second duel uses the same question sequence and answer positions for both friends, with no hints or extra time. Share your result to send that exact course to a friend. Challenge scores are self-reported and are not a verified leaderboard.</p>
         </section>
 
         <section class="pv-faq pv-container">
-            <h2 class="text-center mb-lg">Frequently Asked Questions</h2>
+            <h2 class="text-center mb-lg" data-i18n="common.faq">Frequently Asked Questions</h2>
             <details>
-                <summary data-i18n="games.quickcalc.faq1q">What are the different game modes?</summary>
-                <p id="qc-modes-faq"><strong>Classic:</strong> 3 lives, increasing difficulty. Wrong
-                    answers cost a life.
-                    <strong>Daily:</strong> A shared daily sequence, replayable for practice.
-                    <strong>Time Attack:</strong> 2 minutes, answer as many as possible, wrong = -3s penalty.
-                    <strong>30s duel:</strong> Challenge a friend on the same course, without hints or extra time.
-                </p>
+                <summary data-i18n="games.quickcalc.faq1q">What modes are available?</summary>
+                <p id="qc-modes-faq" data-i18n="games.quickcalc.faq1a">Classic: three lives and a timer per question. Daily: the shared daily course, replayable. Time Attack: two minutes, with a three-second penalty per wrong answer. Duel: a shared 30-second course without hints or extra time.</p>
             </details>
             <details>
-                <summary data-i18n="games.quickcalc.faq2q">How does the scoring work?</summary>
-                <p data-i18n="games.quickcalc.faq2a">Each correct answer earns 100 × phase (1-4) points, plus a speed
-                    bonus (remaining seconds × 10)
-                    and a streak bonus (consecutive correct × 50). Operator Roulette answers earn ×2 points!</p>
+                <summary data-i18n="games.quickcalc.faq2q">How does scoring work?</summary>
+                <p data-i18n="games.quickcalc.faq2a">Correct answers earn 100 × phase, plus remaining seconds ×10 and consecutive correct answers ×50. Operator questions double the answer’s points.</p>
             </details>
             <details>
                 <summary data-i18n="games.quickcalc.faq3q">What is Operator Roulette?</summary>
-                <p id="qc-operators-faq">From question 11, sometimes the operator is hidden: "7 ? 3 = 21" —
-                    you must identify "×".
-                    Correct operator answers earn double points. Outside duels, hints can narrow the choices to 2.</p>
+                <p id="qc-operators-faq" data-i18n="games.quickcalc.faq3a">From question 11, some questions hide one operator, such as 7 ? 3 = 21. Choose × to solve it. Correct operator answers earn double points. Outside duels, a hint can narrow the choices to two.</p>
             </details>
             <details>
-                <summary data-i18n="games.quickcalc.faq4q">Are the wrong answers generated randomly?</summary>
-                <p data-i18n="games.quickcalc.faq4a">No! There's one near miss (±1-3), one medium miss (±5-15), and one
-                    far miss. Careful!</p>
+                <summary data-i18n="games.quickcalc.faq4q">How are answer choices made?</summary>
+                <p data-i18n="games.quickcalc.faq4a">Numeric choices mix the correct value with nearby and more distant errors, then shuffle their positions. Duel friends receive the same choices in the same positions.</p>
             </details>
         </section>
 
@@ -680,7 +709,7 @@
 
     </main>
 
-    <footer id="pv-footer"></footer>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
 
     <!-- Help Modal -->
     <div class="pv-modal" id="qc-help-modal">
@@ -707,16 +736,16 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/js/i18n.js?v=12"></script>
-    <script src="/js/progression.js?v=12"></script>
-    <script src="/js/common.js?v=12"></script>
-    <script src="/js/arcade.js?v=12"></script>
-    <script src="/js/adsense.js?v=12"></script>
-    <script src="/js/seed.js"></script>
-    <script src="/js/sfx.js"></script>
-    <script src="/js/share.js?v=12"></script>
-    <script src="/js/duel.js?v=12"></script>
-    <script src="/games/quickcalc-logic.js?v=12"></script>
+    <script src="/js/i18n.js?v=14"></script>
+    <script src="/js/progression.js?v=14"></script>
+    <script src="/js/common.js?v=14"></script>
+    <script src="/js/arcade.js?v=14"></script>
+    <script src="/js/adsense.js?v=14"></script>
+    <script src="/js/seed.js?v=14"></script>
+    <script src="/js/sfx.js?v=14"></script>
+    <script src="/js/share.js?v=14"></script>
+    <script src="/js/duel.js?v=14"></script>
+    <script src="/games/quickcalc-logic.js?v=14"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 

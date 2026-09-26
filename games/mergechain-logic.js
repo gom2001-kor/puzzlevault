@@ -63,7 +63,7 @@ const BALL_TYPES = {
     256: { radius: 62, colors: ['#A7F3D0', '#D1FAE5'], size: 28 },
     512: { radius: 70, colors: ['#BFDBFE', '#DBEAFE'], size: 30 },
     1024: { radius: 78, colors: ['#DDD6FE', '#EDE9FE'], size: 32 },
-    2048: { radius: 88, colors: ['#FFD700', '#FFF8DC'], size: 36 },
+    2048: { radius: 88, colors: ['#FDE68A', '#FEF3C7'], size: 36 },
     4096: { radius: 95, colors: ['#F43F5E', '#FDA4AF'], size: 38 }, // Beyond 2048
     8192: { radius: 100, colors: ['#7C3AED', '#C4B5FD'], size: 40 }
 };
@@ -164,11 +164,11 @@ function setupInput() {
         let clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
         // Map to canvas coordinate space
-        let x = (clientX - rect.left) * (M.canvas.width / rect.width);
+        let x = (clientX - rect.left) * (CONSTANTS.canvasWidth / rect.width);
 
         // Clamp to allowed range (keep preview ball mostly visible)
         const pr = getTypeInfo(M.nextVal).radius;
-        M.mouseX = Math.max(pr, Math.min(M.canvas.width - pr, x));
+        M.mouseX = Math.max(pr, Math.min(CONSTANTS.canvasWidth - pr, x));
     };
 
     const handleStart = (e) => {
@@ -190,12 +190,21 @@ function setupInput() {
     M.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleStart(e); }, { passive: false });
     document.addEventListener('touchmove', (e) => { if (M.isDragging) handleMove(e); }, { passive: false });
     document.addEventListener('touchend', handleEnd);
+    document.addEventListener('touchcancel', () => { M.isDragging = false; });
+    M.canvas.addEventListener('keydown', event => {
+        if (!M.isPlaying || event.altKey || event.ctrlKey || event.metaKey) return;
+        if (!['ArrowLeft', 'ArrowRight', ' ', 'Enter'].includes(event.key)) return;
+        event.preventDefault();
+        if (event.key === ' ' || event.key === 'Enter') { if (!event.repeat) dropBall(); return; }
+        const radius = getTypeInfo(M.nextVal).radius;
+        M.mouseX = Math.max(radius, Math.min(CONSTANTS.canvasWidth - radius, M.mouseX + (event.key === 'ArrowLeft' ? -12 : 12)));
+        M.keyboardAim = true;
+    });
 }
 
 function resizeCanvas() {
-    // Fixed internal resolution per spec (300x500). CSS handles visual scaling.
-    M.canvas.width = CONSTANTS.canvasWidth;
-    M.canvas.height = CONSTANTS.canvasHeight;
+    // Physics remains 300 × 500; the backing bitmap uses up to 2× pixel density.
+    M.ctx = PVDepth.setupCanvas(M.canvas, CONSTANTS.canvasWidth, CONSTANTS.canvasHeight);
 }
 
 // --- Game Modes ---
@@ -222,6 +231,8 @@ function startMode(mode) {
     M.dangerStartTime = null;
     M.dangerSafeStart = null;
     M.rawPreviewX = CONSTANTS.canvasWidth / 2;
+    M.mouseX = CONSTANTS.canvasWidth / 2;
+    M.keyboardAim = false;
     M.gameStartTime = Date.now();
     M.hintsUsed = 0;
     document.getElementById('mc-canvas-wrap').classList.remove('danger');
@@ -274,12 +285,14 @@ function getTypeInfo(val) {
 }
 
 function dropBall() {
+    if (!M.isPlaying) return;
     const now = Date.now();
     if (now - M.lastDropTime < M.currentCooldown) return;
 
     M.lastDropTime = now;
 
     const info = getTypeInfo(M.nextVal);
+    M.mouseX = Math.max(info.radius, Math.min(CONSTANTS.canvasWidth - info.radius, M.mouseX));
     M.balls.push({
         val: M.nextVal,
         x: M.mouseX,
@@ -301,6 +314,7 @@ function dropBall() {
 }
 
 function createParticles(x, y, color) {
+    if (PVDepth.reduced()) return;
     for (let i = 0; i < 12; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 4 + 2;
@@ -315,6 +329,7 @@ function createParticles(x, y, color) {
             decay: Math.random() * 0.03 + 0.02
         });
     }
+    M.particles = M.particles.slice(-120);
 }
 
 function showChainPopup(mult) {
@@ -346,6 +361,7 @@ function updatePhysics() {
     // 1. Apply forces & move
     for (let i = 0; i < M.balls.length; i++) {
         let b = M.balls[i];
+        b.impact = Math.max(0, (b.impact || 0) - .08);
 
         // Gravity (uses current progressive value)
         b.vy += M.currentGravity;
@@ -369,6 +385,7 @@ function updatePhysics() {
 
         // Floor collision
         if (b.y + b.radius > CONSTANTS.canvasHeight) {
+            if (b.vy > 1.5) b.impact = Math.min(1, b.vy / 12);
             b.y = CONSTANTS.canvasHeight - b.radius;
             b.vy *= CONSTANTS.bounce;
             // Friction on floor
@@ -434,6 +451,10 @@ function updatePhysics() {
                     let kx = b1.vx - b2.vx;
                     let ky = b1.vy - b2.vy;
                     let p = 2.0 * (nx * kx + ny * ky) / 2; // Equal mass approx
+                    if (Math.abs(p) > 2) {
+                        b1.impact = Math.min(1, Math.abs(p) / 15);
+                        b2.impact = Math.min(1, Math.abs(p) / 15);
+                    }
 
                     // Damping to simulate energy loss
                     let damping = 0.6;
@@ -493,6 +514,7 @@ function processMerges(merges) {
             radius: info.radius,
             merged: false,
             bornAt: Date.now(),
+            impact: 1,
             id: Math.random()
         };
         newBalls.push(newBall);
@@ -557,36 +579,23 @@ function handleDangerState(isDanger) {
 }
 
 // --- Render ---
-function drawBlock(ctx, x, y, radius, val) {
-    let info = getTypeInfo(val);
+function drawBlock(ctx, x, y, radius, val, impact = 0) {
+    const info = getTypeInfo(val);
+    PVDepth.sphere(ctx, x, y, radius, info.colors[0], val, info.size, impact);
+}
 
-    // Draw ball
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-
-    // Gradient
-    let grd = ctx.createRadialGradient(x - radius * 0.3, y - radius * 0.3, radius * 0.1, x, y, radius);
-    grd.addColorStop(0, info.colors[1]); // lighter
-    grd.addColorStop(1, info.colors[0]); // darker
-    ctx.fillStyle = grd;
-    ctx.fill();
-
-    // Outline
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#FFFFFF30';
-    ctx.stroke();
-
-    // Number
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = `800 ${info.size}px 'Segoe UI', sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    // Stroke for readability
-    ctx.strokeStyle = '#00000040';
-    ctx.lineWidth = 3;
-    ctx.strokeText(val, x, y);
-    ctx.fillText(val, x, y);
+/** First straight-down contact only; subsequent bounces/rolling are not predicted. */
+function getDropGuide(x, radius, balls = M.balls) {
+    x = Math.max(radius, Math.min(CONSTANTS.canvasWidth - radius, x));
+    let y = CONSTANTS.canvasHeight - radius, target = null;
+    for (const ball of balls) {
+        if (ball.merged) continue;
+        const dx = x - ball.x, distance = radius + ball.radius;
+        if (Math.abs(dx) >= distance) continue;
+        const contact = ball.y - Math.sqrt(distance * distance - dx * dx);
+        if (contact < y) { y = contact; target = ball; }
+    }
+    return { x, y: Math.max(radius + 10, y), target };
 }
 
 function render() {
@@ -594,8 +603,10 @@ function render() {
     const W = CONSTANTS.canvasWidth;
     const H = CONSTANTS.canvasHeight;
 
-    // Background Dark
-    ct.fillStyle = '#1E293B';
+    // Recessed vessel with a lit back wall and an inset floor.
+    const well = ct.createLinearGradient(0, 0, W, H);
+    well.addColorStop(0, '#334155'); well.addColorStop(.45, '#1E293B'); well.addColorStop(1, '#0F172A');
+    ct.fillStyle = well;
     ct.fillRect(0, 0, W, H);
 
     // Subtle grid lines
@@ -608,6 +619,11 @@ function render() {
     for (let gy = gridStep; gy < H; gy += gridStep) {
         ct.beginPath(); ct.moveTo(0, gy); ct.lineTo(W, gy); ct.stroke();
     }
+    const edge = ct.createLinearGradient(0, 0, W, 0);
+    edge.addColorStop(0, 'rgba(2,6,23,.5)'); edge.addColorStop(.06, 'rgba(255,255,255,.06)');
+    edge.addColorStop(.5, 'rgba(255,255,255,0)'); edge.addColorStop(.94, 'rgba(255,255,255,.06)'); edge.addColorStop(1, 'rgba(2,6,23,.5)');
+    ct.fillStyle = edge; ct.fillRect(0, 0, W, H);
+    ct.fillStyle = 'rgba(148,163,184,.2)'; ct.fillRect(0, H - 5, W, 5);
 
     // Danger Line
     ct.beginPath();
@@ -619,27 +635,42 @@ function render() {
     ct.stroke();
     ct.setLineDash([]);
 
+    if (!M.isDragging && !M.keyboardAim) {
+        const label = document.getElementById('mc-aim-status');
+        if (label && label.textContent !== PVDepth.t('landing')) label.textContent = PVDepth.t('landing');
+    }
+
     // Preview Ball (if cooldown passed)
     if (M.isPlaying && Date.now() - M.lastDropTime >= M.currentCooldown) {
-        let alpha = M.isDragging ? 1.0 : 0.5;
+        let alpha = M.isDragging || M.keyboardAim ? 1.0 : 0.85;
         ct.globalAlpha = alpha;
 
-        let targetX = M.isDragging ? M.mouseX : CONSTANTS.canvasWidth / 2;
+        const pInfo = getTypeInfo(M.nextVal);
+        const targetX = Math.max(pInfo.radius, Math.min(W - pInfo.radius, M.mouseX));
         // Smoothly follow
         if (!M.rawPreviewX) M.rawPreviewX = targetX;
-        M.rawPreviewX += (targetX - M.rawPreviewX) * 0.3;
+        M.rawPreviewX += (targetX - M.rawPreviewX) * (PVDepth.reduced() ? 1 : .3);
 
-        let pInfo = getTypeInfo(M.nextVal);
         drawBlock(ct, M.rawPreviewX, pInfo.radius + 10, pInfo.radius, M.nextVal);
 
         // Aim line
-        if (M.isDragging) {
+        if (M.isDragging || M.keyboardAim) {
+            const guide = getDropGuide(targetX, pInfo.radius);
+            const matching = guide.target && guide.target.val === M.nextVal;
             ct.beginPath();
-            ct.moveTo(M.rawPreviewX, pInfo.radius + 10 + pInfo.radius);
-            ct.lineTo(M.rawPreviewX, CONSTANTS.canvasHeight);
-            ct.strokeStyle = 'rgba(255,255,255,0.2)';
+            ct.moveTo(targetX, pInfo.radius * 2 + 10);
+            ct.lineTo(targetX, guide.y);
+            ct.strokeStyle = matching ? '#86EFAC' : 'rgba(255,255,255,.55)';
             ct.lineWidth = 2;
-            ct.stroke();
+            ct.setLineDash([4, 7]); ct.stroke(); ct.setLineDash([]);
+            ct.beginPath(); ct.arc(guide.x, guide.y, pInfo.radius - 2, 0, Math.PI * 2);
+            ct.fillStyle = matching ? 'rgba(134,239,172,.14)' : 'rgba(255,255,255,.07)'; ct.fill(); ct.stroke();
+            if (matching) {
+                ct.beginPath(); ct.arc(guide.target.x, guide.target.y, guide.target.radius + 3, 0, Math.PI * 2); ct.stroke();
+            }
+            const label = document.getElementById('mc-aim-status');
+            const message = matching ? PVDepth.t('contact', M.nextVal) : PVDepth.t('landing');
+            if (label && label.textContent !== message) label.textContent = message;
         }
 
         ct.globalAlpha = 1.0;
@@ -647,7 +678,7 @@ function render() {
 
     // Draw Balls
     for (let b of M.balls) {
-        drawBlock(ct, b.x, b.y, b.radius, b.val);
+        drawBlock(ct, b.x, b.y, b.radius, b.val, b.impact);
     }
 
     // Draw Particles
@@ -751,7 +782,7 @@ function continueGame() {
     }
 
     // Create particles for visual feedback
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < (PVDepth.reduced() ? 0 : 20); i++) {
         M.particles.push({
             x: Math.random() * CONSTANTS.canvasWidth,
             y: CONSTANTS.dangerLineY,
@@ -818,7 +849,7 @@ function showResult(titleStr) {
         
         ${!M.continueUsed ? `<div id="ad-reward" style="text-align:center;margin-bottom:12px">
             <button class="pv-btn" onclick="continueGame()" style="background:var(--pv-emerald);color:#fff;width:100%;padding:12px;font-size:1rem;font-weight:700;border-radius:var(--pv-radius);border:none;cursor:pointer">
-                🎬 Watch Ad to Continue
+                ↻ Continue once
             </button>
             <p style="font-size:.7rem;color:var(--pv-text-secondary);margin-top:4px">Removes balls above danger line (1 use)</p>
         </div>` : ''}
@@ -880,7 +911,7 @@ function useMergeChainHint() {
         function drawGhost() {
             if (Date.now() - ghostStart > ghostDuration || !M.isPlaying) return;
             const ct = M.ctx;
-            const alpha = 0.4 + Math.sin((Date.now() - ghostStart) * 0.006) * 0.2;
+            const alpha = PVDepth.reduced() ? .55 : 0.4 + Math.sin((Date.now() - ghostStart) * 0.006) * 0.2;
             ct.globalAlpha = alpha;
             drawBlock(ct, bestX, ghostInfo.radius + 10, ghostInfo.radius, ghostVal);
             // Golden ring

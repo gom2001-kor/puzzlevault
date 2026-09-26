@@ -16,8 +16,17 @@ const I18n = {
 
     async init() {
         // 1. Check localStorage
-        const saved = localStorage.getItem('pv_lang');
-        if (saved && this.supportedLangs.some(l => l.code === saved)) {
+        let saved;
+        try { saved = localStorage.getItem('pv_lang'); } catch (_) { /* Browser storage can be disabled. */ }
+        const pathname = window.location.pathname;
+        const localizedRoute = pathname.match(/^\/(?:blog\/)?(ko|ja|zh|es)(?:\/|$)/);
+        // Static editorial/policy pages have their language in the URL, including English.
+        // Game pages and the dynamic home page continue to use the player's preference.
+        const englishStaticRoute = /^\/(?:about|privacy|contact|terms)(?:\.html|\/)?$/.test(pathname) || /^\/blog\/posts(?:\/|$)/.test(pathname);
+        const routeLanguage = localizedRoute ? localizedRoute[1] : englishStaticRoute ? 'en' : null;
+        if (routeLanguage) {
+            this.currentLang = routeLanguage;
+        } else if (saved && this.supportedLangs.some(l => l.code === saved)) {
             this.currentLang = saved;
         } else {
             // 2. Auto-detect browser language
@@ -39,14 +48,14 @@ const I18n = {
 
     async loadLang(langCode) {
         try {
-            const resp = await fetch('/lang/' + langCode + '.json?v=12');
+            const resp = await fetch('/lang/' + langCode + '.json?v=14');
             if (!resp.ok) throw new Error('Language file not found');
             this.translations = await resp.json();
             this.currentLang = langCode;
         } catch (e) {
             if (langCode !== 'en') {
                 try {
-                    const resp = await fetch('/lang/en.json?v=12');
+                    const resp = await fetch('/lang/en.json?v=14');
                     if (resp.ok) {
                         this.translations = await resp.json();
                         this.currentLang = 'en';
@@ -82,7 +91,7 @@ const I18n = {
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             const translated = this.t(key);
-            if (typeof translated === 'string') {
+            if (typeof translated === 'string' && translated !== key) {
                 el.textContent = translated;
             }
         });
@@ -91,7 +100,7 @@ const I18n = {
         document.querySelectorAll('[data-i18n-html]').forEach(el => {
             const key = el.getAttribute('data-i18n-html');
             const translated = this.t(key);
-            if (typeof translated === 'string') {
+            if (typeof translated === 'string' && translated !== key) {
                 el.innerHTML = translated;
             }
         });
@@ -127,7 +136,7 @@ const I18n = {
 
     async switchLang(langCode) {
         if (langCode === this.currentLang) return;
-        localStorage.setItem('pv_lang', langCode);
+        try { localStorage.setItem('pv_lang', langCode); } catch (_) { /* Session-only language choice. */ }
         document.cookie = `pv_lang=${langCode}; path=/; max-age=31536000`;
         this.currentLang = langCode;
         await this.loadLang(langCode);

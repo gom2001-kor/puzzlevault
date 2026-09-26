@@ -104,6 +104,7 @@ function refreshQCLanguage() {
     document.getElementById('qc-start-title').textContent = qt(duel ? 'title' : state.mode === 'classic' ? 'classicTitle' : state.mode === 'daily' ? 'dailyTitle' : 'raceTitle');
     document.getElementById('qc-start-description').textContent = qt(duel ? 'rules' : state.mode === 'classic' ? 'classicRules' : state.mode === 'daily' ? 'dailyRules' : 'raceRules');
     document.getElementById('qc-start-btn').textContent = qt('start');
+    document.getElementById('qc-start-emblem').textContent = duel ? '30' : state.mode === 'timeattack' ? '120' : '⚡';
     document.getElementById('qc-duel-banner').hidden = !duel;
     document.getElementById('qc-duel-eyebrow').textContent = qt(state.challengeTarget === null ? 'soloLabel' : 'duelLabel');
     document.getElementById('qc-duel-title').textContent = state.challengeTarget === null ? qt('title') : qt('target', { score: state.challengeTarget.toLocaleString() });
@@ -116,6 +117,7 @@ function refreshQCLanguage() {
     document.getElementById('qc-modes-faq').textContent = ['classic', 'daily', 'timeattack', 'blitz'].map((mode, index) => `${qt(mode)}: ${qt(['classicRules', 'dailyRules', 'raceRules', 'rules'][index])}`).join(' ');
     document.getElementById('qc-operators-faq').textContent = qt('rouletteHelp');
     document.getElementById('qc-time-display').setAttribute('aria-label', qt('time'));
+    updateComboProgress();
     if (document.getElementById('qc-result').classList.contains('show')) renderResultOverlay(false);
 }
 
@@ -393,6 +395,7 @@ function nextProblem() {
     for (let i = 0; i < 4; i++) {
         let btn = document.getElementById(`qc-btn-${i}`);
         btn.textContent = state.currentProblem.choices[i];
+        btn.setAttribute('aria-label', qt('answerKey', { answer: state.currentProblem.choices[i], key: i + 1 }));
         btn.className = 'qc-choice-btn'; // reset class
         btn.disabled = false;
         btn.style.opacity = '1';
@@ -406,6 +409,7 @@ function nextProblem() {
 }
 
 function updateStatusUI() {
+    updateComboProgress();
     document.getElementById('qc-score-display').textContent = state.score;
 
     let comboEl = document.getElementById('qc-combo-display');
@@ -432,7 +436,20 @@ function updateStatusUI() {
     updateTimerBarDOM();
 }
 
+function getQCComboProgress(combo) {
+    const target = Math.ceil(Math.max(1, combo) / 5) * 5;
+    return { target, filled: combo > 0 ? ((combo - 1) % 5) + 1 : 0, milestone: combo > 0 && combo % 5 === 0 };
+}
+function updateComboProgress() {
+    const progress = getQCComboProgress(state.combo);
+    document.getElementById('qc-charge-label').textContent = qt(progress.milestone ? 'comboReached' : 'comboGoal', { n: progress.target });
+    document.getElementById('qc-charge-pips').innerHTML = Array.from({ length: 5 }, (_, index) => `<i${index < progress.filled ? ' class="filled"' : ''}></i>`).join('');
+    document.getElementById('qc-charge').classList.toggle('is-milestone', progress.milestone);
+    document.getElementById('qc-container').dataset.comboTier = String(Math.min(3, Math.floor(state.combo / 5)));
+}
+
 function updateTimerBarDOM(snap = false) {
+    document.getElementById('qc-time-display').classList.toggle('is-urgent', state.isPlaying && state.timeLeft <= 5000);
     const bar = document.getElementById('qc-timer-bar');
     // Calculate percentage based on mode
     let maxTime;

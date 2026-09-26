@@ -16,7 +16,7 @@ let state = {
     currentLevel: null,
     mode: "classic",
     size: 3,
-    minMoves: 0,
+    minMoves: 0, // Legacy name: generated move target, not a proven optimum.
 
     board: [],
     moves: 0,
@@ -404,7 +404,7 @@ function startLevel(packId, levelIdx) {
 
     // Update UI headers
     document.getElementById('tt-game-level-lbl').textContent = `Pack ${pack.id} - Level ${levelIdx}`;
-    document.getElementById('tt-game-star-req-lbl').textContent = `⭐⭐⭐ ≤ ${state.minMoves} moves`;
+    document.getElementById('tt-game-star-req-lbl').textContent = (typeof I18n !== 'undefined' && I18n.currentLang === 'ko' ? `⭐⭐⭐ 목표: ${state.minMoves}회 이내` : `⭐⭐⭐ Target: ≤ ${state.minMoves} moves`);
     updateMoveCounter();
 
     buildBoardDOM();
@@ -451,27 +451,68 @@ function buildBoardDOM() {
     gridEl.style.gridTemplateColumns = `repeat(${state.size}, 1fr)`;
     gridEl.style.gridTemplateRows = `repeat(${state.size}, 1fr)`;
 
-    // Calculate tile sizes
-    const containerWidth = Math.min(window.innerWidth - 64, 400); // minus padding
-    const gap = 8;
-    const tileSize = (containerWidth - (gap * (state.size - 1))) / state.size;
 
     for (let i = 0; i < state.board.length; i++) {
-        const tile = document.createElement('div');
+        const tile = document.createElement('button');
+        tile.type = 'button';
         tile.className = 'tt-tile';
-        tile.style.width = `${tileSize}px`;
-        tile.style.height = `${tileSize}px`;
+        tile.style.width = '100%';
+        tile.style.aspectRatio = '1';
         tile.id = `tt-tile-${i}`;
 
         applyTileStateCSS(tile, state.board[i], state.mode);
 
         tile.addEventListener('click', () => handleTileTap(i));
+        tile.addEventListener('pointerenter', () => previewTileTurn(i));
+        tile.addEventListener('pointerleave', clearTileTurnPreview);
+        tile.addEventListener('focus', () => previewTileTurn(i));
+        tile.addEventListener('blur', clearTileTurnPreview);
 
         gridEl.appendChild(tile);
     }
 }
 
+function clearTileTurnPreview() {
+    document.querySelectorAll('.tt-preview').forEach(tile => tile.classList.remove('tt-preview'));
+}
+
+function getTileTurnPreview(idx) {
+    const affected = getAffectedIndices(idx, state.size, 'classic');
+    const preview = new Set(affected);
+    if (state.mode === 'cascade') {
+        affected.filter(i => state.board[i] === 0).forEach(i => {
+            getAffectedIndices(i, state.size, 'classic').filter(n => n !== i).forEach(n => preview.add(n));
+        });
+    }
+    return [...preview];
+}
+
+function previewTileTurn(idx) {
+    clearTileTurnPreview();
+    if (!state.isPlaying) return;
+    getTileTurnPreview(idx).forEach(i => document.getElementById('tt-tile-' + i)?.classList.add('tt-preview'));
+}
+
+function updateTileTurnGoal() {
+    const goal = document.getElementById('tt-goal');
+    if (!goal) return;
+    const ko = typeof I18n !== 'undefined' && I18n.currentLang === 'ko';
+    const target = state.mode === 'spectrum' ? 2 : 1;
+    const ready = state.board.filter(value => value === target).length;
+    const total = state.board.length;
+    goal.textContent = ko
+        ? (state.mode === 'spectrum' ? '모든 타일을 ✓로 · ' : '모든 타일을 켜세요 · ') + ready + '/' + total + ' 완료'
+        : (state.mode === 'spectrum' ? 'Turn every tile to ✓ · ' : 'Light every tile · ') + ready + '/' + total + ' ready';
+}
+
 function applyTileStateCSS(tileEl, val, mode) {
+    const ko = typeof I18n !== 'undefined' && I18n.currentLang === 'ko';
+    tileEl.textContent = mode === 'spectrum' ? ['○', '◆', '✓'][val] : (val === 1 ? '●' : '○');
+    const names = mode === 'spectrum' ? (ko ? ['꺼짐','파랑','초록 목표'] : ['off','blue','green target']) : (ko ? ['꺼짐','켜짐'] : ['off','on']);
+    const index = Number(tileEl.id.replace('tt-tile-', ''));
+    tileEl.setAttribute('aria-label', (ko ? '타일 ' : 'Tile ') + (index+1) + ': ' + names[val]);
+    tileEl.setAttribute('aria-pressed', String(val === (mode === 'spectrum' ? 2 : 1)));
+
     // Reset all spec and on classes
     tileEl.classList.remove('is-on', 'spec-0', 'spec-1', 'spec-2');
 
@@ -483,6 +524,7 @@ function applyTileStateCSS(tileEl, val, mode) {
 }
 
 function refreshBoardDOM() {
+    updateTileTurnGoal();
     for (let i = 0; i < state.board.length; i++) {
         const tile = document.getElementById(`tt-tile-${i}`);
         if (tile) applyTileStateCSS(tile, state.board[i], state.mode);
@@ -491,6 +533,7 @@ function refreshBoardDOM() {
 
 function updateMoveCounter() {
     document.getElementById('tt-move-count').textContent = state.moves;
+    updateTileTurnGoal();
 }
 
 function handleTileTap(idx) {
@@ -589,6 +632,8 @@ function handleTileTap(idx) {
 
 function checkWinCondition() {
     if (!state.isPlaying) return;
+    updateTileTurnGoal();
+    clearTileTurnPreview();
 
     let isWin = false;
     if (state.mode === 'classic' || state.mode === 'cascade') {
@@ -620,7 +665,7 @@ function handleWin() {
     // Calculate Score per SKILL.md: 300 base + efficiency + no-hint ×1.2 + pack clear 2000
     let score = 300;
     if (state.moves <= state.minMoves) {
-        score += (state.minMoves) * 50; // efficiency bonus for minimum moves
+        score += (state.minMoves) * 50; // bonus for reaching the generated move target
     } else {
         score += Math.max(0, (state.minMoves * 2 - state.moves) * 20);
     }
@@ -656,10 +701,11 @@ function handleWin() {
 
     document.getElementById('tt-res-stars').innerHTML = starHtml;
 
-    let msg = `Score: ${score}`;
-    if (stars === 3) msg += ' — Perfect! Minimum moves.';
-    else if (stars === 2) msg += ' — Great! Close to minimum.';
-    else msg += ' — Cleared! Try fewer moves.';
+    const ko = typeof I18n !== 'undefined' && I18n.currentLang === 'ko';
+    let msg = (ko ? '점수: ' : 'Score: ') + score;
+    if (stars === 3) msg += ko ? ' — 목표 횟수 달성!' : ' — Move target reached!';
+    else if (stars === 2) msg += ko ? ' — 목표에서 두 수 이내!' : ' — Within two moves of the target!';
+    else msg += ko ? ' — 완료! 더 적은 수에도 도전해 보세요.' : ' — Cleared! Try fewer moves.';
 
     document.getElementById('tt-res-msg').textContent = msg;
 
@@ -737,7 +783,7 @@ window.shareTT = function () {
         grid += '\n';
     }
     let text = `🔄 TileTurn Pack ${state.currentPackId} Lvl ${state.currentLevel}\n`;
-    text += `✅ Solved in ${state.moves} moves (min: ${state.minMoves})\n`;
+    text += `✅ Solved in ${state.moves} moves (target: ${state.minMoves})\n`;
     text += grid;
     text += 'puzzlevault.pages.dev/tileturn';
     if (typeof shareResult === 'function') shareResult(text);
@@ -750,7 +796,7 @@ window.useTileTurnHint = function () {
     const revealHint = () => {
         if (state.hintsUsed === 0) state.hintsUsed++;
 
-        // Reset board to pristine state to show the perfect solution
+        // Reset board to demonstrate the generated solution sequence
         if (state.history.length > 0) {
             state.board = [...state.history[0].board];
             state.history = [];

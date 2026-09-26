@@ -34,19 +34,19 @@ const BLOG_POSTS = [
     {
         slug: 'why-we-built-puzzlevault-with-vanilla-js',
         title: {
-            en: 'Why We Built PuzzleVault with Vanilla JS (No Frameworks)',
-            ko: '퍼즐볼트가 React 대신 바닐라 자바스크립트를 선택한 이유',
-            ja: 'PuzzleVaultがVanilla JSで構築された理由（フレームワーク不使用）',
-            zh: '为什么我们使用原生JS构建PuzzleVault（不使用框架）',
-            es: 'Por Qué Construimos PuzzleVault con Vanilla JS (Sin Frameworks)'
-        },
+          "en": "Why PuzzleVault Uses Vanilla JavaScript",
+          "ko": "PuzzleVault가 바닐라 JavaScript를 사용하는 이유",
+          "ja": "PuzzleVaultが素のJavaScriptを使う理由",
+          "zh": "PuzzleVault为何使用原生JavaScript",
+          "es": "Por qué PuzzleVault usa JavaScript sin frameworks"
+},
         description: {
-            en: 'Discover why PuzzleVault rejected modern JavaScript frameworks like React and Vue, opting for pure Vanilla JS to ensure peak performance and zero loading times.',
-            ko: '가장 빠른 로딩 시간과 최고의 성능을 위해 PuzzleVault가 React나 Vue 같은 최신 프레임워크를 버리고 순수 바닐라 JS를 선택한 이유를 알아봅니다.',
-            ja: 'PuzzleVaultがReactやVueのような最新のJavaScriptフレームワークを却下し、最高のパフォーマンスとゼロのロード時間を確保するために純粋なVanilla JSを選んだ理由を発見してください。',
-            zh: '了解为什么PuzzleVault拒绝使用React和Vue等现代JavaScript框架，而选择纯原生JS以确保峰值性能和零加载时间。',
-            es: 'Descubre por qué PuzzleVault rechazó frameworks de JavaScript modernos como React y Vue, optando por puro Vanilla JS para asegurar un rendimiento máximo y tiempos de carga cero.'
-        },
+          "en": "A look at PuzzleVault’s HTML, CSS and JavaScript architecture: direct drawing, small modules, browser storage, and the work required to keep games responsive.",
+          "ko": "PuzzleVault의 HTML·CSS·JavaScript 구조를 살펴봅니다. 직접 그리기, 게임별 코드 분리, 브라우저 저장과 반응성 검증의 실제 역할을 설명합니다.",
+          "ja": "HTML・CSS・JavaScriptで作るPuzzleVaultの構成を紹介。描画、ゲーム別のコード、保存機能と操作性の確認について説明します。",
+          "zh": "了解PuzzleVault的HTML、CSS与JavaScript结构，以及直接绘图、独立游戏模块、浏览器存储和实际操作测试之间的关系。",
+          "es": "Así se organiza PuzzleVault con HTML, CSS y JavaScript: dibujo directo, módulos por juego, almacenamiento del navegador y pruebas de respuesta."
+},
         date: '2026-03-29',
         category: 'updates',
         tags: ['performance'],
@@ -76,19 +76,19 @@ const BLOG_POSTS = [
     {
         slug: 'the-math-behind-sortstack',
         title: {
-            en: 'The Math Behind SortStack: Guaranteeing Every Puzzle is Solvable',
-            ko: 'SortStack 퍼즐 디자인에 숨겨진 수학: 모든 퍼즐이 100% 풀리는 원리',
-            ja: 'SortStackの背後にある数学：すべてのパズルが解けることを保証する方法',
-            zh: 'SortStack背后的数学：保证每个谜题都可解',
-            es: 'Las Matemáticas Detrás de SortStack: Garantizando que Cada Puzzle Tenga Solución'
-        },
+          "en": "SortStack Puzzle Generation and Move Limits",
+          "ko": "SortStack의 퍼즐 생성 방식과 이동 제한",
+          "ja": "SortStackのパズル生成と手数制限",
+          "zh": "SortStack的谜题生成与步数限制",
+          "es": "Cómo genera SortStack sus puzzles y límites de movimientos"
+},
         description: {
-            en: 'Ever wonder if a sorting puzzle is actually impossible? Discover the mathematical reverse-moves algorithm PuzzleVault utilizes to ensure every level is 100% solvable.',
-            ko: '퍼즐을 풀다가 아예 풀 수 없는 문제라고 의심해본 적이 있나요? PuzzleVault가 무작위 배치를 거부하고 역추적 백트래킹 수학 알고리즘을 사용한 이유를 밝힙니다.',
-            ja: '並べ替えパズルが本当に不可能だと疑問に思ったことはありませんか？PuzzleVaultがすべてのレベルで100%解けることを保証するために利用している数学的なリバースムーブアルゴリズムを発見してください。',
-            zh: '有没有想过排序拼图是否实际上是不可能的？发现PuzzleVault用来确保每个关卡100%可解的数学反向移动算法。',
-            es: '¿Alguna vez te has preguntado si un puzzle de clasificación es realmente imposible? Descubre el algoritmo matemático de movimientos inversos que utiliza PuzzleVault para asegurar que cada nivel sea 100% resoluble.'
-        },
+          "en": "How SortStack builds a starting board with reverse moves, why that differs from finding a shortest solution, and how to use spare tubes effectively.",
+          "ko": "SortStack의 역방향 이동 생성 방식, 최단 풀이와 이동 제한의 차이, 빈 튜브를 활용하는 판단 기준을 설명합니다.",
+          "ja": "逆向きの移動で盤面を作る仕組みと、最短解や手数制限との違いを説明。空のチューブを使う判断にも役立ちます。",
+          "zh": "了解SortStack如何通过反向移动生成棋盘、为何这不等于最短解证明，以及如何更有效地使用空管。",
+          "es": "El generador por movimientos inversos de SortStack, su diferencia con una solución mínima y formas de aprovechar los tubos vacíos."
+},
         date: '2026-03-29',
         category: 'science',
         tags: ['sortstack', 'math', 'strategy'],
@@ -97,40 +97,40 @@ const BLOG_POSTS = [
     {
         slug: '5-tips-to-boost-your-brain-with-puzzles',
         title: {
-            en: '5 Science-Backed Ways Puzzle Games Boost Your Brain',
-            ko: '퍼즐 게임이 두뇌를 강화하는 과학적으로 입증된 5가지 방법',
-            ja: 'パズルゲームが脳を鍛える科学的に証明された5つの方法',
-            zh: '益智游戏提升大脑的5种科学方法',
-            es: '5 Formas Científicamente Comprobadas de Mejorar tu Cerebro con Puzzles'
+            en: 'Five Practical Ways to Enjoy PuzzleVault',
+            ko: 'PuzzleVault를 더 즐겁게 플레이하는 다섯 가지 방법',
+            ja: 'PuzzleVaultを楽しく遊ぶための5つのヒント',
+            zh: '更愉快地玩PuzzleVault的五个实用方法',
+            es: 'Cinco formas prácticas de disfrutar de PuzzleVault'
         },
         description: {
-            en: 'Discover how daily puzzle play strengthens memory, sharpens focus, and builds cognitive resilience — backed by real research.',
-            ko: '매일 퍼즐을 풀면 기억력이 강화되고, 집중력이 높아지며, 인지 회복력이 향상된다는 연구 결과를 알아보세요.',
-            ja: '毎日のパズルプレイが記憶力を強化し、集中力を高め、認知的レジリエンスを構築する方法を発見しましょう。',
-            zh: '了解每日益智游戏如何增强记忆力、提高注意力并建立认知韧性——基于真实研究。',
-            es: 'Descubra cómo jugar puzzles diariamente fortalece la memoria, agudiza la concentración y construye resiliencia cognitiva.'
+            en: "Choose a clear goal, read the feedback, leave room for your next move, and build a puzzle session that feels satisfying.",
+            ko: "작은 목표 정하기, 피드백 읽기, 다음 수를 위한 공간 남기기와 같은 조건에서 다시 도전하는 실용적인 퍼즐 팁입니다.",
+            ja: "小さな目標、フィードバック、次の一手の空間、同じ条件での再挑戦を使う実用的な遊び方。",
+            zh: "设定小目标，读懂反馈，为下一步留空间，用相同条件练习，并在自己选择的节点休息。",
+            es: "Elige una meta, interpreta las pistas, reserva espacio para el próximo movimiento y practica en condiciones comparables."
         },
         date: '2026-03-01',
-        category: 'science',
+        category: 'tips',
         tags: ['memory', 'patternpop', 'numvault', 'brain'],
         readTime: 5
     },
     {
         slug: 'gridsmash-beginner-strategy-guide',
         title: {
-            en: "GridSmash Beginner's Guide: Score 10,000+ Every Time",
-            ko: 'GridSmash 초보자 가이드: 매번 10,000점 이상 달성하기',
-            ja: 'GridSmash初心者ガイド：毎回10,000点以上を獲得する方法',
-            zh: 'GridSmash新手攻略：每次达到10,000分以上',
-            es: 'Guía para Principiantes de GridSmash: Cómo Conseguir 10,000+ Puntos'
-        },
+          "en": "GridSmash Strategy: Leave Space and Plan Your Clears",
+          "ko": "GridSmash 전략: 공간을 남기고 다음 줄 지우기",
+          "ja": "GridSmash攻略：空間を残して次の消去を考える",
+          "zh": "GridSmash攻略：保留空间，规划下一次消除",
+          "es": "Estrategia de GridSmash: deja espacio y prepara las líneas"
+},
         description: {
-            en: 'Master block placement, dominate the Shatter Zone, and use special blocks like a pro with these proven GridSmash strategies.',
-            ko: '블록 배치를 마스터하고, 셰터 존을 지배하며, 검증된 GridSmash 전략으로 특수 블록을 프로처럼 활용하세요.',
-            ja: 'ブロック配置をマスターし、シャッターゾーンを制覇し、実証済みのGridSmash攻略法でスペシャルブロックをプロのように使いこなそう。',
-            zh: '掌握方块放置技巧，统治粉碎区，用这些经过验证的GridSmash策略像专业玩家一样使用特殊方块。',
-            es: 'Domina la colocación de bloques, controla la Zona de Destrucción y usa los bloques especiales como un profesional con estas estrategias probadas.'
-        },
+          "en": "Practical GridSmash decisions: fit the whole tray, preserve useful spaces, understand clearing streaks, and plan around special blocks and the Shatter Zone.",
+          "ko": "세 조각을 함께 계획하고 빈 공간을 지키는 GridSmash 공략입니다. 연속 줄 완성, 특수 블록, Shatter Zone의 실제 작동도 설명합니다.",
+          "ja": "3つのピースをまとめて考え、使える空間を守る攻略。連続消去、特殊ブロック、Shatter Zoneの実際の動きも説明します。",
+          "zh": "把三块拼块一起考虑，保留可用空位，并理解连续消除、特殊方块与Shatter Zone的实际规则。",
+          "es": "Planifica las tres piezas, conserva espacios útiles y entiende las rachas, los bloques especiales y la Zona de Destrucción de GridSmash."
+},
         date: '2026-02-25',
         category: 'strategy',
         tags: ['gridsmash', 'strategy', 'tips'],
@@ -146,12 +146,12 @@ const BLOG_POSTS = [
             es: 'Cómo Construir una Racha de 30 Días en los Desafíos Diarios'
         },
         description: {
-            en: 'Practical tips and game-specific strategies to build an unbreakable daily puzzle habit and keep your streak alive.',
-            ko: '깨지지 않는 매일 퍼즐 습관을 만들고 연속 기록을 유지하기 위한 실용적인 팁과 게임별 전략.',
-            ja: '壊れない毎日のパズル習慣を作り、連続記録を維持するための実用的なヒントとゲーム別攻略法。',
-            zh: '建立不可打破的每日益智习惯并保持连胜记录的实用技巧和游戏策略。',
-            es: 'Consejos prácticos y estrategias específicas para construir un hábito diario de puzzles inquebrantable.'
-        },
+          "en": "Choose an optional puzzle routine, understand UTC daily resets and local records, and practice at your own pace.",
+          "ko": "UTC 기준 데일리 갱신과 브라우저 기록을 이해하고, 내 속도에 맞춰 즐겁게 반복 연습하는 방법입니다.",
+          "ja": "UTC基準のデイリー更新とブラウザ内の記録を知り、自分のペースでパズルを楽しむためのヒント。",
+          "zh": "了解UTC每日更新和浏览器本地记录，按自己的节奏选择练习与休息。",
+          "es": "Elige una rutina opcional, conoce el reinicio diario en UTC y los registros locales, y practica a tu ritmo."
+},
         date: '2026-02-20',
         category: 'tips',
         tags: ['daily', 'numvault', 'gridsmash', 'colorflow', 'streak'],
@@ -181,19 +181,19 @@ const BLOG_POSTS = [
     {
         slug: 'numvault-tips-and-strategy',
         title: {
-            en: 'How to Master Number Puzzles: Tips for NumVault',
-            ko: '숫자 퍼즐 마스터하기: NumVault 공략 팁',
-            ja: '数字パズルをマスターする方法：NumVault攻略のコツ',
-            zh: '如何掌握数字谜题：NumVault攻略技巧',
-            es: 'Cómo Dominar los Puzzles Numéricos: Consejos para NumVault'
-        },
+          "en": "NumVault Strategy: Read Every Clue",
+          "ko": "NumVault 전략: 단서를 끝까지 읽는 방법",
+          "ja": "NumVault攻略：すべての手掛かりを読む",
+          "zh": "NumVault攻略：读懂每一条线索",
+          "es": "Estrategia de NumVault: interpreta cada pista"
+},
         description: {
-            en: 'Master NumVault with these proven number deduction strategies. Learn systematic elimination, first-guess tactics, and how to solve any code in 6 tries or fewer.',
-            ko: '검증된 숫자 추론 전략으로 NumVault를 마스터하세요. 체계적 소거법, 첫 번째 추측 전술, 6번 이내로 모든 코드를 풀는 방법을 알아보세요.',
-            ja: '実証済みの数字推理戦略でNumVaultをマスターしよう。体系的消去法、初手のテクニック、6回以内で任意のコードを解く方法を学びます。',
-            zh: '用这些经过验证的数字推理策略掌握NumVault。学习系统排除法、首次猜测技巧，以及如何在6次以内破解任何密码。',
-            es: 'Domina NumVault con estas estrategias de deducción numérica probadas. Aprende eliminación sistemática y cómo resolver cualquier código en 6 intentos o menos.'
-        },
+          "en": "Use NumVault’s position clues, handle repeated digits correctly, and choose informative guesses without assuming a fixed number of attempts will always work.",
+          "ko": "자리 단서와 중복 숫자를 정확히 해석하고, 남은 시도에 맞춰 정보를 얻는 NumVault 추측 전략을 알아봅니다.",
+          "ja": "位置のヒントと重複数字を正しく読み、残りの回数に合わせて情報を得るNumVaultの考え方を紹介します。",
+          "zh": "正确理解位置提示和重复数字，根据剩余次数选择有信息价值的猜测，而不假定固定次数内必能解开所有密码。",
+          "es": "Interpreta posiciones y dígitos repetidos, y elige intentos informativos en NumVault sin asumir que todos los códigos se resuelven en una cifra fija de jugadas."
+},
         date: '2026-02-28',
         category: 'strategy',
         tags: ['numvault', 'tips', 'strategy'],
