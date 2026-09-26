@@ -4,7 +4,7 @@
 
     const STORAGE_KEY = 'pv_player_progress';
     const GAMES = ['numvault', 'gridsmash', 'patternpop', 'sortstack', 'quickcalc',
-        'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch'];
+        'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch', 'mosslight', 'cloudweft'];
     const MISSION_IDS = ['rounds', 'explorer', 'daily'];
     const BADGE_IDS = ['first_round', 'explorer', 'streak_3', 'century'];
     const ROUND_XP = 20;

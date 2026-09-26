@@ -190,6 +190,6 @@ test('the current public site passes the same audit used before publishing', () 
     assert.equal(result.status, 0, result.stdout + result.stderr);
     const report = JSON.parse(result.stdout);
     assert.ok(report.pages_checked > 0);
-    assert.equal(report.games_checked, 10);
+    assert.equal(report.games_checked, 12);
     assert.equal(report.blocker_count, 0);
 });

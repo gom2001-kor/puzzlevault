@@ -68,7 +68,7 @@
         "watchAdUndo": "Undo the last move?",
         "watchAdLife": "Continue with an extra life?",
         "adFreeNote": "Free to play. Help is currently available without ads.",
-        "tryAnotherPuzzle": "Try Another Puzzle",
+        "tryAnotherPuzzle": "Try another game",
         "viewAll": "View All",
         "readMore": "Read →",
         "minuteRead": "{min} min read",
@@ -79,15 +79,15 @@
         "faq": "Frequently Asked Questions"
     },
     "landing": {
-        "title": "PuzzleVault — Free Online Puzzle Games",
-        "metaDesc": "Play 10 free brain puzzle games directly in your browser. No download, no account needed. Daily challenges, score tracking, and more.",
-        "hero": "Free Brain Puzzles — No Download Needed",
-        "heroSub": "Challenge your mind with 10 unique puzzle games. Play directly in your browser.",
+        "title": "PuzzleVault — Free 3D Adventures & Puzzle Games",
+        "metaDesc": "Play 12 free browser games: two original 3D adventures and ten puzzles. Restore a forest, explore floating islands, or try a quick daily challenge. No download.",
+        "hero": "A little world. A real adventure.",
+        "heroSub": "Step into a living forest or follow a path through the clouds. Two new worlds to explore, alongside ten familiar puzzles.",
         "dailyHeading": "📅 Today's Daily Challenges",
         "dailySub": "Fresh puzzles every day — can you keep your streak alive?",
         "streakBadge": "🔥 Your Streak: {count} days",
         "allGamesHeading": "Find your next favorite",
-        "allGamesSub": "Ten ways to take a good little break.",
+        "allGamesSub": "Two 3D adventures and ten puzzles. Choose your kind of play.",
         "playBtn": "Play ▸",
         "blogHeading": "📝 Latest from the Blog",
         "blogSub": "Game guides, worked examples, and project notes",
@@ -320,6 +320,16 @@
             "guide3": "After a clear, tiles settle along the board's slanted columns and refill while leaving the top of each column open. Every eighth completed chain triggers Rising Tide, which shifts the columns upward and adds new tiles below. If an occupied top cell would be pushed out, the run ends. A countdown helps you prepare before the next rise. The hint button highlights a numbered path of four crystals when possible, otherwise a valid three-crystal path. Follow those numbers rather than tracing an entire connected group. If there is no match, the shuffle button rearranges colors. Continue is available once after a run ends.",
             "guideTitle": "How to Play HexMatch",
             "articleGuide": "<a href=\"/blog/posts/hexmatch-chains-and-special-gems-guide.html\">HexMatch: trace a real chain and use special gems correctly →</a>"
+        },
+        "mosslight": {
+            "name": "Mosslight Wardens",
+            "tagline": "Restore the forest and shape your own 3D adventure",
+            "metaDesc": "Play Mosslight Wardens, an original browser 3D action RPG. Restore forest beacons, choose upgrades, and explore three zones with keyboard or touch controls."
+        },
+        "cloudweft": {
+            "name": "Cloudweft Passage",
+            "tagline": "Switch sun and moon to cross the floating isles",
+            "metaDesc": "Explore floating islands in Cloudweft Passage, an original 3D browser adventure. Switch sun and moon paths, jump across gaps, and complete three chapters."
         }
     },
     "blog": {
@@ -394,7 +404,7 @@
         "locked": "Not yet unlocked",
         "welcomeBack": "A little more progress?",
         "continueGame": "Continue {game}",
-        "all": "All puzzles",
+        "all": "All games",
         "quick": "Quick thinking",
         "logic": "Logic & strategy",
         "relax": "Find your flow",
@@ -406,6 +416,29 @@
         "share": "Share today’s progress",
         "shareInvite": "Try a 30-second challenge with me!",
         "gamesTitle": "Find your next favorite",
-        "gamesSub": "Ten ways to take a good little break."
+        "gamesSub": "Two 3D adventures and ten puzzles. Choose your kind of play.",
+        "adventure": "3D adventures"
+    },
+    "flagship": {
+        "heading": "A little world. A real adventure.",
+        "kicker": "Two original 3D adventures",
+        "intro": "Step into a living forest or follow a path through the clouds. Two new worlds to explore, alongside ten familiar puzzles.",
+        "original": "PUZZLEVAULT ORIGINAL",
+        "mossGenre": "3D action RPG",
+        "cloudGenre": "3D exploration adventure",
+        "mossHook": "Carry a spark into the overgrown wilds. Restore beacons, outmaneuver forest creatures, and choose upgrades that change your next encounter.",
+        "cloudHook": "Some paths belong to sunlight. Others appear under the moon. Jump between floating islands and switch the sky to find your way home.",
+        "mossTag1": "Three forest zones",
+        "mossTag2": "Choose your upgrades",
+        "mossTag3": "Restore the beacons",
+        "cloudTag1": "Three chapters",
+        "cloudTag2": "Sun / moon paths",
+        "cloudTag3": "Explore and jump",
+        "mossPlay": "Enter the forest",
+        "cloudPlay": "Follow the clouds",
+        "controls": "Keyboard or on-screen touch controls",
+        "free": "Free to play",
+        "account": "No account required",
+        "browser": "Play in your browser"
     }
 }

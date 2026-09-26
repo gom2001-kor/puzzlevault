@@ -9,13 +9,13 @@ FORM = 'https://forms.gle/NBjCNdVCBGaGGcbM9'
 COPY = {
     'en': {
         'updated': 'Updated', 'privacy': 'Privacy policy', 'about': 'About PuzzleVault', 'contact': 'Contact & feedback', 'terms': 'Terms of use',
-        'settings': 'Change privacy choices', 'form': 'Open the feedback form', 'games': 'Explore all ten games',
+        'settings': 'Change privacy choices', 'form': 'Open the feedback form', 'games': 'Explore all twelve games',
         'aboutSections': [
-            ('A small collection made for playing', 'PuzzleVault is a browser-game project with ten puzzles based on numbers, patterns, colors and spatial decisions. You can start a game without creating an account or installing an app. The project combines original interfaces and implementations of familiar puzzle principles with daily goals and local progress.'),
-            ('Choose your kind of challenge', 'NumVault asks you to deduce a hidden code. PatternPop tests recall of a displayed sequence. QuickCalc offers timed arithmetic, including a 30-second friend challenge. GridSmash, MergeChain and HexMatch reward careful placement and combinations. SortStack, TileTurn, ColorFlow and PipeLink offer step-by-step spatial puzzles. Each game page explains its rules, controls and available modes.'),
+            ('A small collection made for playing', 'PuzzleVault brings together two original 3D adventures and ten puzzles based on numbers, patterns, colors and spatial decisions. Start without an account or app installation. Short puzzle rounds sit alongside longer journeys with checkpoints, daily challenges and progress saved in your browser.'),
+            ('Choose your kind of challenge', 'NumVault asks you to deduce a hidden code. PatternPop tests recall of a displayed sequence. QuickCalc offers timed arithmetic, including a 30-second friend challenge. GridSmash, MergeChain and HexMatch reward careful placement and combinations. SortStack, TileTurn, ColorFlow and PipeLink offer step-by-step spatial puzzles. Each game page explains its rules, controls and available modes. Mosslight Wardens adds a forest action RPG: plant healing light gardens, restore beacons and choose upgrades. Cloudweft Passage is a 3D platform adventure where changing between sun and moon reveals different bridges between floating islands.'),
             ('Records that belong to your browser', 'Finished rounds earn experience toward local levels and badges. Three daily missions reset at midnight UTC. Your scores, settings and progress are stored in this browser; they are not an online account or a verified public leaderboard. Clearing site data, switching browsers or using another device may start a separate record.'),
             ('A fair invitation to a friend', 'QuickCalc challenge links preserve the question seed and a self-reported target score. Players get the same question sequence and answer positions, with a 30-second limit and a three-second penalty for a wrong answer. The challenge does not allow time bonuses or hints. Replaying a course is practice, and shared scores are not independently verified.'),
-            ('How the games are presented', 'The games use HTML, CSS, Canvas and browser audio. Raised tiles, shaded pieces and animated feedback make actions easier to see. These are dimensional visuals on puzzle boards, not a promise of a full 3D world. Reduced-motion preferences limit decorative effects. Loading speed and smoothness depend on the device and browser.'),
+            ('How the games are presented', 'The two main adventures use original low-poly models rendered with WebGL, with depth, perspective and lighting. The ten board puzzles use HTML, CSS and Canvas with raised tiles and shaded pieces. Sounds are generated in the browser. The 3D games require WebGL; graphics speed depends on the device. Touch buttons and keyboard controls are explained on each page.'),
             ('Editorial care and feedback', 'Guides explain the games that are actually available. Tips are suggestions for play, not medical or educational guarantees. We revise material when mechanics change or an error is reported. Use the contact page to report a broken level, confusing control, accessibility issue or incorrect article. Reports should identify the game, mode and steps needed to reproduce the issue.'),
             ('Keeping the project available', 'Games are free to access. Advertising may help support the project when an approved advertising setup is active. Optional analytics is off until allowed through the privacy controls. Game access does not depend on clicking an advertisement. Privacy details and the external feedback service are described on the linked pages below.')
         ],
@@ -43,13 +43,13 @@ COPY = {
         ]
     },
     'ko': {
-        'updated':'수정일', 'privacy':'개인정보 처리방침', 'about':'PuzzleVault 소개', 'contact':'문의와 의견 보내기', 'terms':'이용약관', 'settings':'개인정보 설정 변경', 'form':'의견 보내기 양식 열기', 'games':'10가지 게임 둘러보기',
+        'updated':'수정일', 'privacy':'개인정보 처리방침', 'about':'PuzzleVault 소개', 'contact':'문의와 의견 보내기', 'terms':'이용약관', 'settings':'개인정보 설정 변경', 'form':'의견 보내기 양식 열기', 'games':'12가지 게임 둘러보기',
         'aboutSections':[
-            ('가볍게 시작하는 열 가지 퍼즐','PuzzleVault는 숫자, 패턴, 색상과 공간적 판단을 활용하는 브라우저 퍼즐 프로젝트입니다. 계정이나 앱 설치 없이 게임을 시작할 수 있습니다. 익숙한 퍼즐 원리를 직접 구현한 인터페이스에 일일 목표와 브라우저 내 성장 기록을 더했습니다.'),
-            ('취향에 맞는 도전','NumVault는 비밀 숫자 추리, PatternPop은 순서 기억, QuickCalc는 시간 제한 연산 게임입니다. GridSmash·MergeChain·HexMatch에서는 배치와 조합을 고민하고, SortStack·TileTurn·ColorFlow·PipeLink에서는 단계별 공간 퍼즐을 풀 수 있습니다. 각 게임 페이지에서 실제 규칙과 조작법, 제공 모드를 확인하세요.'),
+            ('퍼즐과 탐험을 함께 즐기는 게임 모음','PuzzleVault는 직접 만든 3D 모험 게임 2개와 숫자·패턴·색상·공간 판단을 활용하는 퍼즐 10개를 제공합니다. 계정이나 앱 설치 없이 시작할 수 있습니다. 짧은 퍼즐 한 판부터 체크포인트와 성장 선택이 있는 탐험까지 즐기고, 진행 상황은 현재 브라우저에 저장합니다.'),
+            ('취향에 맞는 도전','NumVault는 비밀 숫자 추리, PatternPop은 순서 기억, QuickCalc는 시간 제한 연산 게임입니다. GridSmash·MergeChain·HexMatch에서는 배치와 조합을 고민하고, SortStack·TileTurn·ColorFlow·PipeLink에서는 단계별 공간 퍼즐을 풀 수 있습니다. 각 게임 페이지에서 실제 규칙과 조작법, 제공 모드를 확인하세요. 이끼빛 수호대는 빛의 정원을 심고 봉화를 복원하며 능력을 선택하는 숲속 액션 RPG입니다. 구름결 여정은 해와 달 상태를 바꿔 공중섬 사이의 다리를 찾아가는 3D 플랫폼 탐험 게임입니다.'),
             ('내 브라우저에 쌓이는 기록','완료한 게임으로 경험치를 모아 레벨과 배지를 얻습니다. 하루 세 가지 미션은 UTC 자정, 한국 시간 오전 9시에 갱신됩니다. 점수·설정·진행도는 현재 브라우저에 저장되며 온라인 계정이나 공인 순위가 아닙니다. 사이트 데이터를 지우거나 다른 기기를 사용하면 기록이 사라지거나 별도로 시작됩니다.'),
             ('친구에게 건네는 같은 문제','QuickCalc의 도전 링크에는 문제 생성값과 플레이어가 공유한 목표 점수가 담깁니다. 같은 문제와 선택지 순서, 30초 제한을 사용하며 오답은 3초를 차감합니다. 대결 중에는 힌트나 시간 보너스가 없습니다. 같은 코스로 연습할 수 있지만 공유 점수는 서버에서 검증한 대회 기록이 아닙니다.'),
-            ('입체감과 조작의 균형','HTML·CSS·Canvas·브라우저 오디오를 사용합니다. 돌출된 타일, 음영이 있는 조각, 행동에 반응하는 효과로 퍼즐 상태를 알아보기 쉽게 표현합니다. 이는 퍼즐판의 입체 표현이며 자유롭게 이동하는 3D 세계를 뜻하지 않습니다. 움직임 줄이기 설정을 반영하며 실제 속도는 기기와 브라우저에 따라 다릅니다.'),
+            ('입체감과 조작의 균형','두 메인 게임은 직접 만든 로우폴리 모델을 WebGL로 그려 원근감·깊이·조명을 표현합니다. 기존 퍼즐 10개는 HTML·CSS·Canvas의 돌출된 타일과 음영을 사용합니다. 효과음은 브라우저에서 합성합니다. 3D 게임에는 WebGL 지원이 필요하며 속도는 기기와 브라우저에 따라 다릅니다. 각 게임에 터치 버튼과 키보드 조작을 안내합니다.'),
             ('설명과 오류를 고치는 방법','공략은 현재 제공하는 게임을 기준으로 작성하고 기능 변경이나 오류 제보가 있으면 수정합니다. 퍼즐 팁은 플레이 제안이며 의학적 효능이나 학습 성과를 보장하지 않습니다. 풀리지 않는 레벨, 불편한 조작, 접근성·번역 문제는 게임 이름, 모드, 재현 순서와 함께 문의해 주세요.'),
             ('무료 이용과 운영','승인된 광고 설정이 활성화되면 광고가 프로젝트 운영에 도움이 될 수 있습니다. 선택적 분석은 개인정보 설정에서 허용하기 전까지 꺼져 있습니다. 광고 클릭은 게임 이용 조건이 아닙니다. 데이터 처리와 외부 문의 서비스는 아래 안내에서 확인할 수 있습니다.')
         ],
@@ -77,13 +77,13 @@ COPY = {
         ]
     },
     'ja': {
-        'updated':'更新日', 'privacy':'プライバシーポリシー', 'about':'PuzzleVaultについて', 'contact':'お問い合わせ・ご意見', 'terms':'利用規約', 'settings':'プライバシー設定を変更', 'form':'フィードバックフォームを開く', 'games':'10種類のゲームを見る',
+        'updated':'更新日', 'privacy':'プライバシーポリシー', 'about':'PuzzleVaultについて', 'contact':'お問い合わせ・ご意見', 'terms':'利用規約', 'settings':'プライバシー設定を変更', 'form':'フィードバックフォームを開く', 'games':'12種類のゲームを見る',
         'aboutSections':[
-            ('すぐに遊べるパズル集','PuzzleVaultは数字、記憶、色、空間を使う10種類のブラウザパズルのプロジェクトです。アカウントやアプリのインストールは不要です。親しまれているパズルの原理を独自の画面とコードで実装し、日々の目標と端末内の成長記録を加えています。'),
-            ('好きな挑戦を選ぶ','NumVaultは暗号推理、PatternPopは順番の記憶、QuickCalcは時間制限の計算です。GridSmash・MergeChain・HexMatchは配置と組み合わせ、SortStack・TileTurn・ColorFlow・PipeLinkは段階的な空間パズルです。各ページにルールと操作方法があります。'),
+            ('パズルと冒険を楽しむゲーム集','PuzzleVaultには独自の3Dアドベンチャー2作品と、数字・記憶・色・空間を使うパズル10作品があります。アカウントやアプリのインストールは不要です。短い一局からチェックポイントのある探索まで、進行状況は現在のブラウザに保存されます。'),
+            ('好きな挑戦を選ぶ','NumVaultは暗号推理、PatternPopは順番の記憶、QuickCalcは時間制限の計算です。GridSmash・MergeChain・HexMatchは配置と組み合わせ、SortStack・TileTurn・ColorFlow・PipeLinkは段階的な空間パズルです。各ページにルールと操作方法があります。 Mosslight Wardensは光の庭を植え、灯台を復元して能力を選ぶ森のアクションRPGです。Cloudweft Passageは太陽と月を切り替え、浮島の間に現れる橋をたどる3Dアドベンチャーです。'),
             ('ブラウザに残る記録','完了したプレイで経験値、レベル、バッジを獲得します。3つの日次ミッションはUTC午前0時に更新されます。記録はこのブラウザに保存され、アカウントや認証済みランキングではありません。サイトデータの消去や端末変更で失われる場合があります。'),
             ('友達と同じ問題で挑戦','QuickCalcの共有リンクには問題の生成値と本人申告の目標点数が入ります。同じ問題と選択肢の順番を30秒で解き、誤答は3秒減点します。対戦中はヒントや時間追加は使えません。再挑戦は練習用で、点数はサーバーで検証していません。'),
-            ('見やすい立体表現','HTML・CSS・Canvas・ブラウザ音声を使い、盛り上がるタイルや陰影、操作への反応を表現します。自由に移動する3D世界ではなく、パズル盤の立体的な見せ方です。動きを減らす設定を尊重し、速度は環境によって異なります。'),
+            ('見やすい立体表現','メインの2作品では独自のローポリモデルをWebGLで描画し、遠近感・奥行き・照明を表現します。パズル10作品はHTML・CSS・Canvasで立体感のある盤面を描きます。効果音はブラウザ内で合成します。3DゲームにはWebGLが必要で、速度は端末により異なります。各ページでタッチとキーボードの操作を説明します。'),
             ('説明の改善と運営','実際の機能に合わせてガイドを見直します。遊びの提案は医療効果や学習成果の保証ではありません。不具合や翻訳の指摘はゲーム名と再現手順を添えてご連絡ください。広告クリックは利用条件ではなく、任意の分析は許可前には動作しません。')
         ],
         'privacySections':[
@@ -110,13 +110,13 @@ COPY = {
         ]
     },
     'zh': {
-        'updated':'更新日期', 'privacy':'隐私政策', 'about':'关于PuzzleVault', 'contact':'联系与反馈', 'terms':'使用条款', 'settings':'更改隐私选择', 'form':'打开反馈表单', 'games':'探索十款游戏',
+        'updated':'更新日期', 'privacy':'隐私政策', 'about':'关于PuzzleVault', 'contact':'联系与反馈', 'terms':'使用条款', 'settings':'更改隐私选择', 'form':'打开反馈表单', 'games':'探索十二款游戏',
         'aboutSections':[
-            ('随时开始的益智游戏','PuzzleVault是一个包含十款数字、记忆、颜色与空间益智游戏的浏览器项目。无需账号或安装应用即可开始。我们独立实现常见益智原理的界面和代码，加入每日目标与本地成长记录。'),
-            ('选择适合你的挑战','NumVault侧重密码推理，PatternPop需要记住顺序，QuickCalc提供限时计算。GridSmash、MergeChain和HexMatch侧重放置与组合；SortStack、TileTurn、ColorFlow和PipeLink提供逐步解题的空间挑战。每款游戏页面介绍实际规则和操作。'),
+            ('益智与冒险的游戏合集','PuzzleVault提供两款原创3D冒险和十款数字、记忆、颜色与空间益智游戏。无需账号或安装应用即可开始。从短局解谜到带检查点的探索，进度保存在当前浏览器中。'),
+            ('选择适合你的挑战','NumVault侧重密码推理，PatternPop需要记住顺序，QuickCalc提供限时计算。GridSmash、MergeChain和HexMatch侧重放置与组合；SortStack、TileTurn、ColorFlow和PipeLink提供逐步解题的空间挑战。每款游戏页面介绍实际规则和操作。 Mosslight Wardens是一款森林动作RPG：种下光之花园、修复灯塔并选择升级。Cloudweft Passage则是切换太阳与月亮状态、寻找浮岛间桥梁的3D平台冒险。'),
             ('保存在浏览器的记录','完成游戏可获得经验、等级和徽章。三个每日任务在UTC零点更新。成绩保存在当前浏览器，并非在线账号或经验证的排行榜。清除网站数据或更换设备可能丢失记录。'),
             ('与朋友挑战相同题目','QuickCalc链接保留题目生成值和分享者提供的目标分数。双方获得相同题目和选项顺序，时间为30秒，答错扣3秒。对决不提供提示或加时。重玩用于练习，分数未经服务器核验。'),
-            ('立体表现与清晰操作','游戏使用HTML、CSS、Canvas和浏览器音频。凸起的方块、阴影和反馈帮助辨认游戏状态，这是平面棋盘的立体表现，不是自由移动的3D世界。我们尊重减少动态效果设置，性能取决于设备和浏览器。'),
+            ('立体表现与清晰操作','两款主打游戏使用自行制作的低多边形模型，由WebGL呈现透视、深度和光照。十款棋盘益智游戏使用HTML、CSS与Canvas表现凸起方块与阴影。音效在浏览器中合成。3D游戏需要WebGL支持，流畅度取决于设备。每个页面都有触控按钮和键盘操作说明。'),
             ('内容维护与运营','指南会随实际功能和错误反馈更新。技巧不是医疗效果或学习成果的保证。请通过联系页面提供游戏名、模式与复现步骤。基础游戏不要求点击广告，可选分析在允许前保持关闭。')
         ],
         'privacySections':[
@@ -143,13 +143,13 @@ COPY = {
         ]
     },
     'es': {
-        'updated':'Actualizado', 'privacy':'Política de privacidad', 'about':'Acerca de PuzzleVault', 'contact':'Contacto y comentarios', 'terms':'Condiciones de uso', 'settings':'Cambiar opciones de privacidad', 'form':'Abrir el formulario', 'games':'Explorar los diez juegos',
+        'updated':'Actualizado', 'privacy':'Política de privacidad', 'about':'Acerca de PuzzleVault', 'contact':'Contacto y comentarios', 'terms':'Condiciones de uso', 'settings':'Cambiar opciones de privacidad', 'form':'Abrir el formulario', 'games':'Explorar los doce juegos',
         'aboutSections':[
-            ('Una colección para jugar al instante','PuzzleVault es un proyecto con diez puzles de números, memoria, colores y decisiones espaciales. Puedes empezar sin cuenta ni aplicación. Combina implementaciones e interfaces propias de principios conocidos con metas diarias y progreso local.'),
-            ('Elige tu reto','NumVault trata de deducir un código, PatternPop de recordar secuencias y QuickCalc de calcular contrarreloj. GridSmash, MergeChain y HexMatch premian la colocación y las combinaciones. SortStack, TileTurn, ColorFlow y PipeLink ofrecen retos espaciales por etapas. Cada página explica las reglas y los controles disponibles.'),
+            ('Una colección de puzles y aventuras','PuzzleVault reúne dos aventuras 3D originales y diez puzles de números, memoria, colores y decisiones espaciales. Puedes empezar sin cuenta ni instalación. Hay partidas breves y recorridos más largos con puntos de control, retos diarios y progreso guardado en este navegador.'),
+            ('Elige tu reto','NumVault trata de deducir un código, PatternPop de recordar secuencias y QuickCalc de calcular contrarreloj. GridSmash, MergeChain y HexMatch premian la colocación y las combinaciones. SortStack, TileTurn, ColorFlow y PipeLink ofrecen retos espaciales por etapas. Cada página explica las reglas y los controles disponibles. Mosslight Wardens es un RPG de acción forestal: planta jardines de luz, restaura balizas y elige mejoras. Cloudweft Passage es una aventura de plataformas 3D en la que alternar sol y luna revela distintos puentes entre islas flotantes.'),
             ('Registros en tu navegador','Las partidas completadas dan experiencia, niveles e insignias. Tres misiones se renuevan a medianoche UTC. Los datos pertenecen a este navegador: no son una cuenta sincronizada ni una clasificación verificada. Borrar datos o cambiar de dispositivo puede hacer perder el progreso.'),
             ('El mismo reto para tus amigos','Los enlaces de QuickCalc conservan la semilla y una puntuación declarada por quien comparte. Las preguntas y posiciones de respuesta coinciden, con 30 segundos y tres segundos de penalización por error. No hay pistas ni tiempo extra en el duelo. Repetir sirve para practicar; las puntuaciones no están verificadas por un servidor.'),
-            ('Gráficos con profundidad','HTML, CSS, Canvas y audio del navegador permiten fichas elevadas, sombras y respuesta visual. Son tableros con apariencia dimensional, no mundos 3D de movimiento libre. Se respeta la preferencia de reducir movimiento y el rendimiento depende del dispositivo.'),
+            ('Gráficos con profundidad','Las dos aventuras usan modelos de pocos polígonos creados para el proyecto y dibujados con WebGL, perspectiva, profundidad e iluminación. Los diez puzles usan HTML, CSS y Canvas con fichas elevadas y sombras. El audio se sintetiza en el navegador. Los juegos 3D requieren WebGL y su rendimiento depende del dispositivo. Cada página explica sus botones táctiles y controles de teclado.'),
             ('Cuidar el contenido y el proyecto','Revisamos las guías cuando cambian las funciones o se comunican errores. Los consejos no garantizan beneficios médicos ni educativos. Envía el juego, modo y pasos del problema por la página de contacto. No hace falta pulsar anuncios para jugar y la analítica opcional no se inicia sin permiso.')
         ],
         'privacySections':[

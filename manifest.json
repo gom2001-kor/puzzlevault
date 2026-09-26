@@ -1,7 +1,7 @@
 {
   "name": "PuzzleVault",
   "short_name": "PuzzleVault",
-  "description": "10 free browser-based puzzle games to challenge your mind every day.",
+  "description": "Two original 3D adventures and ten free browser puzzles, with daily challenges and local progress.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

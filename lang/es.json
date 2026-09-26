@@ -68,7 +68,7 @@
         "watchAdUndo": "¿Deshacer el último movimiento?",
         "watchAdLife": "¿Continuar con una vida extra?",
         "adFreeNote": "Juega gratis. La ayuda está disponible actualmente sin anuncios.",
-        "tryAnotherPuzzle": "Prueba otro puzle",
+        "tryAnotherPuzzle": "Prueba otro juego",
         "viewAll": "Ver todo",
         "readMore": "Leer más →",
         "minuteRead": "{min} min de lectura",
@@ -79,15 +79,15 @@
         "faq": "Preguntas frecuentes"
     },
     "landing": {
-        "title": "PuzzleVault — Juegos de puzles gratis en línea",
-        "metaDesc": "Juega 10 juegos de puzles gratis directamente en tu navegador. Sin descargas, sin registro. Desafíos diarios y seguimiento de puntuación.",
-        "hero": "Puzles gratis — Sin descargas",
-        "heroSub": "Desafía tu mente con 10 juegos de puzles únicos. Juega directamente en tu navegador.",
+        "title": "PuzzleVault — Aventuras 3D y puzles gratis",
+        "metaDesc": "Juega a 12 juegos gratis en tu navegador: dos aventuras 3D originales y diez puzles. Restaura un bosque o explora islas flotantes. Sin descargas ni registro.",
+        "hero": "Un pequeño mundo. Una gran aventura.",
+        "heroSub": "Entra en un bosque vivo o sigue un camino entre las nubes. Dos mundos nuevos para explorar, junto a diez puzles conocidos.",
         "dailyHeading": "📅 Desafíos diarios de hoy",
         "dailySub": "Puzles nuevos cada día — ¿puedes mantener tu racha?",
         "streakBadge": "🔥 Tu racha: {count} días",
         "allGamesHeading": "Encuentra tu próximo favorito",
-        "allGamesSub": "Diez formas de disfrutar de una pequeña pausa.",
+        "allGamesSub": "Dos aventuras 3D y diez puzles. Elige cómo quieres jugar.",
         "playBtn": "Jugar ▸",
         "blogHeading": "📝 Últimas publicaciones del blog",
         "blogSub": "Guías, ejemplos paso a paso y notas del proyecto",
@@ -320,6 +320,16 @@
             "guide3": "Tras borrar, las fichas se asientan por las columnas inclinadas y se reponen dejando libre la parte superior. Cada ocho cadenas, la marea las empuja hacia arriba y añade fichas abajo. Si una casilla superior ocupada sale del tablero, termina la partida. El contador ayuda a prepararse. La pista marca una ruta numerada de cuatro cristales si es posible, o de tres. Sigue los números, no todo el grupo conectado. Si no hay combinación, baraja los colores. Puedes continuar una vez tras terminar.",
             "guideTitle": "Cómo jugar a HexMatch",
             "articleGuide": "<a href=\"/blog/es/hexmatch-chains-and-special-gems-guide.html\">HexMatch: traza una cadena válida y usa las gemas especiales →</a>"
+        },
+        "mosslight": {
+            "name": "Mosslight Wardens",
+            "tagline": "Restaura el bosque y elige tu camino en una aventura 3D",
+            "metaDesc": "Mosslight Wardens es un RPG de acción 3D original para navegador. Restaura balizas, elige mejoras y explora tres zonas con teclado o controles táctiles."
+        },
+        "cloudweft": {
+            "name": "Cloudweft Passage",
+            "tagline": "Alterna entre sol y luna para cruzar islas flotantes",
+            "metaDesc": "Explora islas flotantes en Cloudweft Passage, una aventura 3D original. Alterna caminos de sol y luna, salta y completa tres capítulos en tu navegador."
         }
     },
     "blog": {
@@ -394,7 +404,7 @@
         "locked": "Sin conseguir",
         "welcomeBack": "¿Un poco más de progreso?",
         "continueGame": "Continuar {game}",
-        "all": "Todos",
+        "all": "Todos los juegos",
         "quick": "Agilidad mental",
         "logic": "Lógica y estrategia",
         "relax": "A tu ritmo",
@@ -406,6 +416,29 @@
         "share": "Compartir el progreso de hoy",
         "shareInvite": "¡Prueba un reto de 30 segundos conmigo!",
         "gamesTitle": "Encuentra tu próximo favorito",
-        "gamesSub": "Diez formas de disfrutar de una pequeña pausa."
+        "gamesSub": "Dos aventuras 3D y diez puzles. Elige cómo quieres jugar.",
+        "adventure": "Aventuras 3D"
+    },
+    "flagship": {
+        "heading": "Un pequeño mundo. Una gran aventura.",
+        "kicker": "Dos aventuras 3D originales",
+        "intro": "Entra en un bosque vivo o sigue un camino entre las nubes. Dos mundos nuevos para explorar, junto a diez puzles conocidos.",
+        "original": "PUZZLEVAULT ORIGINAL",
+        "mossGenre": "RPG de acción 3D",
+        "cloudGenre": "Aventura de exploración 3D",
+        "mossHook": "Lleva una chispa al bosque. Restaura balizas, esquiva a las criaturas y elige mejoras que cambien tu próximo combate.",
+        "cloudHook": "Algunos caminos aparecen con el sol; otros, bajo la luna. Cambia el cielo y salta entre islas flotantes para encontrar el camino a casa.",
+        "mossTag1": "Tres zonas de bosque",
+        "mossTag2": "Elige tus mejoras",
+        "mossTag3": "Restaura las balizas",
+        "cloudTag1": "Tres capítulos",
+        "cloudTag2": "Caminos de sol y luna",
+        "cloudTag3": "Explora y salta",
+        "mossPlay": "Entrar en el bosque",
+        "cloudPlay": "Seguir las nubes",
+        "controls": "Teclado o botones táctiles en pantalla",
+        "free": "Gratis",
+        "account": "Sin registro",
+        "browser": "Juega en tu navegador"
     }
 }

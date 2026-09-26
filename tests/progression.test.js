@@ -8,7 +8,7 @@ const source = fs.readFileSync(path.join(__dirname, '../js/progression.js'), 'ut
 const common = fs.readFileSync(path.join(__dirname, '../js/common.js'), 'utf8');
 const KEY = 'pv_player_progress';
 const GAMES = ['numvault', 'gridsmash', 'patternpop', 'sortstack', 'quickcalc',
-    'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch'];
+    'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch', 'mosslight', 'cloudweft'];
 
 function fixture(options = {}) {
     let now = new Date(options.date || '2026-09-24T12:00:00Z');
@@ -93,7 +93,7 @@ test('daily XP is capped while progress, lifetime badges, and bounded storage ke
     assert.equal(snapshot.xp, 520);
     assert.equal(snapshot.todayRounds, 300);
     assert.equal(snapshot.totalRounds, 300);
-    assert.equal(snapshot.todayGames.length, 10);
+    assert.equal(snapshot.todayGames.length, 12);
     assert.ok(snapshot.badges.find(badge => badge.id === 'explorer').unlocked);
     assert.ok(snapshot.badges.find(badge => badge.id === 'century').unlocked);
     const saved = f.data.get(KEY);

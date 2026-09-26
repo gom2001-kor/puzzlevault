@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <meta name="google-adsense-account" content="ca-pub-6035096210993315">
+    <title>Cloudweft Passage — Free 3D Sky Adventure | PuzzleVault</title>
+    <meta name="description" content="Explore floating islands in Cloudweft Passage, an original free 3D adventure. Fold sun and moon bridges, collect dawn glyphs and restore three sky beacons.">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/games/cloudweft">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Cloudweft Passage — An Original 3D Sky Adventure">
+    <meta property="og:description" content="Two skies. One little courier. Fold sun and moon bridges to bring the dawn home in this free three-chapter adventure.">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/games/cloudweft">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cloudweft Passage | PuzzleVault">
+    <meta name="twitter:description" content="Explore three original floating-island chapters in a free browser 3D adventure.">
+    <meta name="twitter:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+    <link rel="stylesheet" href="/css/global.css?v=16">
+    <link rel="stylesheet" href="/css/site-quality.css?v=16">
+    <link rel="stylesheet" href="/css/arcade.css?v=16">
+    <link rel="stylesheet" href="/css/cloudweft.css?v=16">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Cloudweft Passage","description":"An original browser 3D adventure about a sky courier switching sun and moon bridges, collecting dawn glyphs and restoring three floating beacons.","url":"https://puzzlevault.pages.dev/games/cloudweft","genre":["Adventure","Platform","Puzzle"],"playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","isAccessibleForFree":true,"inLanguage":["en","ko","ja","zh","es"],"author":{"@type":"Organization","name":"PuzzleVault"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+</head>
+<body>
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Home"><a href="/">🧩 PuzzleVault</a><a href="/#games">Games</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
+    <main class="sf-page">
+        <section class="sf-heading" aria-labelledby="sf-page-title">
+            <div><span class="sf-eyebrow" data-sf="badge">ORIGINAL 3D ADVENTURE</span><h1 id="sf-page-title">Cloudweft Passage</h1><p data-sf="subtitle">Fold the sky. Deliver the dawn.</p></div>
+            <div class="sf-settings"><button type="button" id="sf-sound" aria-pressed="true" data-sf="sound">Sound</button><button type="button" id="sf-motion" aria-pressed="false" data-sf="lowMotion">Gentle motion</button></div>
+        </section>
+
+        <section class="sf-game" aria-label="Cloudweft Passage game">
+            <div class="sf-dashboard">
+                <div class="sf-chapter"><span id="sf-chapter-label">Chapter 1 / 3</span><strong id="sf-chapter-name">The waking bridge</strong></div>
+                <div class="sf-stat"><span data-sf="glyph">Glyphs</span><strong id="sf-glyphs">0/3</strong></div>
+                <div class="sf-stat sf-relic-stat"><span data-sf="relic">Relics</span><strong id="sf-relics">0/4</strong></div>
+                <div class="sf-stat"><span data-sf="time">Time</span><strong id="sf-time">0:00</strong></div>
+                <div class="sf-stat sf-fall-stat"><span data-sf="falls">Rescues</span><strong id="sf-falls">0</strong></div>
+                <button type="button" id="sf-pause" data-sf="pause">Pause</button>
+            </div>
+            <div class="sf-stage" id="sf-stage">
+                <canvas id="sf-canvas" width="960" height="650" tabindex="0" aria-label="Collect three dawn glyphs and enter the blue portal. Use WASD or arrows, Space to jump, E to fold the sky.">This 3D game requires a browser with WebGL enabled.</canvas>
+                <div class="sf-stage-top"><span class="sf-phase-indicator" id="sf-phase-indicator">☀ SUN</span><p id="sf-objective">Collect 3 glyphs, then enter the blue portal.</p></div>
+                <canvas class="sf-map" id="sf-map" width="104" height="152" aria-hidden="true"></canvas>
+                <div class="sf-menu sf-overlay" id="sf-menu">
+                    <div class="sf-menu-card">
+                        <div class="sf-emblem" aria-hidden="true"><span>☀</span><i>◇</i><span>☾</span></div>
+                        <h2 data-sf="intro">A little sky courier. Two overlapping worlds. One broken route home.</h2>
+                        <p data-sf="description">Switch sun and moon bridges, leap over gaps, and restore three floating beacons. Three chapters, secret relics, and a daily mirrored route.</p>
+                        <p id="sf-error" class="sf-error" hidden></p>
+                        <div class="sf-menu-actions"><button type="button" id="sf-start" class="sf-primary" data-sf="play">Begin the journey</button><button type="button" id="sf-campaign" data-sf="play" hidden>Begin the journey</button><button type="button" id="sf-daily" data-sf="daily">Daily expedition</button><button type="button" id="sf-resume" class="sf-resume" data-sf="resume" hidden>Continue saved journey</button></div>
+                        <details class="sf-practice"><summary data-sf="practice">Chapter practice</summary><div id="sf-chapters"></div></details>
+                        <p class="sf-save-note" data-sf="saveNotice">Progress is saved on this device. Clearing browser data removes it.</p>
+                    </div>
+                </div>
+                <div class="sf-overlay sf-pause-panel" id="sf-pause-panel" hidden>
+                    <div class="sf-dialog" role="dialog" aria-modal="true" aria-labelledby="sf-pause-title"><span class="sf-dialog-symbol" aria-hidden="true">☁</span><h2 id="sf-pause-title" data-sf="paused">Journey paused</h2><p data-sf="foldTip">Solid amber bridges belong to SUN. Blue bridges belong to MOON. Pale bridges cannot hold you.</p><button type="button" id="sf-continue" class="sf-primary" data-sf="continue">Continue</button><button type="button" id="sf-restart" data-sf="restart">Restart chapter</button><button type="button" id="sf-menu-button" data-sf="menu">Journey menu</button></div>
+                </div>
+                <div class="sf-overlay sf-result" id="sf-result" hidden>
+                    <div class="sf-dialog" role="dialog" aria-modal="true" aria-labelledby="sf-result-title"><span class="sf-dialog-symbol" aria-hidden="true">✦</span><p id="sf-medal" class="sf-medal">Sky navigator</p><h2 id="sf-result-title" tabindex="-1">Beacon restored</h2><p id="sf-result-copy">A new beacon is glowing.</p><div class="sf-score"><span data-sf="score">Score</span><strong id="sf-result-score">0</strong></div><p id="sf-result-stats"></p><button type="button" id="sf-next" class="sf-primary" data-sf="next">Next chapter</button><button type="button" id="sf-again" data-sf="again">Play again</button><button type="button" id="sf-share" data-sf="share">Share this journey</button><button type="button" id="sf-result-menu" class="sf-text-button" data-sf="menu">Journey menu</button><div class="sf-result-links"><a href="/games/mosslight.html">🌿 Mosslight Wardens</a><a href="/games/colorflow">🎨 ColorFlow</a><a href="/games/pipelink">🔧 PipeLink</a></div></div>
+                </div>
+            </div>
+            <div class="sf-notice" id="sf-notice" role="status" aria-live="polite">Solid amber bridges belong to SUN. Blue bridges belong to MOON. Pale bridges cannot hold you.</div>
+            <div class="sf-controls game-controls">
+                <div class="sf-pad" role="group" aria-label="Move"><button type="button" data-direction="up" aria-label="Move forward">▲</button><button type="button" data-direction="left" aria-label="Move left">◀</button><button type="button" data-direction="down" aria-label="Move back">▼</button><button type="button" data-direction="right" aria-label="Move right">▶</button></div>
+                <div class="sf-action-buttons"><button type="button" id="sf-phase" class="sf-fold" data-sf="phase" aria-pressed="false">Fold sky</button><button type="button" id="sf-jump" class="sf-primary" data-sf="jump">Jump</button></div>
+                <button type="button" id="sf-hint" class="sf-hint" data-sf="hint">Route hint</button>
+            </div>
+            <p class="sf-keyboard-note" data-sf="keys">Move: WASD / arrows · Jump: Space · Fold: E · Pause: Esc</p>
+        </section>
+        <div class="cross-promo pv-container"></div>
+        <div class="ad-slot" id="ad-sidebar"></div>
+        <div class="ad-slot" id="ad-interstitial" hidden></div>
+
+        <section class="game-guide sf-editorial" id="guide" aria-labelledby="sf-guide-title">
+            <h2 id="sf-guide-title" data-sf="guideTitle">How to play Cloudweft Passage</h2>
+            <div id="sf-guide-copy">
+                <p>You are the courier of a small floating archipelago. Its paths have split into two overlapping worlds: SUN and MOON. Recover three dawn glyphs in each chapter and carry them to the blue portal on the final island. Three handcrafted chapters unlock in order, and completed chapters are available for practice.</p>
+                <p>Use WASD or the arrow keys to move, Space to jump, and E to fold between worlds. On touch screens, use the direction pad and Jump and Fold sky buttons. Amber bridges are solid in SUN, while blue bridges are solid in MOON. Pale bridge outlines are previews, not walkable surfaces. Change worlds from a broad island before crossing.</p>
+                <p>The second chapter introduces gaps and moving pink sentry lights. Jump across gaps and wait for a light to pass. The third chapter adds wider gaps and a gentle wind gate. Every island is a checkpoint. Falling returns you to the last island with collected items intact. There is no life limit or payment to retry.</p>
+                <p>Each chapter has four optional mint relics. Two are on the side island reached from the third main island. Scores start at 2,200, add 250 per relic, and subtract three per active second and 100 per rescue, with a minimum of 100. Gold requires all four relics, no rescues and under 160 seconds; up to three rescues earns silver otherwise. The daily route mirrors the course on some days and changes sentry timing. Progress and best scores stay on this device. Shared results are self-reported, with no online leaderboard.</p>
+            </div>
+        </section>
+        <section class="pv-faq sf-editorial" aria-labelledby="sf-faq-title"><h2 id="sf-faq-title" data-sf="faqTitle">Questions before your first flight</h2><div id="sf-faq-copy"><details><summary>Is this a full 3D game?</summary><p>Yes. The islands, bridges and courier are rendered as real 3D meshes with WebGL. The game runs in your browser without external game models.</p></details><details><summary>What happens if I fall or close the page?</summary><p>A fall returns you to the last island with collected items intact. Continue saved journey restores the latest checkpoint on this device. A new journey replaces that active save.</p></details><details><summary>Can I play without ads or an account?</summary><p>Yes. No account, payment or ad viewing is required to complete any chapter. Daily routes are replayable. Shared results are self-reported.</p></details></div></section>
+        <div class="ad-slot" id="ad-bottom"></div>
+    </main>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
+    <script src="/js/privacy-controls.js?v=16"></script>
+    <script src="/js/i18n.js?v=16"></script>
+    <script src="/js/progression.js?v=16"></script>
+    <script src="/js/common.js?v=16"></script>
+    <script src="/js/arcade.js?v=16"></script>
+    <script src="/js/adsense.js?v=16"></script>
+    <script src="/js/seed.js?v=16"></script>
+    <script src="/js/sfx.js?v=16"></script>
+    <script src="/js/share.js?v=16"></script>
+    <script src="/js/pv3d.js?v=16"></script>
+    <script src="/games/cloudweft-logic.js?v=16"></script>
+</body>
+</html>
+
+

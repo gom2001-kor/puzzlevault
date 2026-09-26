@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <meta name="google-adsense-account" content="ca-pub-6035096210993315">
+    <title>Mosslight Wardens — Free 3D Forest Action RPG | PuzzleVault</title>
+    <meta name="description" content="Explore three original 3D forest islands in Mosslight Wardens. Grow healing gardens, dodge crystal creatures and restore the beacons in this free browser RPG.">
+    <meta name="theme-color" content="#059669">
+    <link rel="canonical" href="https://puzzlevault.pages.dev/games/mosslight">
+    <link rel="icon" href="/favicon.ico?v=2">
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Mosslight Wardens — A Small Guardian, a Living Forest">
+    <meta property="og:description" content="An original free 3D action RPG. Grow healing gardens, choose your upgrades and awaken three forest islands.">
+    <meta property="og:url" content="https://puzzlevault.pages.dev/games/mosslight">
+    <meta property="og:image" content="https://puzzlevault.pages.dev/images/og-default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/css/global.css?v=16">
+    <link rel="stylesheet" href="/css/site-quality.css?v=16">
+    <link rel="stylesheet" href="/css/arcade.css?v=16">
+    <link rel="stylesheet" href="/css/mosslight.css?v=16">
+    <script defer src="/js/privacy-controls.js?v=16"></script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Mosslight Wardens","description":"An original browser action RPG where a forest guardian grows healing gardens and restores three island beacons.","url":"https://puzzlevault.pages.dev/games/mosslight","genre":["Action RPG","Adventure"],"playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Web Browser","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+</head>
+<body class="ml-page">
+    <header id="pv-header"><nav class="pv-static-nav" aria-label="Main navigation"><a href="/">PuzzleVault</a><a href="/#daily-hub">Daily Challenge</a><a href="/blog/">Blog</a><a href="/about.html">About</a></nav></header>
+    <main>
+        <section class="ml-shell" aria-labelledby="ml-title">
+            <div class="ml-heading"><div><p class="ml-eyebrow" data-ml="eyebrow">ORIGINAL 3D ACTION RPG</p><h1 id="ml-title">Mosslight Wardens</h1><p data-ml="subtitle">A small guardian. A forest worth saving.</p></div><div class="ml-toolbar"><button type="button" id="ml-sound">Sound: On</button><button type="button" id="ml-pause" data-ml="pause" disabled>Pause</button></div></div>
+            <div class="ml-game">
+                <div class="ml-hud"><div class="ml-vitality"><span data-ml="health">Vitality</span><strong id="ml-vitality">6 / 6</strong><div class="ml-health-track"><div id="ml-healthbar"></div></div></div><div><span data-ml="seeds">Glowseeds</span><strong id="ml-seeds">0 / 5</strong></div><div><span data-ml="foes">Creatures</span><strong id="ml-foes">5</strong></div><div><span data-ml="score">Score</span><strong id="ml-score">0</strong></div></div>
+                <div class="ml-world"><canvas id="ml-canvas" width="800" height="640" tabindex="0" aria-label="Mosslight Wardens 3D forest. Move with arrows or WASD, pulse with Space, dash with Shift, plant a garden with Q, restore with E."></canvas><div class="ml-world-label" id="ml-zone">Island 1 / 3 · The Waking Glade</div><div id="ml-overlay" class="ml-overlay"><div id="ml-overlay-content" class="ml-overlay-content"><h2>Mosslight Wardens</h2><p>A three-island forest expedition. JavaScript and WebGL are required to play.</p></div></div></div>
+                <p id="ml-webgl" class="ml-webgl" data-ml="webgl" hidden>This browser could not start WebGL. Try a current browser with hardware acceleration enabled. The other PuzzleVault games are still available below.</p>
+                <div class="ml-objectives"><strong id="ml-objective" data-ml="objective">Collect 5 glowseeds · clear the creatures · restore the beacon</strong><p id="ml-status" role="status" aria-live="polite" data-ml="enter">Find the five floating glowseeds. Watch amber warnings before creatures rush!</p></div>
+                <div class="ml-controls game-controls">
+                    <div class="ml-dpad" role="group" aria-label="Movement"><button type="button" id="ml-north" data-dir="north" aria-label="Move up">↑</button><button type="button" id="ml-west" data-dir="west" aria-label="Move left">←</button><span aria-hidden="true">✦</span><button type="button" id="ml-east" data-dir="east" aria-label="Move right">→</button><button type="button" id="ml-south" data-dir="south" aria-label="Move down">↓</button></div>
+                    <div class="ml-actions"><button type="button" id="ml-pulse" class="ml-pulse" disabled><strong data-ml="pulse">Pulse</strong><small id="ml-pulse-cd">Space / J</small></button><button type="button" id="ml-dash" disabled><strong data-ml="dash">Dash</strong><small id="ml-dash-cd">Shift / K</small></button><button type="button" id="ml-garden" disabled><strong data-ml="garden">Garden</strong><small id="ml-garden-cd">2/3 · Q / L</small></button><button type="button" id="ml-restore" disabled><strong data-ml="restore">Restore</strong><small>E</small></button></div>
+                </div>
+                <details class="ml-help"><summary data-ml="help">Controls &amp; goal</summary><p data-ml="controls">Move: WASD / arrows · Pulse: Space / J · Dash: Shift / K · Garden: Q / L · Restore: E · Pause: P / Esc</p><p data-ml="touchHelp">Hold the direction pad to move. Tap Pulse near a creature. Garden heals and doubles the base pulse damage while you stand inside it.</p></details>
+                <div class="ml-progress"><span id="ml-build" data-ml="none">No upgrades yet</span><span id="ml-best">Personal best: 0</span><small data-ml="saved">Local progress only · no account required</small></div>
+            </div>
+        </section>
+        <div class="cross-promo pv-container"></div>
+        <div class="ad-slot" id="ad-sidebar"></div>
+        <div class="ad-slot" id="ad-interstitial"></div>
+        <section id="guide" class="game-guide pv-container ml-guide"><h2 data-ml="guideTitle">How to play Mosslight Wardens</h2><div id="ml-guide-text"><p>You are a lantern keeper crossing three floating forest islands. Each island has five glowseeds, a central beacon and crystal creatures guarding the paths. Walk over every floating gold seed to collect it. Defeat the creatures, approach the beacon, then press Restore to wake its roots. The counter above the world shows exactly what remains.</p><p>Move with WASD, arrow keys or the direction pad. Pulse damages every creature within the expanding ring around you; you do not need to aim. Creatures turn amber before rushing in a fixed direction. Step sideways during that warning, or dash through danger, then strike while they recover. The final island has a larger guardian with more vitality and a longer rush.</p><p>Your strongest tool is a living garden. Plant one, stay inside its green ring to heal, and pulse from its roots for extra damage. Charges regrow over time, so use them before your vitality becomes critical. Gardens do not spend the five glowseeds needed for a beacon.</p><p>After the first two beacons, choose more vitality, stronger pulses or a faster dash. Each choice lasts for the expedition, and the next island starts at full vitality. Expedition mode keeps an island checkpoint locally. Daily starts a fresh, shared seeded course and permits practice replays. Pause whenever needed; hiding this tab also pauses the game. Finish the forest, compare your own builds and share your result with a friend.</p></div></section>
+        <section class="pv-faq pv-container ml-guide"><h2 data-ml="faqTitle">Questions from the trail</h2><details><summary data-ml="faq1q">What does a garden do?</summary><p data-ml="faq1a">A garden lasts 14 seconds. Stand inside its visible green ring to recover vitality and add 1 pulse damage. You begin each island with two garden charges; another charge grows every 18 seconds, up to three. Glowseeds are separate quest items and are never spent on gardens.</p></details><details><summary data-ml="faq2q">What is saved, and how does Daily work?</summary><p data-ml="faq2a">Expedition saves your island entrance and chosen upgrades on this device. Continue restarts that island at full vitality. Daily always starts on island one, uses today’s UTC seed and can be replayed. Best scores and restored-forest counts are local, not a verified leaderboard.</p></details><details><summary data-ml="faq3q">Are there paid upgrades or copyrighted assets?</summary><p data-ml="faq3a">All islands and upgrades are free. The models, maps, effects and game code were created for PuzzleVault, with geometric shapes and synthesized audio. No downloaded game artwork, characters or music is used.</p></details></section>
+        <div class="ad-slot" id="ad-bottom"></div>
+    </main>
+    <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a></nav></footer>
+    <script src="/js/i18n.js?v=16"></script><script src="/js/progression.js?v=16"></script><script src="/js/common.js?v=16"></script><script src="/js/arcade.js?v=16"></script><script src="/js/adsense.js?v=16"></script><script src="/js/seed.js?v=16"></script><script src="/js/sfx.js?v=16"></script><script src="/js/share.js?v=16"></script><script src="/js/pv3d.js?v=16"></script><script src="/games/mosslight-logic.js?v=16"></script>
+</body>
+</html>

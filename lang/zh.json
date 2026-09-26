@@ -68,7 +68,7 @@
         "watchAdUndo": "撤销上一步？",
         "watchAdLife": "增加一条命并继续？",
         "adFreeNote": "免费游玩，目前帮助无需观看广告。",
-        "tryAnotherPuzzle": "试试其他益智游戏",
+        "tryAnotherPuzzle": "试试其他游戏",
         "viewAll": "查看全部",
         "readMore": "阅读更多 →",
         "minuteRead": "{min}分钟阅读",
@@ -79,15 +79,15 @@
         "faq": "常见问题"
     },
     "landing": {
-        "title": "PuzzleVault — 免费在线益智游戏",
-        "metaDesc": "在浏览器中畅玩10款免费益智游戏。无需下载，无需注册。每日挑战、成绩记录等你来体验。",
-        "hero": "免费益智游戏 — 无需下载",
-        "heroSub": "10款独特的益智游戏，锻炼你的大脑。直接在浏览器中畅玩。",
+        "title": "PuzzleVault — 免费3D冒险与益智游戏",
+        "metaDesc": "畅玩12款免费浏览器游戏：2款原创3D冒险和10款益智游戏。点亮森林、探索浮空岛，或挑战每日谜题。无需下载，无需注册，打开浏览器即可开始。",
+        "hero": "小小世界，真正的冒险。",
+        "heroSub": "走进失去光芒的森林，踏上云端的浮岛。两段新冒险与十款熟悉的益智游戏等你探索。",
         "dailyHeading": "📅 今日每日挑战",
         "dailySub": "每天都有全新谜题 — 你能保持连续记录吗？",
         "streakBadge": "🔥 连续记录：{count}天",
-        "allGamesHeading": "发现你的下一款最爱",
-        "allGamesSub": "十种方式，享受片刻放松。",
+        "allGamesHeading": "发现下一款喜欢的游戏",
+        "allGamesSub": "两款3D冒险与十款益智游戏，按心情选择。",
         "playBtn": "开始 ▸",
         "blogHeading": "📝 最新博客文章",
         "blogSub": "游戏攻略、步骤示例与项目随笔",
@@ -320,6 +320,16 @@
             "guide3": "消除后，方块沿倾斜列下落并补充，但每列顶部留空。每完成8条连线，涨潮会把列向上推，并在底部加入新块。若已占用的顶部格被推出棋盘，游戏结束。查看倒计时提前准备。提示优先标出4个水晶的可行路径，否则给出3个；请按编号连接，而不是试图遍历整片同色区域。没有匹配时可洗牌改变颜色，结束后可继续一次。",
             "guideTitle": "HexMatch玩法",
             "articleGuide": "<a href=\"/blog/zh/hexmatch-chains-and-special-gems-guide.html\">HexMatch 攻略：画出有效连线，用对特殊宝石 →</a>"
+        },
+        "mosslight": {
+            "name": "Mosslight Wardens",
+            "tagline": "点亮森林，在3D冒险中选择自己的成长路线",
+            "metaDesc": "Mosslight Wardens是一款原创浏览器3D动作角色扮演游戏。修复森林信标、选择能力升级并探索三片区域，支持键盘与触控操作。"
+        },
+        "cloudweft": {
+            "name": "Cloudweft Passage",
+            "tagline": "切换日月，穿越浮空岛屿",
+            "metaDesc": "在原创3D浏览器冒险Cloudweft Passage中探索浮空岛屿。切换太阳与月亮的路径，跳过空隙，完成三个章节。"
         }
     },
     "blog": {
@@ -405,7 +415,30 @@
         "niceRound": "又进一步",
         "share": "分享今天的成就",
         "shareInvite": "和我一起试试30秒挑战吧！",
-        "gamesTitle": "发现你的下一款最爱",
-        "gamesSub": "十种方式，享受片刻放松。"
+        "gamesTitle": "发现下一款喜欢的游戏",
+        "gamesSub": "两款3D冒险与十款益智游戏，按心情选择。",
+        "adventure": "3D冒险"
+    },
+    "flagship": {
+        "heading": "小小世界，真正的冒险。",
+        "kicker": "两款原创3D冒险游戏",
+        "intro": "走进失去光芒的森林，踏上云端的浮岛。两段新冒险与十款熟悉的益智游戏等你探索。",
+        "original": "PUZZLEVAULT ORIGINAL",
+        "mossGenre": "3D动作角色扮演",
+        "cloudGenre": "3D探索冒险",
+        "mossHook": "带着一束微光走进森林。修复信标，闪避并对抗森林生物，选择能改变下一场战斗的能力升级。",
+        "cloudHook": "有些路在阳光下出现，有些路只属于月光。切换天空，跳过浮岛之间的空隙，寻找回家的路。",
+        "mossTag1": "三片森林区域",
+        "mossTag2": "自选能力升级",
+        "mossTag3": "修复信标",
+        "cloudTag1": "三个章节",
+        "cloudTag2": "日月双重路径",
+        "cloudTag3": "探索与跳跃",
+        "mossPlay": "走进森林",
+        "cloudPlay": "踏上云端之路",
+        "controls": "支持键盘或屏幕触控按钮",
+        "free": "免费游玩",
+        "account": "无需注册",
+        "browser": "浏览器直接游玩"
     }
 }

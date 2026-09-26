@@ -34,6 +34,19 @@
 
   <!-- Game Pages -->
   <url>
+    <loc>https://puzzlevault.pages.dev/games/mosslight.html</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/games/cloudweft.html</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
     <loc>https://puzzlevault.pages.dev/games/numvault.html</loc>
     <lastmod>2026-09-26</lastmod>
     <changefreq>weekly</changefreq>

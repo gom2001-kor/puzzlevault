@@ -9,8 +9,8 @@ const languages = ['en', 'ko', 'ja', 'zh', 'es'];
 const homes = languages.map(lang => lang === 'en' ? 'index.html' : `${lang}/index.html`);
 const games = fs.readdirSync(path.join(root, 'games')).filter(file => file.endsWith('.html')).map(file => `games/${file}`);
 
-test('all ten games and five homes load progress before common initialization', () => {
-    assert.equal(games.length, 10);
+test('all twelve games and five homes load progress before common initialization', () => {
+    assert.equal(games.length, 12);
     for (const file of [...homes, ...games]) {
         const html = read(file);
         assert.match(html, /src="\/js\/arcade\.js/);
@@ -36,6 +36,59 @@ test('all UI keys and interpolation parameters are available in all five languag
     for (const file of homes) {
         for (const [, key] of read(file).matchAll(/data-i18n="arcade\.([^"]+)"/g)) assert.ok(en[key], `${file}: ${key}`);
     }
+});
+
+test('flagship discovery stays accessible without JavaScript in every language', () => {
+    const reference = JSON.parse(read('lang/en.json')).flagship;
+    for (const lang of languages) {
+        const file = lang === 'en' ? 'index.html' : `${lang}/index.html`;
+        const html = read(file).replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
+        const strings = JSON.parse(read(`lang/${lang}.json`));
+        assert.deepEqual(Object.keys(strings.flagship).sort(), Object.keys(reference).sort());
+        assert.equal((html.match(/<h1\b/g) || []).length, 1, file);
+        assert.ok(html.indexOf('id="adventures"') < html.indexOf('id="daily-hub"'), file);
+        for (const id of ['mosslight', 'cloudweft']) {
+            assert.ok(html.includes(`data-flagship-game="${id}" href="/games/${id}.html?lang=${lang}"`), file);
+            assert.ok(strings.games[id].name && strings.games[id].tagline && strings.games[id].metaDesc, `${lang}.${id}`);
+            assert.ok(read('sitemap.xml').includes(`/games/${id}.html`));
+            assert.ok(read('_redirects').includes(`/games/${id}.html`));
+        }
+        for (const [, key] of html.matchAll(/data-i18n="flagship\.([^"]+)"/g)) assert.ok(strings.flagship[key], `${lang}.${key}`);
+        assert.match(html, /data-filter="adventure"/);
+    }
+});
+
+test('flagship games retain progress and language-aware cross-promotion', () => {
+    const saved = new Map();
+    const context = vm.createContext({
+        URL,
+        location: { origin: 'https://puzzlevault.pages.dev' },
+        document: { addEventListener() {} },
+        localStorage: { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) },
+        dispatchEvent() {},
+        CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init.detail; } },
+        I18n: { currentLang: 'ko', t: key => key === 'games.mosslight.name' ? '이끼빛 수호대' : key }
+    });
+    context.window = context;
+    vm.runInContext(read('js/common.js') + '\nglobalThis.registry = PV_GAMES; globalThis.promos = CROSS_PROMO_MAP;', context);
+    assert.equal(Object.keys(context.registry).length, 12);
+    assert.equal(context.getGameName('mosslight'), '이끼빛 수호대');
+    assert.equal(context.getGameName('cloudweft'), 'Cloudweft Passage');
+    assert.equal(context.getLocalizedGamePath('/games/mosslight.html?mode=daily#guide'), '/games/mosslight.html?mode=daily&lang=ko#guide');
+    for (const [id, promos] of Object.entries(context.promos)) {
+        assert.equal(promos.length, 3, id);
+        assert.equal(new Set(promos).size, 3, id);
+        for (const next of promos) assert.ok(next !== id && context.registry[next], `${id} -> ${next}`);
+    }
+    vm.runInContext(read('js/progression.js'), context);
+    context.PVProgress.recordRound('mosslight', 100, { roundId: 'forest-complete' });
+    context.PVProgress.recordRound('cloudweft', 200, { roundId: 'islands-complete' });
+    vm.runInContext(read('js/progression.js'), context);
+    const snapshot = context.PVProgress.getSnapshot();
+    assert.equal(snapshot.lastGame, 'cloudweft');
+    assert.deepEqual(Array.from(snapshot.todayGames), ['mosslight', 'cloudweft']);
+    assert.equal(snapshot.totalRounds, 2);
+    assert.ok(snapshot.xp > 0);
 });
 
 test('every local script and stylesheet exists and all inline JS parses', () => {

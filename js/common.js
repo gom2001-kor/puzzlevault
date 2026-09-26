@@ -5,6 +5,8 @@
 
 /* --- Game Registry --- */
 const PV_GAMES = {
+    mosslight: { emoji: '🌿', name: 'Mosslight Wardens', nameKey: 'games.mosslight.name', tagline: 'Restore a living forest in a 3D action RPG', taglineKey: 'games.mosslight.tagline', path: '/games/mosslight.html' },
+    cloudweft: { emoji: '☁️', name: 'Cloudweft Passage', nameKey: 'games.cloudweft.name', tagline: 'Switch sun and moon to cross the floating isles', taglineKey: 'games.cloudweft.tagline', path: '/games/cloudweft.html' },
     numvault: { emoji: '🔢', name: 'NumVault', tagline: 'Number Deduction Puzzle', taglineKey: 'games.numvault.tagline', path: '/games/numvault.html' },
     gridsmash: { emoji: '🧱', name: 'GridSmash', tagline: 'Block Placement Puzzle', taglineKey: 'games.gridsmash.tagline', path: '/games/gridsmash.html' },
     patternpop: { emoji: '🧠', name: 'PatternPop', tagline: 'Pattern Memory', taglineKey: 'games.patternpop.tagline', path: '/games/patternpop.html' },
@@ -19,9 +21,11 @@ const PV_GAMES = {
 
 /* --- Cross-Promotion Map --- */
 const CROSS_PROMO_MAP = {
+    mosslight: ['cloudweft', 'hexmatch', 'gridsmash'],
+    cloudweft: ['mosslight', 'colorflow', 'tileturn'],
     numvault: ['gridsmash', 'patternpop', 'quickcalc'],
-    gridsmash: ['hexmatch', 'mergechain', 'numvault'],
-    colorflow: ['pipelink', 'tileturn', 'sortstack'],
+    gridsmash: ['mosslight', 'mergechain', 'numvault'],
+    colorflow: ['cloudweft', 'tileturn', 'sortstack'],
     mergechain: ['gridsmash', 'hexmatch', 'numvault'],
     patternpop: ['numvault', 'quickcalc', 'tileturn'],
     tileturn: ['colorflow', 'pipelink', 'patternpop'],
@@ -50,6 +54,21 @@ function getLocalizedPath(href) {
     if (href.startsWith('/games/')) return href;
     if (href.startsWith('/')) return `/${lang}${href}`;
     return href;
+}
+
+/** Preserve a player's language when opening shared game URLs. */
+function getLocalizedGamePath(href) {
+    const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+    const url = new URL(href, window.location.origin);
+    url.searchParams.set('lang', lang);
+    return url.pathname + url.search + url.hash;
+}
+
+function getGameName(id) {
+    const game = PV_GAMES[id];
+    if (!game) return id;
+    const translated = game.nameKey && typeof I18n !== 'undefined' ? I18n.t(game.nameKey) : '';
+    return translated && translated !== game.nameKey ? translated : game.name;
 }
 
 /* --- Header --- */
@@ -240,12 +259,12 @@ function renderCrossPromo(currentGameId) {
 
         const card = document.createElement('a');
         card.className = 'pv-game-card';
-        card.href = game.path;
+        card.href = getLocalizedGamePath(game.path);
         const taglineText = (typeof I18n !== 'undefined' && game.taglineKey) ? I18n.t(game.taglineKey) : game.tagline;
         card.innerHTML = `
       <div class="pv-game-card-icon">${game.emoji}</div>
       <div class="pv-game-card-body">
-        <div class="pv-game-card-name">${game.name}</div>
+        <div class="pv-game-card-name">${getGameName(id)}</div>
         <div class="pv-game-card-tagline" data-i18n="${game.taglineKey}">${taglineText}</div>
       </div>
     `;
@@ -421,8 +440,8 @@ function renderMiniCrossPromo(currentGameId, container) {
         if (!game) return;
         const a = document.createElement('a');
         a.className = 'mini-cross-promo-item';
-        a.href = game.path;
-        a.innerHTML = `<span class="mini-cross-promo-icon">${game.emoji}</span>${game.name}`;
+        a.href = getLocalizedGamePath(game.path);
+        a.innerHTML = `<span class="mini-cross-promo-icon">${game.emoji}</span>${getGameName(id)}`;
         wrap.appendChild(a);
     });
 

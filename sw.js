@@ -3,12 +3,21 @@
    Cache game HTML/CSS/JS for offline play
    =================================================== */
 
-const CACHE_VERSION = 15;
+const CACHE_VERSION = 16;
 const CACHE_NAME = 'puzzlevault-v' + CACHE_VERSION;
 const ASSETS = [
     '/',
     '/index.html',
     '/css/global.css',
+    '/js/pv3d.js',
+    '/css/flagship.css',
+    '/js/flagship.js',
+    '/css/mosslight.css',
+    '/css/cloudweft.css',
+    '/games/mosslight.html',
+    '/games/cloudweft.html',
+    '/games/mosslight-logic.js',
+    '/games/cloudweft-logic.js',
     '/css/arcade.css',
     '/css/site-quality.css',
     '/css/blog.css',

@@ -4,7 +4,8 @@
     const categories = {
         quick: ['quickcalc', 'patternpop', 'numvault'],
         logic: ['numvault', 'sortstack', 'tileturn', 'pipelink'],
-        relax: ['colorflow', 'mergechain', 'hexmatch', 'gridsmash']
+        relax: ['colorflow', 'mergechain', 'hexmatch', 'gridsmash'],
+        adventure: ['mosslight', 'cloudweft']
     };
     const badgeIcons = { first_round: '🌱', explorer: '🧭', streak_3: '🔥', century: '💎' };
     let activeFilter = 'all';
@@ -18,6 +19,8 @@
     const safe = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const homeURL = () => typeof getLocalizedPath === 'function' ? getLocalizedPath('/') : '/';
     const game = id => typeof PV_GAMES !== 'undefined' ? PV_GAMES[id] : null;
+    const gameName = id => typeof getGameName === 'function' ? getGameName(id) : (game(id) || {}).name || id;
+    const gameURL = href => typeof getLocalizedGamePath === 'function' ? getLocalizedGamePath(href) : href;
     const track = (event, data) => { if (typeof window.gtag === 'function') window.gtag('event', event, data); };
 
     function renderMissions(snapshot) {
@@ -26,12 +29,12 @@
         const daily = game(snapshot.dailyGame);
         const icons = { rounds: '⚡', explorer: '🧭', daily: daily ? daily.emoji : '🎯' };
         container.innerHTML = snapshot.missions.map(mission => {
-            const href = mission.id === 'daily' && daily ? daily.path : mission.id === 'rounds' ? '/games/quickcalc.html?mode=blitz' : '#games';
+            const href = mission.id === 'daily' && daily ? gameURL(daily.path) : mission.id === 'rounds' ? gameURL('/games/quickcalc.html?mode=blitz') : '#games';
             return `<a class="arcade-mission" href="${href}">
                 <span class="arcade-mission-icon" aria-hidden="true">${mission.completed ? '✓' : icons[mission.id]}</span>
-                <span class="arcade-mission-copy"><strong>${safe(t('mission_' + mission.id, { game: daily ? daily.name : '' }))}</strong>
+                <span class="arcade-mission-copy"><strong>${safe(t('mission_' + mission.id, { game: daily ? gameName(snapshot.dailyGame) : '' }))}</strong>
                 <small>${safe(mission.completed ? t('completed') : t('missionProgress', { count: mission.progress, total: mission.target }))}</small>
-                <progress class="arcade-meter" value="${mission.progress}" max="${mission.target}" aria-label="${safe(t('mission_' + mission.id, { game: daily ? daily.name : '' }))}"></progress></span>
+                <progress class="arcade-meter" value="${mission.progress}" max="${mission.target}" aria-label="${safe(t('mission_' + mission.id, { game: daily ? gameName(snapshot.dailyGame) : '' }))}"></progress></span>
                 <span class="arcade-mission-reward">${mission.completed ? '✓' : '+' + mission.xp + ' XP'}</span>
             </a>`;
         }).join('');
@@ -51,7 +54,7 @@
         if (resume) {
             resume.hidden = !last;
             resume.style.display = last ? '' : 'none';
-            if (last) resume.innerHTML = `<span>${safe(t('welcomeBack'))}</span><a href="${last.path}">${last.emoji} ${safe(t('continueGame', { game: last.name }))} →</a>`;
+            if (last) resume.innerHTML = `<span>${safe(t('welcomeBack'))}</span><a href="${gameURL(last.path)}">${last.emoji} ${safe(t('continueGame', { game: gameName(snapshot.lastGame) }))} →</a>`;
         }
     }
 
@@ -67,7 +70,7 @@
         document.querySelectorAll('.arcade-filter').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === activeFilter)));
         document.querySelectorAll('#all-games-grid .game-card-link').forEach(card => {
             const id = (card.getAttribute('href') || '').split('/').pop().split('.')[0];
-            card.hidden = activeFilter !== 'all' && !categories[activeFilter].includes(id);
+            card.hidden = activeFilter !== 'all' && !(categories[activeFilter] || []).includes(id);
         });
     }
 
