@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "gom2001-kor/study-english2",
+  "sourceCommit": "b9e3495d86c3cef8d92ba971e9ec765025212f60",
+  "sourceCommittedAt": "2026-09-28T02:18:25+09:00",
+  "contentHash": "16cdc0f1db72bb4f47992f057ede388c9dc07ef4afea75114dec519f493a9420",
+  "fileHashes": {
+    "classics.json": "2fd23d35d5be2843fe00cf96b255b9234973be1cd65117d15ffc35d8e7064a52",
+    "voa-lincoln.json": "b91b640992e38358d31a8d0b5854889f0f212ac0604f2306a0027e508ae8ab6a",
+    "modern.json": "f36184c363768c0d1e9232597b4d824b3e262aa33ea45f7082d59f70a27ba0f7",
+    "guides/classics-a.json": "24615e8ee60948ad9d77e960fcedd92a28aebbcc25566dfff662886df1b63877",
+    "guides/classics-b.json": "ac9bec1665048e6f4eb1528b3626050db2835cd969cdeb8929210ca50ef42dab",
+    "guides/voa-lincoln.json": "0d9b65627a7a7313ced0f23c910b4d165b589ea2a0bd6d915884beb17c7e2783"
+  },
+  "verifiedLessons": 8,
+  "segments": 69
+}

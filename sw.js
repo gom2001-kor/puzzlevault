@@ -3,7 +3,7 @@
    Cache game HTML/CSS/JS for offline play
    =================================================== */
 
-const CACHE_VERSION = 18;
+const CACHE_VERSION = 19;
 const CACHE_NAME = 'puzzlevault-v' + CACHE_VERSION;
 const ASSETS = [
     '/',
@@ -75,13 +75,26 @@ const ASSETS = [
 ASSETS.push(
     "/learn/english/",
     "/learn/english/THIRD-PARTY-NOTICES.txt",
-    "/learn/english/assets/index-D7O7a8ru.js",
-    "/learn/english/assets/index-DEP4q_MK.css",
+    "/learn/english/assets/App-2QGa-Oyh.js",
+    "/learn/english/assets/App-Bs-NSIuC.css",
+    "/learn/english/assets/index-DYWR09XU.css",
+    "/learn/english/assets/index-Djeia02W.js",
     "/learn/english/assets/learning-guides-Ba1fNu86.js",
-    "/learn/english/assets/reading-library-BnTD4AHA.js",
-    "/learn/english/assets/vendor-CfaPcH2q.js",
+    "/learn/english/assets/reading-library-DLd1fPOq.js",
+    "/learn/english/assets/vendor-ZCX-mnP3.js",
+    "/learn/english/guides/alice.html",
+    "/learn/english/guides/gettysburg-address.html",
+    "/learn/english/guides/hat.html",
+    "/learn/english/guides/index.html",
+    "/learn/english/guides/magi.html",
+    "/learn/english/guides/north-wind.html",
+    "/learn/english/guides/peter-rabbit.html",
+    "/learn/english/guides/voa-gym.html",
+    "/learn/english/guides/voa-welcome.html",
     "/learn/english/index.html",
-    "/css/learning.css"
+    "/css/learning.css",
+    "/css/english-guides.css",
+    "/learn/english/guides/"
 );
 // ENGLISH_ASSETS_END
 

@@ -14,7 +14,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プライバシーポリシー | PuzzleVault</title>
-    <meta name="description" content="この方針はpuzzlevault.pages.devに適用されます。アカウントは不要です。Cloudflareはサイトの配信と保護のため、IPアドレス、要求URL、ブラウザ情報などの通信情報を処理します。これは端末内のゲーム記録とは別です。">
+    <meta name="description" content="PuzzleVaultのゲーム・学習記録、公開教材の更新、端末の音声・録音、任意の分析と問い合わせ情報の扱いを説明します。">
         <!-- hreflang -->
     <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/privacy.html">
     <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/privacy.html">
@@ -22,7 +22,7 @@
     <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/privacy.html">
     <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/privacy.html">
     <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/privacy.html">
-    <link rel="stylesheet" href="/css/global.css?v=18">
+    <link rel="stylesheet" href="/css/global.css?v=19">
     <link rel="canonical" href="https://puzzlevault.pages.dev/ja/privacy.html">
     <meta name="theme-color" content="#2563EB">
     <link rel="manifest" href="/manifest.json">
@@ -75,8 +75,8 @@
             text-decoration: underline;
         }
     </style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=18">
-    <script defer src="/js/privacy-controls.js?v=18"></script>
+    <link rel="stylesheet" href="/css/site-quality.css?v=19">
+    <script defer src="/js/privacy-controls.js?v=19"></script>
 </head>
 
 <body>
@@ -86,9 +86,9 @@
 <p class="pv-editorial-meta">更新日: <time datetime="2026-09-28">2026-09-28</time></p>
 <section><h2>対象とホスティング</h2><p>この方針はpuzzlevault.pages.devに適用されます。アカウントは不要です。Cloudflareはサイトの配信と保護のため、IPアドレス、要求URL、ブラウザ情報などの通信情報を処理します。これは端末内のゲーム記録とは別です。</p></section>
 <section><h2>端末内の保存</h2><p>pv_で始まる項目に得点、経験値、ミッション、連続記録、音声、言語、プライバシー設定を保存します。セッション保存には一時的なヒントや回数が入り、pv_lang Cookieは言語を記憶します。公開ゲーム・学習ファイルはオフライン用にキャッシュします。記録は同期されず、サイトデータ削除で失われる場合があります。</p></section>
-<section id="english-learning-data"><h2>英語学習の記録とバックアップ</h2><p>英語学習室は読書の進捗、練習結果と誤答、作文、保存した表現、復習予定、学習設定をこのブラウザーに保存します。保存キーは<code>pv_english_reading_v2</code>と<code>pv_english_quest_v1</code>です。これらの記録をアプリのサーバーへ自動送信したり、アカウントと同期したりしません。サイトデータを削除すると記録が失われる場合があります。</p><p>設定からJSONバックアップをダウンロードし、読み込めます。自分で書いた回答が含まれる場合があるため、自分で管理できる場所に保管してください。study-english2.pages.devの記録はPuzzleVaultへ自動移行されません。元のアプリでバックアップし、こちらで読み込んでプレビューを確認してから復元します。復元を確定すると、対象となる現在の記録がバックアップの内容に置き換わります。</p></section>
+<section id="english-learning-data"><h2>英語学習の記録とバックアップ</h2><p>英語学習室は読書の進捗、練習結果と誤答、作文、保存した表現、復習予定、学習設定をこのブラウザーに保存します。保存キーはpv_english_reading_v2とpv_english_quest_v1です。これらの記録をアプリのサーバーへ自動送信したり、アカウントと同期したりしません。サイトデータを削除すると記録が失われる場合があります。</p><p>設定からJSONバックアップをダウンロードし、読み込めます。自分で書いた回答が含まれる場合があるため、自分で管理できる場所に保管してください。study-english2.pages.devの記録はPuzzleVaultへ自動移行されません。元のアプリでバックアップし、こちらで読み込んでプレビューを確認してから復元します。復元を確定すると、対象となる現在の記録がバックアップの内容に置き換わります。</p></section>
+<section id="english-content-updates"><h2>公開学習資料の更新取得</h2><p>英語学習室を開くと公開教材の更新を1回確認するため、study-english2.pages.devへコンテンツファイルを要求します。元サイトのホスティング事業者はIPアドレス、要求URL、ブラウザー情報など通常の通信情報を受け取る場合があります。教材を配信するための要求であり、アクセス分析イベントではありません。回答、進捗、作文、復習記録、マイク録音は送りません。</p><p>確認済みの公開資料は、オフライン利用のため端末のブラウザーCache APIのpuzzlevault-english-content-v1に保存する場合があります。更新を取得または検証できない場合、同梱資料か以前に確認済みの資料を使えます。教材の更新と、両サイト間での個人学習記録の移行は別の機能です。</p></section>
 <section id="english-audio"><h2>端末の音声合成とマイク録音</h2><p>テキスト再生にはブラウザーの音声合成を使用します。一部の音声はネットワークサービスを利用し、端末や音声の提供者が読み上げるテキストを処理する場合があります。利用可否や品質はブラウザーとインストール済みの音声によって異なります。</p><p>録音ボタンを押したときだけマイクの許可を求めます。録音は1回につき最大60秒です。アプリは音声をアプリのサーバーへ送信せず、現在の画面のメモリーに一時保存します。文・モード・画面の変更や再読み込みで消去され、JSONバックアップには含まれません。ブラウザーの設定でマイクへのアクセスを拒否・取り消しできます。</p></section>
-
 <section><h2>任意のGoogle Analytics</h2><p>分析は初期状態で無効です。許可するとページ閲覧、端末・ブラウザ情報、ゲーム完了や共有成功などのイベントを送信し、_gaなどのCookieを使う場合があります。共有イベントに本文や挑戦URLは入れません。拒否しても遊べます。現在Microsoft Clarityのセッション記録は読み込みません。</p></section>
 <section><h2>設定の変更</h2><p>下部の設定から変更できます。プレイを再開させないため許可の変更は次のページから適用します。取り消すと現在ページの追加分析を無効にし、アクセス可能な自サイトの分析Cookieを削除します。送信済みのデータは取り消せません。保存を拒否する環境では選択は現在ページのみ有効です。</p></section>
 <section><h2>広告</h2><p>AdSense確認用メタデータがあっても広告配信を意味しません。現在は広告タグを自動読み込みしません。有効化前に運営者は必要な認証済み同意管理サービスと配置を設定する必要があります。分析設定はGoogle認証済み広告CMPの代わりにはなりません。広告提供時の識別子やCookieはその同意画面で説明されます。</p></section>
@@ -101,8 +101,8 @@
 
     <footer id="pv-footer"><nav class="pv-static-footer"><a href="/ja/about.html">サイト情報</a><a href="/ja/privacy.html">プライバシー</a><a href="/ja/terms.html">利用規約</a><a href="/ja/contact.html">お問い合わせ</a><a href="/blog/ja/">ブログ</a><a href="/learn/english/">英語学習</a></nav></footer>
 
-    <script src="/js/i18n.js?v=18"></script>
-    <script src="/js/common.js?v=18"></script>
+    <script src="/js/i18n.js?v=19"></script>
+    <script src="/js/common.js?v=19"></script>
     <script>
         window.addEventListener('langchange', (e) => {
             const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');

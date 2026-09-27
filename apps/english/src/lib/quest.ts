@@ -11,14 +11,14 @@ export type QuestBank = Record<string, QuestQuestion>
 export type QuestRun = {
   id: string; seed: string; mode: 'daily' | 'practice' | 'review'; day: string; lessonId: string | null;
   questionIds: string[]; position: number; answers: number[][]; draft: number[];
-  stage: 'question' | 'feedback' | 'result'; reward: number;
+  stage: 'question' | 'feedback' | 'result'; reward: number; bankFingerprint?: string;
 }
 export type QuestState = {
   version: 1; dailyAwards: Record<string, { correct: number; xp: number }>;
   best: Record<string, number>; active: QuestRun | null;
 }
 export type QuestStorage = Pick<Storage, 'getItem' | 'setItem'>
-export type QuestLoad = { state: QuestState; error: string; raw: string | null }
+export type QuestLoad = { state: QuestState; error: string; raw: string | null; notice?: string }
 export const freshQuest = (): QuestState => ({ version: 1, dailyAwards: {}, best: {}, active: null })
 export const utcQuestDay = (date = new Date()): string => date.toISOString().slice(0, 10)
 const compact = (text: string) => text.normalize('NFKC').replace(/\s+/g, ' ').trim()
@@ -60,6 +60,17 @@ export function buildQuestBank(lessons: readonly Lesson[], guides: Record<string
   return bank
 }
 
+/** A local edition marker, not an authentication signature. Include answer text as
+ * well as IDs: a new lesson can also change existing word distractor choices. */
+export function questBankFingerprint(bank: QuestBank): string {
+  const source = JSON.stringify(Object.keys(bank).sort().map(id => {
+    const q = bank[id]
+    return [q.id, q.kind, q.lessonId, q.lessonTitle, q.segment ?? null, q.prompt, q.english,
+      q.translation, q.explanation, q.choices, q.answer, q.evidence, q.cardId ?? null, !!q.fragment]
+  }))
+  return 'b1:' + hash(source).toString(16).padStart(8, '0') + hash('edition:' + source).toString(16).padStart(8, '0')
+}
+
 export function courseLessons(bank: QuestBank): { id: string; title: string }[] {
   const lessons = new Map<string, { id: string; title: string }>()
   Object.values(bank).forEach(q => lessons.set(q.lessonId, { id: q.lessonId, title: q.lessonTitle }))
@@ -86,7 +97,7 @@ export function courseQuestionIds(bank: QuestBank, day: string, lessonId: string
 export function startQuest(bank: QuestBank, mode: 'daily' | 'practice', day: string, lessonId: string | null, id: string): QuestRun {
   if (mode === 'practice' && !lessonId) throw new Error('연습할 수업을 선택해 주세요.')
   const lesson = mode === 'daily' ? null : lessonId
-  return { id, seed: mode === 'daily' ? `daily:${day}` : id, mode, day, lessonId: lesson, questionIds: courseQuestionIds(bank, day, lesson, id), position: 0, answers: [], draft: [], stage: 'question', reward: 0 }
+  return { id, seed: mode === 'daily' ? `daily:${day}` : id, mode, day, lessonId: lesson, questionIds: courseQuestionIds(bank, day, lesson, id), position: 0, answers: [], draft: [], stage: 'question', reward: 0, bankFingerprint: questBankFingerprint(bank) }
 }
 export function startQuestReview(run: QuestRun, bank: QuestBank, id: string): QuestRun | null {
   if (run.stage !== 'result') return null
@@ -151,42 +162,66 @@ const record = (value: unknown): value is Record<string, unknown> => typeof valu
 const integer = (value: unknown, min: number, max: number): value is number => Number.isSafeInteger(value) && (value as number) >= min && (value as number) <= max
 function validDay(value: unknown): value is string { return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(`${value}T00:00:00Z`)) && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value }
 function check(value: unknown): asserts value { if (!value) throw new Error('탐험 기록의 형식이 올바르지 않아요.') }
-export function validateQuest(value: unknown, bank: QuestBank): QuestState {
-  const lessonIds = new Set(courseLessons(bank).map(lesson => lesson.id))
+export function validateQuest(value: unknown, bank: QuestBank, migrateContent = false): QuestState {
+  const lessonIds = new Set(Object.values(bank).map(question => question.lessonId))
   check(record(value) && value.version === 1 && record(value.dailyAwards) && record(value.best))
   check(Object.keys(value.dailyAwards).length <= 10000 && Object.keys(value.best).length <= 20000)
   for (const [day, award] of Object.entries(value.dailyAwards)) check(validDay(day) && record(award) && integer(award.correct, 0, 6) && award.xp === 30 + (award.correct as number) * 10)
-  for (const [key, score] of Object.entries(value.best)) check(integer(score, 0, 6) && (key.startsWith('daily:') ? validDay(key.slice(6)) : key.startsWith('practice:') && lessonIds.has(key.slice(9))))
+  for (const [key, score] of Object.entries(value.best)) check(integer(score, 0, 6) && (key.startsWith('daily:') ? validDay(key.slice(6)) : key.startsWith('practice:') && /^[a-z][a-z0-9-]{0,79}$/.test(key.slice(9))))
   if (value.active !== null) {
     const run = value.active
     check(record(run) && typeof run.id === 'string' && /^[a-zA-Z0-9:_-]{1,150}$/.test(run.id) && typeof run.seed === 'string' && /^[a-zA-Z0-9:_-]{1,150}$/.test(run.seed))
     check(['daily', 'practice', 'review'].includes(run.mode as string) && validDay(run.day) && ['question', 'feedback', 'result'].includes(run.stage as string))
-    check(run.lessonId === null || typeof run.lessonId === 'string' && lessonIds.has(run.lessonId))
-    check(Array.isArray(run.questionIds) && run.questionIds.length > 0 && run.questionIds.length <= 6 && new Set(run.questionIds).size === run.questionIds.length && run.questionIds.every(id => typeof id === 'string' && Object.hasOwn(bank, id)))
+    check(run.lessonId === null || typeof run.lessonId === 'string' && /^[a-z][a-z0-9-]{0,79}$/.test(run.lessonId))
+    check(Array.isArray(run.questionIds) && run.questionIds.length > 0 && run.questionIds.length <= 6 && new Set(run.questionIds).size === run.questionIds.length && run.questionIds.every(id => typeof id === 'string' && /^[a-z][a-z0-9-]{0,79}:(word|order|reading):\d{1,3}$/.test(id)))
     const ids = run.questionIds as string[]
+    // Validate the saved record itself before treating an edition change as a migration.
+    // Damaged JSON, impossible rewards or answer indices must retain the old error path.
+    check(run.bankFingerprint === undefined || typeof run.bankFingerprint === 'string' && /^b1:[a-f0-9]{16}$/.test(run.bankFingerprint))
+    check(integer(run.position, 0, ids.length - 1) && Array.isArray(run.answers))
+    const expected = run.stage === 'question' ? run.position : run.position + 1
+    const boundedAnswer = (answer: unknown) => Array.isArray(answer) && answer.length <= 6 && answer.every(index => integer(index, 0, 5)) && new Set(answer).size === answer.length
+    check(run.answers.length === expected && run.answers.every(answer => boundedAnswer(answer) && (answer as unknown[]).length > 0))
+    check(boundedAnswer(run.draft))
+    if (run.stage !== 'question') check(JSON.stringify(run.draft) === JSON.stringify(run.answers[run.position]))
+    check(run.stage !== 'result' || run.position === ids.length - 1)
+    check(integer(run.reward, 0, 90) && (run.stage === 'result' && run.mode === 'daily' ? run.reward === 0 || (record(value.dailyAwards[run.day as string]) && run.reward === (value.dailyAwards[run.day as string] as Record<string, unknown>).xp) : run.reward === 0))
+    if (run.mode !== 'review') check(ids.length === 6 && (run.mode === 'daily' ? run.lessonId === null && run.seed === `daily:${run.day}` : run.lessonId !== null && run.seed === run.id))
+    const editionChanged = run.bankFingerprint !== questBankFingerprint(bank)
+    if (migrateContent && editionChanged) {
+      // Legacy v1 runs have no edition marker, so their old option indices cannot be
+      // interpreted safely. Close only that run, keeping earned XP and personal bests.
+      return { ...value, active: null } as QuestState
+    }
+    check(run.bankFingerprint === undefined || !editionChanged)
+    check(run.lessonId === null || lessonIds.has(run.lessonId))
+    check(ids.every(id => Object.hasOwn(bank, id)))
     if (run.mode !== 'review') {
       check(ids.length === 6 && (run.mode === 'daily' ? run.lessonId === null && run.seed === `daily:${run.day}` : run.lessonId !== null && run.seed === run.id))
       check(JSON.stringify(ids) === JSON.stringify(courseQuestionIds(bank, run.day as string, run.lessonId as string | null, run.id as string)))
     }
-    check(integer(run.position, 0, ids.length - 1) && Array.isArray(run.answers))
-    const expected = run.stage === 'question' ? run.position : run.position + 1
-    check(run.answers.length === expected && run.answers.every((answer, i) => validQuestAnswer(bank[ids[i]], answer)))
+    check(run.answers.every((answer, i) => validQuestAnswer(bank[ids[i]], answer)))
     check(validQuestAnswer(bank[ids[run.position]], run.draft, run.stage !== 'question'))
-    if (run.stage !== 'question') check(JSON.stringify(run.draft) === JSON.stringify(run.answers[run.position]))
-    check(run.stage !== 'result' || run.position === ids.length - 1)
-    check(integer(run.reward, 0, 90) && (run.stage === 'result' && run.mode === 'daily' ? run.reward === 0 || (record(value.dailyAwards[run.day as string]) && run.reward === (value.dailyAwards[run.day as string] as Record<string, unknown>).xp) : run.reward === 0))
   }
   return value as QuestState
 }
 export function loadQuest(storage: QuestStorage, bank: QuestBank): QuestLoad {
   let raw: string | null = null
-  try { raw = storage.getItem(QUEST_STORAGE_KEY); return { state: raw === null ? freshQuest() : validateQuest(JSON.parse(raw), bank), error: '', raw } }
+  try {
+    raw = storage.getItem(QUEST_STORAGE_KEY)
+    if (raw === null) return { state: freshQuest(), error: '', raw }
+    const parsed = JSON.parse(raw)
+    const state = validateQuest(parsed, bank, true)
+    const notice = parsed.active !== null && state.active === null
+      ? '학습 자료 버전이 달라 이전 코스를 닫았어요. 획득한 XP와 최고 기록은 그대로입니다. 새 코스로 이어가세요.' : ''
+    return { state, error: '', raw, notice }
+  }
   catch { return { state: freshQuest(), error: '탐험 기록을 읽을 수 없어 자동 저장을 멈췄어요. 기존 기록은 보존됩니다. 지금 탐험은 이 창에서 임시로 유지되며, 페이지를 새로고침하거나 탭을 닫으면 사라집니다.', raw } }
 }
 export function saveQuest(storage: QuestStorage, state: QuestState, bank: QuestBank): string {
   try {
     const existing = storage.getItem(QUEST_STORAGE_KEY)
-    if (existing !== null) validateQuest(JSON.parse(existing), bank)
+    if (existing !== null) validateQuest(JSON.parse(existing), bank, true)
     validateQuest(state, bank); storage.setItem(QUEST_STORAGE_KEY, JSON.stringify(state)); return ''
   }
   catch { return '탐험 기록을 저장하지 못했어요. 기존 저장 기록은 보존됩니다. 새 진도와 XP는 이 창에서 임시로 유지되며, 페이지를 새로고침하거나 탭을 닫으면 사라집니다.' }

@@ -7,6 +7,10 @@
 .pv-editorial ol { list-style: decimal; padding-left: 22px; }
 .pv-editorial a { color: var(--pv-blue); text-decoration: underline; text-underline-offset: 3px; }
 .pv-editorial .pv-btn { text-decoration: none; }
+.pv-editorial a.pv-btn-primary,
+.pv-editorial a.pv-btn-primary:visited { color: #fff; background: #1d4ed8; min-height: 44px; white-space: normal; text-align: center; }
+.pv-editorial a.pv-btn-primary:hover { background: #1e40af; }
+.pv-editorial a.pv-btn-primary:focus-visible { outline: 3px solid var(--pv-text); outline-offset: 4px; }
 .pv-editorial-meta { font-size: .82rem; color: var(--pv-text-secondary); }
 .pv-editorial-callout { background: var(--pv-card-bg); border: 1px solid var(--pv-border); border-left: 4px solid var(--pv-blue); padding: 22px; border-radius: 12px; margin: 24px 0; }
 .pv-static-nav { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; max-width: 1160px; padding: 18px 24px; margin: auto; }
@@ -40,4 +44,4 @@
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 @media (max-width: 480px) { .pv-editorial { padding-inline: 20px; margin-top: 28px; } .pv-privacy-panel { padding: 22px; } }
 
-@media(prefers-color-scheme:dark){.game-guide .guide-article-link a{color:#93c5fd}}
+@media(prefers-color-scheme:dark){.game-guide .guide-article-link a,.pv-editorial a{color:#93c5fd}}

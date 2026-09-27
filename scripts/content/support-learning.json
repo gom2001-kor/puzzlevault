@@ -1,0 +1,267 @@
+{
+  "en": {
+    "aboutIntro": "The English learning room adds guided reading and short practice courses with Korean explanations.",
+    "about": [
+      "English, one passage at a time",
+      [
+        "PuzzleVault English brings the Little by Little Reading Room into this collection. Read selected English passages alongside separately prepared Korean translations, word meanings, sentence breakdowns and grammar examples, then practise with questions, writing, device speech and review cards. The interface and explanations are in Korean; the reading text is in English.",
+        "English Quest turns the material into short courses using word meanings, sentence ordering and comprehension questions. Daily-course XP is separate from game XP and is a record of practice, not a language qualification. See the reading guides before opening a lesson, and check each work’s sources and usage scope. Existing records from study-english2.pages.dev move through an exported JSON backup and a confirmed import, not an automatic account transfer."
+      ],
+      "english-learning"
+    ],
+    "contactIntro": [
+      "Contact the PuzzleVault project",
+      "This page provides the project’s feedback channel for the games, guides and English learning room. For a game problem, include the game name, mode or level, device/browser and the steps that led to the problem. Explain what you expected and what happened. Do not send passwords, payment details or private account data."
+    ],
+    "contact": [
+      "Report a learning correction",
+      "Include the lesson title, page address, passage or question number, the wording or answer that seems wrong, and your suggested correction with a source if available. For a playback problem, include the browser and selected voice; do not send a recording or a full learning backup unless needed and specifically requested. Backups may include your writing and personal study history.",
+      "learning-corrections"
+    ],
+    "rightsReport": [
+      "Report a rights concern",
+      "Identify the affected page and material, explain your connection to the rights or the basis of the concern, and provide a source or permission record where possible. Do not attach identity documents or unrelated personal information. The form is an inquiry channel, not confirmation that a claim has been resolved.",
+      "rights-reports"
+    ],
+    "privacy": [
+      "Receiving updated learning material",
+      [
+        "Once when you open the learning room, it checks for updated public lessons and requests a content file from study-english2.pages.dev. Its hosting provider can receive your IP address and ordinary request information such as the requested address and browser details. This request delivers learning material; it is not an analytics event. It does not send your answers, learning progress, writing drafts, review records or microphone recordings.",
+        "Previously accepted public material may be stored on this device using the browser Cache API under puzzlevault-english-content-v1, so it can be used offline. If an update cannot be retrieved or validated, the learning room can use the bundled material or a previously accepted copy. Updating lesson content is separate from moving your personal study records between the two sites."
+      ],
+      "english-content-updates"
+    ],
+    "termsIntro": [
+      "Playing and learning",
+      "PuzzleVault provides browser games for personal entertainment and an English learning room for self-directed practice, without registration. Use the site lawfully and do not disrupt its operation or other users. The service offers no gambling, cash prizes or financial rewards. Learning activities do not issue an accredited qualification or guarantee a test result."
+    ],
+    "terms": [
+      "Reading sources and learning material",
+      "The English originals follow the source-specific public-domain status or usage conditions shown with each work. Korean explanations, examples and exercises are separate learning material. These terms do not remove rights granted by a source’s open licence. A source’s public-domain status in one territory does not establish the same status worldwide. Source credits do not imply endorsement by the author or original publisher. Use the contact page to report a rights or content issue.",
+      "learning-materials"
+    ],
+    "links": [
+      "English reading guides (Korean)",
+      "Sources and usage scope",
+      "How guides are made"
+    ],
+    "descriptions": {
+      "about": "Meet PuzzleVault: twelve browser games, worked-example guides and an English learning room with Korean explanations, local progress and free access.",
+      "contact": "Contact PuzzleVault about game bugs, English lesson corrections, accessibility, copyright or privacy, with page links and useful reproduction details.",
+      "privacy": "How PuzzleVault handles local game and English study records, content updates, device speech, microphone recordings, optional analytics and feedback.",
+      "terms": "Terms for PuzzleVault games and English learning, including local records, source-specific content rights, fair use, advertising and feedback."
+    }
+  },
+  "ko": {
+    "aboutIntro": "한국어 해설로 영어를 읽고 짧은 문제를 풀 수 있는 영어 학습실도 함께 제공합니다.",
+    "about": [
+      "한 구간씩 읽고 연습하는 영어",
+      [
+        "PuzzleVault English는 Little by Little Reading Room을 이 프로젝트에 통합한 학습 공간입니다. 선정한 영어 구간에 별도로 작성한 한국어 번역, 문맥에 맞는 단어 뜻, 문장 구조와 문법 예문을 함께 제공합니다. 읽은 뒤 문제 풀기, 쓰기, 기기 음성으로 듣기와 복습 카드를 이용할 수 있습니다. 화면과 해설은 한국어, 읽기 본문은 영어입니다.",
+        "영어 탐험은 단어 뜻·문장 순서·내용 이해를 짧은 코스로 연습하는 기능입니다. 일일 코스 XP는 게임 XP와 별개인 연습 기록이며 공인 영어 능력 인증이 아닙니다. 학습 가이드에서 내용을 살펴보고 각 자료의 출처와 이용 범위를 확인할 수 있습니다. study-english2.pages.dev의 기존 기록은 JSON 백업을 내보내고 새 학습실에서 확인 후 불러오는 방식으로 이전합니다. 계정을 통한 자동 이전은 아닙니다."
+      ],
+      "english-learning"
+    ],
+    "contactIntro": [
+      "PuzzleVault 프로젝트에 문의하기",
+      "게임, 공략, 영어 학습실에 관한 의견을 받는 프로젝트 문의 창구입니다. 게임 문제는 이름, 모드·레벨, 기기·브라우저와 문제가 발생한 순서를 알려 주세요. 기대한 동작과 실제 결과를 함께 적으면 도움이 됩니다. 계정 비밀번호, 결제 정보나 비공개 계정 자료는 보내지 마세요."
+    ],
+    "contact": [
+      "영어 학습 내용 정정",
+      "자료 제목, 페이지 주소, 학습 구간 또는 문제 번호, 잘못되었다고 생각하는 문구나 정답을 알려 주세요. 수정 제안과 확인 가능한 근거가 있으면 함께 적어 주세요. 음성 문제라면 브라우저와 선택한 음성을 알려 주시면 됩니다. 별도로 필요성을 안내받지 않았다면 녹음이나 학습 백업 전체를 보내지 마세요. 백업에는 직접 쓴 글과 개인 학습 기록이 포함될 수 있습니다.",
+      "learning-corrections"
+    ],
+    "rightsReport": [
+      "권리 문제 제보",
+      "해당 페이지와 자료를 구체적으로 표시하고, 권리와의 관계 또는 문제를 제기하는 근거를 설명해 주세요. 확인할 수 있는 출처나 허락 기록이 있으면 함께 알려 주세요. 신분증이나 관련 없는 개인정보는 첨부하지 마세요. 양식 제출은 문의 접수 절차이며 문제 해결이 완료되었다는 확인은 아닙니다.",
+      "rights-reports"
+    ],
+    "privacy": [
+      "공개 학습 자료 업데이트 수신",
+      [
+        "영어 학습실을 열면 공개 학습 자료의 업데이트를 한 번 확인하기 위해 study-english2.pages.dev에서 콘텐츠 파일을 요청합니다. 원본 사이트의 호스팅 제공자는 이용자의 IP 주소, 요청 주소와 브라우저 정보 등 일반적인 통신 정보를 받을 수 있습니다. 학습 자료를 전달하기 위한 요청이며 이용 분석 이벤트가 아닙니다. 이 요청에 답안, 학습 진도, 작성한 글, 복습 기록이나 마이크 녹음을 보내지 않습니다.",
+        "이전에 검증을 통과한 공개 자료는 오프라인 이용을 위해 브라우저 Cache API의 puzzlevault-english-content-v1 저장소에 보관될 수 있습니다. 업데이트를 받거나 검증할 수 없으면 내장 자료 또는 이전에 확인된 자료를 이용할 수 있습니다. 학습 콘텐츠 업데이트와 두 사이트 사이의 개인 학습 기록 이전은 별개의 기능입니다."
+      ],
+      "english-content-updates"
+    ],
+    "termsIntro": [
+      "게임과 학습 이용",
+      "PuzzleVault는 개인의 오락을 위한 브라우저 게임과 자율 연습을 위한 영어 학습실을 제공합니다. 가입 없이 이용할 수 있으며 사이트 운영이나 다른 이용자를 방해해서는 안 됩니다. 도박, 현금 상금 또는 금전적 보상은 제공하지 않습니다. 학습 활동은 공인 자격을 발급하거나 시험 성적을 보장하지 않습니다."
+    ],
+    "terms": [
+      "원문과 학습 자료의 이용",
+      "영어 원문에는 각 자료에 표시한 공개영역 여부 또는 개별 이용 조건이 적용됩니다. 한국어 해설·예문·연습 문제는 원문과 별도로 제작한 학습 자료입니다. 이 약관은 원문의 공개 라이선스가 허용하는 권리를 없애지 않습니다. 한 지역에서의 공개영역 여부가 전 세계의 동일한 권리 상태를 뜻하지는 않습니다. 출처 표시는 원저자나 원문 제공자의 공식 제휴·보증을 뜻하지 않습니다. 권리나 내용에 문제가 있으면 문의 페이지에서 알려 주세요.",
+      "learning-materials"
+    ],
+    "links": [
+      "영어 읽기 학습 가이드",
+      "학습 자료 출처와 이용 범위",
+      "공략 작성·검토 방법"
+    ],
+    "descriptions": {
+      "about": "PuzzleVault의 브라우저 게임 12개, 예제로 설명하는 공략과 한국어 해설 영어 학습실을 소개합니다. 무료 이용, 기록 저장과 콘텐츠 작성 방법을 확인하세요.",
+      "contact": "PuzzleVault 게임 오류, 영어 학습 내용 정정, 접근성, 저작권과 개인정보 문의를 보내는 방법입니다. 해당 페이지와 재현 순서를 함께 알려 주세요.",
+      "privacy": "PuzzleVault의 게임·영어 학습 기록, 공개 콘텐츠 업데이트, 기기 음성과 마이크 녹음, 선택적 분석 및 문의 정보 처리 방식을 안내합니다.",
+      "terms": "PuzzleVault 게임과 영어 학습실의 이용약관입니다. 저장 기록, 자료별 이용 조건, 공정한 이용, 광고와 문의에 관한 내용을 확인하세요."
+    }
+  },
+  "ja": {
+    "aboutIntro": "韓国語の解説で英文を読み、短い問題に取り組める英語学習室もあります。",
+    "about": [
+      "英文を少しずつ読んで練習",
+      [
+        "PuzzleVault EnglishはLittle by Little Reading Roomをこのサイトに統合した学習スペースです。選んだ英文に、別途作成した韓国語訳、文脈に沿った単語の意味、文の構造と文法例を添えています。問題、作文、端末の読み上げ、復習カードで練習できます。画面と解説は韓国語、読書本文は英語です。",
+        "English Questでは単語の意味、語句の並べ替え、内容理解を短いコースで練習します。日次コースのXPはゲームXPと別の練習記録であり、公的な語学資格ではありません。読書ガイドと各資料の出典・利用範囲を確認できます。study-english2.pages.devの記録はJSONバックアップを出力し、こちらで確認して読み込むと移行できます。アカウントによる自動移行ではありません。"
+      ],
+      "english-learning"
+    ],
+    "contactIntro": [
+      "PuzzleVaultプロジェクトへの連絡",
+      "ゲーム、攻略、英語学習室へのフィードバック窓口です。ゲームの問題には名前、モードやレベル、端末・ブラウザー、発生した操作順を添えてください。期待した結果と実際の動作を区別すると役立ちます。パスワード、決済情報、非公開のアカウント情報は送らないでください。"
+    ],
+    "contact": [
+      "英語教材の訂正",
+      "教材名、ページURL、学習区間や問題番号、誤りと思われる文章や答えをお知らせください。訂正案と確認できる出典があれば添えてください。音声の問題はブラウザーと選択した音声を記してください。個別に必要性を案内された場合を除き、録音や学習バックアップ全体は送らないでください。バックアップには作文や個人の学習記録が含まれる場合があります。",
+      "learning-corrections"
+    ],
+    "rightsReport": [
+      "権利に関する報告",
+      "対象ページと資料を特定し、権利との関係または問題と考える根拠を説明してください。確認できる出典や許諾記録があれば添えてください。身分証や無関係な個人情報は不要です。フォームの送信は問い合わせの手続きであり、問題の解決を確認するものではありません。",
+      "rights-reports"
+    ],
+    "privacy": [
+      "公開学習資料の更新取得",
+      [
+        "英語学習室を開くと公開教材の更新を1回確認するため、study-english2.pages.devへコンテンツファイルを要求します。元サイトのホスティング事業者はIPアドレス、要求URL、ブラウザー情報など通常の通信情報を受け取る場合があります。教材を配信するための要求であり、アクセス分析イベントではありません。回答、進捗、作文、復習記録、マイク録音は送りません。",
+        "確認済みの公開資料は、オフライン利用のため端末のブラウザーCache APIのpuzzlevault-english-content-v1に保存する場合があります。更新を取得または検証できない場合、同梱資料か以前に確認済みの資料を使えます。教材の更新と、両サイト間での個人学習記録の移行は別の機能です。"
+      ],
+      "english-content-updates"
+    ],
+    "termsIntro": [
+      "ゲームと学習の利用",
+      "PuzzleVaultは個人の娯楽向けブラウザーゲームと自主練習向け英語学習室を提供します。登録は不要です。適法に利用し、運営や他の利用者を妨害しないでください。賭博、現金賞金、金銭的報酬はありません。学習活動は公的資格を発行せず、試験結果を保証しません。"
+    ],
+    "terms": [
+      "原文と学習資料",
+      "英語原文には資料ごとのパブリックドメインの範囲または個別の利用条件が適用されます。韓国語の解説・例文・練習問題は別途作成した教材です。本規約は原文のオープンライセンスが認める権利を取り消しません。ある地域のパブリックドメイン状態が全世界で同じとは限りません。出典表示は原著者や提供元の公認・保証を意味しません。権利や内容の問題はお問い合わせページからご連絡ください。",
+      "learning-materials"
+    ],
+    "links": [
+      "英語読書ガイド（韓国語）",
+      "教材の出典と利用範囲",
+      "記事の作成と確認方法"
+    ],
+    "descriptions": {
+      "about": "12種類のブラウザーゲーム、実例で説明する攻略、韓国語解説の英語学習室を備えるPuzzleVault。無料利用や端末内の記録について紹介します。",
+      "contact": "PuzzleVaultの不具合、英語教材の訂正、アクセシビリティ、著作権、プライバシーについての連絡方法です。ページと再現手順をお知らせください。",
+      "privacy": "PuzzleVaultのゲーム・学習記録、公開教材の更新、端末の音声・録音、任意の分析と問い合わせ情報の扱いを説明します。",
+      "terms": "PuzzleVaultのゲームと英語学習の利用規約。端末内の記録、教材ごとの権利、公正な利用、広告とお問い合わせについて。"
+    }
+  },
+  "zh": {
+    "aboutIntro": "还提供带韩语讲解的英语学习室，可阅读英文并完成简短练习。",
+    "about": [
+      "逐段阅读与练习英语",
+      [
+        "PuzzleVault English将Little by Little Reading Room整合到本站。精选英文片段配有单独制作的韩语翻译、语境词义、句子结构和语法例句，并提供答题、写作、设备朗读和复习卡。界面与讲解为韩语，阅读原文为英语。",
+        "English Quest用短课程练习词义、句子排序和内容理解。每日课程XP与游戏XP分开，只记录练习，并非正式语言资格。可先阅读学习指南，并查看各材料的来源和使用范围。study-english2.pages.dev的旧记录需导出JSON备份，再到此处核对并导入，不通过账号自动迁移。"
+      ],
+      "english-learning"
+    ],
+    "contactIntro": [
+      "联系PuzzleVault项目",
+      "此页面提供游戏、攻略和英语学习室的反馈渠道。游戏问题请说明游戏名、模式或关卡、设备和浏览器、导致问题的操作顺序，以及预期和实际结果。不要发送密码、支付信息或私密账户资料。"
+    ],
+    "contact": [
+      "更正英语学习内容",
+      "请提供材料标题、页面地址、片段或题目编号、认为有误的文字或答案。如有更正建议及可核查的来源，请一并说明。语音问题请提供浏览器和所选声音。除非另行说明有必要，请勿发送录音或完整学习备份；备份可能含有写作内容和个人学习记录。",
+      "learning-corrections"
+    ],
+    "rightsReport": [
+      "反馈权利问题",
+      "请指出涉及的页面和材料，说明与相关权利的关系或提出问题的依据，并尽可能提供来源或许可记录。请勿附上身份证件或无关个人信息。提交表单是咨询步骤，不代表问题已获解决。",
+      "rights-reports"
+    ],
+    "privacy": [
+      "接收公开学习材料更新",
+      [
+        "打开英语学习室时，会检查一次公开教材更新，并会向study-english2.pages.dev请求内容文件。原站点的托管服务商可能接收IP地址、请求地址、浏览器信息等一般网络请求信息。这是为传送教材而发出的请求，不是访问分析事件；不会发送答题、进度、写作、复习记录或麦克风录音。",
+        "此前通过验证的公开材料可能通过浏览器Cache API保存在设备的puzzlevault-english-content-v1缓存中，以便离线使用。如无法获取或验证更新，可以使用内置材料或此前已接受的副本。教材更新与两个站点之间的个人学习记录迁移是不同功能。"
+      ],
+      "english-content-updates"
+    ],
+    "termsIntro": [
+      "游戏与学习用途",
+      "PuzzleVault提供个人娱乐用的浏览器游戏和自主练习用的英语学习室，无需注册。请合法使用，不干扰网站或其他用户。本站不提供赌博、现金奖品或金钱奖励。学习活动不颁发认可资格，也不保证考试成绩。"
+    ],
+    "terms": [
+      "原文与学习资料",
+      "英语原文适用各资料注明的公共领域范围或单独使用条件。韩语讲解、例句和练习为另行制作的学习资料。本条款不取消原文开放许可赋予的权利。某一地区的公共领域状态不等于全球相同的权利状态。来源标注不表示作者或原出版方的官方合作或认可。如有权利或内容问题，请通过联系页面反馈。",
+      "learning-materials"
+    ],
+    "links": [
+      "英语阅读指南（韩语）",
+      "教材来源和使用范围",
+      "攻略编写与核对方法"
+    ],
+    "descriptions": {
+      "about": "了解PuzzleVault的十二款浏览器游戏、实例攻略与韩语讲解英语学习室，以及免费使用、设备记录和内容编写方式。",
+      "contact": "向PuzzleVault反馈游戏故障、英语教材更正、无障碍、版权或隐私问题。请附上相关页面和有助复现的操作步骤。",
+      "privacy": "说明PuzzleVault如何处理游戏与英语学习记录、公开教材更新、设备语音及录音、可选分析和反馈信息。",
+      "terms": "PuzzleVault游戏与英语学习室使用条款：本地记录、各材料使用条件、公平使用、广告和联系渠道。"
+    }
+  },
+  "es": {
+    "aboutIntro": "La sala de inglés añade lectura guiada y ejercicios breves con explicaciones en coreano.",
+    "about": [
+      "Inglés, pasaje a pasaje",
+      [
+        "PuzzleVault English integra Little by Little Reading Room en esta colección. Los pasajes seleccionados tienen traducciones coreanas, significados en contexto, análisis de oraciones y ejemplos gramaticales elaborados por separado. Puedes practicar con preguntas, escritura, la voz del dispositivo y tarjetas de repaso. La interfaz y las explicaciones están en coreano; los textos de lectura, en inglés.",
+        "English Quest ofrece cursos breves de vocabulario, orden de frases y comprensión. Su XP diario está separado del XP de juegos y registra práctica, no una titulación lingüística. Consulta las guías y las fuentes y condiciones de cada obra. Para trasladar registros de study-english2.pages.dev, exporta una copia JSON e impórtala aquí tras revisar la vista previa; no hay traslado automático mediante una cuenta."
+      ],
+      "english-learning"
+    ],
+    "contactIntro": [
+      "Contactar con el proyecto PuzzleVault",
+      "Este es el canal de comentarios sobre los juegos, guías y sala de inglés. Para un problema de juego, incluye nombre, modo o nivel, dispositivo y navegador, pasos, resultado esperado y resultado real. No envíes contraseñas, datos de pago ni información privada de cuentas."
+    ],
+    "contact": [
+      "Corregir material de inglés",
+      "Indica el título, dirección de la página, número del pasaje o pregunta, y el texto o respuesta que consideras incorrecto. Añade una corrección y una fuente verificable si las tienes. Para problemas de voz, indica navegador y voz elegida. No envíes grabaciones ni una copia completa de tus estudios salvo que se solicite por una necesidad concreta: puede contener escritos e historial personal.",
+      "learning-corrections"
+    ],
+    "rightsReport": [
+      "Comunicar un problema de derechos",
+      "Identifica la página y el material, explica tu relación con los derechos o el fundamento de la incidencia y, si es posible, aporta una fuente o permiso. No adjuntes documentos de identidad ni información personal ajena al caso. Enviar el formulario es una consulta, no una confirmación de que el asunto esté resuelto.",
+      "rights-reports"
+    ],
+    "privacy": [
+      "Recepción de material actualizado",
+      [
+        "Al abrir la sala de inglés se comprueba una vez si hay material público actualizado y se solicita un archivo de contenido a study-english2.pages.dev. El alojamiento del sitio original puede recibir tu dirección IP e información normal de la solicitud, como dirección solicitada y datos del navegador. La petición entrega material educativo; no es un evento de analítica. No envía respuestas, progreso, borradores, repasos ni grabaciones del micrófono.",
+        "El material público aceptado puede guardarse mediante Cache API del navegador, en puzzlevault-english-content-v1, para usarlo sin conexión. Si no se puede obtener o validar una actualización, se puede usar el material incluido o una copia aceptada anteriormente. Actualizar contenidos y trasladar tus registros personales entre los dos sitios son funciones distintas."
+      ],
+      "english-content-updates"
+    ],
+    "termsIntro": [
+      "Jugar y aprender",
+      "PuzzleVault ofrece juegos de navegador para entretenimiento personal y una sala de inglés para práctica autónoma, sin registro. Utiliza el sitio legalmente y no interfieras con su funcionamiento ni con otros usuarios. No ofrece apuestas, premios en efectivo ni recompensas monetarias. Las actividades no emiten títulos acreditados ni garantizan resultados de exámenes."
+    ],
+    "terms": [
+      "Fuentes y material de aprendizaje",
+      "Los originales ingleses se rigen por el alcance del dominio público o las condiciones particulares indicadas para cada obra. Las explicaciones coreanas, ejemplos y ejercicios son material elaborado por separado. Estas condiciones no eliminan los derechos concedidos por una licencia abierta de la fuente. El dominio público en un territorio no establece el mismo estado en todo el mundo. Citar una fuente no implica respaldo del autor o editor original. Comunica incidencias de derechos o contenido por la página de contacto.",
+      "learning-materials"
+    ],
+    "links": [
+      "Guías de lectura inglesa (coreano)",
+      "Fuentes y alcance de uso",
+      "Cómo elaboramos las guías"
+    ],
+    "descriptions": {
+      "about": "Conoce PuzzleVault: doce juegos de navegador, guías con ejemplos y una sala de inglés con explicaciones coreanas, progreso local y acceso gratuito.",
+      "contact": "Contacta con PuzzleVault sobre errores, correcciones de inglés, accesibilidad, derechos o privacidad, indicando páginas y pasos útiles para reproducirlos.",
+      "privacy": "Cómo PuzzleVault trata los registros de juego y estudio, actualizaciones públicas, voz y grabaciones, analítica opcional y comentarios.",
+      "terms": "Condiciones de los juegos y el aprendizaje de inglés en PuzzleVault: registros locales, derechos de las fuentes, uso adecuado, publicidad y contacto."
+    }
+  }
+}

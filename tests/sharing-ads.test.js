@@ -57,7 +57,7 @@ function sandbox(file, overrides = {}) {
 
 function withProvider(provider) {
     const env = sandbox('adsense.js');
-    env.ads.configure({ enabled: true, provider });
+    env.ads.configure({ enabled: true, provider, canRequestAds: () => true });
     return env;
 }
 
@@ -218,4 +218,56 @@ test('every legacy game calls the controller once only while its result is still
         callback();
         assert.equal(calls, 1, `${game}: only showInterstitial counts this opportunity`);
     }
+});
+
+test('enabled provider without a valid request gate stays private and grants free help', async () => {
+    for (const canRequestAds of [undefined, null, () => false, () => 'true', () => { throw new Error('CMP unavailable'); }]) {
+        const env = sandbox('adsense.js');
+        let requests = 0, rewards = 0, prompts = 0;
+        env.context.window.confirm = () => { prompts++; return true; };
+        env.ads.configure({ enabled: true, canRequestAds, provider: {
+            isRewardAvailable() { requests++; return true; },
+            showReward() { requests++; }, showInterstitial() { requests++; }
+        } });
+        assert.equal(env.ads.isRewardAdAvailable(), false);
+        assert.equal((await env.ads.showRewardAd(() => rewards++)).status, 'free');
+        for (let game = 1; game <= 6; game++) await env.ads.showInterstitial();
+        assert.equal(requests, 0);
+        assert.equal(prompts, 0);
+        assert.equal(rewards, 1);
+    }
+});
+
+test('request permission is rechecked after opt-in and before every later placement', async () => {
+    const env = sandbox('adsense.js');
+    let permission = true, requests = 0, rewards = 0;
+    env.ads.configure({ enabled: true, canRequestAds: () => permission, provider: {
+        isRewardAvailable: () => true,
+        showReward(callbacks) { requests++; callbacks.onComplete(); },
+        showInterstitial(callbacks) { requests++; callbacks.onNoFill(); }
+    } });
+    env.context.window.confirm = () => { permission = false; return true; };
+    assert.equal((await env.ads.showRewardAd(() => rewards++)).status, 'free');
+    assert.equal(requests, 0);
+    assert.equal(rewards, 1);
+    permission = true;
+    env.context.window.confirm = () => true;
+    assert.equal((await env.ads.showRewardAd(() => rewards++)).status, 'completed');
+    permission = false;
+    for (let game = 1; game <= 6; game++) await env.ads.showInterstitial();
+    assert.equal(requests, 1);
+    assert.equal(rewards, 2);
+});
+
+test('request gate distinguishes rewarded and interstitial product permission', async () => {
+    const env = sandbox('adsense.js');
+    let requests = 0;
+    env.ads.configure({ enabled: true, canRequestAds: kind => kind === 'reward', provider: {
+        isRewardAvailable: () => true,
+        showReward(callbacks) { requests++; callbacks.onComplete(); },
+        showInterstitial() { throw new Error('product not enabled'); }
+    } });
+    assert.equal((await env.ads.showRewardAd(() => {})).status, 'completed');
+    for (let game = 1; game <= 6; game++) await env.ads.showInterstitial();
+    assert.equal(requests, 1);
 });

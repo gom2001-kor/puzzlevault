@@ -229,10 +229,11 @@ const readLibrary = (): Lesson[] => ['classics.json', 'voa-lincoln.json', 'moder
   .flatMap(name => JSON.parse(readFileSync(new URL('../src/data/' + name, import.meta.url), 'utf8')) as Lesson[])
   .sort((a, b) => a.order - b.order)
 
-test('the ten source candidates have stable, unique identities and usable provenance', () => {
+test('source candidates retain the original identities and have usable provenance', () => {
   const lessons = readLibrary()
-  assert.equal(lessons.length, 10)
-  assert.deepEqual(lessons.map(l => l.order), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  assert.ok(lessons.length >= 10)
+  assert.equal(new Set(lessons.map(l => l.order)).size, lessons.length)
+  for (const id of ['voa-welcome', 'voa-gym', 'north-wind', 'peter-rabbit', 'magi', 'alice', 'hat', 'gettysburg-address']) assert.ok(lessons.some(lesson => lesson.id === id), id)
   assert.equal(new Set(lessons.map(l => l.id)).size, lessons.length)
   const cardIds: string[] = []
   for (const lesson of lessons) {

@@ -41,6 +41,7 @@ export default function EnglishQuest({ onStudy, speak, stopSpeech, onSaveCard }:
   const blocked = useRef(!!initial.error)
   const preservedRaw = useRef(initial.raw)
   const [error, setError] = useState(initial.error)
+  const [contentNotice, setContentNotice] = useState(initial.notice || '')
   const errorRef = useRef(initial.error)
   const [lobby, setLobby] = useState(!initial.state.active)
   const [selection, setSelection] = useState(lessons[0]?.id ?? '')
@@ -82,7 +83,7 @@ export default function EnglishQuest({ onStudy, speak, stopSpeech, onSaveCard }:
     stateRef.current = next; setState(next)
   }
   function start(mode: 'daily' | 'practice') {
-    stopSpeech(); setSavedCards([])
+    stopSpeech(); setSavedCards([]); setContentNotice('')
     const day = utcQuestDay(); setToday(day)
     update(previous => ({ ...previous, active: startQuest(bank, mode, day, mode === 'daily' ? null : selection, newId()) }))
     setLobby(false); setDiscard(false)
@@ -106,6 +107,7 @@ export default function EnglishQuest({ onStudy, speak, stopSpeech, onSaveCard }:
   return <section className="english-quest" aria-label="영어 탐험">
     <div className="eq-topline"><span className="eq-eyebrow">PUZZLEVAULT · ENGLISH QUEST</span><span className="eq-xp"><span aria-hidden="true">✦</span> 학습 {xp} XP</span></div>
     {error && <div className="eq-storage-note" role="alert"><strong>이 기기의 저장을 확인해 주세요</strong><p>{error}</p>{preservedRaw.current !== null && <button type="button" onClick={downloadPreserved}>기존 탐험 기록 내려받기</button>}</div>}
+    {contentNotice && <div className="eq-storage-note" role="status"><strong>새 자료로 탐험을 이어가세요</strong><p>{contentNotice}</p><button type="button" onClick={() => setContentNotice('')}>확인</button></div>}
     {lobby || !run || !question ? <>
       <header className="eq-hero">
         <div className="eq-hero-copy"><span className="eq-kicker">읽고, 연결하고, 발견하는 6개의 순간</span><h1>단어의 숲에서<br/>이야기의 끝까지.</h1><p>짧은 원문 속 단어를 발견하고, 문장을 잇고, 이야기의 단서를 찾아보세요. 틀린 답도 다음 탐험의 힌트가 됩니다.</p><div className="eq-hero-tags"><span>단어 찾기</span><span>문장 조립</span><span>내용 이해</span></div></div>
@@ -113,7 +115,7 @@ export default function EnglishQuest({ onStudy, speak, stopSpeech, onSaveCard }:
       </header>
       {inProgress && <div className="eq-resume"><div><strong>잠시 멈춘 탐험이 있어요</strong><p>{run!.mode === 'daily' ? `${run!.day} 오늘의 탐험` : run!.mode === 'review' ? '오답 다시 탐험' : '수업별 연습'} · {run!.answers.length} / {run!.questionIds.length}문제 제출</p></div><button className="eq-primary" type="button" onClick={() => setLobby(false)}>이어서 탐험</button><button className="eq-text-button" type="button" onClick={() => setDiscard(!discard)}>이 탐험 그만두기</button>{discard && <div className="eq-discard"><p>이 탐험의 중간 진도만 지워집니다. 지금까지 얻은 XP와 최고 기록은 유지돼요.</p><button type="button" onClick={() => { update(previous => ({ ...previous, active: null })); setDiscard(false) }}>중간 진도 지우기</button><button type="button" onClick={() => setDiscard(false)}>계속 보관하기</button></div>}</div>}
       <div className="eq-course-grid">
-        <article className="eq-course eq-daily"><div className="eq-course-top"><span className="eq-small-icon" aria-hidden="true">◈</span><span className="eq-chip">매일 새로운 조합</span></div><h2>오늘의 탐험</h2><p>두 이야기에서 출발하는 여섯 문제. 같은 날에는 누구나 같은 코스를 만나게 됩니다.</p><div className="eq-route-mini" aria-label="단어, 문장, 독해를 두 번 만나는 코스">✦ <i/> ⌘ <i/> ◈ <i/> ✦ <i/> ⌘ <i/> ◈</div><button className="eq-primary" type="button" disabled={inProgress} onClick={() => start('daily')}>{state.dailyAwards[today] ? '오늘의 코스 다시 탐험' : '오늘의 탐험 시작'} <span aria-hidden="true">↗</span></button><small>{today} · UTC 기준, 한국 시간 오전 9시 갱신</small>{state.dailyAwards[today] && <span className="eq-earned">오늘의 학습 XP 수령 완료 · 다시 풀어도 XP는 추가되지 않아요.</span>}</article>
+        <article className="eq-course eq-daily"><div className="eq-course-top"><span className="eq-small-icon" aria-hidden="true">◈</span><span className="eq-chip">매일 새로운 조합</span></div><h2>오늘의 탐험</h2><p>두 이야기에서 출발하는 여섯 문제. 같은 자료 버전의 같은 날에는 누구나 같은 코스를 만나게 됩니다.</p><div className="eq-route-mini" aria-label="단어, 문장, 독해를 두 번 만나는 코스">✦ <i/> ⌘ <i/> ◈ <i/> ✦ <i/> ⌘ <i/> ◈</div><button className="eq-primary" type="button" disabled={inProgress} onClick={() => start('daily')}>{state.dailyAwards[today] ? '오늘의 코스 다시 탐험' : '오늘의 탐험 시작'} <span aria-hidden="true">↗</span></button><small>{today} · UTC 기준, 한국 시간 오전 9시 갱신</small>{state.dailyAwards[today] && <span className="eq-earned">오늘의 학습 XP 수령 완료 · 다시 풀어도 XP는 추가되지 않아요.</span>}</article>
         <article className="eq-course"><div className="eq-course-top"><span className="eq-small-icon" aria-hidden="true">⌘</span><span className="eq-chip eq-chip-soft">나의 속도로</span></div><h2>수업별 연습</h2><p>마음에 드는 이야기를 골라 집중해 보세요. 정답 해설에서 원문 수업으로 바로 이어집니다.</p><label className="eq-select-label" htmlFor="eq-lesson-select">탐험할 이야기</label><select id="eq-lesson-select" value={selection} onChange={event => setSelection(event.target.value)} disabled={inProgress}>{lessons.map(lesson => <option key={lesson.id} value={lesson.id}>{lesson.title}</option>)}</select><button className="eq-secondary" type="button" onClick={() => start('practice')} disabled={inProgress || !selection}>이 이야기로 연습 <span aria-hidden="true">→</span></button><small>문제 조합은 매번 변경 · XP 없이 최고 정답 기록 갱신</small></article>
       </div>
       <div className="eq-explainer"><span aria-hidden="true">✧</span><p><strong>완벽한 첫 답보다, 이해한 다음 답.</strong> 시간제한과 생명 차감 없이 진행합니다. 오늘의 탐험은 처음 완료할 때 30 XP와 정답당 10 XP를 얻으며, 다른 PuzzleVault 게임의 XP와 별도로 이 브라우저에 저장됩니다.</p></div>

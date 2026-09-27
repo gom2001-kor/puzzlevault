@@ -1,10 +1,11 @@
 """Maintain the site's static, crawlable support pages (no runtime/build dependency)."""
 from pathlib import Path
 import html
+import json
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-DATE = '2026-09-26'
+DATE = '2026-09-28'
 PAGE_DATES = {'privacy': '2026-09-28'}
 FORM = 'https://forms.gle/NBjCNdVCBGaGGcbM9'
 COPY = {
@@ -70,7 +71,7 @@ COPY = {
         'contactSections':[
             ('재현할 수 있는 설명을 보내 주세요','게임 이름, 모드·레벨, 기기·브라우저와 문제가 발생한 순서를 알려 주세요. 기대한 동작과 실제 결과를 함께 적으면 도움이 됩니다. 도전 링크는 같은 문제를 확인하는 데 쓸 수 있지만 계정 비밀번호, 결제 정보나 개인 계정 자료는 보내지 마세요.'),
             ('보낼 수 있는 의견','게임 오류, 접근성, 번역과 콘텐츠 수정, 저작권 문제, 개인정보 관련 문의를 보낼 수 있습니다. 콘텐츠 문제라면 해당 페이지와 문구 또는 이미지 위치를 알려 주세요. 다른 사람의 개인정보는 제출하지 마세요.'),
-            ('외부 문의 서비스','아래 버튼은 프로젝트의 Google Forms 문의 창을 새 탭에서 엽니다. 실시간 채팅이 아니며 양식 제출은 별도의 동작입니다. 직접 입력한 정보는 Google의 서비스에서 처리될 수 있습니다. 열리지 않으면 다른 브라우저에서 링크를 열어 보고, 같은 문의를 반복 제출하지 마세요.')
+            ('외부 문의 서비스','의견 보내기 버튼은 프로젝트의 Google Forms 문의 창을 새 탭에서 엽니다. 실시간 채팅이 아니며 양식 제출은 별도의 동작입니다. 직접 입력한 정보는 Google의 서비스에서 처리될 수 있습니다. 열리지 않으면 다른 브라우저에서 링크를 열어 보고, 같은 문의를 반복 제출하지 마세요.')
         ],
         'termsSections':[
             ('게임 이용','PuzzleVault는 개인의 오락을 위한 브라우저 퍼즐을 제공합니다. 가입 없이 이용할 수 있으며 사이트 운영이나 다른 이용자를 방해해서는 안 됩니다. 도박, 현금 상금 또는 금전적 보상은 제공하지 않습니다.'),
@@ -188,6 +189,27 @@ COPY = {
     }
 }
 
+def apply_learning_copy():
+    """Keep the support pages aligned with the learning service and its data flow."""
+    additions = json.loads((ROOT / 'scripts/content/support-learning.json').read_text(encoding='utf-8'))
+    for lang, extra in additions.items():
+        copy = COPY[lang]
+        heading, paragraph = copy['aboutSections'][0]
+        copy['aboutSections'][0] = (heading, paragraph + ' ' + extra['aboutIntro'])
+        copy['aboutSections'].insert(2, extra['about'])
+        copy['contactSections'][0] = extra['contactIntro']
+        copy['contactSections'].insert(2, extra['contact'])
+        copy['contactSections'].insert(3, extra['rightsReport'])
+        copy['privacySections'].insert(3, extra['privacy'])
+        copy['termsSections'][0] = extra['termsIntro']
+        copy['termsSections'].insert(3, extra['terms'])
+        copy['learningLinks'] = extra['links']
+        copy['descriptions'] = extra['descriptions']
+
+
+apply_learning_copy()
+
+
 def localized(lang, page):
     return ('/' if lang == 'en' else '/' + lang + '/') + page + '.html'
 
@@ -214,10 +236,18 @@ def refresh():
             blocks.append(f'<p class="pv-editorial-callout">{links}</p>')
             if page == 'about':
                 blocks.append(f'<a class="pv-btn pv-btn-primary" href="{"/" if lang == "en" else "/" + lang + "/"}#games">{copy["games"]} →</a>')
+            if page in ('about', 'terms', 'contact'):
+                learning_links = copy['learningLinks']
+                editorial_url = '/blog/' + ('' if lang == 'en' else lang + '/') + 'editorial.html'
+                blocks.append('<p class="pv-editorial-callout">' + ' · '.join([
+                    f'<a href="/learn/english/guides/">{html.escape(learning_links[0])}</a>',
+                    f'<a href="/learn/english/#/sources">{html.escape(learning_links[1])}</a>',
+                    f'<a href="{editorial_url}">{html.escape(learning_links[2])}</a>',
+                ]) + '</p>')
             blocks.append('</main>')
             source = re.sub(r'<main\b[^>]*>[\s\S]*?</main>', '\n'.join(blocks), source, count=1)
             source = re.sub(r'<title>.*?</title>', '<title>' + html.escape(copy[page]) + ' | PuzzleVault</title>', source)
-            description = html.escape(copy[page + 'Sections'][0][1], quote=True)
+            description = html.escape(copy['descriptions'][page], quote=True)
             source = re.sub(r'<meta\s+name="description"\s+content="[^"]*"\s*/?>', lambda _: '<meta name="description" content="' + description + '">', source)
             target.write_text(source, encoding='utf-8')
 

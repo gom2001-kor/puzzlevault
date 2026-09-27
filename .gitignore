@@ -5,3 +5,5 @@ node_modules/
 *.tsbuildinfo
 dist/
 apps/english/docs/screenshots/
+
+.wrangler/

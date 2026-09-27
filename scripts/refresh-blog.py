@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / 'scripts/content'
 LANGS = ('en', 'ko', 'ja', 'zh', 'es')
 DATE = '2026-09-26'
-VERSION = 18
+VERSION = 19
 SITE = 'https://puzzlevault.pages.dev'
 GAMES = dict(zip(('numvault','gridsmash','patternpop','sortstack','quickcalc','tileturn','colorflow','pipelink','mergechain','hexmatch'), ('NumVault','GridSmash','PatternPop','SortStack','QuickCalc','TileTurn','ColorFlow','PipeLink','MergeChain','HexMatch')))
 ICONS = dict(zip(GAMES, ('🔢','🧱','🧠','📚','⚡','🔄','🎨','🔧','🔮','⬡')))
@@ -136,9 +136,10 @@ def render_index(posts,lang):
 def render_editorial(lang):
     p=json.loads((CONTENT/'editorial.json').read_text(encoding='utf-8'))[lang]
     c=COPY[lang]; url=blog_root(lang)+'editorial.html'
-    schema={'@context':'https://schema.org','@type':'WebPage','name':p['title'],'inLanguage':lang,'dateModified':DATE,'url':SITE+url}
+    editorial_date=p.get('updated',DATE)
+    schema={'@context':'https://schema.org','@type':'WebPage','name':p['title'],'inLanguage':lang,'dateModified':editorial_date,'url':SITE+url}
     result=head(lang,p['title']+' | PuzzleVault',p['description'],url,{l:blog_root(l)+'editorial.html' for l in LANGS},schema)+nav(lang)
-    result+=f'<main><header class="blog-post-header"><nav class="blog-breadcrumb"><a href="{blog_root(lang)}">← {c["blog"]}</a></nav><h1>{p["title"]}</h1><p class="blog-post-meta">{c["updated"]} <time datetime="{DATE}">{DATE}</time></p></header><article class="blog-content">{p["body"]}</article></main>'
+    result+=f'<main><header class="blog-post-header"><nav class="blog-breadcrumb"><a href="{blog_root(lang)}">← {c["blog"]}</a></nav><h1>{p["title"]}</h1><p class="blog-post-meta">{c["updated"]} <time datetime="{editorial_date}">{editorial_date}</time></p></header><article class="blog-content">{p["body"]}</article></main>'
     return result+foot(lang)
 
 def update_registry(posts):

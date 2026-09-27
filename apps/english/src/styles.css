@@ -77,3 +77,11 @@ button,a,input,select,textarea{touch-action:manipulation}
 .sentence-panel>.row,.explorer-heading,.reading-toolbar{flex-wrap:wrap}.sentence-actions .btn{max-width:100%}
 .lesson-heading .tags{flex-wrap:wrap}.lesson-title-row{min-width:0}.reader-tip p{min-width:0}
 @media(max-width:950px){.reader-grid{grid-template-columns:minmax(0,1fr)}}
+
+.reading-guide-link { margin: 8px 0 18px; font-size: .82rem; line-height: 1.7; }
+.reading-guide-link a { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: #175b66; text-decoration: underline; text-underline-offset: 4px; }
+.content-edition { border: 1px solid var(--border, #dce6ec); padding: 12px 17px; border-radius: 12px; background: #fff; color: #415d70; font-size: .78rem; margin: 12px 0; line-height: 1.75; }
+.content-edition summary { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; cursor: pointer; min-height: 30px; font-weight: 600; }
+.content-edition summary span { margin-left: auto; font-size: .7rem; color: #176858; }
+.content-edition p { margin: 9px 0; }
+.content-edition a { text-decoration: underline; color: #176858; }

@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5175 --strictPort",
-    "build": "tsc -b && vite build && node ../../scripts/sync-english-assets.cjs",
-    "test": "node --experimental-strip-types --test tests/*.test.ts"
+    "build": "tsc -b && vite build && node ../../scripts/build-english-guides.cjs && node ../../scripts/sync-english-assets.cjs",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "content:sync": "node --experimental-strip-types ../../scripts/sync-english-content.mjs",
+    "content:check": "node --experimental-strip-types ../../scripts/sync-english-content.mjs --check"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

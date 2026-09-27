@@ -17,10 +17,10 @@ const escape=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
  const bank=quest.buildQuestBank(lessons,guides);
  const browser=await chromium.launch({channel:'msedge',headless:true});
  const errors=[],external=[],checks=[];
- function observe(page){page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>{if(/^https?:/.test(request.url())&&!request.url().startsWith(origin+'/'))external.push(request.url());});}
+ async function observe(page){await page.route("https://study-english2.pages.dev/puzzlevault-content.json", route=>route.fulfill({status:503,contentType:"application/json",body:"{}",headers:{"access-control-allow-origin":"*"}}));page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>{if(/^https?:/.test(request.url())&&!request.url().startsWith(origin+'/'))external.push(request.url());});}
  try{
   const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
-  const page=await context.newPage();observe(page);
+  const page=await context.newPage();await observe(page);
   await page.goto(url+'#/quest');await page.locator('.eq-hero').waitFor();
   await page.evaluate(()=>{localStorage.setItem('pv_numvault_best','81');localStorage.setItem('pv_player_progress','existing-game-record');});
   await page.getByRole('button',{name:/오늘의 탐험 시작/}).click();
@@ -64,7 +64,7 @@ const escape=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pv_english_reading_v2')).completed.length),0);
   checks.push('Wrong answers can enter the reading review list; review and repeated daily completion do not duplicate XP or alter game/reading completion records');
   for(const width of [320,390,1280]){await page.setViewportSize({width,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}
-  const broken=await browser.newContext({serviceWorkers:'block'}),bp=await broken.newPage();observe(bp);
+  const broken=await browser.newContext({serviceWorkers:'block'}),bp=await broken.newPage();await observe(bp);
   await bp.goto(url+'#/quest');await bp.locator('.eq-hero').waitFor();await bp.evaluate(()=>localStorage.setItem('pv_english_quest_v1','{broken'));
   await bp.reload();await bp.getByRole('alert').waitFor();await bp.getByRole('button',{name:/오늘의 탐험 시작/}).click();
   await bp.locator('.eq-options button').first().click();await bp.getByRole('button',{name:/답 확인하기/}).click();
@@ -73,19 +73,19 @@ const escape=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   await bp.goto(url+'#/quest');await bp.locator('.eq-feedback').waitFor();
   assert.equal(await bp.evaluate(()=>localStorage.getItem('pv_english_quest_v1')),'{broken');await broken.close();
   checks.push('Malformed quest storage is preserved; temporary progress survives the round trip to its source lesson');
-  const offline=await browser.newContext({viewport:{width:390,height:844}}),op=await offline.newPage();observe(op);
+  const offline=await browser.newContext({viewport:{width:390,height:844}}),op=await offline.newPage();await observe(op);
   await op.goto(url);await op.locator('.app-shell').waitFor();await op.evaluate(()=>navigator.serviceWorker.ready);await op.reload();
   await op.waitForFunction(()=>!!navigator.serviceWorker.controller);
-  const cached=await op.evaluate(async()=>{const cache=await caches.open('puzzlevault-v18');return (await cache.keys()).map(r=>new URL(r.url).pathname);});
+  const cached=await op.evaluate(async()=>{const cache=await caches.open('puzzlevault-v19');return (await cache.keys()).map(r=>new URL(r.url).pathname);});
   for(const file of fs.readdirSync(path.join(root,'learn/english/assets')))assert.ok(cached.includes('/learn/english/assets/'+file),file);
   await offline.setOffline(true);await op.goto(url+'#/lesson/peter-rabbit/0');await op.reload();await op.locator('.sentence-panel').waitFor();
   await op.goto(url+'#/quest');await op.getByRole('button',{name:/오늘의 탐험 시작/}).click();await op.locator('.eq-question').waitFor();
   await op.goto(origin+'/games/numvault.html?lang=ko');await op.waitForFunction(()=>window.pvReady);
-  checks.push('The version18 root cache includes every hashed learning bundle; reading, quests and an existing puzzle start offline');await offline.close();
+  checks.push('The version19 root cache includes every hashed learning bundle; reading, quests and an existing puzzle start offline');await offline.close();
   const nojs=await browser.newContext({javaScriptEnabled:false,serviceWorkers:'block'}),np=await nojs.newPage();await np.goto(url);
   assert.ok((await np.locator('main').innerText()).includes('선정 학습 구간 69개'));assert.ok(await np.locator('header a[href="/ko/"]').count());await nojs.close();
   checks.push('Static learning/content/backup/source information remains readable without JavaScript');
-  assert.deepEqual(errors,[]);assert.deepEqual([...new Set(external)],[]);
+  assert.deepEqual(errors,[]);assert.deepEqual([...new Set(external)],['https://study-english2.pages.dev/puzzlevault-content.json']);
   const report={date:'2026-09-28',checks,pageErrors:errors,externalRequests:external,microphoneTested:false};
   fs.writeFileSync(path.join(root,'docs/english-integration-browser-checks.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
  }finally{await browser.close();}

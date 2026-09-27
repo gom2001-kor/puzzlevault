@@ -5,10 +5,10 @@ import type { Lesson, LessonGuide } from '../src/data/types.ts'
 import {
   QUEST_STORAGE_KEY, advanceQuest, buildQuestBank, courseLessons, courseQuestionIds, createQuestSession,
   freshQuest, isQuestCorrect, loadQuest, mergeQuestProgress, questChoices, questRecordKey,
-  questSummary, questXP, saveQuest, setQuestDraft, startQuest, startQuestReview,
+  questBankFingerprint, questSummary, questXP, saveQuest, setQuestDraft, startQuest, startQuestReview,
   submitQuestAnswer, utcQuestDay, validateQuest,
 } from '../src/lib/quest.ts'
-import type { QuestQuestion, QuestRun, QuestState, QuestStorage } from '../src/lib/quest.ts'
+import type { QuestBank, QuestQuestion, QuestRun, QuestState, QuestStorage } from '../src/lib/quest.ts'
 
 const json = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'))
 const lessons: Lesson[] = ['classics', 'voa-lincoln', 'modern'].flatMap(file => json(`../src/data/${file}.json`))
@@ -17,11 +17,11 @@ const bank = buildQuestBank(lessons, guides)
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value))
 const correctAnswer = (q: QuestQuestion) => q.kind === 'order' ? q.choices.map((_, i) => i) : [q.answer]
 const wrongAnswer = (q: QuestQuestion) => q.kind === 'order' ? correctAnswer(q).reverse() : [(q.answer + 1) % q.choices.length]
-function finish(state: QuestState, wrong: number[] = []) {
+function finish(state: QuestState, wrong: number[] = [], edition: QuestBank = bank) {
   while (state.active!.stage !== 'result') {
-    const run = state.active!; const q = bank[run.questionIds[run.position]]
-    if (run.stage === 'question') state = submitQuestAnswer(setQuestDraft(state, bank, wrong.includes(run.position) ? wrongAnswer(q) : correctAnswer(q)), bank)
-    state = advanceQuest(state, bank)
+    const run = state.active!; const q = edition[run.questionIds[run.position]]
+    if (run.stage === 'question') state = submitQuestAnswer(setQuestDraft(state, edition, wrong.includes(run.position) ? wrongAnswer(q) : correctAnswer(q)), edition)
+    state = advanceQuest(state, edition)
   }
   return state
 }
@@ -31,9 +31,11 @@ function memory(raw: string | null = null): QuestStorage & { raw: string | null;
 const daily = (day = '2026-09-28', id = 'test-run') => ({ ...freshQuest(), active: startQuest(bank, 'daily', day, null, id) })
 
 test('question bank includes only verified source material and short exact chunk excerpts', () => {
-  assert.equal(courseLessons(bank).length, 8)
-  assert.equal(Object.values(bank).filter(q => q.kind === 'word').length, 40)
-  assert.equal(Object.values(bank).filter(q => q.kind === 'reading').length, 24)
+  const verified = lessons.filter(lesson => lesson.status === 'verified')
+  assert.ok(courseLessons(bank).length >= 2, 'the daily course needs two eligible lessons')
+  assert.ok(courseLessons(bank).every(course => verified.some(lesson => lesson.id === course.id)))
+  assert.equal(Object.values(bank).filter(q => q.kind === 'word').length, verified.reduce((count, lesson) => count + lesson.vocabulary.length, 0))
+  assert.equal(Object.values(bank).filter(q => q.kind === 'reading').length, verified.reduce((count, lesson) => count + lesson.quiz.length, 0))
   for (const q of Object.values(bank)) {
     const lesson = lessons.find(l => l.id === q.lessonId)!
     assert.equal(lesson.status, 'verified')
@@ -240,4 +242,100 @@ test('incomplete or out-of-range answer input never advances a run', () => {
   assert.equal(startQuestReview(initial.active!, bank, 'too-early'), null)
   assert.throws(() => startQuest(bank, 'practice', '2026-09-28', null, 'bad'))
   assert.throws(() => startQuest(bank, 'practice', '2026-09-28', 'cameroon', 'bad'))
+})
+
+
+function expandedBank(): QuestBank {
+  const original = lessons.find(lesson => lesson.status === 'verified')!
+  const added: Lesson = { ...clone(original), id: 'reading-update-fixture', order: 999 }
+  return buildQuestBank([...lessons, added], { ...guides, [added.id]: { ...clone(guides[original.id]), lessonId: added.id } })
+}
+
+test('question edition marker is order-independent and includes choices, not just IDs', () => {
+  assert.equal(questBankFingerprint(bank), questBankFingerprint(Object.fromEntries(Object.entries(bank).reverse())))
+  const changed = clone(bank)
+  const question = Object.values(changed).find(question => question.kind === 'word')!
+  question.choices[1] = 'A newly added distractor'
+  assert.notEqual(questBankFingerprint(bank), questBankFingerprint(changed))
+  assert.notEqual(questBankFingerprint(bank), questBankFingerprint(expandedBank()))
+})
+
+test('a new lesson closes only an old active course and keeps XP, bests and writable storage', () => {
+  const previous = finish(daily('2026-08-31'))
+  previous.active = startQuest(bank, 'daily', '2026-09-01', null, 'update-fixture')
+  const store = memory(JSON.stringify(previous)), oldRaw = store.raw
+  const newer = expandedBank()
+  const loaded = loadQuest(store, newer)
+  assert.equal(loaded.error, '')
+  assert.ok(loaded.notice)
+  assert.equal(loaded.state.active, null)
+  assert.equal(questXP(loaded.state), 90)
+  assert.deepEqual(loaded.state.best, previous.best)
+  assert.equal(store.raw, oldRaw, 'reading a migration does not rewrite the original')
+  const next = { ...loaded.state, active: startQuest(newer, 'daily', '2026-09-01', null, 'new-edition') }
+  assert.equal(saveQuest(store, next, newer), '')
+  assert.equal(loadQuest(store, newer).notice, '')
+  assert.deepEqual(loadQuest(store, newer).state, next)
+  assert.equal(store.writes, 1)
+})
+
+test('a completed course is never reinterpreted after an update and replay cannot pay XP twice', () => {
+  const complete = finish(daily(), [0])
+  const store = memory(JSON.stringify(complete)), newer = expandedBank()
+  const loaded = loadQuest(store, newer)
+  assert.equal(loaded.error, '')
+  assert.equal(loaded.state.active, null, 'old answers are not graded against new options')
+  const replay = finish({ ...loaded.state, active: startQuest(newer, 'daily', complete.active!.day, null, 'same-day-new-edition') }, [], newer)
+  assert.equal(replay.active!.reward, 0)
+  assert.equal(questXP(replay), 80)
+  assert.equal(saveQuest(store, replay, newer), '')
+  assert.equal(questXP(loadQuest(store, newer).state), 80)
+})
+
+test('legacy v1 records retain completed history and start a versioned course without blocking writes', () => {
+  const legacy = finish(daily())
+  delete legacy.active!.bankFingerprint
+  const store = memory(JSON.stringify(legacy))
+  const loaded = loadQuest(store, bank)
+  assert.equal(loaded.error, '')
+  assert.equal(loaded.state.active, null)
+  assert.equal(questXP(loaded.state), 90)
+  assert.deepEqual(loaded.state.best, legacy.best)
+  assert.ok(loaded.notice)
+  const replay = finish({ ...loaded.state, active: startQuest(bank, 'daily', legacy.active!.day, null, 'legacy-replay') })
+  assert.equal(replay.active!.reward, 0)
+  assert.equal(saveQuest(store, replay, bank), '')
+  assert.equal(loadQuest(store, bank).notice, '')
+  assert.deepEqual(loadQuest(store, bank).state, replay)
+})
+
+test('migration preserves scores for a newer lesson when an older offline edition is used', () => {
+  const newer = expandedBank()
+  const previous = finish(daily())
+  previous.active = startQuest(newer, 'practice', '2026-09-28', 'reading-update-fixture', 'newer-practice')
+  previous.best['practice:reading-update-fixture'] = 5
+  const store = memory(JSON.stringify(previous))
+  const loaded = loadQuest(store, bank)
+  assert.equal(loaded.error, '')
+  assert.equal(loaded.state.active, null)
+  assert.equal(loaded.state.best['practice:reading-update-fixture'], 5)
+  assert.equal(questXP(loaded.state), 90)
+  assert.equal(saveQuest(store, loaded.state, bank), '')
+})
+
+test('an edition change does not hide corrupt history or malformed saved answers', () => {
+  const newer = expandedBank()
+  for (const mutate of [
+    (state: QuestState) => { state.dailyAwards['2026-09-28'] = { correct: 6, xp: 999 } },
+    (state: QuestState) => { state.active!.draft = [99] },
+    (state: QuestState) => { state.active!.position = 99 },
+    (state: QuestState) => { state.active!.bankFingerprint = 'invalid-marker' },
+  ]) {
+    const state = daily(); mutate(state)
+    const store = memory(JSON.stringify(state)), raw = store.raw
+    assert.ok(loadQuest(store, newer).error)
+    assert.ok(saveQuest(store, freshQuest(), newer))
+    assert.equal(store.raw, raw)
+    assert.equal(store.writes, 0)
+  }
 })

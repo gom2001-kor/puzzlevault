@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-28",
+  "checks": [
+    "A validated source edition is applied before rendering and adds a lesson without changing application code",
+    "A changed question bank safely starts a new course while preserving XP, best records and unrelated game storage",
+    "A later offline visit uses the last verified public edition from Cache API",
+    "Tampered content is rejected and cannot replace the last verified edition",
+    "One anonymous public-data GET per app opening; no cookies, referrer, answers or learning records sent"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "body": null
+    }
+  ],
+  "pageErrors": [],
+  "source": "controlled test feed; no production content changed"
+}

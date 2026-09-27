@@ -11,7 +11,7 @@ trigger: always_on
 PuzzleVault is a browser-based puzzle game platform with 10 games.
 - Domain: https://puzzlevault.pages.dev
 - Stack: Vanilla JS + HTML5 Canvas (NO frameworks, NO React, NO build tools)
-- Hosting: Cloudflare Pages (static files, Direct Upload)
+- Hosting: Cloudflare Pages (GitHub main integration; python3 scripts/package-site.py --directory; output dist/site)
 - Revenue: Google AdSense (banner + interstitial + reward ads)
 - Audience: Global (all games are language-independent)
 
@@ -110,45 +110,18 @@ CSS variables (defined in global.css):
 - All game pieces: border-radius: 4px (rounded corners, NOT sharp edges)
 - Clean minimal aesthetic (NOT neon/flashy)
 
-## Ad Slot Rules
-- Ad placements per game page:
-  - #ad-sidebar: 300×250 to the right of game (desktop only, hidden on mobile)
-  - #ad-interstitial: full-screen overlay (shown after game over, controlled by AdController)
-  - #ad-bottom: 728×90 below cross-promotion section
-  - #ad-reward: reward ad button inside game UI ("💡 Hint — Watch ad")
-- AdController logic (in adsense.js):
-  - First 3 games: NO interstitial ads (onboarding protection)
-  - After that: 1 interstitial every 3 games
-  - Reward ads: always available, voluntary (user-initiated), for hints only
-  - Ad refresh: when user transitions between packs/levels or returns to menu, call refreshBottomAd() to reload #ad-bottom slot (max 1 refresh per 60 seconds to comply with AdSense policy)
-- Landing page: 1 ad slot (728×90 between games grid and stats)
-
-## Mobile Anchor Ad Safe Area
-- CRITICAL: All game pages MUST include bottom safe area for mobile anchor ads
-- In global.css, add: `.game-controls { padding-bottom: 80px; }` on mobile
-- This prevents game control buttons from being hidden behind AdSense auto anchor ads
-- Also add: `body { padding-bottom: env(safe-area-inset-bottom, 0); }` for iOS notch devices
-
-## Hint System (Reward Ad Integration)
-Every game that has solvable puzzles MUST include a 💡 Hint button:
-- Button location: in the game controls area, visually distinct (amber/gold color)
-- Button text: "💡 Hint" with small "(Ad)" label
-- Behavior: user taps → reward ad plays → hint is revealed
-- Hint is FREE for the first use per game session (no ad required)
-- After first free hint, each subsequent hint requires watching a reward ad
-- Hint types per game (defined in skills.md for each game):
-  - NumVault: reveal one digit's correct position
-  - GridSmash: highlight optimal placement zone
-  - PatternPop: replay the pattern one more time (slower)
-  - SortStack: show the optimal next move
-  - QuickCalc: extend timer by 5 seconds (no ad needed, just bonus)
-  - TileTurn: highlight which tile to flip next
-  - ColorFlow: show one correct path segment
-  - PipeLink: rotate one pipe to correct orientation
-  - MergeChain: show optimal drop column
-  - HexMatch: highlight a valid 4+ chain
-- Undo remains FREE and unlimited (undo is not a hint)
-- Reset remains FREE and unlimited
+## Advertising and Hint Rules
+- The source of truth is `docs/monetization-readiness.md` and the current official Google policy links in `docs/adsense-operations-2026-09-28.md`.
+- Advertising stays disabled until the real account/site/product and privacy setup are ready. Keep ownership metadata and ads.txt; these do not request ads.
+- Never automatically load an ad SDK, use a guessed slot ID, or treat optional Analytics consent as advertising consent.
+- `AdController.configure` needs a real provider and a `canRequestAds(kind)` function backed by the actual product/CMP state. Missing, denied or failed permission makes no ad request and keeps help free.
+- Standard AdSense display ads must not be converted into homemade rewarded ads, timers, or full-screen overlays. Use only an approved game-ad product and its official lifecycle callbacks for those formats.
+- Never automatically refresh display ad slots. `refreshBottomAd()` is intentionally a no-op; a 60-second timer does not make automatic refresh compliant.
+- Future display units must be clearly labeled and separated from play buttons and game controls. Google strongly recommends at least 150 pixels from the game or removal from gameplay pages; assess the actual layout on every screen size.
+- Hints, undo and reset are usable with no provider. Do not show a fake ad, an '(Ad)' label, or a promise to watch an ad while ads are disabled.
+- If approved rewarded ads are connected, state the exact reward, ask for voluntary opt-in, and grant it once only after the provider confirms completion. Refusal or dismissal must preserve ordinary play.
+- Current interstitial opportunities are completed games 6, 9, 12, ... with at least 120 seconds between actual impressions. The provider owns pause/mute/restore and must not interrupt active play.
+- Preserve mobile safe areas for game controls. Do not turn on anchor ads without checking controls and closing actions at actual supported viewport sizes.
 
 ## Game Page Template (Every Game Page)
 Every game .html file MUST include these sections in order:
@@ -158,12 +131,12 @@ Every game .html file MUST include these sections in order:
 4. Game canvas area (centered, responsive)
 5. Game controls below canvas: score, buttons, 💡 Hint button
 6. Cross-promotion: "Try Another Puzzle" — 3 game cards (rendered by common.js) — placed DIRECTLY below game controls for maximum visibility
-7. `<div class="ad-slot" id="ad-sidebar">` — Desktop sidebar ad (right of game)
+7. Existing `#ad-sidebar` is a disabled legacy placeholder, not a required live placement
 8. Result overlay (hidden by default, shown on game over/clear) — MUST include mini cross-promo icons inside the modal
-9. `<div class="ad-slot" id="ad-interstitial">` — Interstitial container
+9. Existing `#ad-interstitial` stays hidden; approved game-ad providers own their ad UI
 10. Game guide section: H2 "How to Play [GameName]", 200-300 words
 11. FAQ section: 3-5 questions using `<details><summary>` accordion
-12. `<div class="ad-slot" id="ad-bottom">` — Bottom ad
+12. Existing `#ad-bottom` stays empty/hidden until an approved display placement is configured
 13. Footer (rendered by common.js)
 14. Scripts: common.js, adsense.js, seed.js, sfx.js, share.js, then inline `<script>` for game logic
 

@@ -16,7 +16,7 @@ from pathlib import Path
 from urllib.parse import unquote, urljoin, urlsplit
 
 SITE = 'https://puzzlevault.pages.dev'
-EXCLUDED = {'.git', '.agent', '.agents', '.codex', 'node_modules', 'docs', 'tests', 'scripts', 'apps', '.npm-cache'}
+EXCLUDED = {'.git', '.agent', '.agents', '.codex', 'node_modules', 'docs', 'tests', 'scripts', 'apps', '.npm-cache', 'dist'}
 VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'}
 TRACKERS = ('googletagmanager.com', 'google-analytics.com', 'googlesyndication.com', 'doubleclick.net', 'clarity.ms')
 CLAIMS = {
@@ -126,6 +126,22 @@ def audit(root: Path):
     pages = {path.resolve(): Page(path.read_text(encoding='utf-8-sig')) for path in public_html(root)}
     blockers, warnings, claims = [], [], []
     aliases = {}
+    # Explicitly recognize implemented hash routes, rather than ignoring broken anchors.
+    english_lessons = {}
+    for filename in ('classics.json', 'voa-lincoln.json', 'modern.json'):
+        source_data = root / 'apps' / 'english' / 'src' / 'data' / filename
+        if source_data.is_file():
+            english_lessons.update({item['id']: len(item.get('segments', [])) for item in json.loads(source_data.read_text(encoding='utf-8-sig')) if item.get('status') == 'verified'})
+
+    def valid_learning_route(target, fragment):
+        if target != root / 'learn' / 'english' / 'index.html':
+            return False
+        if fragment in {'/home', '/library', '/quest', '/studio', '/saved', '/review', '/sources', '/settings'}:
+            return True
+        match = re.fullmatch(r'/lesson/([a-z0-9-]+)(?:/(title|\d+))?', fragment)
+        if not match or match[1] not in english_lessons:
+            return False
+        return match[2] is None or match[2] == 'title' or int(match[2]) < english_lessons[match[1]]
     redirects = root / '_redirects'
     if redirects.exists():
         for line in redirects.read_text(encoding='utf-8-sig').splitlines():
@@ -208,7 +224,7 @@ def audit(root: Path):
                     linked_games.add(target)
                 if fragment and target in pages:
                     known = {identity for identity, _ in pages[target].ids}
-                    if fragment not in known and fragment not in dynamic_ids[target]:
+                    if fragment not in known and fragment not in dynamic_ids[target] and not valid_learning_route(target, fragment):
                         issue('missing_fragment', path, value, line)
         for source, line in page.scripts:
             if any(domain in urlsplit(source).netloc.lower() for domain in TRACKERS):

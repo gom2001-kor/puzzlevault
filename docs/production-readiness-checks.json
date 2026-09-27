@@ -1,0 +1,55 @@
+{
+  "verifiedAt": "2026-09-27T17:20:09.057Z",
+  "checks": [
+    {
+      "url": "https://puzzlevault.pages.dev/ko/",
+      "status": 200
+    },
+    {
+      "url": "https://puzzlevault.pages.dev/ko/contact.html",
+      "status": 200
+    },
+    {
+      "url": "https://puzzlevault.pages.dev/learn/english/guides/",
+      "status": 200
+    },
+    {
+      "url": "https://puzzlevault.pages.dev/learn/english/guides/voa-welcome.html",
+      "status": 200
+    },
+    {
+      "url": "https://puzzlevault.pages.dev/ads.txt",
+      "status": 200
+    },
+    {
+      "url": "https://puzzlevault.pages.dev/robots.txt",
+      "status": 200
+    },
+    {
+      "url": "https://puzzlevault.pages.dev/readiness-missing-page-20260928",
+      "status": 404
+    },
+    {
+      "url": "https://puzzlevault.pages.dev/apps/english/package.json",
+      "status": 404
+    },
+    {
+      "url": "https://study-english2.pages.dev/puzzlevault-content.json",
+      "status": 200,
+      "lessons": 8,
+      "segments": 69,
+      "contentHash": "16cdc0f1db72bb4f47992f057ede388c9dc07ef4afea75114dec519f493a9420"
+    },
+    {
+      "browser": "390px dark",
+      "liveSourceApplied": true,
+      "contactButton": {
+        "color": "rgb(255, 255, 255)",
+        "background": "rgb(29, 78, 216)",
+        "height": 48.125
+      },
+      "pageErrors": [],
+      "advertisingRequests": 0
+    }
+  ]
+}

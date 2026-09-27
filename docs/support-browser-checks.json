@@ -1,0 +1,224 @@
+{
+  "checkedAt": "2026-09-27T16:41:13.437Z",
+  "contactChecks": [
+    {
+      "lang": "en",
+      "scheme": "light",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ko",
+      "scheme": "light",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ja",
+      "scheme": "light",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 76.25
+    },
+    {
+      "lang": "zh",
+      "scheme": "light",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "es",
+      "scheme": "light",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "en",
+      "scheme": "light",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ko",
+      "scheme": "light",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ja",
+      "scheme": "light",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "zh",
+      "scheme": "light",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "es",
+      "scheme": "light",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "en",
+      "scheme": "light",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ko",
+      "scheme": "light",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ja",
+      "scheme": "light",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "zh",
+      "scheme": "light",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "es",
+      "scheme": "light",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "en",
+      "scheme": "dark",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ko",
+      "scheme": "dark",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ja",
+      "scheme": "dark",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 76.25
+    },
+    {
+      "lang": "zh",
+      "scheme": "dark",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "es",
+      "scheme": "dark",
+      "width": 320,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "en",
+      "scheme": "dark",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ko",
+      "scheme": "dark",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ja",
+      "scheme": "dark",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "zh",
+      "scheme": "dark",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "es",
+      "scheme": "dark",
+      "width": 390,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "en",
+      "scheme": "dark",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ko",
+      "scheme": "dark",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "ja",
+      "scheme": "dark",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "zh",
+      "scheme": "dark",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    },
+    {
+      "lang": "es",
+      "scheme": "dark",
+      "width": 1280,
+      "contrast": 6.7,
+      "height": 48.125
+    }
+  ],
+  "staticLanguages": [
+    "en",
+    "ko",
+    "ja",
+    "zh",
+    "es"
+  ],
+  "pageErrors": [],
+  "externalRequests": []
+}

@@ -9,18 +9,31 @@ const AdController = {
     COOLDOWN_MS: 120000,
     TIMEOUT_MS: 90000,
     _provider: null,
+    _canRequestAds: null,
     _enabled: false,
     _busy: false,
     _lastAdAt: 0,
 
-    /** Provider methods accept lifecycle callbacks; ads are disabled by default. */
-    configure({ provider = null, enabled = false, cooldownMs = 120000, timeoutMs = 90000 } = {}) {
+    /** The request gate must use the real product/CMP state, never analytics consent. */
+    configure({ provider = null, enabled = false, canRequestAds = null, cooldownMs = 120000, timeoutMs = 90000 } = {}) {
         if (this._busy) return false;
         this._provider = provider;
+        this._canRequestAds = typeof canRequestAds === 'function' ? canRequestAds : null;
         this._enabled = enabled === true && provider !== null;
         this.COOLDOWN_MS = Math.max(120000, Number(cooldownMs) || 120000);
         this.TIMEOUT_MS = Math.min(180000, Math.max(1000, Number(timeoutMs) || 90000));
         return true;
+    },
+
+    /** Recheck every request so missing, failed or withdrawn consent fails closed. */
+    _mayRequest(kind) {
+        if (!this._enabled || !this._provider || !this._canRequestAds) return false;
+        try { return this._canRequestAds(kind) === true; } catch (_) { return false; }
+    },
+
+    _freeHelp(onReward) {
+        if (typeof onReward === 'function') onReward();
+        return Promise.resolve({ status: 'free' });
     },
 
     /** Called once per completed game. Opportunities are games 6, 9, 12, ... */
@@ -36,7 +49,7 @@ const AdController = {
         if (!eligible || this._busy || (this._lastAdAt && Date.now() - this._lastAdAt < this.COOLDOWN_MS)) {
             return Promise.resolve({ status: 'skipped' });
         }
-        if (!this._enabled || typeof this._provider.showInterstitial !== 'function') {
+        if (!this._mayRequest('interstitial') || typeof this._provider.showInterstitial !== 'function') {
             return Promise.resolve({ status: 'unavailable' });
         }
         this._busy = true;
@@ -52,9 +65,8 @@ const AdController = {
     /** Existing HintManager calls remain valid; absent provider means free help. */
     showRewardAd(onReward, { rewardLabel } = {}) {
         if (this._busy) return Promise.resolve({ status: 'busy' });
-        if (!this._enabled || !this._provider || typeof this._provider.showReward !== 'function') {
-            if (typeof onReward === 'function') onReward();
-            return Promise.resolve({ status: 'free' });
+        if (!this._mayRequest('reward') || typeof this._provider.showReward !== 'function') {
+            return this._freeHelp(onReward);
         }
         if (!this.isRewardAdAvailable()) {
             this._notifyUnavailable();
@@ -68,6 +80,8 @@ const AdController = {
         if (typeof window.confirm !== 'function' || !window.confirm(message)) {
             return Promise.resolve({ status: 'cancelled' });
         }
+        // The display choice is separate from a CMP choice and does not override it.
+        if (!this._mayRequest('reward')) return this._freeHelp(onReward);
         this._busy = true;
         return this._runPlacement('reward', onReward).then(result => {
             if (['no-fill', 'timeout', 'error'].includes(result.status)) this._notifyUnavailable();
@@ -84,7 +98,7 @@ const AdController = {
     },
 
     isRewardAdAvailable() {
-        if (!this._enabled || !this._provider || this._busy || typeof this._provider.showReward !== 'function') return false;
+        if (this._busy || !this._mayRequest('reward') || typeof this._provider.showReward !== 'function') return false;
         try {
             return typeof this._provider.isRewardAvailable === 'function' && this._provider.isRewardAvailable() === true;
         } catch (_) { return false; }

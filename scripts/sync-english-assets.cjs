@@ -11,7 +11,7 @@ function files(folder) {
         return entry.isDirectory() ? files(file) : [file];
     });
 }
-const assets = ['/learn/english/', ...files(output).map(file => '/' + path.relative(root, file).split(path.sep).join('/')).sort(), '/css/learning.css'];
+const assets = ['/learn/english/', ...files(output).map(file => '/' + path.relative(root, file).split(path.sep).join('/')).sort(), '/css/learning.css', '/css/english-guides.css', '/learn/english/guides/'];
 const workerPath = path.join(root, 'sw.js');
 const worker = fs.readFileSync(workerPath, 'utf8');
 const block = '// ENGLISH_ASSETS_START\nASSETS.push(' + JSON.stringify(assets, null, 4).slice(1, -1) + ');\n// ENGLISH_ASSETS_END';

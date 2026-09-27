@@ -14,7 +14,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy policy | PuzzleVault</title>
-    <meta name="description" content="This notice explains the browser games and English learning room at puzzlevault.pages.dev. No account is required to play or learn. The hosting provider, Cloudflare, necessarily handles network requests such as IP address, requested URL and browser information to deliver and protect the site. This is different from the game progress stored on your device.">
+    <meta name="description" content="How PuzzleVault handles local game and English study records, content updates, device speech, microphone recordings, optional analytics and feedback.">
         <!-- hreflang -->
     <link rel="alternate" hreflang="en" href="https://puzzlevault.pages.dev/privacy.html">
     <link rel="alternate" hreflang="ko" href="https://puzzlevault.pages.dev/ko/privacy.html">
@@ -22,7 +22,7 @@
     <link rel="alternate" hreflang="zh" href="https://puzzlevault.pages.dev/zh/privacy.html">
     <link rel="alternate" hreflang="es" href="https://puzzlevault.pages.dev/es/privacy.html">
     <link rel="alternate" hreflang="x-default" href="https://puzzlevault.pages.dev/privacy.html">
-    <link rel="stylesheet" href="/css/global.css?v=18">
+    <link rel="stylesheet" href="/css/global.css?v=19">
     <link rel="canonical" href="https://puzzlevault.pages.dev/privacy.html">
     <meta name="theme-color" content="#2563EB">
     <link rel="manifest" href="/manifest.json">
@@ -75,8 +75,8 @@
             text-decoration: underline;
         }
     </style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=18">
-    <script defer src="/js/privacy-controls.js?v=18"></script>
+    <link rel="stylesheet" href="/css/site-quality.css?v=19">
+    <script defer src="/js/privacy-controls.js?v=19"></script>
 </head>
 
 <body>
@@ -86,9 +86,9 @@
 <p class="pv-editorial-meta">Updated: <time datetime="2026-09-28">2026-09-28</time></p>
 <section><h2>Scope and hosting</h2><p>This notice explains the browser games and English learning room at puzzlevault.pages.dev. No account is required to play or learn. The hosting provider, Cloudflare, necessarily handles network requests such as IP address, requested URL and browser information to deliver and protect the site. This is different from the game progress stored on your device.</p></section>
 <section><h2>Local game data and preferences</h2><p>Keys beginning with pv_ store scores, experience, missions, streaks, sound, language and privacy choices. Session storage may hold temporary hints or game-session counters. The pv_lang cookie remembers language preference. The service worker caches public game and learning assets for offline use. Game saves are not synced to an account; clearing site data can permanently remove them.</p></section>
-<section id="english-learning-data"><h2>English learning records and backups</h2><p>The English learning room stores reading progress, practice results and mistakes, writing drafts, saved expressions, review schedules, and learning settings in this browser. The storage keys are <code>pv_english_reading_v2</code> and <code>pv_english_quest_v1</code>. These records are not automatically sent to the app server or synced to an account. Clearing site data can remove them.</p><p>You can download a JSON backup and import it in Settings. Backups may contain your written answers, so keep them in a place you control. Records on study-english2.pages.dev do not transfer automatically to PuzzleVault: export a backup from the original app and import it here, review the preview, then confirm restoration. A confirmed restore replaces the applicable current records.</p></section>
+<section id="english-learning-data"><h2>English learning records and backups</h2><p>The English learning room stores reading progress, practice results and mistakes, writing drafts, saved expressions, review schedules, and learning settings in this browser. The storage keys are pv_english_reading_v2 and pv_english_quest_v1. These records are not automatically sent to the app server or synced to an account. Clearing site data can remove them.</p><p>You can download a JSON backup and import it in Settings. Backups may contain your written answers, so keep them in a place you control. Records on study-english2.pages.dev do not transfer automatically to PuzzleVault: export a backup from the original app and import it here, review the preview, then confirm restoration. A confirmed restore replaces the applicable current records.</p></section>
+<section id="english-content-updates"><h2>Receiving updated learning material</h2><p>Once when you open the learning room, it checks for updated public lessons and requests a content file from study-english2.pages.dev. Its hosting provider can receive your IP address and ordinary request information such as the requested address and browser details. This request delivers learning material; it is not an analytics event. It does not send your answers, learning progress, writing drafts, review records or microphone recordings.</p><p>Previously accepted public material may be stored on this device using the browser Cache API under puzzlevault-english-content-v1, so it can be used offline. If an update cannot be retrieved or validated, the learning room can use the bundled material or a previously accepted copy. Updating lesson content is separate from moving your personal study records between the two sites.</p></section>
 <section id="english-audio"><h2>Device speech and microphone recording</h2><p>Text playback uses the browser’s speech synthesis. Some voices use a network service, and the device or voice provider may process the text being spoken. Availability and quality depend on your browser and installed voices.</p><p>Microphone permission is requested only when you press the recording control. Each recording is limited to 60 seconds. The app does not send recordings to its server; audio stays temporarily in the current screen’s memory and is cleared when you change the sentence, mode or screen, or reload. Recordings are excluded from JSON backups. You can deny or revoke microphone access in browser settings.</p></section>
-
 <section><h2>Optional Google Analytics</h2><p>Google Analytics is off by default. If you allow analytics in Privacy choices, it can receive page visits, device/browser information and game events such as a completed round or a successful share. A share event does not contain the shared message or challenge URL. Google may set analytics cookies such as _ga. Refusing optional analytics does not restrict games. Microsoft Clarity session recording is not loaded by the current site.</p></section>
 <section><h2>Changing your choice</h2><p>Use Privacy choices in the footer or the button below. Permission changes take effect on the next page so a live round is not restarted. Revoking analytics permission disables subsequent Google Analytics collection on this page and removes accessible first-party analytics cookies. It cannot undo data already sent. Where storage is blocked, the choice lasts only for the current page.</p></section>
 <section><h2>Advertising</h2><p>AdSense publisher verification metadata may be present without serving advertisements. The current site does not automatically load advertising tags. Before advertising is enabled, the publisher must configure the applicable certified consent platform and ad placements. Google and its advertising partners may then process identifiers and use cookies as described in that platform. These analytics controls are not a Google-certified advertising CMP and do not replace one.</p></section>
@@ -101,8 +101,8 @@
 
     <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a><a href="/learn/english/">Learn English</a></nav></footer>
 
-    <script src="/js/i18n.js?v=18"></script>
-    <script src="/js/common.js?v=18"></script>
+    <script src="/js/i18n.js?v=19"></script>
+    <script src="/js/common.js?v=19"></script>
     <script>
         window.addEventListener('langchange', (e) => {
             const newLang = e.detail ? e.detail.lang : (typeof I18n !== 'undefined' ? I18n.currentLang : 'en');
