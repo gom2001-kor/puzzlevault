@@ -329,4 +329,10 @@
   <url><loc>https://puzzlevault.pages.dev/blog/es/mergechain-drop-and-merge-guide.html</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/es/hexmatch-chains-and-special-gems-guide.html</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://puzzlevault.pages.dev/blog/es/editorial.html</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url>
+    <loc>https://puzzlevault.pages.dev/learn/english/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 </urlset>

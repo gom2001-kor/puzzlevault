@@ -1,0 +1,20 @@
+{
+  "checks": [
+    {
+      "width": 320,
+      "textScale": "200%",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "textScale": "200%",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "textScale": "200%",
+      "overflow": false
+    }
+  ],
+  "errors": []
+}

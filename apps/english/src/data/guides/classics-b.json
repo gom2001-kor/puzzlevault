@@ -1,0 +1,3406 @@
+[
+  {
+    "lessonId": "alice",
+    "title": {
+      "text": "Down the Rabbit-Hole",
+      "meaning": "토끼 굴 아래로",
+      "kind": "title",
+      "overview": "작품 전체 제목 Alice’s Adventures in Wonderland는 '이상한 나라에서의 앨리스의 모험들'이라는 명사구입니다. Alice’s는 소유, Adventures는 중심 명사, in Wonderland는 장소를 더합니다. 현재 화면의 Down the Rabbit-Hole은 그 작품 제1장의 제목입니다. down + 장소로 이동 방향을 보여 주며 주어·동사가 있는 완전한 문장은 아닙니다.",
+      "structure": [
+        {
+          "text": "Down",
+          "label": "연결",
+          "explanation": "토끼 굴을 따라 아래로 향하는 방향을 이끄는 전치사입니다."
+        },
+        {
+          "text": "the Rabbit-Hole",
+          "label": "목적어",
+          "explanation": "전치사 down의 뒤에서 어디로 내려가는지 알려 줍니다. 문장 동사의 목적어와는 구별합니다."
+        }
+      ],
+      "chunks": [
+        {
+          "text": "Down",
+          "meaning": "아래로",
+          "role": "connector",
+          "label": "방향"
+        },
+        {
+          "text": "the Rabbit-Hole",
+          "meaning": "그 토끼 굴을 따라",
+          "role": "object",
+          "label": "방향의 대상"
+        }
+      ],
+      "grammar": [
+        {
+          "title": "제목은 완전한 문장이 아니어도 돼요",
+          "explanation": "제목은 장소나 방향만으로 장면을 제시할 수 있습니다. 없는 주어나 동사를 원문에 넣어 읽을 필요는 없습니다.",
+          "example": "Through the Forest",
+          "translation": "숲을 지나서"
+        },
+        {
+          "title": "합성 명사 rabbit-hole",
+          "explanation": "rabbit(토끼)과 hole(굴)을 연결해 '토끼 굴'이라는 한 덩어리 명사를 만듭니다.",
+          "example": "A rabbit-hole was hidden under the tree.",
+          "translation": "토끼 굴 하나가 나무 아래 숨겨져 있었다."
+        }
+      ],
+      "tip": "책 전체의 제목과 장 제목을 구별하세요. 화면의 영어 제목에는 Alice’s라는 단어가 들어 있지 않습니다.",
+      "check": {
+        "question": "이 장 제목에서 아래 방향을 나타내는 단어는?",
+        "answer": "Down",
+        "hint": "제목의 첫 단어를 떠올려 보세요."
+      },
+      "words": [
+        {
+          "text": "Down",
+          "lemma": "down",
+          "pos": "전치사",
+          "meaning": "~를 따라 아래로",
+          "note": "뒤의 the Rabbit-Hole을 목적어로 삼아 아래 방향을 나타냅니다."
+        },
+        {
+          "text": "the",
+          "lemma": "the",
+          "pos": "관사",
+          "meaning": "그, 해당하는",
+          "note": "이미 알거나 특정한 대상을 가리킵니다."
+        },
+        {
+          "text": "Rabbit-Hole",
+          "lemma": "rabbit-hole",
+          "pos": "명사",
+          "meaning": "토끼 굴",
+          "note": "rabbit과 hole을 하이픈으로 연결한 합성어입니다."
+        }
+      ]
+    },
+    "segments": [
+      {
+        "text": "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do:",
+        "meaning": "앨리스는 강둑에서 언니 곁에 앉아 있는 것과 할 일이 전혀 없는 것이 점점 지겨워지기 시작했다.",
+        "kind": "fragment",
+        "overview": "원문의 긴 첫 문장에서 앞부분만 떼어 놓은 구간입니다. 중심은 Alice(누가) + was beginning(시작하고 있었다)이며, 무엇을 시작했는지는 to get tired가 설명합니다. of 뒤에는 싫증 난 이유 두 가지가 나란히 옵니다. 끝의 콜론 뒤로 원문이 계속됩니다.",
+        "structure": [
+          {
+            "text": "Alice",
+            "label": "주어",
+            "explanation": "싫증을 느끼는 사람입니다."
+          },
+          {
+            "text": "was beginning",
+            "label": "동사",
+            "explanation": "과거에 변화가 막 진행되던 중임을 보여 줍니다."
+          },
+          {
+            "text": "to get very tired",
+            "label": "목적어",
+            "explanation": "beginning의 내용을 채우는 to부정사입니다. 그 안에서 get은 '~해지다', tired는 바뀌는 상태입니다."
+          },
+          {
+            "text": "of sitting by her sister on the bank",
+            "label": "꾸미는말",
+            "explanation": "tired의 이유를 설명합니다. 앉아 있는 것에 싫증이 났습니다."
+          },
+          {
+            "text": "and of having nothing to do",
+            "label": "연결",
+            "explanation": "and가 두 번째 of 덩어리를 연결합니다. 할 일이 없다는 점도 싫증의 이유입니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "Alice",
+            "meaning": "앨리스는",
+            "role": "subject",
+            "label": "누가"
+          },
+          {
+            "text": "was beginning",
+            "meaning": "시작하고 있었다",
+            "role": "verb",
+            "label": "과거의 진행"
+          },
+          {
+            "text": "to get very tired",
+            "meaning": "매우 싫증이 나기",
+            "role": "object",
+            "label": "시작한 변화"
+          },
+          {
+            "text": "of sitting",
+            "meaning": "앉아 있는 것에",
+            "role": "modifier",
+            "label": "첫째 이유"
+          },
+          {
+            "text": "by her sister",
+            "meaning": "언니 곁에",
+            "role": "modifier",
+            "label": "누구 곁"
+          },
+          {
+            "text": "on the bank,",
+            "meaning": "강둑에서",
+            "role": "modifier",
+            "label": "장소"
+          },
+          {
+            "text": "and of having nothing to do:",
+            "meaning": "그리고 할 일이 전혀 없는 것에",
+            "role": "connector",
+            "label": "둘째 이유 연결"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "was + -ing: 그때 진행 중이던 일",
+            "explanation": "was beginning은 과거 어느 순간 시작되고 있던 변화를 보여 줍니다.",
+            "example": "Mina was beginning to feel hungry.",
+            "translation": "미나는 배가 고파지기 시작하고 있었다."
+          },
+          {
+            "title": "get tired of + 명사/-ing",
+            "explanation": "get tired of는 '~에 싫증이 나다'입니다. 전치사 of 뒤의 동사는 sitting처럼 -ing형으로 씁니다.",
+            "example": "I get tired of hearing the same story.",
+            "translation": "나는 같은 이야기를 듣는 데 싫증이 난다."
+          },
+          {
+            "title": "nothing to do: 할 일이 없다",
+            "explanation": "to do는 앞의 nothing을 뒤에서 꾸며 '할 것'이 없음을 나타냅니다.",
+            "example": "We had nothing to carry.",
+            "translation": "우리는 들고 갈 것이 없었다."
+          }
+        ],
+        "tip": "먼저 Alice was beginning을 잡고, 두 개의 of 덩어리가 나란히 tired를 설명한다는 점을 보세요.",
+        "check": {
+          "question": "get tired of 뒤에서 '앉아 있는 것'을 뜻하는 형태는?",
+          "answer": "sitting",
+          "hint": "sit에 -ing가 붙습니다."
+        },
+        "words": [
+          {
+            "text": "Alice",
+            "lemma": "Alice",
+            "pos": "고유명사",
+            "meaning": "앨리스",
+            "note": "이 이야기의 주인공 이름입니다."
+          },
+          {
+            "text": "was",
+            "lemma": "be",
+            "pos": "동사·조동사",
+            "meaning": "~이었다, ~하고 있었다",
+            "note": "be의 과거형입니다. -ing와 만나면 과거진행형이 됩니다."
+          },
+          {
+            "text": "beginning",
+            "lemma": "begin",
+            "pos": "현재분사",
+            "meaning": "시작하고 있는",
+            "note": "was beginning은 '시작하고 있었다'라는 과거진행형입니다."
+          },
+          {
+            "text": "to",
+            "lemma": "to",
+            "pos": "전치사·부정사 표지",
+            "meaning": "~하기, ~할",
+            "note": "to get은 beginning의 내용, to do는 nothing을 꾸밉니다. 둘 다 동사원형 앞의 to입니다."
+          },
+          {
+            "text": "get",
+            "lemma": "get",
+            "pos": "동사",
+            "meaning": "~해지다, 이동하다",
+            "note": "뒤에 형용사가 오면 상태 변화, out과 함께면 '나오다'입니다."
+          },
+          {
+            "text": "very",
+            "lemma": "very",
+            "pos": "부사",
+            "meaning": "매우, 아주",
+            "note": "형용사나 부사 앞에서 정도를 더합니다."
+          },
+          {
+            "text": "tired",
+            "lemma": "tired",
+            "pos": "형용사",
+            "meaning": "싫증 난, 지친",
+            "note": "tired of는 그 일에 지루함이나 싫증을 느낀다는 뜻입니다."
+          },
+          {
+            "text": "of",
+            "lemma": "of",
+            "pos": "전치사",
+            "meaning": "~의, ~에 관한",
+            "note": "앞말과 뒤의 명사·동명사를 연결합니다. 덩어리 전체로 뜻을 읽으세요."
+          },
+          {
+            "text": "sitting",
+            "lemma": "sit",
+            "pos": "동명사",
+            "meaning": "앉아 있는 것",
+            "note": "of 뒤에서 앉는 행위를 명사처럼 나타냅니다."
+          },
+          {
+            "text": "by",
+            "lemma": "by",
+            "pos": "전치사",
+            "meaning": "~곁에",
+            "note": "이 문맥에서는 가까운 위치를 나타냅니다."
+          },
+          {
+            "text": "her",
+            "lemma": "she",
+            "pos": "소유한정사",
+            "meaning": "그녀의",
+            "note": "her sister는 앨리스의 언니입니다."
+          },
+          {
+            "text": "sister",
+            "lemma": "sister",
+            "pos": "명사",
+            "meaning": "여자 형제, 언니",
+            "note": "이야기에서 앨리스와 함께 있는 언니를 가리킵니다."
+          },
+          {
+            "text": "on",
+            "lemma": "on",
+            "pos": "전치사",
+            "meaning": "~위에, ~에서",
+            "note": "on the bank는 강둑이라는 위치를 나타냅니다."
+          },
+          {
+            "text": "the",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "bank",
+            "lemma": "bank",
+            "pos": "명사",
+            "meaning": "강둑",
+            "note": "여기서는 돈을 맡기는 은행이 아니라 강의 가장자리입니다."
+          },
+          {
+            "text": "and",
+            "lemma": "and",
+            "pos": "접속사",
+            "meaning": "그리고, ~와",
+            "note": "같은 역할의 말이나 절을 이어 줍니다."
+          },
+          {
+            "text": "having",
+            "lemma": "have",
+            "pos": "동명사",
+            "meaning": "~인 상태에 있는 것",
+            "note": "having nothing to do 전체를 '할 일이 없는 것'으로 읽습니다."
+          },
+          {
+            "text": "nothing",
+            "lemma": "nothing",
+            "pos": "대명사",
+            "meaning": "아무것도 없음",
+            "note": "not이 없어도 부정 의미를 담습니다."
+          },
+          {
+            "text": "do",
+            "lemma": "do",
+            "pos": "동사",
+            "meaning": "하다",
+            "note": "nothing to do에서 '할 것'의 행동을 나타냅니다."
+          }
+        ]
+      },
+      {
+        "text": "once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it,",
+        "meaning": "한두 번 앨리스는 언니가 읽고 있는 책을 슬쩍 들여다본 적이 있었지만, 그 책에는 그림도 대화도 없었다.",
+        "kind": "fragment",
+        "overview": "원문 첫 문장의 가운데 구간입니다. she had peeped가 첫 뼈대, but it had no pictures or conversations가 두 번째 뼈대입니다. the book 뒤의 her sister was reading은 어떤 책인지 설명합니다. 끝의 쉼표 뒤로 생각을 나타내는 인용문이 이어집니다.",
+        "structure": [
+          {
+            "text": "once or twice",
+            "label": "꾸미는말",
+            "explanation": "들여다본 횟수 '한두 번'입니다."
+          },
+          {
+            "text": "she",
+            "label": "주어",
+            "explanation": "첫 절의 주어로 앨리스를 가리킵니다."
+          },
+          {
+            "text": "had peeped",
+            "label": "동사",
+            "explanation": "지금 서술하는 과거보다 먼저 슬쩍 본 일을 나타냅니다."
+          },
+          {
+            "text": "into the book",
+            "label": "꾸미는말",
+            "explanation": "시선이 향한 대상을 알려 줍니다."
+          },
+          {
+            "text": "her sister was reading",
+            "label": "꾸미는말",
+            "explanation": "the book을 설명하는 관계절입니다. 목적격 관계대명사가 생략되었습니다."
+          },
+          {
+            "text": "but it had no pictures or conversations in it",
+            "label": "연결",
+            "explanation": "but 뒤에서는 책을 주어로, 그림과 대화가 없었다고 말합니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "once or twice",
+            "meaning": "한두 번",
+            "role": "modifier",
+            "label": "횟수"
+          },
+          {
+            "text": "she",
+            "meaning": "그녀는",
+            "role": "subject",
+            "label": "누가"
+          },
+          {
+            "text": "had peeped",
+            "meaning": "슬쩍 본 적이 있었다",
+            "role": "verb",
+            "label": "앞서 한 일"
+          },
+          {
+            "text": "into the book",
+            "meaning": "책 안을",
+            "role": "modifier",
+            "label": "시선의 대상"
+          },
+          {
+            "text": "her sister was reading,",
+            "meaning": "언니가 읽고 있던",
+            "role": "modifier",
+            "label": "어떤 책인지"
+          },
+          {
+            "text": "but",
+            "meaning": "하지만",
+            "role": "connector",
+            "label": "대조"
+          },
+          {
+            "text": "it",
+            "meaning": "그 책은",
+            "role": "subject",
+            "label": "무엇에 대해"
+          },
+          {
+            "text": "had no pictures or conversations",
+            "meaning": "그림도 대화도 담고 있지 않았다",
+            "role": "verb",
+            "label": "없었던 것"
+          },
+          {
+            "text": "in it,",
+            "meaning": "그 안에",
+            "role": "modifier",
+            "label": "장소"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "had + 과거분사: 더 앞선 과거",
+            "explanation": "had peeped는 앨리스가 싫증을 느끼던 시점보다 먼저 책을 들여다본 일을 돌아봅니다.",
+            "example": "She had opened the letter before lunch.",
+            "translation": "그녀는 점심 전에 그 편지를 열어 보았었다."
+          },
+          {
+            "title": "책을 뒤에서 설명하는 절",
+            "explanation": "the book (that) her sister was reading에서 book은 reading의 목적어입니다. 목적격 관계대명사 that은 생략할 수 있습니다.",
+            "example": "This is the bag my friend bought.",
+            "translation": "이것은 내 친구가 산 가방이다."
+          },
+          {
+            "title": "no A or B: A도 B도 없음",
+            "explanation": "부정 의미의 no 아래에서 or로 두 대상을 나열하면 두 가지 모두 없다는 뜻이 됩니다.",
+            "example": "The room had no chairs or tables.",
+            "translation": "그 방에는 의자도 탁자도 없었다."
+          }
+        ],
+        "tip": "had가 두 번 보여도 역할이 달라요. had peeped는 완료를 만드는 조동사, had no pictures는 '가지고 있었다'의 과거형입니다.",
+        "check": {
+          "question": "the book 뒤에서 어떤 책인지 설명할 때 생략할 수 있는 관계대명사는?",
+          "answer": "that",
+          "hint": "the book (____) her sister was reading"
+        },
+        "words": [
+          {
+            "text": "once",
+            "lemma": "once",
+            "pos": "부사",
+            "meaning": "한 번",
+            "note": "횟수를 나타냅니다."
+          },
+          {
+            "text": "or",
+            "lemma": "or",
+            "pos": "접속사",
+            "meaning": "또는, ~거나",
+            "note": "선택 가능한 말이나 두 가능성을 연결합니다."
+          },
+          {
+            "text": "twice",
+            "lemma": "twice",
+            "pos": "부사",
+            "meaning": "두 번",
+            "note": "once or twice는 '한두 번'입니다."
+          },
+          {
+            "text": "she",
+            "lemma": "she",
+            "pos": "대명사",
+            "meaning": "그녀는",
+            "note": "여기서는 앨리스를 가리키며 동작의 주체입니다."
+          },
+          {
+            "text": "had",
+            "lemma": "have",
+            "pos": "조동사·동사",
+            "meaning": "~한 적이 있었다; 가지고 있었다",
+            "note": "첫 had는 peeped와 과거완료, 두 번째 had는 책에 내용이 '있었다'라는 일반동사입니다."
+          },
+          {
+            "text": "peeped",
+            "lemma": "peep",
+            "pos": "과거분사",
+            "meaning": "슬쩍 들여다본",
+            "note": "had peeped에서 과거완료를 이루며 앞서 한 행동을 나타냅니다."
+          },
+          {
+            "text": "into",
+            "lemma": "into",
+            "pos": "전치사",
+            "meaning": "~안으로",
+            "note": "들여다보는 시선이 책 안쪽으로 향함을 나타냅니다."
+          },
+          {
+            "text": "the",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "book",
+            "lemma": "book",
+            "pos": "명사",
+            "meaning": "책",
+            "note": "언니가 읽고 있는 책입니다."
+          },
+          {
+            "text": "her",
+            "lemma": "she",
+            "pos": "소유한정사",
+            "meaning": "그녀의",
+            "note": "her sister는 앨리스의 언니를 가리킵니다."
+          },
+          {
+            "text": "sister",
+            "lemma": "sister",
+            "pos": "명사",
+            "meaning": "여자 형제, 언니",
+            "note": "이야기에서 앨리스와 함께 있는 언니를 가리킵니다."
+          },
+          {
+            "text": "was",
+            "lemma": "be",
+            "pos": "동사·조동사",
+            "meaning": "~이었다, ~하고 있었다",
+            "note": "be의 과거형입니다. -ing와 만나면 과거진행형이 됩니다."
+          },
+          {
+            "text": "reading",
+            "lemma": "read",
+            "pos": "현재분사",
+            "meaning": "읽고 있는",
+            "note": "was reading은 그때 읽고 있던 중이라는 뜻입니다."
+          },
+          {
+            "text": "but",
+            "lemma": "but",
+            "pos": "접속사",
+            "meaning": "하지만",
+            "note": "앞말과 다른 방향의 내용을 이어 줍니다."
+          },
+          {
+            "text": "it",
+            "lemma": "it",
+            "pos": "대명사",
+            "meaning": "그 책, 그 책 안",
+            "note": "두 번의 it 모두 앞서 말한 book을 가리킵니다."
+          },
+          {
+            "text": "no",
+            "lemma": "no",
+            "pos": "한정사",
+            "meaning": "하나도 없는",
+            "note": "명사 앞에서 대상을 부정합니다."
+          },
+          {
+            "text": "pictures",
+            "lemma": "picture",
+            "pos": "명사·복수",
+            "meaning": "그림들",
+            "note": "책에 있는 삽화나 그림을 가리킵니다."
+          },
+          {
+            "text": "conversations",
+            "lemma": "conversation",
+            "pos": "명사·복수",
+            "meaning": "대화들",
+            "note": "책 속 인물들이 주고받는 말을 뜻합니다."
+          },
+          {
+            "text": "in",
+            "lemma": "in",
+            "pos": "전치사",
+            "meaning": "~안에, ~에서",
+            "note": "장소 또는 어떤 상황 안에 있음을 나타냅니다."
+          }
+        ]
+      },
+      {
+        "text": "“and what is the use of a book,” thought Alice “without pictures or conversations?”",
+        "meaning": "“그리고 그림도 대화도 없는 책이 무슨 소용이지?” 하고 앨리스는 생각했다.",
+        "kind": "fragment",
+        "overview": "원문 첫 문장의 마지막 구간이며, 앨리스의 생각을 직접 인용합니다. 질문의 뼈대는 what is the use ...?이고 중간에 thought Alice라는 전달 표현이 끼어 있습니다. without pictures or conversations는 끼어든 표현 다음에서도 계속 a book을 설명합니다.",
+        "structure": [
+          {
+            "text": "what",
+            "label": "보어",
+            "explanation": "책의 쓸모가 무엇인지 묻는 말입니다. 질문이라 맨 앞으로 나왔습니다."
+          },
+          {
+            "text": "is",
+            "label": "동사",
+            "explanation": "주어의 쓸모와 what을 연결합니다."
+          },
+          {
+            "text": "the use of a book",
+            "label": "주어",
+            "explanation": "'책의 쓸모'라는 질문의 주어입니다."
+          },
+          {
+            "text": "thought Alice",
+            "label": "동사",
+            "explanation": "생각의 주체를 소개하는 삽입 표현입니다. 기본 어순은 Alice thought입니다."
+          },
+          {
+            "text": "without pictures or conversations",
+            "label": "꾸미는말",
+            "explanation": "어떤 책인지 설명합니다. 인용문의 끊긴 두 부분을 연결해 읽어야 합니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "“and",
+            "meaning": "그리고",
+            "role": "connector",
+            "label": "앞 생각과 연결"
+          },
+          {
+            "text": "what",
+            "meaning": "무엇인가",
+            "role": "complement",
+            "label": "쓸모를 묻는 말"
+          },
+          {
+            "text": "is the use of a book,”",
+            "meaning": "책의 쓸모가",
+            "role": "subject",
+            "label": "질문의 동사와 주어"
+          },
+          {
+            "text": "thought Alice",
+            "meaning": "앨리스는 생각했다",
+            "role": "other",
+            "label": "생각을 전하는 삽입"
+          },
+          {
+            "text": "“without pictures or conversations?”",
+            "meaning": "그림도 대화도 없는",
+            "role": "modifier",
+            "label": "어떤 책인지"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "What is the use of ...?",
+            "explanation": "'~의 쓸모가 무엇인가?'라는 질문이며, 이 장면에서는 쓸모가 없다는 생각을 드러내는 반문입니다.",
+            "example": "What is the use of a map without names?",
+            "translation": "이름이 없는 지도가 무슨 소용인가?"
+          },
+          {
+            "title": "thought Alice: 인용 뒤의 어순",
+            "explanation": "이야기에서는 말이나 생각을 소개할 때 동사 뒤에 이름을 놓기도 합니다. 일반 평서문의 기본 순서는 Alice thought입니다.",
+            "example": "“I can try,” said Min.",
+            "translation": "“해볼 수 있어.”라고 민이 말했다."
+          }
+        ],
+        "tip": "thought Alice에서 잠깐 쉬고, 그 뒤의 without을 a book에 다시 연결하세요. 그림과 대화가 없는 것은 앨리스가 아니라 책입니다.",
+        "check": {
+          "question": "이 문장에서 use는 동사일까요, 명사일까요?",
+          "answer": "명사",
+          "hint": "the use 앞의 관사 the를 보세요."
+        },
+        "words": [
+          {
+            "text": "and",
+            "lemma": "and",
+            "pos": "접속사",
+            "meaning": "그리고, ~와",
+            "note": "같은 역할의 말이나 절을 이어 줍니다."
+          },
+          {
+            "text": "what",
+            "lemma": "what",
+            "pos": "의문대명사",
+            "meaning": "무엇",
+            "note": "의문문에서 앞으로 나온 보어로 쓸모의 정체를 묻습니다."
+          },
+          {
+            "text": "is",
+            "lemma": "be",
+            "pos": "동사",
+            "meaning": "~이다",
+            "note": "주어의 상태나 정체를 뒤의 말과 연결합니다."
+          },
+          {
+            "text": "the",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "use",
+            "lemma": "use",
+            "pos": "명사",
+            "meaning": "쓸모, 소용",
+            "note": "여기서는 '사용하다'라는 동사가 아니라 usefulness의 뜻입니다."
+          },
+          {
+            "text": "of",
+            "lemma": "of",
+            "pos": "전치사",
+            "meaning": "~의",
+            "note": "the use of a book은 '책의 쓸모'입니다."
+          },
+          {
+            "text": "a",
+            "lemma": "a",
+            "pos": "관사",
+            "meaning": "하나의, 어떤",
+            "note": "셀 수 있는 단수 명사 앞에 씁니다. 한국어로 늘 '하나'라고 번역하지는 않습니다."
+          },
+          {
+            "text": "book",
+            "lemma": "book",
+            "pos": "명사",
+            "meaning": "책",
+            "note": "언니가 읽고 있는 책입니다."
+          },
+          {
+            "text": "thought",
+            "lemma": "think",
+            "pos": "과거형 동사",
+            "meaning": "생각했다",
+            "note": "앨리스의 머릿속 말을 소개합니다."
+          },
+          {
+            "text": "Alice",
+            "lemma": "Alice",
+            "pos": "고유명사",
+            "meaning": "앨리스",
+            "note": "이 이야기의 주인공 이름입니다."
+          },
+          {
+            "text": "without",
+            "lemma": "without",
+            "pos": "전치사",
+            "meaning": "~없이, ~없는",
+            "note": "뒤의 명사들이 없다는 뜻입니다."
+          },
+          {
+            "text": "pictures",
+            "lemma": "picture",
+            "pos": "명사·복수",
+            "meaning": "그림들",
+            "note": "책에 있는 삽화나 그림을 가리킵니다."
+          },
+          {
+            "text": "or",
+            "lemma": "or",
+            "pos": "접속사",
+            "meaning": "또는, ~거나",
+            "note": "선택 가능한 말이나 두 가능성을 연결합니다."
+          },
+          {
+            "text": "conversations",
+            "lemma": "conversation",
+            "pos": "명사·복수",
+            "meaning": "대화들",
+            "note": "책 속 인물들이 주고받는 말을 뜻합니다."
+          }
+        ]
+      },
+      {
+        "text": "In another moment down went Alice after it, never once considering how in the world she was to get out again.",
+        "meaning": "다음 순간 앨리스도 그 뒤를 따라 내려갔다. 도대체 어떻게 다시 빠져나올지는 한 번도 생각하지 않은 채였다.",
+        "kind": "sentence",
+        "overview": "중심 행동은 Alice went down after it입니다. 원문에서는 아래 방향을 생생하게 보여 주려고 down을 맨 앞으로 보내 동사 went 뒤에 주어 Alice를 놓았습니다. 쉼표 뒤는 앨리스가 어떤 생각 없이 움직였는지를 덧붙입니다.",
+        "structure": [
+          {
+            "text": "In another moment",
+            "label": "꾸미는말",
+            "explanation": "행동이 일어나는 때입니다."
+          },
+          {
+            "text": "down",
+            "label": "꾸미는말",
+            "explanation": "아래 방향을 강조하며 앞으로 나온 부사입니다."
+          },
+          {
+            "text": "went",
+            "label": "동사",
+            "explanation": "앨리스가 움직였습니다."
+          },
+          {
+            "text": "Alice",
+            "label": "주어",
+            "explanation": "도치 때문에 동사 뒤에 놓인 행동의 주체입니다."
+          },
+          {
+            "text": "after it",
+            "label": "꾸미는말",
+            "explanation": "앞서 내려간 토끼의 뒤를 따라갔다는 뜻입니다."
+          },
+          {
+            "text": "never once considering how in the world she was to get out again",
+            "label": "꾸미는말",
+            "explanation": "considering의 주체도 Alice입니다. 빠져나올 방법을 고려하지 않았음을 덧붙입니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "In another moment",
+            "meaning": "바로 다음 순간",
+            "role": "modifier",
+            "label": "언제"
+          },
+          {
+            "text": "down went Alice",
+            "meaning": "앨리스가 아래로 내려갔다",
+            "role": "verb",
+            "label": "방향을 앞세운 주절"
+          },
+          {
+            "text": "after it,",
+            "meaning": "그 토끼를 따라서",
+            "role": "modifier",
+            "label": "무엇을 따라"
+          },
+          {
+            "text": "never once considering",
+            "meaning": "한 번도 생각하지 않은 채",
+            "role": "modifier",
+            "label": "동시에 하지 않은 일"
+          },
+          {
+            "text": "how in the world",
+            "meaning": "도대체 어떻게",
+            "role": "connector",
+            "label": "생각할 방법"
+          },
+          {
+            "text": "she was to get out again.",
+            "meaning": "그녀가 다시 빠져나올 것인지",
+            "role": "object",
+            "label": "고려하지 않은 내용"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "방향어 + 동사 + 주어",
+            "explanation": "down went Alice는 Alice went down의 문학적인 도치입니다. 장소나 방향을 먼저 보여 주는 효과가 있습니다.",
+            "example": "Into the room came a small dog.",
+            "translation": "방 안으로 작은 개 한 마리가 들어왔다."
+          },
+          {
+            "title": "주절, -ing: 상황을 덧붙이기",
+            "explanation": "considering 앞에 새 주어가 없으므로 생각하는 사람도 Alice입니다. never once가 그 행동을 부정합니다.",
+            "example": "He left, carrying a small box.",
+            "translation": "그는 작은 상자를 들고 떠났다."
+          },
+          {
+            "title": "how + 주어 + 동사",
+            "explanation": "문장 안에서 '어떻게 ~할지'라는 내용을 말할 때는 직접 질문처럼 주어와 동사를 뒤집지 않습니다. was to get out은 이 문맥에서 앞으로 어떻게 나올 수 있을지를 나타냅니다.",
+            "example": "I wondered how I was to get home.",
+            "translation": "나는 어떻게 집에 돌아갈 수 있을지 궁금했다."
+          }
+        ],
+        "tip": "down went Alice를 Alice went down으로 한 번 바꿔 읽은 다음, never once considering 이하를 붙이세요.",
+        "check": {
+          "question": "down went Alice의 주어는?",
+          "answer": "Alice",
+          "hint": "동사 went 뒤에 놓인 이름입니다."
+        },
+        "words": [
+          {
+            "text": "In",
+            "lemma": "in",
+            "pos": "전치사",
+            "meaning": "~안에, ~후에",
+            "note": "In another moment는 곧 다음 순간, in the world는 '도대체'라는 강조 덩어리입니다."
+          },
+          {
+            "text": "another",
+            "lemma": "another",
+            "pos": "한정사",
+            "meaning": "또 하나의, 다음의",
+            "note": "another moment는 이어지는 아주 짧은 시간을 말합니다."
+          },
+          {
+            "text": "moment",
+            "lemma": "moment",
+            "pos": "명사",
+            "meaning": "순간, 잠깐",
+            "note": "매우 짧은 시간입니다."
+          },
+          {
+            "text": "down",
+            "lemma": "down",
+            "pos": "전치사·부사",
+            "meaning": "아래로",
+            "note": "이동하는 방향을 나타냅니다."
+          },
+          {
+            "text": "went",
+            "lemma": "go",
+            "pos": "과거형 동사",
+            "meaning": "갔다, 이어졌다",
+            "note": "go의 불규칙 과거형입니다. 주어에 따라 이동 또는 길의 진행을 말합니다."
+          },
+          {
+            "text": "Alice",
+            "lemma": "Alice",
+            "pos": "고유명사",
+            "meaning": "앨리스",
+            "note": "이 이야기의 주인공 이름입니다."
+          },
+          {
+            "text": "after",
+            "lemma": "after",
+            "pos": "전치사",
+            "meaning": "~뒤를 따라",
+            "note": "여기서는 시간 '후에'보다 뒤쫓는 방향입니다."
+          },
+          {
+            "text": "it",
+            "lemma": "it",
+            "pos": "대명사",
+            "meaning": "그 토끼",
+            "note": "바로 앞의 원문 장면에 나온 White Rabbit을 가리킵니다."
+          },
+          {
+            "text": "never",
+            "lemma": "never",
+            "pos": "부사",
+            "meaning": "결코 ~않다, 한 번도 ~않다",
+            "note": "한 번도 일어나지 않음을 강조합니다."
+          },
+          {
+            "text": "once",
+            "lemma": "once",
+            "pos": "부사",
+            "meaning": "한 번",
+            "note": "never once로 '단 한 번도 ~않다'를 강조합니다."
+          },
+          {
+            "text": "considering",
+            "lemma": "consider",
+            "pos": "현재분사",
+            "meaning": "생각하면서, 고려하면서",
+            "note": "앞 주어가 동시에 한 행동이나 하지 않은 행동을 덧붙입니다."
+          },
+          {
+            "text": "how",
+            "lemma": "how",
+            "pos": "의문부사",
+            "meaning": "어떻게",
+            "note": "방법에 대한 질문을 이끕니다."
+          },
+          {
+            "text": "the",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "world",
+            "lemma": "world",
+            "pos": "명사",
+            "meaning": "세상",
+            "note": "in the world는 질문을 강조하는 '도대체'라는 덩어리입니다."
+          },
+          {
+            "text": "she",
+            "lemma": "she",
+            "pos": "대명사",
+            "meaning": "그녀는",
+            "note": "여기서는 앨리스를 가리키며 동작의 주체입니다."
+          },
+          {
+            "text": "was",
+            "lemma": "be",
+            "pos": "동사",
+            "meaning": "~할 것이었다",
+            "note": "was to get out에서 be to는 여기서 빠져나올 방법·가능성을 나타냅니다."
+          },
+          {
+            "text": "to",
+            "lemma": "to",
+            "pos": "전치사·부정사 표지",
+            "meaning": "~로, ~하기",
+            "note": "명사 앞이면 방향·대상, 동사원형 앞이면 to부정사를 이룹니다."
+          },
+          {
+            "text": "get",
+            "lemma": "get",
+            "pos": "동사",
+            "meaning": "~해지다, 이동하다",
+            "note": "뒤에 형용사가 오면 상태 변화, out과 함께면 '나오다'입니다."
+          },
+          {
+            "text": "out",
+            "lemma": "out",
+            "pos": "부사",
+            "meaning": "밖으로",
+            "note": "get out처럼 동사와 묶어 '나오다'로 읽습니다."
+          },
+          {
+            "text": "again",
+            "lemma": "again",
+            "pos": "부사",
+            "meaning": "다시",
+            "note": "이전 상태나 장소로 되돌아가는 뜻을 보탭니다."
+          }
+        ]
+      },
+      {
+        "text": "The rabbit-hole went straight on like a tunnel for some way, and then dipped suddenly down, so suddenly that Alice had not a moment to think about stopping herself before she found herself falling down a very deep well.",
+        "meaning": "토끼 굴은 한동안 터널처럼 곧게 이어지다가 갑자기 아래로 꺾였다. 너무 갑작스러워 앨리스는 멈출 생각을 할 틈도 없이 아주 깊은 우물 속으로 떨어지는 자신을 발견했다.",
+        "kind": "sentence",
+        "overview": "큰 뼈대는 The rabbit-hole went ... and then dipped ...입니다. 하나의 주어가 두 동사에 걸립니다. 이어지는 so suddenly that은 '너무 갑자기여서 그 결과 ~했다'를 연결합니다. 마지막에는 she found herself falling이라는 '자신이 떨어지고 있음을 알았다'는 구조가 들어갑니다.",
+        "structure": [
+          {
+            "text": "The rabbit-hole",
+            "label": "주어",
+            "explanation": "이어지다가 아래로 꺾이는 길입니다."
+          },
+          {
+            "text": "went straight on",
+            "label": "동사",
+            "explanation": "굴이 곧게 이어졌습니다. went는 여기서 사람이 걸어갔다는 뜻이 아닙니다."
+          },
+          {
+            "text": "and then dipped suddenly down",
+            "label": "연결",
+            "explanation": "같은 주어 rabbit-hole에 두 번째 동작을 이어 붙입니다."
+          },
+          {
+            "text": "so suddenly that Alice had not a moment",
+            "label": "연결",
+            "explanation": "정도가 너무 커서 시간이 없었다는 결과를 이끕니다."
+          },
+          {
+            "text": "to think about stopping herself",
+            "label": "꾸미는말",
+            "explanation": "moment를 꾸며 무엇을 할 순간인지 알려 줍니다."
+          },
+          {
+            "text": "she found herself falling down a very deep well",
+            "label": "꾸미는말",
+            "explanation": "before 뒤의 절입니다. 그 안에서 herself는 found의 목적어, falling 이하는 그 목적어의 상태를 설명합니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "The rabbit-hole",
+            "meaning": "토끼 굴은",
+            "role": "subject",
+            "label": "주어"
+          },
+          {
+            "text": "went straight on",
+            "meaning": "곧게 계속 이어졌다",
+            "role": "verb",
+            "label": "첫 동작"
+          },
+          {
+            "text": "like a tunnel",
+            "meaning": "터널처럼",
+            "role": "modifier",
+            "label": "비교"
+          },
+          {
+            "text": "for some way,",
+            "meaning": "얼마간의 거리 동안",
+            "role": "modifier",
+            "label": "범위"
+          },
+          {
+            "text": "and then",
+            "meaning": "그러고 나서",
+            "role": "connector",
+            "label": "순서 연결"
+          },
+          {
+            "text": "dipped suddenly down,",
+            "meaning": "갑자기 아래로 꺾였다",
+            "role": "verb",
+            "label": "둘째 동작"
+          },
+          {
+            "text": "so suddenly that",
+            "meaning": "너무 갑작스러워서",
+            "role": "connector",
+            "label": "정도와 결과"
+          },
+          {
+            "text": "Alice had not a moment",
+            "meaning": "앨리스에게는 한순간도 없었다",
+            "role": "verb",
+            "label": "결과"
+          },
+          {
+            "text": "to think about stopping herself",
+            "meaning": "자신을 멈출 생각을 할",
+            "role": "modifier",
+            "label": "어떤 순간인지"
+          },
+          {
+            "text": "before she found herself",
+            "meaning": "그녀가 자신을 발견하기 전에",
+            "role": "modifier",
+            "label": "시간의 경계"
+          },
+          {
+            "text": "falling down a very deep well.",
+            "meaning": "아주 깊은 우물 아래로 떨어지는 상태로",
+            "role": "complement",
+            "label": "자신의 상태"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "같은 주어에 동사 두 개",
+            "explanation": "went와 dipped의 주어는 모두 the rabbit-hole입니다. and 뒤에 같은 주어를 반복하지 않았습니다.",
+            "example": "The path turned left and disappeared into the trees.",
+            "translation": "그 길은 왼쪽으로 꺾여 나무들 사이로 사라졌다."
+          },
+          {
+            "title": "so + 부사 + that: 너무 ~해서",
+            "explanation": "so suddenly가 변화의 정도를 강조하고 that절은 그 결과를 설명합니다.",
+            "example": "The bird flew so quickly that I lost sight of it.",
+            "translation": "새가 너무 빨리 날아서 나는 그것을 놓쳤다."
+          },
+          {
+            "title": "find + 목적어 + -ing",
+            "explanation": "found herself falling은 '자신이 떨어지고 있음을 알았다'입니다. falling은 앨리스의 상태를 설명하는 목적격 보어입니다.",
+            "example": "I found myself smiling.",
+            "translation": "나는 어느새 미소 짓고 있는 나를 발견했다."
+          }
+        ],
+        "tip": "먼저 굴의 움직임인 went와 dipped만 찾으세요. 다음으로 that 이하에서 Alice had not a moment를 읽으면 긴 문장의 줄기가 보입니다.",
+        "check": {
+          "question": "found herself 뒤에서 그녀의 진행 중인 상태를 나타내는 단어는?",
+          "answer": "falling",
+          "hint": "fall에 -ing가 붙은 형태입니다."
+        },
+        "words": [
+          {
+            "text": "The",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "rabbit-hole",
+            "lemma": "rabbit-hole",
+            "pos": "명사",
+            "meaning": "토끼 굴",
+            "note": "rabbit과 hole을 하이픈으로 연결한 합성어입니다."
+          },
+          {
+            "text": "went",
+            "lemma": "go",
+            "pos": "과거형 동사",
+            "meaning": "갔다, 이어졌다",
+            "note": "go의 불규칙 과거형입니다. 주어에 따라 이동 또는 길의 진행을 말합니다."
+          },
+          {
+            "text": "straight",
+            "lemma": "straight",
+            "pos": "부사",
+            "meaning": "곧장, 곧게",
+            "note": "길이 휘지 않고 이어지는 모습을 말합니다."
+          },
+          {
+            "text": "on",
+            "lemma": "on",
+            "pos": "부사",
+            "meaning": "계속, 앞으로",
+            "note": "went straight on에서 굴이 곧게 계속 이어졌다는 뜻입니다."
+          },
+          {
+            "text": "like",
+            "lemma": "like",
+            "pos": "전치사",
+            "meaning": "~처럼",
+            "note": "뒤의 명사와 비슷하다고 비교합니다."
+          },
+          {
+            "text": "a",
+            "lemma": "a",
+            "pos": "관사",
+            "meaning": "하나의, 어떤",
+            "note": "셀 수 있는 단수 명사 앞에 씁니다. 한국어로 늘 '하나'라고 번역하지는 않습니다."
+          },
+          {
+            "text": "tunnel",
+            "lemma": "tunnel",
+            "pos": "명사",
+            "meaning": "터널",
+            "note": "긴 통로와 같은 굴을 비유합니다."
+          },
+          {
+            "text": "for",
+            "lemma": "for",
+            "pos": "전치사",
+            "meaning": "~만큼의 거리 동안",
+            "note": "for some way는 길의 일정 구간을 나타냅니다."
+          },
+          {
+            "text": "some",
+            "lemma": "some",
+            "pos": "한정사",
+            "meaning": "어느 정도의",
+            "note": "some way는 정확하지 않은 얼마간의 거리를 뜻합니다."
+          },
+          {
+            "text": "way",
+            "lemma": "way",
+            "pos": "명사",
+            "meaning": "거리, 길",
+            "note": "for some way에서는 '얼마간의 거리 동안'의 뜻입니다."
+          },
+          {
+            "text": "and",
+            "lemma": "and",
+            "pos": "접속사",
+            "meaning": "그리고, ~와",
+            "note": "같은 역할의 말이나 절을 이어 줍니다."
+          },
+          {
+            "text": "then",
+            "lemma": "then",
+            "pos": "부사",
+            "meaning": "그다음에",
+            "note": "앞의 상황 뒤에 일어난 일을 나타냅니다."
+          },
+          {
+            "text": "dipped",
+            "lemma": "dip",
+            "pos": "과거형 동사",
+            "meaning": "아래로 꺾였다",
+            "note": "길의 방향이 갑자기 아래쪽으로 내려갔다는 뜻입니다."
+          },
+          {
+            "text": "suddenly",
+            "lemma": "suddenly",
+            "pos": "부사",
+            "meaning": "갑자기",
+            "note": "예고 없이 동작이나 변화가 일어남을 나타냅니다."
+          },
+          {
+            "text": "down",
+            "lemma": "down",
+            "pos": "부사·전치사",
+            "meaning": "아래로, ~아래를 따라",
+            "note": "dipped ... down에서는 방향 부사, down a ... well에서는 우물을 따라 아래로 향하는 전치사입니다."
+          },
+          {
+            "text": "so",
+            "lemma": "so",
+            "pos": "부사",
+            "meaning": "너무, 그렇게",
+            "note": "so ... that에서 정도가 뒤의 결과를 일으켰음을 나타냅니다."
+          },
+          {
+            "text": "that",
+            "lemma": "that",
+            "pos": "접속사",
+            "meaning": "~라는 것, 그 결과 ~",
+            "note": "여기서는 뒤의 절을 앞말의 내용이나 결과로 연결합니다."
+          },
+          {
+            "text": "Alice",
+            "lemma": "Alice",
+            "pos": "고유명사",
+            "meaning": "앨리스",
+            "note": "이 이야기의 주인공 이름입니다."
+          },
+          {
+            "text": "had",
+            "lemma": "have",
+            "pos": "동사",
+            "meaning": "가지고 있었다",
+            "note": "had not a moment는 '한순간도 없었다'라는 고전적인 부정 표현입니다. 과거완료가 아닙니다."
+          },
+          {
+            "text": "not",
+            "lemma": "not",
+            "pos": "부사",
+            "meaning": "~아니다, ~않다",
+            "note": "동사나 뒤의 내용을 부정합니다."
+          },
+          {
+            "text": "moment",
+            "lemma": "moment",
+            "pos": "명사",
+            "meaning": "순간, 잠깐",
+            "note": "매우 짧은 시간입니다."
+          },
+          {
+            "text": "to",
+            "lemma": "to",
+            "pos": "전치사·부정사 표지",
+            "meaning": "~로, ~하기",
+            "note": "명사 앞이면 방향·대상, 동사원형 앞이면 to부정사를 이룹니다."
+          },
+          {
+            "text": "think",
+            "lemma": "think",
+            "pos": "동사",
+            "meaning": "생각하다",
+            "note": "마음속으로 판단하거나 방법을 떠올린다는 뜻입니다."
+          },
+          {
+            "text": "about",
+            "lemma": "about",
+            "pos": "전치사·부사",
+            "meaning": "~에 관해, 주변을",
+            "note": "think about에서는 주제, look about에서는 둘러보는 방향입니다."
+          },
+          {
+            "text": "stopping",
+            "lemma": "stop",
+            "pos": "동명사",
+            "meaning": "멈추는 것",
+            "note": "about 뒤에서 정지하는 행동을 명사처럼 나타냅니다."
+          },
+          {
+            "text": "herself",
+            "lemma": "herself",
+            "pos": "재귀대명사",
+            "meaning": "그녀 자신을",
+            "note": "주어 she와 같은 사람인 앨리스를 가리킵니다."
+          },
+          {
+            "text": "before",
+            "lemma": "before",
+            "pos": "접속사",
+            "meaning": "~하기 전에",
+            "note": "생각할 틈도 생기기 전에 이미 떨어졌다는 시간 순서를 보여 줍니다."
+          },
+          {
+            "text": "she",
+            "lemma": "she",
+            "pos": "대명사",
+            "meaning": "그녀는",
+            "note": "여기서는 앨리스를 가리키며 동작의 주체입니다."
+          },
+          {
+            "text": "found",
+            "lemma": "find",
+            "pos": "과거형 동사",
+            "meaning": "알게 되었다, 발견했다",
+            "note": "find oneself -ing는 자신이 어떤 상황에 있음을 깨닫는 표현입니다."
+          },
+          {
+            "text": "falling",
+            "lemma": "fall",
+            "pos": "현재분사",
+            "meaning": "떨어지고 있는",
+            "note": "herself의 행동·상태를 설명합니다."
+          },
+          {
+            "text": "very",
+            "lemma": "very",
+            "pos": "부사",
+            "meaning": "매우, 아주",
+            "note": "형용사나 부사 앞에서 정도를 더합니다."
+          },
+          {
+            "text": "deep",
+            "lemma": "deep",
+            "pos": "형용사",
+            "meaning": "깊은",
+            "note": "우물의 깊이를 나타냅니다."
+          },
+          {
+            "text": "well",
+            "lemma": "well",
+            "pos": "명사",
+            "meaning": "우물",
+            "note": "이 문맥에서는 '잘'이라는 부사가 아닙니다."
+          }
+        ]
+      },
+      {
+        "text": "Either the well was very deep, or she fell very slowly, for she had plenty of time as she went down to look about her and to wonder what was going to happen next.",
+        "meaning": "우물이 아주 깊었거나 앨리스가 아주 천천히 떨어졌던 모양이다. 내려가면서 주위를 둘러보고 다음에 무슨 일이 일어날지 궁금해할 시간이 충분했기 때문이다.",
+        "kind": "sentence",
+        "overview": "Either A or B로 두 가능성을 제시합니다. A는 우물이 깊었다는 것, B는 앨리스가 천천히 떨어졌다는 것입니다. for 이하가 그 추정의 근거를 설명합니다. 시간의 용도 두 가지는 to look과 to wonder로 나란히 연결됩니다.",
+        "structure": [
+          {
+            "text": "Either the well was very deep",
+            "label": "연결",
+            "explanation": "첫 가능성입니다. well이 주어, was가 동사, deep이 상태를 말하는 보어입니다."
+          },
+          {
+            "text": "or she fell very slowly",
+            "label": "연결",
+            "explanation": "둘째 가능성입니다. fell이 행동, slowly가 그 속도입니다."
+          },
+          {
+            "text": "for she had plenty of time",
+            "label": "연결",
+            "explanation": "왜 그렇게 추정하는지를 설명하는 이유절입니다."
+          },
+          {
+            "text": "as she went down",
+            "label": "꾸미는말",
+            "explanation": "충분한 시간이 생긴 때, 즉 떨어지는 동안을 나타냅니다."
+          },
+          {
+            "text": "to look about her and to wonder",
+            "label": "꾸미는말",
+            "explanation": "time을 설명하며 시간을 쓸 수 있었던 두 행동을 나란히 놓습니다."
+          },
+          {
+            "text": "what was going to happen next",
+            "label": "목적어",
+            "explanation": "wonder의 내용입니다. 이 절 안에서 what이 happen의 주어입니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "Either the well was very deep,",
+            "meaning": "우물이 아주 깊었거나",
+            "role": "connector",
+            "label": "첫 가능성"
+          },
+          {
+            "text": "or she fell very slowly,",
+            "meaning": "그녀가 아주 천천히 떨어졌거나",
+            "role": "connector",
+            "label": "둘째 가능성"
+          },
+          {
+            "text": "for",
+            "meaning": "왜냐하면",
+            "role": "connector",
+            "label": "근거 연결"
+          },
+          {
+            "text": "she had plenty of time",
+            "meaning": "그녀에게 충분한 시간이 있었기 때문이다",
+            "role": "verb",
+            "label": "근거의 중심"
+          },
+          {
+            "text": "as she went down",
+            "meaning": "아래로 내려가는 동안",
+            "role": "modifier",
+            "label": "언제"
+          },
+          {
+            "text": "to look about her",
+            "meaning": "자기 주위를 둘러볼",
+            "role": "modifier",
+            "label": "시간의 첫 용도"
+          },
+          {
+            "text": "and to wonder",
+            "meaning": "그리고 궁금해할",
+            "role": "connector",
+            "label": "둘째 용도"
+          },
+          {
+            "text": "what was going to happen next.",
+            "meaning": "다음에 무슨 일이 일어날지를",
+            "role": "object",
+            "label": "궁금한 내용"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "Either A or B: 둘 중 하나",
+            "explanation": "두 가능성을 나란히 놓습니다. 여기서는 어느 쪽인지 단정하지 않고 이유를 붙입니다.",
+            "example": "Either the clock is slow, or we are early.",
+            "translation": "시계가 느리거나 우리가 일찍 온 것이다."
+          },
+          {
+            "title": "for + 주어 + 동사: 이유 덧붙이기",
+            "explanation": "여기의 for는 '~를 위해'라는 전치사가 아니라 앞의 판단에 근거를 붙이는 접속사입니다.",
+            "example": "I stayed inside, for the wind was strong.",
+            "translation": "바람이 강했기에 나는 안에 머물렀다."
+          },
+          {
+            "title": "was going to + 동사원형",
+            "explanation": "과거 장면에서 그다음 일어날 일을 바라보는 표현입니다. 실제로 걸어가고 있다는 뜻이 아닙니다.",
+            "example": "She wondered what was going to change.",
+            "translation": "그녀는 무엇이 바뀔지 궁금해했다."
+          }
+        ],
+        "tip": "either와 or를 먼저 짝짓고, for부터는 '왜냐하면'으로 새롭게 읽으세요.",
+        "check": {
+          "question": "이 문장에서 추정의 이유를 이끄는 접속사는?",
+          "answer": "for",
+          "hint": "전치사 '~을 위해'가 아니라 이유를 이어 주는 세 글자 단어입니다."
+        },
+        "words": [
+          {
+            "text": "Either",
+            "lemma": "either",
+            "pos": "접속사",
+            "meaning": "둘 중 하나로, ~거나",
+            "note": "either A or B의 첫 부분입니다."
+          },
+          {
+            "text": "the",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "well",
+            "lemma": "well",
+            "pos": "명사",
+            "meaning": "우물",
+            "note": "이 문맥에서는 '잘'이라는 부사가 아닙니다."
+          },
+          {
+            "text": "was",
+            "lemma": "be",
+            "pos": "동사·조동사",
+            "meaning": "~이었다; ~할 것이었다",
+            "note": "was deep은 상태, was going to happen은 과거 시점의 전망을 나타냅니다."
+          },
+          {
+            "text": "very",
+            "lemma": "very",
+            "pos": "부사",
+            "meaning": "매우, 아주",
+            "note": "형용사나 부사 앞에서 정도를 더합니다."
+          },
+          {
+            "text": "deep",
+            "lemma": "deep",
+            "pos": "형용사",
+            "meaning": "깊은",
+            "note": "우물의 깊이를 나타냅니다."
+          },
+          {
+            "text": "or",
+            "lemma": "or",
+            "pos": "접속사",
+            "meaning": "또는, ~거나",
+            "note": "선택 가능한 말이나 두 가능성을 연결합니다."
+          },
+          {
+            "text": "she",
+            "lemma": "she",
+            "pos": "대명사",
+            "meaning": "그녀는",
+            "note": "여기서는 앨리스를 가리키며 동작의 주체입니다."
+          },
+          {
+            "text": "fell",
+            "lemma": "fall",
+            "pos": "과거형 동사",
+            "meaning": "떨어졌다",
+            "note": "fall의 불규칙 과거형입니다."
+          },
+          {
+            "text": "slowly",
+            "lemma": "slowly",
+            "pos": "부사",
+            "meaning": "천천히",
+            "note": "떨어지는 동작의 속도를 설명합니다."
+          },
+          {
+            "text": "for",
+            "lemma": "for",
+            "pos": "전치사·접속사",
+            "meaning": "~동안, 왜냐하면",
+            "note": "명사 앞이면 범위·기간, 절 앞이면 이유를 설명할 수 있습니다."
+          },
+          {
+            "text": "had",
+            "lemma": "have",
+            "pos": "동사",
+            "meaning": "가지고 있었다",
+            "note": "had plenty of time은 시간이 충분히 있었다는 뜻이며 과거완료가 아닙니다."
+          },
+          {
+            "text": "plenty",
+            "lemma": "plenty",
+            "pos": "명사·수량 표현",
+            "meaning": "충분함, 많은 양",
+            "note": "plenty of time으로 '충분한 시간'을 나타냅니다."
+          },
+          {
+            "text": "of",
+            "lemma": "of",
+            "pos": "전치사",
+            "meaning": "~의, ~에 관한",
+            "note": "앞말과 뒤의 명사·동명사를 연결합니다. 덩어리 전체로 뜻을 읽으세요."
+          },
+          {
+            "text": "time",
+            "lemma": "time",
+            "pos": "명사",
+            "meaning": "시간",
+            "note": "어떤 행동을 할 여유를 뜻하며 여기서는 셀 수 없는 명사입니다."
+          },
+          {
+            "text": "as",
+            "lemma": "as",
+            "pos": "접속사",
+            "meaning": "~하는 동안",
+            "note": "as she went down은 시간의 흐름을 나타냅니다."
+          },
+          {
+            "text": "went",
+            "lemma": "go",
+            "pos": "과거형 동사",
+            "meaning": "갔다, 이어졌다",
+            "note": "go의 불규칙 과거형입니다. 주어에 따라 이동 또는 길의 진행을 말합니다."
+          },
+          {
+            "text": "down",
+            "lemma": "down",
+            "pos": "전치사·부사",
+            "meaning": "아래로",
+            "note": "이동하는 방향을 나타냅니다."
+          },
+          {
+            "text": "to",
+            "lemma": "to",
+            "pos": "부정사 표지",
+            "meaning": "~할, ~하려고",
+            "note": "to look과 to wonder는 time의 용도를 설명하며, going to happen은 예정 표현입니다."
+          },
+          {
+            "text": "look",
+            "lemma": "look",
+            "pos": "동사",
+            "meaning": "보다, 둘러보다",
+            "note": "look about은 주위를 살피는 것입니다."
+          },
+          {
+            "text": "about",
+            "lemma": "about",
+            "pos": "전치사",
+            "meaning": "~주위로",
+            "note": "look about her는 그녀 주위를 둘러본다는 뜻입니다."
+          },
+          {
+            "text": "her",
+            "lemma": "she",
+            "pos": "목적격 대명사",
+            "meaning": "그녀, 자기 자신",
+            "note": "전치사 about의 대상입니다. about her 전체로 그녀의 주위를 뜻해요. 여기서는 소유격 그녀의가 아닙니다."
+          },
+          {
+            "text": "and",
+            "lemma": "and",
+            "pos": "접속사",
+            "meaning": "그리고, ~와",
+            "note": "같은 역할의 말이나 절을 이어 줍니다."
+          },
+          {
+            "text": "wonder",
+            "lemma": "wonder",
+            "pos": "동사",
+            "meaning": "궁금해하다",
+            "note": "뒤의 what절이 궁금한 내용을 알려 줍니다."
+          },
+          {
+            "text": "what",
+            "lemma": "what",
+            "pos": "의문대명사",
+            "meaning": "무엇이",
+            "note": "what was going to happen에서 앞으로 일어날 일 자체를 묻는 주어입니다."
+          },
+          {
+            "text": "going",
+            "lemma": "go",
+            "pos": "현재분사",
+            "meaning": "~하려는, ~할 예정인",
+            "note": "was going to happen에서 과거 시점의 전망을 나타냅니다."
+          },
+          {
+            "text": "happen",
+            "lemma": "happen",
+            "pos": "동사",
+            "meaning": "일어나다",
+            "note": "사건이나 일이 생김을 뜻합니다."
+          },
+          {
+            "text": "next",
+            "lemma": "next",
+            "pos": "부사",
+            "meaning": "다음에",
+            "note": "이어질 때를 나타냅니다."
+          }
+        ]
+      },
+      {
+        "text": "Down, down, down.",
+        "meaning": "아래로, 아래로, 계속 아래로.",
+        "kind": "fragment",
+        "overview": "방향 부사 down을 세 번 반복한 표현입니다. 주어도 시제를 가진 동사도 없으므로 완전한 문장 구조로 분석하지 않습니다. 끊임없이 떨어지는 움직임을 리듬으로 전달합니다.",
+        "structure": [
+          {
+            "text": "Down, down, down.",
+            "label": "꾸미는말",
+            "explanation": "아래 방향을 반복해 하강이 계속된다는 인상을 줍니다. 단독 문장으로 완성된 주어·동사 구조는 아닙니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "Down,",
+            "meaning": "아래로,",
+            "role": "modifier",
+            "label": "첫 하강"
+          },
+          {
+            "text": "down,",
+            "meaning": "아래로,",
+            "role": "modifier",
+            "label": "반복"
+          },
+          {
+            "text": "down.",
+            "meaning": "계속 아래로.",
+            "role": "modifier",
+            "label": "이어지는 반복"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "동사가 없는 표현도 이야기의 리듬을 만들어요",
+            "explanation": "문학에서는 방향이나 소리만 반복해 장면을 보여 줄 수 있습니다. 일반 서술문을 쓸 때는 주어와 동사가 필요합니다.",
+            "example": "Up, up, up.",
+            "translation": "위로, 위로, 계속 위로."
+          }
+        ],
+        "tip": "쉼표마다 짧게 쉬며 아래로 내려가는 장면을 떠올려 보세요. 영어를 억지로 완전한 문장으로 늘리지 않아도 됩니다.",
+        "check": {
+          "question": "이 표현에는 주어와 시제를 가진 동사가 있나요?",
+          "answer": "없다",
+          "hint": "같은 방향 부사만 세 번 나옵니다."
+        },
+        "words": [
+          {
+            "text": "Down",
+            "lemma": "down",
+            "pos": "부사",
+            "meaning": "아래로",
+            "note": "문장 안에서 세 번 반복되지만 단어 설명은 한 번만 제공합니다."
+          }
+        ]
+      },
+      {
+        "text": "Would the fall never come to an end?",
+        "meaning": "이 추락은 끝내 끝나지 않는 걸까?",
+        "kind": "sentence",
+        "overview": "기본 순서를 떠올리면 the fall would never come to an end입니다. 질문으로 만들면서 조동사 Would가 주어 앞으로 나왔습니다. 주어는 떨어지는 일 자체인 the fall이며, come to an end가 '끝나다'라는 동작 표현입니다.",
+        "structure": [
+          {
+            "text": "Would",
+            "label": "동사",
+            "explanation": "과거 장면에서 이후의 일을 묻는 조동사이며 의문문 맨 앞에 있습니다."
+          },
+          {
+            "text": "the fall",
+            "label": "주어",
+            "explanation": "추락이라는 일 자체를 가리킵니다."
+          },
+          {
+            "text": "never",
+            "label": "꾸미는말",
+            "explanation": "끝나는 일이 전혀 없을지를 묻는 부정 부사입니다."
+          },
+          {
+            "text": "come to an end",
+            "label": "동사",
+            "explanation": "'끝에 이르다', 즉 '끝나다'라는 관용 표현입니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "Would",
+            "meaning": "~하게 될까",
+            "role": "verb",
+            "label": "질문의 조동사"
+          },
+          {
+            "text": "the fall",
+            "meaning": "이 추락이",
+            "role": "subject",
+            "label": "주어"
+          },
+          {
+            "text": "never",
+            "meaning": "결코 ~않다",
+            "role": "modifier",
+            "label": "부정"
+          },
+          {
+            "text": "come to an end?",
+            "meaning": "끝나다",
+            "role": "verb",
+            "label": "끝나다"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "조동사로 시작하는 질문",
+            "explanation": "would가 있을 때는 의문문을 만들려고 do를 더하지 않습니다. would를 주어 앞으로 보냅니다.",
+            "example": "Would the rain stop soon?",
+            "translation": "비가 곧 그칠까?"
+          },
+          {
+            "title": "come to an end: 끝나다",
+            "explanation": "come, to, an, end를 단어마다 따로 옮기기보다 '끝나다'라는 덩어리로 기억하세요.",
+            "example": "The long meeting came to an end.",
+            "translation": "긴 회의가 끝났다."
+          }
+        ],
+        "tip": "fall을 동사 '떨어지다'로 읽으면 뼈대가 흐려져요. the가 앞에 있으므로 여기서는 명사 '추락'입니다.",
+        "check": {
+          "question": "이 문장의 주어 두 단어는?",
+          "answer": "the fall",
+          "hint": "무엇이 끝나기를 바라는지 떠올려 보세요."
+        },
+        "words": [
+          {
+            "text": "Would",
+            "lemma": "will",
+            "pos": "조동사",
+            "meaning": "~하게 될까",
+            "note": "떨어지는 장면의 과거 시점에서 이 추락이 끝날지를 묻습니다."
+          },
+          {
+            "text": "the",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "fall",
+            "lemma": "fall",
+            "pos": "명사",
+            "meaning": "추락, 떨어지는 일",
+            "note": "the fall처럼 관사 뒤에 와서 동작 전체를 명사로 나타냅니다."
+          },
+          {
+            "text": "never",
+            "lemma": "never",
+            "pos": "부사",
+            "meaning": "결코 ~않다, 한 번도 ~않다",
+            "note": "한 번도 일어나지 않음을 강조합니다."
+          },
+          {
+            "text": "come",
+            "lemma": "come",
+            "pos": "동사",
+            "meaning": "오다, 이르다",
+            "note": "come to an end는 '끝에 이르다', 즉 '끝나다'입니다."
+          },
+          {
+            "text": "to",
+            "lemma": "to",
+            "pos": "전치사",
+            "meaning": "~에, ~까지",
+            "note": "come to an end에서 명사 end를 이끄는 전치사입니다. to부정사가 아닙니다."
+          },
+          {
+            "text": "an",
+            "lemma": "an",
+            "pos": "관사",
+            "meaning": "하나의, 어떤",
+            "note": "모음 소리로 시작하는 단수 명사 앞에 쓰는 a의 형태입니다."
+          },
+          {
+            "text": "end",
+            "lemma": "end",
+            "pos": "명사",
+            "meaning": "끝",
+            "note": "come to an end라는 표현의 마지막 명사입니다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "lessonId": "hat",
+    "title": {
+      "text": "On Running After One’s Hat",
+      "meaning": "자기 모자를 뒤쫓는 일에 관하여",
+      "kind": "title",
+      "overview": "On은 이 제목에서 '~에 관하여'라는 주제를 소개합니다. 뒤의 Running After One’s Hat은 '자기 모자를 뒤쫓는 것'이라는 동명사구입니다. 주어와 시제를 가진 동사가 있는 문장은 아닙니다. One’s는 불특정한 사람이 자기 물건을 말할 때 쓰는 소유형입니다.",
+      "structure": [
+        {
+          "text": "On",
+          "label": "연결",
+          "explanation": "시간이나 표면이 아니라 글의 주제를 소개하는 '~에 관하여'입니다."
+        },
+        {
+          "text": "Running After One’s Hat",
+          "label": "목적어",
+          "explanation": "전치사 On의 목적어 역할을 하는 동명사구입니다."
+        },
+        {
+          "text": "After One’s Hat",
+          "label": "꾸미는말",
+          "explanation": "어떤 대상을 뒤쫓아 달리는지 알려 줍니다."
+        },
+        {
+          "text": "One’s",
+          "label": "꾸미는말",
+          "explanation": "Hat의 주인이 일반적인 사람 자기 자신임을 나타냅니다."
+        }
+      ],
+      "chunks": [
+        {
+          "text": "On",
+          "meaning": "~에 관하여",
+          "role": "connector",
+          "label": "주제 소개"
+        },
+        {
+          "text": "Running",
+          "meaning": "달리는 일",
+          "role": "object",
+          "label": "주제의 중심"
+        },
+        {
+          "text": "After One’s Hat",
+          "meaning": "자기 모자의 뒤를 쫓아",
+          "role": "modifier",
+          "label": "무엇을 쫓는지"
+        }
+      ],
+      "grammar": [
+        {
+          "title": "전치사 뒤의 -ing",
+          "explanation": "On 뒤에서 running은 '달리는 일'이라는 명사 역할을 합니다. 여기서는 진행형을 만드는 be동사가 없습니다.",
+          "example": "A short note on waiting patiently.",
+          "translation": "참을성 있게 기다리는 일에 관한 짧은 메모."
+        },
+        {
+          "title": "one’s: 누구든 자기 자신의",
+          "explanation": "one은 특정 인물이 아니라 일반적인 사람을 가리키고, ’s는 그 사람의 소유를 나타냅니다.",
+          "example": "It helps to know one’s limits.",
+          "translation": "자신의 한계를 아는 것은 도움이 된다."
+        }
+      ],
+      "tip": "On을 '~위에'로 읽지 마세요. 에세이 제목에서 글의 주제를 소개하는 뜻입니다.",
+      "check": {
+        "question": "이 제목의 On은 한국어로 어떤 뜻인가요?",
+        "answer": "~에 관하여",
+        "hint": "이 글이 다룰 주제를 소개합니다."
+      },
+      "words": [
+        {
+          "text": "On",
+          "lemma": "on",
+          "pos": "전치사",
+          "meaning": "~에 관하여",
+          "note": "에세이의 주제를 이끕니다. 표면 '위에'라는 뜻이 아닙니다."
+        },
+        {
+          "text": "Running",
+          "lemma": "run",
+          "pos": "동명사",
+          "meaning": "달리는 것",
+          "note": "On 뒤에 와서 '달리기라는 일'을 명사처럼 나타냅니다."
+        },
+        {
+          "text": "After",
+          "lemma": "after",
+          "pos": "전치사",
+          "meaning": "~뒤를 따라",
+          "note": "여기서는 시간 '후에'보다 뒤쫓는 방향입니다."
+        },
+        {
+          "text": "One’s",
+          "lemma": "one",
+          "pos": "소유한정사",
+          "meaning": "자기 자신의",
+          "note": "불특정한 사람 one의 소유형입니다. 여기서는 누구나 자신의 모자를 쫓는 상황입니다."
+        },
+        {
+          "text": "Hat",
+          "lemma": "hat",
+          "pos": "명사",
+          "meaning": "모자",
+          "note": "바람에 날아가서 주인이 뒤쫓는 모자입니다."
+        }
+      ]
+    },
+    "segments": [
+      {
+        "text": "But in the case of all such annoyances, as I have said, everything depends upon the emotional point of view.",
+        "meaning": "그러나 내가 이미 말했듯이, 이런 모든 성가신 일의 경우에는 모든 것이 감정적으로 어떤 관점에서 바라보느냐에 달려 있다.",
+        "kind": "sentence",
+        "overview": "삽입 부분을 잠시 빼면 everything depends upon the emotional point of view가 중심입니다. in the case of는 어떤 상황에 대한 말인지, as I have said는 앞서 언급한 내용임을 알려 줍니다.",
+        "structure": [
+          {
+            "text": "But",
+            "label": "연결",
+            "explanation": "앞의 논의에서 글쓴이의 주장으로 방향을 잇습니다."
+          },
+          {
+            "text": "in the case of all such annoyances",
+            "label": "꾸미는말",
+            "explanation": "이 주장이 적용되는 상황을 먼저 제시합니다."
+          },
+          {
+            "text": "as I have said",
+            "label": "꾸미는말",
+            "explanation": "'내가 이미 말했듯'이라는 삽입절입니다."
+          },
+          {
+            "text": "everything",
+            "label": "주어",
+            "explanation": "그러한 불편을 받아들이는 모든 측면을 넓게 가리킵니다."
+          },
+          {
+            "text": "depends upon",
+            "label": "동사",
+            "explanation": "무엇에 의해 결정되는지 나타냅니다."
+          },
+          {
+            "text": "the emotional point of view",
+            "label": "목적어",
+            "explanation": "전치사 upon의 목적어입니다. 달려 있는 기준이 관점임을 말합니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "But",
+            "meaning": "그러나",
+            "role": "connector",
+            "label": "대조"
+          },
+          {
+            "text": "in the case of all such annoyances,",
+            "meaning": "이런 모든 성가신 일의 경우에는",
+            "role": "modifier",
+            "label": "어떤 상황"
+          },
+          {
+            "text": "as I have said,",
+            "meaning": "내가 말했듯이",
+            "role": "modifier",
+            "label": "삽입 설명"
+          },
+          {
+            "text": "everything",
+            "meaning": "모든 것이",
+            "role": "subject",
+            "label": "주어"
+          },
+          {
+            "text": "depends upon",
+            "meaning": "~에 달려 있다",
+            "role": "verb",
+            "label": "핵심 동사"
+          },
+          {
+            "text": "the emotional point of view.",
+            "meaning": "감정적으로 취하는 관점에",
+            "role": "object",
+            "label": "달려 있는 기준"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "everything은 단수로 받아요",
+            "explanation": "뜻은 모든 것을 아우르지만 문법적으로는 단수라서 동사에 -s가 붙어 depends가 됩니다.",
+            "example": "Everything looks different today.",
+            "translation": "오늘은 모든 것이 다르게 보인다."
+          },
+          {
+            "title": "as + 주어 + 동사: ~하듯이",
+            "explanation": "as I have said는 주절 중간에 끼워 넣은 설명입니다. 빼도 중심 문장은 남습니다.",
+            "example": "As I mentioned, the room is small.",
+            "translation": "내가 언급했듯이 그 방은 작다."
+          },
+          {
+            "title": "depend upon = depend on",
+            "explanation": "둘 다 '~에 달려 있다'입니다. upon은 이 글처럼 격식 있거나 문학적인 글에서도 보입니다.",
+            "example": "Our plan depends on the weather.",
+            "translation": "우리 계획은 날씨에 달려 있다."
+          }
+        ],
+        "tip": "everything depends를 먼저 한 덩어리로 읽으면 긴 앞부분에 흔들리지 않고 주장을 잡을 수 있어요.",
+        "check": {
+          "question": "everything 뒤의 동사는 depend와 depends 중 어느 것인가요?",
+          "answer": "depends",
+          "hint": "everything은 문법적으로 단수입니다."
+        },
+        "words": [
+          {
+            "text": "But",
+            "lemma": "but",
+            "pos": "접속사",
+            "meaning": "하지만",
+            "note": "앞말과 다른 방향의 내용을 이어 줍니다."
+          },
+          {
+            "text": "in",
+            "lemma": "in",
+            "pos": "전치사",
+            "meaning": "~안에, ~에서",
+            "note": "장소 또는 어떤 상황 안에 있음을 나타냅니다."
+          },
+          {
+            "text": "the",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "case",
+            "lemma": "case",
+            "pos": "명사",
+            "meaning": "경우",
+            "note": "in the case of는 '~의 경우에는'이라는 묶음입니다."
+          },
+          {
+            "text": "of",
+            "lemma": "of",
+            "pos": "전치사",
+            "meaning": "~의",
+            "note": "case of는 어떤 경우인지, point of view는 '관점'이라는 묶음을 만듭니다."
+          },
+          {
+            "text": "all",
+            "lemma": "all",
+            "pos": "한정사",
+            "meaning": "모든",
+            "note": "뒤의 복수 대상을 빠짐없이 가리킵니다."
+          },
+          {
+            "text": "such",
+            "lemma": "such",
+            "pos": "한정사",
+            "meaning": "그러한, 이런",
+            "note": "앞에서 설명한 종류의 일을 다시 가리킵니다."
+          },
+          {
+            "text": "annoyances",
+            "lemma": "annoyance",
+            "pos": "명사·복수",
+            "meaning": "성가신 일들",
+            "note": "짜증을 일으키는 사소한 불편을 뜻합니다."
+          },
+          {
+            "text": "as",
+            "lemma": "as",
+            "pos": "접속사",
+            "meaning": "~하듯이",
+            "note": "as I have said는 이미 한 말을 다시 언급하는 삽입절입니다."
+          },
+          {
+            "text": "I",
+            "lemma": "I",
+            "pos": "대명사",
+            "meaning": "나는",
+            "note": "글쓴이 자신을 가리킵니다. 영어에서는 항상 대문자로 씁니다."
+          },
+          {
+            "text": "have",
+            "lemma": "have",
+            "pos": "조동사",
+            "meaning": "이미 ~했다",
+            "note": "have said에서 현재완료를 만들며 앞서 말한 사실을 지금의 주장과 연결합니다."
+          },
+          {
+            "text": "said",
+            "lemma": "say",
+            "pos": "과거분사",
+            "meaning": "말한",
+            "note": "have said는 앞서 말했고 지금도 그 내용이 관련됨을 나타냅니다."
+          },
+          {
+            "text": "everything",
+            "lemma": "everything",
+            "pos": "대명사",
+            "meaning": "모든 것",
+            "note": "뜻은 여럿을 포함하지만 문법적으로 단수 취급합니다."
+          },
+          {
+            "text": "depends",
+            "lemma": "depend",
+            "pos": "동사",
+            "meaning": "달려 있다",
+            "note": "단수 주어 everything에 맞춰 -s가 붙었습니다."
+          },
+          {
+            "text": "upon",
+            "lemma": "upon",
+            "pos": "전치사",
+            "meaning": "~에",
+            "note": "depend upon은 depend on과 같은 뜻의 표현입니다."
+          },
+          {
+            "text": "emotional",
+            "lemma": "emotional",
+            "pos": "형용사",
+            "meaning": "감정적인, 감정에 관한",
+            "note": "point of view를 꾸며 감정을 받아들이는 관점을 말합니다."
+          },
+          {
+            "text": "point",
+            "lemma": "point",
+            "pos": "명사",
+            "meaning": "점, 관점",
+            "note": "point of view라는 묶음으로 '관점'을 뜻합니다."
+          },
+          {
+            "text": "view",
+            "lemma": "view",
+            "pos": "명사",
+            "meaning": "시각, 견해",
+            "note": "point of view에서는 세상을 바라보는 관점입니다."
+          }
+        ]
+      },
+      {
+        "text": "For instance, there is a current impression that it is unpleasant to have to run after one’s hat.",
+        "meaning": "예를 들어, 자기 모자를 뒤쫓아야 하는 것은 불쾌하다는 생각이 널리 퍼져 있다.",
+        "kind": "sentence",
+        "overview": "큰 뼈대는 there is an impression, 즉 '그런 생각이 있다'입니다. that 이하가 그 생각의 내용을 풀어 줍니다. 그 안의 it은 뒤에 나오는 긴 행동 to have to run after one’s hat을 먼저 대신 받는 가주어입니다.",
+        "structure": [
+          {
+            "text": "For instance",
+            "label": "연결",
+            "explanation": "앞선 주장에 구체적인 예를 붙입니다."
+          },
+          {
+            "text": "there",
+            "label": "연결",
+            "explanation": "존재 구문을 시작하는 자리이며 장소 '거기'를 가리키지 않습니다."
+          },
+          {
+            "text": "is",
+            "label": "동사",
+            "explanation": "뒤의 단수 명사가 존재함을 나타냅니다."
+          },
+          {
+            "text": "a current impression",
+            "label": "주어",
+            "explanation": "현재 널리 퍼져 있다고 소개하는 생각입니다."
+          },
+          {
+            "text": "that it is unpleasant to have to run after one’s hat",
+            "label": "꾸미는말",
+            "explanation": "impression이 어떤 내용인지 설명하는 동격절입니다."
+          },
+          {
+            "text": "it",
+            "label": "주어",
+            "explanation": "뒤의 긴 to부정사 내용을 대신해 앞자리를 채운 가주어입니다."
+          },
+          {
+            "text": "unpleasant",
+            "label": "보어",
+            "explanation": "그 행동이 어떻게 느껴지는지 평가합니다."
+          },
+          {
+            "text": "to have to run after one’s hat",
+            "label": "주어",
+            "explanation": "'자기 모자를 뒤쫓아야 하는 것'이라는 진짜 주어 내용입니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "For instance,",
+            "meaning": "예를 들어",
+            "role": "connector",
+            "label": "사례 시작"
+          },
+          {
+            "text": "there is",
+            "meaning": "~이 있다",
+            "role": "verb",
+            "label": "존재 소개"
+          },
+          {
+            "text": "a current impression",
+            "meaning": "현재 널리 퍼진 생각이",
+            "role": "subject",
+            "label": "존재하는 것"
+          },
+          {
+            "text": "that",
+            "meaning": "그 내용은 ~라는 것이다",
+            "role": "connector",
+            "label": "내용 연결"
+          },
+          {
+            "text": "it is unpleasant",
+            "meaning": "불쾌하다는",
+            "role": "complement",
+            "label": "행동에 대한 평가"
+          },
+          {
+            "text": "to have to run",
+            "meaning": "달려야 하는 것이",
+            "role": "subject",
+            "label": "진짜 주어 내용"
+          },
+          {
+            "text": "after one’s hat.",
+            "meaning": "자기 모자를 쫓아",
+            "role": "modifier",
+            "label": "달리는 대상"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "there is + 단수 명사",
+            "explanation": "새로운 사실이나 존재를 소개합니다. there를 장소 '거기'로 번역할 필요가 없습니다.",
+            "example": "There is a reason for this change.",
+            "translation": "이 변화에는 이유가 있다."
+          },
+          {
+            "title": "it is + 형용사 + to부정사",
+            "explanation": "긴 행동을 주어 자리에 먼저 놓기 어려울 때 it으로 자리를 채우고 행동은 뒤에서 설명합니다.",
+            "example": "It is difficult to wait quietly.",
+            "translation": "조용히 기다리는 것은 어렵다."
+          },
+          {
+            "title": "to have to + 동사원형",
+            "explanation": "첫 to는 진주어인 to부정사를 시작합니다. have to는 '해야 한다'는 한 덩어리라서 to가 두 번 보여도 역할이 다릅니다.",
+            "example": "It is tiring to have to explain everything.",
+            "translation": "모든 것을 설명해야 하는 것은 피곤하다."
+          }
+        ],
+        "tip": "that은 '그것'이 아니라 impression의 내용을 시작합니다. it이 가리키는 구체적인 물건을 찾을 필요도 없어요.",
+        "check": {
+          "question": "it is unpleasant에서 뒤의 긴 행동을 대신하는 가주어는?",
+          "answer": "it",
+          "hint": "두 글자 대명사가 문장 앞자리를 채웁니다."
+        },
+        "words": [
+          {
+            "text": "For",
+            "lemma": "for",
+            "pos": "전치사",
+            "meaning": "예를 들어",
+            "note": "For instance 전체로 사례를 소개합니다. 여기서는 이유 접속사 for가 아닙니다."
+          },
+          {
+            "text": "instance",
+            "lemma": "instance",
+            "pos": "명사",
+            "meaning": "예, 사례",
+            "note": "for instance 전체로 '예를 들어'라고 읽습니다."
+          },
+          {
+            "text": "there",
+            "lemma": "there",
+            "pos": "존재 구문 표지",
+            "meaning": "~이 있다",
+            "note": "there is에서 존재를 소개하는 말이며 장소 '거기'를 뜻하지 않습니다."
+          },
+          {
+            "text": "is",
+            "lemma": "be",
+            "pos": "동사",
+            "meaning": "~이다",
+            "note": "주어의 상태나 정체를 뒤의 말과 연결합니다."
+          },
+          {
+            "text": "a",
+            "lemma": "a",
+            "pos": "관사",
+            "meaning": "하나의, 어떤",
+            "note": "셀 수 있는 단수 명사 앞에 씁니다. 한국어로 늘 '하나'라고 번역하지는 않습니다."
+          },
+          {
+            "text": "current",
+            "lemma": "current",
+            "pos": "형용사",
+            "meaning": "현재 널리 퍼진",
+            "note": "impression을 꾸며 당시 흔한 생각임을 나타냅니다."
+          },
+          {
+            "text": "impression",
+            "lemma": "impression",
+            "pos": "명사",
+            "meaning": "인상, 생각",
+            "note": "뒤의 that절이 그 생각의 내용을 풀이합니다."
+          },
+          {
+            "text": "that",
+            "lemma": "that",
+            "pos": "접속사",
+            "meaning": "~라는",
+            "note": "뒤에 완전한 절이 와 impression의 내용을 설명합니다. 관계대명사가 아닙니다."
+          },
+          {
+            "text": "it",
+            "lemma": "it",
+            "pos": "가주어",
+            "meaning": "뒤의 긴 행동을 대신하는 말",
+            "note": "실제 주어 내용은 to have to run after one’s hat입니다."
+          },
+          {
+            "text": "unpleasant",
+            "lemma": "unpleasant",
+            "pos": "형용사",
+            "meaning": "불쾌한, 즐겁지 않은",
+            "note": "pleasant 앞에 반대 뜻의 un-이 붙었습니다."
+          },
+          {
+            "text": "to",
+            "lemma": "to",
+            "pos": "부정사 표지",
+            "meaning": "~하기; ~해야",
+            "note": "to have는 진주어인 부정사를 시작하고 have to run은 의무를 나타냅니다."
+          },
+          {
+            "text": "have",
+            "lemma": "have",
+            "pos": "준조동사 구성",
+            "meaning": "~해야 한다",
+            "note": "have to run은 '달려야 한다'이며 소유 뜻의 have가 아닙니다."
+          },
+          {
+            "text": "run",
+            "lemma": "run",
+            "pos": "동사",
+            "meaning": "달리다",
+            "note": "run after는 '~의 뒤를 쫓아 달리다'입니다."
+          },
+          {
+            "text": "after",
+            "lemma": "after",
+            "pos": "전치사",
+            "meaning": "~뒤를 따라",
+            "note": "여기서는 시간 '후에'보다 뒤쫓는 방향입니다."
+          },
+          {
+            "text": "one’s",
+            "lemma": "one",
+            "pos": "소유한정사",
+            "meaning": "자기 자신의",
+            "note": "불특정한 사람 one의 소유형입니다. 여기서는 누구나 자신의 모자를 쫓는 상황입니다."
+          },
+          {
+            "text": "hat",
+            "lemma": "hat",
+            "pos": "명사",
+            "meaning": "모자",
+            "note": "바람에 날아가서 주인이 뒤쫓는 모자입니다."
+          }
+        ]
+      },
+      {
+        "text": "Why should it be unpleasant to the well-ordered and pious mind?",
+        "meaning": "질서 잡히고 경건한 마음을 지닌 사람에게 그것이 왜 불쾌해야 하는가?",
+        "kind": "sentence",
+        "overview": "질문의 뼈대는 Why + should + it + be + unpleasant?입니다. it은 앞에서 말한 모자를 쫓는 일을 받습니다. to 이하에서는 누구에게 불쾌하다는 것인지 말합니다. 글쓴이는 그 일이 당연히 불쾌하다는 생각에 반문합니다.",
+        "structure": [
+          {
+            "text": "Why",
+            "label": "꾸미는말",
+            "explanation": "그 판단을 당연하게 여기는 이유를 묻습니다."
+          },
+          {
+            "text": "should",
+            "label": "동사",
+            "explanation": "의문문에서 주어 앞에 놓인 조동사입니다. 여기서는 전제에 대한 의문을 나타냅니다."
+          },
+          {
+            "text": "it",
+            "label": "주어",
+            "explanation": "모자를 뒤쫓는 상황을 가리킵니다."
+          },
+          {
+            "text": "be",
+            "label": "동사",
+            "explanation": "조동사 뒤라 원형이며 주어의 상태를 연결합니다."
+          },
+          {
+            "text": "unpleasant",
+            "label": "보어",
+            "explanation": "주어인 일이 어떤 상태로 느껴지는지 나타냅니다."
+          },
+          {
+            "text": "to the well-ordered and pious mind",
+            "label": "꾸미는말",
+            "explanation": "그 일을 평가하는 마음 또는 그런 마음을 지닌 사람을 나타냅니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "Why",
+            "meaning": "왜",
+            "role": "modifier",
+            "label": "이유 질문"
+          },
+          {
+            "text": "should",
+            "meaning": "~해야 하는가",
+            "role": "verb",
+            "label": "조동사"
+          },
+          {
+            "text": "it",
+            "meaning": "그 일이",
+            "role": "subject",
+            "label": "주어"
+          },
+          {
+            "text": "be unpleasant",
+            "meaning": "불쾌하다",
+            "role": "complement",
+            "label": "연결동사와 상태"
+          },
+          {
+            "text": "to the well-ordered and pious mind?",
+            "meaning": "질서 있고 경건한 마음에",
+            "role": "modifier",
+            "label": "누구에게"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "Why should ...?: 당연하다는 생각에 질문하기",
+            "explanation": "여기의 should는 해야 할 행동을 명령하는 말이 아닙니다. '그게 왜 그래야 하지?'라는 의문을 담습니다.",
+            "example": "Why should a small mistake ruin the day?",
+            "translation": "작은 실수 하나가 왜 하루를 망쳐야 하지?"
+          },
+          {
+            "title": "조동사 뒤의 be",
+            "explanation": "should 뒤에서는 is나 was를 쓰지 않고 be를 씁니다. 형용사 unpleasant을 주어에 연결합니다.",
+            "example": "The task should be simple.",
+            "translation": "그 일은 간단해야 한다."
+          }
+        ],
+        "tip": "well-ordered와 pious는 둘 다 mind를 꾸밉니다. 이 문장은 독자에게 모자를 쫓으라는 의무를 부여하는 문장이 아닙니다.",
+        "check": {
+          "question": "should 뒤에서 is 대신 쓰는 be동사 형태는?",
+          "answer": "be",
+          "hint": "조동사 뒤에는 원형이 옵니다."
+        },
+        "words": [
+          {
+            "text": "Why",
+            "lemma": "why",
+            "pos": "의문부사",
+            "meaning": "왜",
+            "note": "이유를 묻습니다."
+          },
+          {
+            "text": "should",
+            "lemma": "should",
+            "pos": "조동사",
+            "meaning": "~해야 하는가",
+            "note": "이 질문에서는 당연하다는 전제에 의문을 제기합니다."
+          },
+          {
+            "text": "it",
+            "lemma": "it",
+            "pos": "대명사",
+            "meaning": "그 일, 모자를 뒤쫓는 것",
+            "note": "앞 문장의 행동을 받는 대명사입니다. 이 문장 안에서는 뒤에 별도의 진주어가 나오는 가주어 구문이 아닙니다."
+          },
+          {
+            "text": "be",
+            "lemma": "be",
+            "pos": "동사원형",
+            "meaning": "~이다, ~되다",
+            "note": "조동사 뒤에서는 was나 is 대신 원형 be를 씁니다."
+          },
+          {
+            "text": "unpleasant",
+            "lemma": "unpleasant",
+            "pos": "형용사",
+            "meaning": "불쾌한, 즐겁지 않은",
+            "note": "pleasant 앞에 반대 뜻의 un-이 붙었습니다."
+          },
+          {
+            "text": "to",
+            "lemma": "to",
+            "pos": "전치사",
+            "meaning": "~에게",
+            "note": "to the ... mind는 그렇게 느끼는 대상·관점을 나타냅니다."
+          },
+          {
+            "text": "the",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "well-ordered",
+            "lemma": "well-ordered",
+            "pos": "형용사",
+            "meaning": "질서 잡힌, 잘 정돈된",
+            "note": "well과 ordered가 하이픈으로 이어져 mind를 꾸밉니다."
+          },
+          {
+            "text": "and",
+            "lemma": "and",
+            "pos": "접속사",
+            "meaning": "그리고, ~와",
+            "note": "같은 역할의 말이나 절을 이어 줍니다."
+          },
+          {
+            "text": "pious",
+            "lemma": "pious",
+            "pos": "형용사",
+            "meaning": "경건한, 신앙심 깊은",
+            "note": "글쓴이는 이 성격을 내세워 독자의 통념에 질문을 던집니다."
+          },
+          {
+            "text": "mind",
+            "lemma": "mind",
+            "pos": "명사",
+            "meaning": "마음, 정신",
+            "note": "여기서는 그런 마음을 지닌 사람의 사고방식까지 가리킵니다."
+          }
+        ]
+      },
+      {
+        "text": "The same people run much faster in games and sports.",
+        "meaning": "똑같은 사람들이 경기나 운동을 할 때는 훨씬 더 빨리 달린다.",
+        "kind": "sentence",
+        "overview": "The same people이 주어이고 run이 동사입니다. faster는 어떻게 달리는지, much는 얼마나 더 빠른지 설명합니다. in games and sports는 그렇게 달리는 상황을 알려 줍니다. 모자를 쫓을 때 불쾌해하는 그 사람들이 운동할 때는 달리기를 즐긴다는 비교입니다.",
+        "structure": [
+          {
+            "text": "The same people",
+            "label": "주어",
+            "explanation": "앞에서 모자를 쫓기 싫어하던 사람들과 같은 사람들입니다."
+          },
+          {
+            "text": "run",
+            "label": "동사",
+            "explanation": "사람들이 하는 행동입니다."
+          },
+          {
+            "text": "much faster",
+            "label": "꾸미는말",
+            "explanation": "달리는 속도를 비교하며 much가 비교의 차이를 강조합니다."
+          },
+          {
+            "text": "in games and sports",
+            "label": "꾸미는말",
+            "explanation": "더 빨리 달리는 상황을 말합니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "The same people",
+            "meaning": "바로 그 똑같은 사람들은",
+            "role": "subject",
+            "label": "누가"
+          },
+          {
+            "text": "run",
+            "meaning": "달린다",
+            "role": "verb",
+            "label": "행동"
+          },
+          {
+            "text": "much faster",
+            "meaning": "훨씬 더 빨리",
+            "role": "modifier",
+            "label": "어떻게"
+          },
+          {
+            "text": "in games and sports.",
+            "meaning": "경기와 운동에서는",
+            "role": "modifier",
+            "label": "어떤 상황"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "much + 비교급",
+            "explanation": "faster는 fast의 비교급입니다. 비교의 차이가 크다는 뜻으로 much를 붙이며 여기서 very faster라고 하지 않습니다.",
+            "example": "This train moves much faster.",
+            "translation": "이 기차는 훨씬 더 빨리 움직인다."
+          },
+          {
+            "title": "people 뒤의 동사",
+            "explanation": "people은 복수이므로 현재형에서 동사 원형 run을 씁니다. 한 사람 he를 주어로 쓰면 runs가 됩니다.",
+            "example": "These people work together.",
+            "translation": "이 사람들은 함께 일한다."
+          }
+        ],
+        "tip": "faster를 형용사 '더 빠른'으로만 외우지 마세요. 여기서는 run을 꾸미므로 부사 '더 빨리'입니다.",
+        "check": {
+          "question": "faster의 차이가 크다는 뜻을 더하는 단어는?",
+          "answer": "much",
+          "hint": "비교급 앞의 네 글자 단어입니다."
+        },
+        "words": [
+          {
+            "text": "The",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "same",
+            "lemma": "same",
+            "pos": "형용사",
+            "meaning": "같은, 똑같은",
+            "note": "주로 the same으로 묶어 씁니다."
+          },
+          {
+            "text": "people",
+            "lemma": "people",
+            "pos": "명사·복수",
+            "meaning": "사람들",
+            "note": "여러 사람을 가리키므로 뒤에 runs가 아닌 run이 옵니다."
+          },
+          {
+            "text": "run",
+            "lemma": "run",
+            "pos": "동사",
+            "meaning": "달린다",
+            "note": "복수 주어 people의 현재형이며 -s를 붙이지 않습니다."
+          },
+          {
+            "text": "much",
+            "lemma": "much",
+            "pos": "부사",
+            "meaning": "훨씬",
+            "note": "비교급 faster 앞에서 차이가 크다고 강조합니다."
+          },
+          {
+            "text": "faster",
+            "lemma": "fast",
+            "pos": "비교급 부사",
+            "meaning": "더 빨리",
+            "note": "달리는 동사 run을 꾸밉니다."
+          },
+          {
+            "text": "in",
+            "lemma": "in",
+            "pos": "전치사",
+            "meaning": "~을 할 때, ~에서",
+            "note": "경기와 운동이라는 활동 상황을 나타냅니다."
+          },
+          {
+            "text": "games",
+            "lemma": "game",
+            "pos": "명사·복수",
+            "meaning": "경기, 놀이",
+            "note": "규칙이 있는 게임이나 경기를 말합니다."
+          },
+          {
+            "text": "and",
+            "lemma": "and",
+            "pos": "접속사",
+            "meaning": "그리고, ~와",
+            "note": "같은 역할의 말이나 절을 이어 줍니다."
+          },
+          {
+            "text": "sports",
+            "lemma": "sport",
+            "pos": "명사·복수",
+            "meaning": "운동, 스포츠",
+            "note": "몸을 움직이며 즐기거나 겨루는 활동입니다."
+          }
+        ]
+      },
+      {
+        "text": "He might regard himself as a jolly huntsman pursuing a wild animal, for certainly no animal could be wilder.",
+        "meaning": "그는 자신을 야생 동물을 쫓는 유쾌한 사냥꾼으로 여길 수도 있다. 분명 어떤 동물도 그 모자보다 더 종잡을 수 없지는 않을 테니 말이다.",
+        "kind": "sentence",
+        "overview": "중심 구조는 He might regard himself as a jolly huntsman입니다. 자기 자신(A)을 사냥꾼(B)으로 여긴다는 뜻입니다. pursuing 이하는 사냥꾼이 하는 행동을 뒤에서 꾸밉니다. for 뒤의 이유절은 모자가 가장 제멋대로 움직인다는 과장된 농담을 붙입니다.",
+        "structure": [
+          {
+            "text": "He",
+            "label": "주어",
+            "explanation": "모자를 뒤쫓는 사람입니다."
+          },
+          {
+            "text": "might regard",
+            "label": "동사",
+            "explanation": "그렇게 생각해 볼 수도 있다는 가능성입니다."
+          },
+          {
+            "text": "himself",
+            "label": "목적어",
+            "explanation": "생각의 대상은 주어와 같은 사람인 자기 자신입니다."
+          },
+          {
+            "text": "as a jolly huntsman",
+            "label": "보어",
+            "explanation": "자신을 무엇으로 보는지 설명합니다."
+          },
+          {
+            "text": "pursuing a wild animal",
+            "label": "꾸미는말",
+            "explanation": "huntsman을 뒤에서 꾸며 어떤 사냥꾼인지 알려 줍니다."
+          },
+          {
+            "text": "for certainly no animal could be wilder",
+            "label": "연결",
+            "explanation": "모자가 어느 동물보다도 거칠다는 이유를 유머로 제시합니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "He",
+            "meaning": "그는",
+            "role": "subject",
+            "label": "누가"
+          },
+          {
+            "text": "might regard himself",
+            "meaning": "자기 자신을 여길 수도 있다",
+            "role": "verb",
+            "label": "가능한 생각"
+          },
+          {
+            "text": "as a jolly huntsman",
+            "meaning": "유쾌한 사냥꾼으로",
+            "role": "complement",
+            "label": "어떻게 여기는지"
+          },
+          {
+            "text": "pursuing a wild animal,",
+            "meaning": "야생 동물을 쫓고 있는",
+            "role": "modifier",
+            "label": "어떤 사냥꾼"
+          },
+          {
+            "text": "for certainly",
+            "meaning": "왜냐하면 분명",
+            "role": "connector",
+            "label": "이유 연결"
+          },
+          {
+            "text": "no animal",
+            "meaning": "어떤 동물도",
+            "role": "subject",
+            "label": "이유절 주어"
+          },
+          {
+            "text": "could be wilder.",
+            "meaning": "더 제멋대로일 수 없을 테니까",
+            "role": "complement",
+            "label": "비교한 상태"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "regard A as B",
+            "explanation": "A를 B라고 생각하거나 간주할 때 쓰는 구조입니다. A와 B의 역할을 차례로 찾으세요.",
+            "example": "She regards the challenge as an adventure.",
+            "translation": "그녀는 그 도전을 모험으로 여긴다."
+          },
+          {
+            "title": "명사 뒤의 -ing",
+            "explanation": "pursuing은 주절의 동사가 아니라 앞의 사냥꾼을 꾸미는 현재분사입니다. '쫓고 있는 사냥꾼'이라는 뜻입니다.",
+            "example": "I saw a child carrying a basket.",
+            "translation": "나는 바구니를 들고 있는 아이를 보았다."
+          },
+          {
+            "title": "no + 명사 + 비교급",
+            "explanation": "어떤 동물도 더 wild할 수 없다는 말은 비교 대상인 모자가 그만큼 제멋대로라는 과장입니다. 문맥상 than the hat이 생략되어 있습니다.",
+            "example": "No road could be quieter.",
+            "translation": "어떤 길도 이보다 더 조용할 수는 없을 것이다."
+          }
+        ],
+        "tip": "himself는 새 인물이 아니라 He 자신입니다. wild와 wilder의 차이를 듣고 마지막 이유절의 유머도 생각해 보세요.",
+        "check": {
+          "question": "regard A as B에서 '자기 자신'인 A에 해당하는 단어는?",
+          "answer": "himself",
+          "hint": "주어 He와 같은 사람을 받는 재귀대명사입니다."
+        },
+        "words": [
+          {
+            "text": "He",
+            "lemma": "he",
+            "pos": "대명사",
+            "meaning": "그는",
+            "note": "앞에서 언급한 모자를 쫓는 사람을 가리킵니다."
+          },
+          {
+            "text": "might",
+            "lemma": "may",
+            "pos": "조동사",
+            "meaning": "~할 수도 있다",
+            "note": "확정되지 않은 가능성이나 상상을 제시합니다."
+          },
+          {
+            "text": "regard",
+            "lemma": "regard",
+            "pos": "동사",
+            "meaning": "여기다, 생각하다",
+            "note": "regard A as B는 'A를 B로 여기다'입니다."
+          },
+          {
+            "text": "himself",
+            "lemma": "himself",
+            "pos": "재귀대명사",
+            "meaning": "그 자신을",
+            "note": "주어 he와 목적어가 같은 사람임을 나타냅니다."
+          },
+          {
+            "text": "as",
+            "lemma": "as",
+            "pos": "전치사",
+            "meaning": "~로",
+            "note": "regard himself as ...에서 생각하는 기준이나 정체를 연결합니다."
+          },
+          {
+            "text": "a",
+            "lemma": "a",
+            "pos": "관사",
+            "meaning": "하나의, 어떤",
+            "note": "셀 수 있는 단수 명사 앞에 씁니다. 한국어로 늘 '하나'라고 번역하지는 않습니다."
+          },
+          {
+            "text": "jolly",
+            "lemma": "jolly",
+            "pos": "형용사",
+            "meaning": "유쾌한, 즐거운",
+            "note": "사냥꾼의 기분이나 성격을 꾸밉니다."
+          },
+          {
+            "text": "huntsman",
+            "lemma": "huntsman",
+            "pos": "명사",
+            "meaning": "사냥꾼",
+            "note": "여기서는 모자를 쫓는 사람을 비유한 말입니다."
+          },
+          {
+            "text": "pursuing",
+            "lemma": "pursue",
+            "pos": "현재분사",
+            "meaning": "쫓고 있는",
+            "note": "앞의 huntsman이 무엇을 하는지 뒤에서 설명합니다."
+          },
+          {
+            "text": "wild",
+            "lemma": "wild",
+            "pos": "형용사",
+            "meaning": "야생의, 제멋대로 날뛰는",
+            "note": "동물의 야생성에 모자의 예측 불가능한 움직임을 겹칩니다."
+          },
+          {
+            "text": "animal",
+            "lemma": "animal",
+            "pos": "명사",
+            "meaning": "동물",
+            "note": "모자 쫓기를 사냥에 빗대는 표현에 쓰입니다."
+          },
+          {
+            "text": "for",
+            "lemma": "for",
+            "pos": "접속사",
+            "meaning": "왜냐하면",
+            "note": "뒤의 주어 no animal과 동사 could be가 앞말의 이유를 설명합니다."
+          },
+          {
+            "text": "certainly",
+            "lemma": "certainly",
+            "pos": "부사",
+            "meaning": "분명히",
+            "note": "글쓴이의 확신을 강조합니다."
+          },
+          {
+            "text": "no",
+            "lemma": "no",
+            "pos": "한정사",
+            "meaning": "어떤 ~도 없는",
+            "note": "no animal 자체에 부정 뜻이 있어 not을 덧붙이지 않습니다."
+          },
+          {
+            "text": "could",
+            "lemma": "can",
+            "pos": "조동사",
+            "meaning": "~할 수 있을 것이다",
+            "note": "가능성을 나타냅니다. 뒤에는 동사원형을 씁니다."
+          },
+          {
+            "text": "be",
+            "lemma": "be",
+            "pos": "동사원형",
+            "meaning": "~이다",
+            "note": "could 뒤에 원형으로 쓰이며 wilder라는 상태를 연결합니다."
+          },
+          {
+            "text": "wilder",
+            "lemma": "wild",
+            "pos": "비교급 형용사",
+            "meaning": "더 제멋대로인",
+            "note": "문맥상 모자보다 더 통제하기 어려운지 비교합니다."
+          }
+        ]
+      },
+      {
+        "text": "The same principle can be applied to every other typical domestic worry.",
+        "meaning": "같은 원리는 집안에서 흔히 겪는 다른 모든 걱정거리에도 적용할 수 있다.",
+        "kind": "sentence",
+        "overview": "The same principle이 주어, can be applied가 동사 덩어리입니다. 원리가 스스로 무언가에 적용하는 것이 아니라 사람이 그 원리를 다른 걱정거리에 적용할 수 있다는 수동 표현입니다. to 뒤에서 적용 대상을 밝힙니다.",
+        "structure": [
+          {
+            "text": "The same principle",
+            "label": "주어",
+            "explanation": "앞에서 설명한 관점을 바꾸는 원리입니다."
+          },
+          {
+            "text": "can be applied",
+            "label": "동사",
+            "explanation": "can은 가능, be applied는 '적용되다'라는 수동을 나타냅니다."
+          },
+          {
+            "text": "to every other typical domestic worry",
+            "label": "꾸미는말",
+            "explanation": "원리가 적용되는 대상을 나타내는 전치사구입니다."
+          },
+          {
+            "text": "every other typical domestic",
+            "label": "꾸미는말",
+            "explanation": "모두 뒤의 명사 worry의 범위나 성격을 설명합니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "The same principle",
+            "meaning": "같은 원리는",
+            "role": "subject",
+            "label": "무엇이"
+          },
+          {
+            "text": "can be applied",
+            "meaning": "적용될 수 있다",
+            "role": "verb",
+            "label": "가능한 수동"
+          },
+          {
+            "text": "to every other typical domestic worry.",
+            "meaning": "집안의 다른 모든 흔한 걱정거리에",
+            "role": "modifier",
+            "label": "적용 대상"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "can be + 과거분사",
+            "explanation": "can 뒤에서는 be가 원형으로 오고, applied가 수동태를 만듭니다. '적용할 수 있다'를 대상 중심으로 표현합니다.",
+            "example": "This rule can be used in other situations.",
+            "translation": "이 규칙은 다른 상황에서도 쓰일 수 있다."
+          },
+          {
+            "title": "every 뒤의 단수 명사",
+            "explanation": "every는 모든 대상을 하나씩 바라보므로 worry를 단수로 씁니다. 이 문맥의 every other는 '나머지 모든'이며 '하나 건너마다'라는 시간·간격 표현이 아닙니다.",
+            "example": "Every other room was empty.",
+            "translation": "다른 모든 방은 비어 있었다."
+          }
+        ],
+        "tip": "can / be / applied를 따로 흩어 읽기보다 '적용될 수 있다'라는 한 동사 덩어리로 읽어 보세요.",
+        "check": {
+          "question": "can be applied가 능동인지 수동인지 답해 보세요.",
+          "answer": "수동",
+          "hint": "원리는 적용하는 주체가 아니라 적용되는 대상입니다."
+        },
+        "words": [
+          {
+            "text": "The",
+            "lemma": "the",
+            "pos": "관사",
+            "meaning": "그, 해당하는",
+            "note": "이미 알거나 특정한 대상을 가리킵니다."
+          },
+          {
+            "text": "same",
+            "lemma": "same",
+            "pos": "형용사",
+            "meaning": "같은, 똑같은",
+            "note": "주로 the same으로 묶어 씁니다."
+          },
+          {
+            "text": "principle",
+            "lemma": "principle",
+            "pos": "명사",
+            "meaning": "원리, 원칙",
+            "note": "불편도 관점을 바꾸면 다르게 볼 수 있다는 생각입니다."
+          },
+          {
+            "text": "can",
+            "lemma": "can",
+            "pos": "조동사",
+            "meaning": "~할 수 있다",
+            "note": "가능함을 나타내며 뒤에는 동사원형이 옵니다."
+          },
+          {
+            "text": "be",
+            "lemma": "be",
+            "pos": "수동태 조동사",
+            "meaning": "~되다",
+            "note": "can 뒤의 원형 be와 과거분사 applied가 수동태를 이룹니다."
+          },
+          {
+            "text": "applied",
+            "lemma": "apply",
+            "pos": "과거분사",
+            "meaning": "적용된",
+            "note": "be applied는 원리가 '적용되다'라는 수동 표현입니다."
+          },
+          {
+            "text": "to",
+            "lemma": "to",
+            "pos": "전치사",
+            "meaning": "~에",
+            "note": "apply a principle to a worry에서 원리가 적용되는 대상을 이끕니다."
+          },
+          {
+            "text": "every",
+            "lemma": "every",
+            "pos": "한정사",
+            "meaning": "모든, 하나하나의",
+            "note": "뜻은 전체이지만 뒤에 단수 명사 worry를 씁니다."
+          },
+          {
+            "text": "other",
+            "lemma": "other",
+            "pos": "형용사",
+            "meaning": "다른, 나머지",
+            "note": "여기서 every other worry는 나머지 다른 모든 걱정거리입니다."
+          },
+          {
+            "text": "typical",
+            "lemma": "typical",
+            "pos": "형용사",
+            "meaning": "흔한, 전형적인",
+            "note": "자주 볼 수 있는 보통의 걱정을 꾸밉니다."
+          },
+          {
+            "text": "domestic",
+            "lemma": "domestic",
+            "pos": "형용사",
+            "meaning": "가정의, 집안의",
+            "note": "여기서는 국제·국내의 구별이 아니라 집안일에 관한 뜻입니다."
+          },
+          {
+            "text": "worry",
+            "lemma": "worry",
+            "pos": "명사",
+            "meaning": "걱정거리",
+            "note": "정신을 쓰이게 하는 일 하나를 가리킵니다."
+          }
+        ]
+      },
+      {
+        "text": "An adventure is only an inconvenience rightly considered.",
+        "meaning": "모험이란 불편한 일을 올바른 관점에서 바라본 것일 뿐이다.",
+        "kind": "sentence",
+        "overview": "An adventure가 주어, is가 동사, an inconvenience가 주어를 설명하는 보어입니다. rightly considered는 inconvenience를 뒤에서 꾸밉니다. 모험과 불편이 다른 사건이라기보다 바라보는 관점이 다르다는 글쓴이의 주장입니다.",
+        "structure": [
+          {
+            "text": "An adventure",
+            "label": "주어",
+            "explanation": "지금 정의하려는 대상인 모험입니다."
+          },
+          {
+            "text": "is",
+            "label": "동사",
+            "explanation": "주어와 뒤의 설명을 연결합니다."
+          },
+          {
+            "text": "only",
+            "label": "꾸미는말",
+            "explanation": "별개의 무언가가 아니라는 뜻으로 뒤의 설명을 한정합니다."
+          },
+          {
+            "text": "an inconvenience",
+            "label": "보어",
+            "explanation": "모험을 다른 관점의 불편한 일이라고 설명합니다."
+          },
+          {
+            "text": "rightly considered",
+            "label": "꾸미는말",
+            "explanation": "inconvenience가 어떻게 여겨진 것인지 뒤에서 설명하는 과거분사구입니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "An adventure",
+            "meaning": "모험은",
+            "role": "subject",
+            "label": "정의할 대상"
+          },
+          {
+            "text": "is only",
+            "meaning": "단지 ~일 뿐이다",
+            "role": "verb",
+            "label": "연결과 한정"
+          },
+          {
+            "text": "an inconvenience",
+            "meaning": "불편한 일",
+            "role": "complement",
+            "label": "무엇인지"
+          },
+          {
+            "text": "rightly considered.",
+            "meaning": "올바르게 바라본",
+            "role": "modifier",
+            "label": "어떤 관점"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "A is B: 정의와 재해석",
+            "explanation": "be동사 뒤의 명사 덩어리는 목적어가 아니라 주어를 설명하는 보어입니다.",
+            "example": "A mistake is a chance to learn.",
+            "translation": "실수는 배울 기회다."
+          },
+          {
+            "title": "과거분사로 명사를 뒤에서 꾸미기",
+            "explanation": "rightly considered는 that is rightly considered로 풀어 이해할 수 있습니다. considered는 여기서 문장의 과거형 동사가 아닙니다.",
+            "example": "This is a story often told at home.",
+            "translation": "이것은 집에서 자주 이야기되는 이야기다."
+          }
+        ],
+        "tip": "문장에 시제를 가진 중심 동사는 is입니다. considered에만 주목해 과거 이야기라고 읽지 않도록 하세요.",
+        "check": {
+          "question": "rightly considered가 바로 뒤에서 꾸미는 명사는?",
+          "answer": "inconvenience",
+          "hint": "무엇을 올바르게 바라보았다는 뜻인지 생각해 보세요."
+        },
+        "words": [
+          {
+            "text": "An",
+            "lemma": "an",
+            "pos": "관사",
+            "meaning": "하나의, 어떤",
+            "note": "adventure와 inconvenience가 모두 모음 소리로 시작해 a 대신 an을 씁니다."
+          },
+          {
+            "text": "adventure",
+            "lemma": "adventure",
+            "pos": "명사",
+            "meaning": "모험",
+            "note": "새롭고 흥미로운 경험을 말합니다."
+          },
+          {
+            "text": "is",
+            "lemma": "be",
+            "pos": "동사",
+            "meaning": "~이다",
+            "note": "주어의 상태나 정체를 뒤의 말과 연결합니다."
+          },
+          {
+            "text": "only",
+            "lemma": "only",
+            "pos": "부사",
+            "meaning": "단지, ~일 뿐",
+            "note": "뒤의 설명으로 의미를 간명하게 한정합니다."
+          },
+          {
+            "text": "inconvenience",
+            "lemma": "inconvenience",
+            "pos": "명사",
+            "meaning": "불편한 일, 불편함",
+            "note": "작가는 사소한 불편을 모험과 비교합니다."
+          },
+          {
+            "text": "rightly",
+            "lemma": "rightly",
+            "pos": "부사",
+            "meaning": "올바르게",
+            "note": "considered를 꾸미며 글쓴이의 가치 판단을 나타냅니다."
+          },
+          {
+            "text": "considered",
+            "lemma": "consider",
+            "pos": "과거분사",
+            "meaning": "바라본, 여겨진",
+            "note": "inconvenience를 뒤에서 꾸미는 수동 의미의 분사이며 문장의 과거형 동사가 아닙니다."
+          }
+        ]
+      },
+      {
+        "text": "An inconvenience is only an adventure wrongly considered.",
+        "meaning": "불편함이란 모험을 잘못된 관점에서 바라본 것일 뿐이다.",
+        "kind": "sentence",
+        "overview": "An inconvenience + is + an adventure가 중심입니다. wrongly considered는 adventure를 뒤에서 꾸밉니다. 앞 문장의 adventure와 inconvenience 자리를 바꾸고 rightly를 wrongly로 바꾸어, 같은 일을 보는 방식의 차이를 강조합니다.",
+        "structure": [
+          {
+            "text": "An inconvenience",
+            "label": "주어",
+            "explanation": "이번에는 불편한 일을 정의합니다."
+          },
+          {
+            "text": "is",
+            "label": "동사",
+            "explanation": "주어의 정체를 뒤의 말과 연결합니다."
+          },
+          {
+            "text": "only",
+            "label": "꾸미는말",
+            "explanation": "뒤의 설명으로 의미를 한정합니다."
+          },
+          {
+            "text": "an adventure",
+            "label": "보어",
+            "explanation": "불편함을 다른 관점의 모험이라고 설명합니다."
+          },
+          {
+            "text": "wrongly considered",
+            "label": "꾸미는말",
+            "explanation": "adventure가 잘못된 관점으로 여겨진 것이라는 과거분사 수식입니다."
+          }
+        ],
+        "chunks": [
+          {
+            "text": "An inconvenience",
+            "meaning": "불편한 일은",
+            "role": "subject",
+            "label": "정의할 대상"
+          },
+          {
+            "text": "is only",
+            "meaning": "단지 ~일 뿐이다",
+            "role": "verb",
+            "label": "연결과 한정"
+          },
+          {
+            "text": "an adventure",
+            "meaning": "모험",
+            "role": "complement",
+            "label": "무엇인지"
+          },
+          {
+            "text": "wrongly considered.",
+            "meaning": "잘못 바라본",
+            "role": "modifier",
+            "label": "어떤 관점"
+          }
+        ],
+        "grammar": [
+          {
+            "title": "부사가 분사를 꾸며요",
+            "explanation": "wrongly는 '어떻게 여겨졌는지'를 설명하는 부사입니다. 앞의 명사 adventure 자체를 직접 꾸미는 형용사가 아닙니다.",
+            "example": "It was a question badly understood.",
+            "translation": "그것은 잘못 이해된 질문이었다."
+          },
+          {
+            "title": "같은 문장 틀에서 핵심 낱말 바꾸기",
+            "explanation": "앞 문장과 뼈대를 맞추고 두 명사의 위치를 바꾸면 대조가 또렷해집니다. 두 문장의 형태는 같지만 무엇을 주제로 삼는지가 달라집니다.",
+            "example": "A delay can be a chance to rest.",
+            "translation": "지연은 쉴 기회가 될 수 있다."
+          }
+        ],
+        "tip": "앞 문장과 나란히 읽으며 주어와 보어가 뒤바뀌는 지점을 짚어 보세요. 이 말은 사소한 불편을 다르게 보는 글쓴이의 관점입니다.",
+        "check": {
+          "question": "wrongly는 considered를 꾸미는 형용사일까요, 부사일까요?",
+          "answer": "부사",
+          "hint": "어떻게 생각되었는지 설명합니다."
+        },
+        "words": [
+          {
+            "text": "An",
+            "lemma": "an",
+            "pos": "관사",
+            "meaning": "하나의, 어떤",
+            "note": "모음 소리로 시작하는 단수 명사 앞에 쓰는 a의 형태입니다."
+          },
+          {
+            "text": "inconvenience",
+            "lemma": "inconvenience",
+            "pos": "명사",
+            "meaning": "불편한 일, 불편함",
+            "note": "작가는 사소한 불편을 모험과 비교합니다."
+          },
+          {
+            "text": "is",
+            "lemma": "be",
+            "pos": "동사",
+            "meaning": "~이다",
+            "note": "주어의 상태나 정체를 뒤의 말과 연결합니다."
+          },
+          {
+            "text": "only",
+            "lemma": "only",
+            "pos": "부사",
+            "meaning": "단지, ~일 뿐",
+            "note": "뒤의 설명으로 의미를 간명하게 한정합니다."
+          },
+          {
+            "text": "adventure",
+            "lemma": "adventure",
+            "pos": "명사",
+            "meaning": "모험",
+            "note": "새롭고 흥미로운 경험을 말합니다."
+          },
+          {
+            "text": "wrongly",
+            "lemma": "wrongly",
+            "pos": "부사",
+            "meaning": "잘못되게",
+            "note": "considered를 꾸며 앞 문장의 rightly와 대조합니다."
+          },
+          {
+            "text": "considered",
+            "lemma": "consider",
+            "pos": "과거분사",
+            "meaning": "바라본, 여겨진",
+            "note": "adventure를 뒤에서 꾸밉니다. 주절의 동사는 현재형 is입니다."
+          }
+        ]
+      }
+    ]
+  }
+]

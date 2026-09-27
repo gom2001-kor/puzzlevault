@@ -1,5 +1,6 @@
 {
     "common": {
+        "learn": "英语学习",
         "home": "首页",
         "games": "游戏",
         "blog": "博客",
@@ -440,5 +441,25 @@
         "free": "免费游玩",
         "account": "无需注册",
         "browser": "浏览器直接游玩"
+    },
+    "learning": {
+        "kicker": "PUZZLEVAULT · ENGLISH READING ROOM",
+        "title": "英语探索，从每一句开始。",
+        "intro": "阅读、聆听、开口、写作，再通过复习巩固。阅读8篇英语原文，把词义、组句和内容理解化为一个个小挑战。",
+        "language": "界面与学习讲解均为韩语。",
+        "open": "进入英语学习室",
+        "library": "浏览阅读材料",
+        "free": "免费使用",
+        "account": "无需账号",
+        "site": "在PuzzleVault内使用",
+        "texts": "英语原文",
+        "segments": "精选学习片段",
+        "meaning": "单词释义",
+        "assembly": "组句练习",
+        "understanding": "内容理解",
+        "modeLabel": "用三种方式探索英语",
+        "transferTitle": "已有Little by Little学习记录？",
+        "transfer": "不同网站之间的记录不会自动迁移。请先在原应用的设置中将全部记录备份为JSON，再到本学习室的设置中导入备份，查看预览后确认恢复。",
+        "transferLink": "打开原应用设置"
     }
 }

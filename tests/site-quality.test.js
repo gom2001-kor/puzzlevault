@@ -145,7 +145,7 @@ test('corrupt, unexpected, or inaccessible storage stays private and interactive
 test('public HTML retains the ads.txt publisher metadata without standalone tracker tags', () => {
     const ads = fs.readFileSync(path.join(root, 'ads.txt'), 'utf8');
     const expected = 'ca-' + ads.match(/google\.com,\s*(pub-\d+)/)[1];
-    const excluded = new Set(['.git', '.agent', '.agents', '.codex', 'node_modules', 'docs', 'tests', 'scripts']);
+    const excluded = new Set(['.git', '.agent', '.agents', '.codex', 'node_modules', 'docs', 'tests', 'scripts', 'apps', '.npm-cache']);
     function walk(folder) {
         return fs.readdirSync(folder, { withFileTypes: true }).flatMap(entry => {
             if(excluded.has(entry.name)) return [];

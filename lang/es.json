@@ -1,5 +1,6 @@
 {
     "common": {
+        "learn": "Aprender inglés",
         "home": "Inicio",
         "games": "Juegos",
         "blog": "Blog",
@@ -440,5 +441,25 @@
         "free": "Gratis",
         "account": "Sin registro",
         "browser": "Juega en tu navegador"
+    },
+    "learning": {
+        "kicker": "PUZZLEVAULT · SALA DE LECTURA EN INGLÉS",
+        "title": "Otra aventura. Una frase cada vez.",
+        "intro": "Lee, escucha, habla, escribe y repasa. Explora ocho textos en inglés y practica el significado de palabras, la construcción de frases y la comprensión con pequeños retos.",
+        "language": "La interfaz y las explicaciones de aprendizaje están en coreano.",
+        "open": "Abrir la sala de inglés",
+        "library": "Explorar los textos",
+        "free": "Uso gratuito",
+        "account": "Sin cuenta",
+        "site": "Dentro de PuzzleVault",
+        "texts": "textos en inglés",
+        "segments": "fragmentos seleccionados",
+        "meaning": "Significado de palabras",
+        "assembly": "Construir frases",
+        "understanding": "Comprensión",
+        "modeLabel": "Tres formas de explorar el inglés",
+        "transferTitle": "¿Ya usas Little by Little?",
+        "transfer": "Los registros no se transfieren automáticamente entre sitios. En los ajustes de la aplicación original, descarga una copia completa en JSON. Impórtala en los ajustes de esta sala, revisa la vista previa y confirma la restauración.",
+        "transferLink": "Abrir los ajustes de la aplicación original"
     }
 }

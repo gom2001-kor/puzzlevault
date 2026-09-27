@@ -1,5 +1,6 @@
 {
     "common": {
+        "learn": "英語学習",
         "home": "ホーム",
         "games": "ゲーム",
         "blog": "ブログ",
@@ -440,5 +441,25 @@
         "free": "無料プレイ",
         "account": "登録不要",
         "browser": "ブラウザーですぐに"
+    },
+    "learning": {
+        "kicker": "PUZZLEVAULT · ENGLISH READING ROOM",
+        "title": "英語の冒険も、一文ずつ。",
+        "intro": "読み、聞き、話し、書いて、復習しましょう。8編の英語原文を読み、単語の意味・文の組み立て・内容理解の小さなチャレンジへ進めます。",
+        "language": "画面表示と学習解説は韓国語です。",
+        "open": "英語学習室を開く",
+        "library": "読む作品を探す",
+        "free": "無料",
+        "account": "アカウント不要",
+        "site": "PuzzleVault内で利用",
+        "texts": "英語原文",
+        "segments": "選定学習区間",
+        "meaning": "単語の意味",
+        "assembly": "文の組み立て",
+        "understanding": "内容理解",
+        "modeLabel": "3つの方法で英語を探求",
+        "transferTitle": "Little by Littleの学習記録を移すには？",
+        "transfer": "異なるサイト間で記録は自動移行されません。元のアプリの設定で全記録をJSONにバックアップし、この学習室の設定で読み込んで、プレビューを確認してから復元してください。",
+        "transferLink": "元のアプリの設定を開く"
     }
 }

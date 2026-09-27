@@ -4,6 +4,12 @@
   X-Robots-Tag: noindex
 /scripts/*
   X-Robots-Tag: noindex
+/apps/*
+  X-Robots-Tag: noindex
+/learn/english/*
+  Permissions-Policy: microphone=(self), camera=(), geolocation=()
+/learn/english/assets/*
+  Cache-Control: public, max-age=31536000, immutable
 /solution.html
   X-Robots-Tag: noindex
 /blog/posts/_template.html

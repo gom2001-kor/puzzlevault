@@ -5,6 +5,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 DATE = '2026-09-26'
+PAGE_DATES = {'privacy': '2026-09-28'}
 FORM = 'https://forms.gle/NBjCNdVCBGaGGcbM9'
 COPY = {
     'en': {
@@ -20,13 +21,15 @@ COPY = {
             ('Keeping the project available', 'Games are free to access. Advertising may help support the project when an approved advertising setup is active. Optional analytics is off until allowed through the privacy controls. Game access does not depend on clicking an advertisement. Privacy details and the external feedback service are described on the linked pages below.')
         ],
         'privacySections': [
-            ('Scope and hosting', 'This notice explains the browser-game site at puzzlevault.pages.dev. No account is required to play. The hosting provider, Cloudflare, necessarily handles network requests such as IP address, requested URL and browser information to deliver and protect the site. This is different from the game progress stored on your device.'),
-            ('Local game data and preferences', 'Keys beginning with pv_ store scores, experience, missions, streaks, sound, language and privacy choices. Session storage may hold temporary hints or game-session counters. The pv_lang cookie remembers language preference. The service worker caches public game assets for offline use. Game saves are not synced to an account; clearing site data can permanently remove them.'),
+            ('Scope and hosting', 'This notice explains the browser games and English learning room at puzzlevault.pages.dev. No account is required to play or learn. The hosting provider, Cloudflare, necessarily handles network requests such as IP address, requested URL and browser information to deliver and protect the site. This is different from the game progress stored on your device.'),
+            ('Local game data and preferences', 'Keys beginning with pv_ store scores, experience, missions, streaks, sound, language and privacy choices. Session storage may hold temporary hints or game-session counters. The pv_lang cookie remembers language preference. The service worker caches public game and learning assets for offline use. Game saves are not synced to an account; clearing site data can permanently remove them.'),
+            ('English learning records and backups', ['The English learning room stores reading progress, practice results and mistakes, writing drafts, saved expressions, review schedules, and learning settings in this browser. The storage keys are pv_english_reading_v2 and pv_english_quest_v1. These records are not automatically sent to the app server or synced to an account. Clearing site data can remove them.', 'You can download a JSON backup and import it in Settings. Backups may contain your written answers, so keep them in a place you control. Records on study-english2.pages.dev do not transfer automatically to PuzzleVault: export a backup from the original app and import it here, review the preview, then confirm restoration. A confirmed restore replaces the applicable current records.'], 'english-learning-data'),
+            ('Device speech and microphone recording', ['Text playback uses the browser’s speech synthesis. Some voices use a network service, and the device or voice provider may process the text being spoken. Availability and quality depend on your browser and installed voices.', 'Microphone permission is requested only when you press the recording control. Each recording is limited to 60 seconds. The app does not send recordings to its server; audio stays temporarily in the current screen’s memory and is cleared when you change the sentence, mode or screen, or reload. Recordings are excluded from JSON backups. You can deny or revoke microphone access in browser settings.'], 'english-audio'),
             ('Optional Google Analytics', 'Google Analytics is off by default. If you allow analytics in Privacy choices, it can receive page visits, device/browser information and game events such as a completed round or a successful share. A share event does not contain the shared message or challenge URL. Google may set analytics cookies such as _ga. Refusing optional analytics does not restrict games. Microsoft Clarity session recording is not loaded by the current site.'),
             ('Changing your choice', 'Use Privacy choices in the footer or the button below. Permission changes take effect on the next page so a live round is not restarted. Revoking analytics permission disables subsequent Google Analytics collection on this page and removes accessible first-party analytics cookies. It cannot undo data already sent. Where storage is blocked, the choice lasts only for the current page.'),
             ('Advertising', 'AdSense publisher verification metadata may be present without serving advertisements. The current site does not automatically load advertising tags. Before advertising is enabled, the publisher must configure the applicable certified consent platform and ad placements. Google and its advertising partners may then process identifiers and use cookies as described in that platform. These analytics controls are not a Google-certified advertising CMP and do not replace one.'),
             ('Feedback, external services and sharing', 'The feedback link opens Google Forms only when you choose it; the form is not embedded automatically. Information you enter, and any account information disclosed by the form, is handled by Google Forms and the recipient. Do not include passwords or other sensitive data. Native sharing sends the result only through the destination you select. Clipboard copying and downloaded result cards remain under your control.'),
-            ('Your options and contact', 'You can refuse analytics, use your browser to delete site data, adjust Google advertising settings, or contact the project through the feedback page about a privacy question. Include enough context to identify the request without sending unnecessary personal information. We update this notice when the site’s handling changes.')
+            ('Your options and contact', 'You can refuse analytics, use your browser to delete site data, adjust Google advertising settings, or contact the project through the feedback page about a privacy question. Include enough context to identify the request without sending unnecessary personal information. We update this notice when the site’s handling changes.'),
         ],
         'contactSections': [
             ('Make your report useful', 'For a game problem, include the game name, mode or level, device/browser, and the exact steps that led to the problem. Say what you expected and what happened instead. A challenge link can help reproduce a seeded course, but do not send credentials, payment details or private account data.'),
@@ -53,14 +56,16 @@ COPY = {
             ('설명과 오류를 고치는 방법','공략은 현재 제공하는 게임을 기준으로 작성하고 기능 변경이나 오류 제보가 있으면 수정합니다. 퍼즐 팁은 플레이 제안이며 의학적 효능이나 학습 성과를 보장하지 않습니다. 풀리지 않는 레벨, 불편한 조작, 접근성·번역 문제는 게임 이름, 모드, 재현 순서와 함께 문의해 주세요.'),
             ('무료 이용과 운영','승인된 광고 설정이 활성화되면 광고가 프로젝트 운영에 도움이 될 수 있습니다. 선택적 분석은 개인정보 설정에서 허용하기 전까지 꺼져 있습니다. 광고 클릭은 게임 이용 조건이 아닙니다. 데이터 처리와 외부 문의 서비스는 아래 안내에서 확인할 수 있습니다.')
         ],
-        'privacySections':[
-            ('범위와 호스팅','이 안내는 puzzlevault.pages.dev의 브라우저 게임에 적용됩니다. 게임에 계정은 필요하지 않습니다. 호스팅 제공자인 Cloudflare는 사이트 전달과 보호를 위해 IP 주소, 요청 URL, 브라우저 정보 같은 네트워크 요청 정보를 처리합니다. 이는 기기에 저장되는 게임 기록과 별개입니다.'),
-            ('게임 기록과 필수 설정','pv_로 시작하는 브라우저 저장 항목에 점수, 경험치, 미션, 연속 기록, 소리, 언어, 개인정보 선택을 저장합니다. 세션 저장소에는 힌트와 임시 플레이 횟수가 들어갈 수 있고 pv_lang 쿠키는 언어 선택을 기억합니다. 서비스 워커는 오프라인 이용을 위해 공개 게임 파일을 캐시합니다. 저장 기록은 계정으로 동기화되지 않으며 사이트 데이터 삭제 시 사라질 수 있습니다.'),
-            ('선택적 Google Analytics','Google Analytics는 기본적으로 꺼져 있습니다. 개인정보 설정에서 허용하면 페이지 방문, 기기·브라우저 정보, 게임 완료나 공유 성공 같은 이용 이벤트가 전송될 수 있으며 _ga 등의 분석 쿠키를 사용할 수 있습니다. 공유 이벤트에 공유 메시지나 도전 URL을 넣지 않습니다. 분석을 거부해도 게임은 이용할 수 있습니다. 현재 사이트는 Microsoft Clarity 세션 기록을 불러오지 않습니다.'),
-            ('선택 변경과 철회','하단의 개인정보 설정 또는 아래 버튼을 이용하세요. 진행 중인 게임을 다시 시작하지 않도록 허용 변경은 다음 페이지부터 적용합니다. 분석 허용을 철회하면 현재 페이지의 추가 Google Analytics 수집을 비활성화하고 접근 가능한 자체 도메인 분석 쿠키를 삭제합니다. 이미 전송된 데이터까지 되돌리지는 못합니다. 브라우저 저장이 차단된 경우 선택은 현재 페이지에서만 유지됩니다.'),
-            ('광고','AdSense 게시자 확인용 메타데이터가 있어도 광고가 제공되는 것은 아닙니다. 현재 사이트는 광고 태그를 자동으로 불러오지 않습니다. 광고 활성화 전 운영자는 해당 지역에 필요한 인증 동의 관리 플랫폼과 광고 배치를 구성해야 합니다. 활성화 후 Google 및 광고 파트너는 해당 동의 화면의 안내에 따라 식별자와 쿠키를 처리할 수 있습니다. 여기의 분석 설정은 Google 인증 광고 CMP가 아니며 이를 대체하지 않습니다.'),
-            ('문의·외부 서비스·공유','문의 링크를 선택하면 Google Forms가 열리며 양식을 자동으로 삽입하지 않습니다. 입력한 정보와 양식이 안내하는 계정 정보는 Google Forms 및 수신자가 처리합니다. 비밀번호 등 민감한 정보는 적지 마세요. 기기의 공유 기능은 직접 선택한 대상으로 결과를 보내며 클립보드 복사와 다운로드한 카드의 전달 여부는 이용자가 결정합니다.'),
-            ('이용자의 선택과 문의','분석 거부, 브라우저의 사이트 데이터 삭제, Google 광고 설정 변경을 이용할 수 있습니다. 개인정보 질문은 문의 페이지로 전달해 주세요. 요청을 확인하는 데 필요한 설명만 적고 불필요한 개인정보는 보내지 마세요. 처리 방식이 바뀌면 이 안내를 갱신합니다.')
+        'privacySections': [
+            ('범위와 호스팅', '이 안내는 puzzlevault.pages.dev의 브라우저 게임과 영어 학습실에 적용됩니다. 게임과 학습에 계정은 필요하지 않습니다. 호스팅 제공자인 Cloudflare는 사이트 전달과 보호를 위해 IP 주소, 요청 URL, 브라우저 정보 같은 네트워크 요청 정보를 처리합니다. 이는 기기에 저장되는 게임 기록과 별개입니다.'),
+            ('게임 기록과 필수 설정', 'pv_로 시작하는 브라우저 저장 항목에 점수, 경험치, 미션, 연속 기록, 소리, 언어, 개인정보 선택을 저장합니다. 세션 저장소에는 힌트와 임시 플레이 횟수가 들어갈 수 있고 pv_lang 쿠키는 언어 선택을 기억합니다. 서비스 워커는 오프라인 이용을 위해 공개 게임·학습 파일을 캐시합니다. 저장 기록은 계정으로 동기화되지 않으며 사이트 데이터 삭제 시 사라질 수 있습니다.'),
+            ('영어 학습 기록과 백업', ['영어 학습실은 읽기 진도, 연습 결과와 오답, 작성한 글, 저장한 표현, 복습 일정, 학습 설정을 이 브라우저에 저장합니다. 저장 키는 pv_english_reading_v2와 pv_english_quest_v1입니다. 이 기록은 앱 서버로 자동 전송되거나 계정으로 동기화되지 않습니다. 사이트 데이터를 삭제하면 기록이 사라질 수 있습니다.', '설정에서 JSON 백업을 내려받고 불러올 수 있습니다. 백업에는 직접 작성한 답안이 포함될 수 있으므로 이용자가 관리하는 곳에 보관하세요. study-english2.pages.dev의 기존 기록은 PuzzleVault로 자동 이전되지 않습니다. 기존 앱에서 백업한 뒤 여기에서 불러와 미리보기를 확인하고 복원해야 합니다. 복원을 확정하면 해당 현재 기록이 백업 내용으로 교체됩니다.'], 'english-learning-data'),
+            ('기기 음성과 마이크 녹음', ['텍스트 재생은 브라우저의 음성 합성 기능을 사용합니다. 일부 음성은 네트워크 서비스를 사용하며 기기 또는 음성 제공자가 읽을 텍스트를 처리할 수 있습니다. 사용 가능 여부와 품질은 브라우저와 설치된 음성에 따라 다릅니다.', '이용자가 녹음 버튼을 눌렀을 때만 마이크 권한을 요청합니다. 녹음은 한 번에 최대 60초입니다. 앱은 녹음을 앱 서버로 전송하지 않으며 현재 화면의 메모리에만 임시 보관합니다. 문장·모드·화면을 바꾸거나 새로고침하면 녹음은 사라지며 JSON 백업에도 포함되지 않습니다. 브라우저 설정에서 마이크 접근을 거부하거나 철회할 수 있습니다.'], 'english-audio'),
+            ('선택적 Google Analytics', 'Google Analytics는 기본적으로 꺼져 있습니다. 개인정보 설정에서 허용하면 페이지 방문, 기기·브라우저 정보, 게임 완료나 공유 성공 같은 이용 이벤트가 전송될 수 있으며 _ga 등의 분석 쿠키를 사용할 수 있습니다. 공유 이벤트에 공유 메시지나 도전 URL을 넣지 않습니다. 분석을 거부해도 게임은 이용할 수 있습니다. 현재 사이트는 Microsoft Clarity 세션 기록을 불러오지 않습니다.'),
+            ('선택 변경과 철회', '하단의 개인정보 설정 또는 아래 버튼을 이용하세요. 진행 중인 게임을 다시 시작하지 않도록 허용 변경은 다음 페이지부터 적용합니다. 분석 허용을 철회하면 현재 페이지의 추가 Google Analytics 수집을 비활성화하고 접근 가능한 자체 도메인 분석 쿠키를 삭제합니다. 이미 전송된 데이터까지 되돌리지는 못합니다. 브라우저 저장이 차단된 경우 선택은 현재 페이지에서만 유지됩니다.'),
+            ('광고', 'AdSense 게시자 확인용 메타데이터가 있어도 광고가 제공되는 것은 아닙니다. 현재 사이트는 광고 태그를 자동으로 불러오지 않습니다. 광고 활성화 전 운영자는 해당 지역에 필요한 인증 동의 관리 플랫폼과 광고 배치를 구성해야 합니다. 활성화 후 Google 및 광고 파트너는 해당 동의 화면의 안내에 따라 식별자와 쿠키를 처리할 수 있습니다. 여기의 분석 설정은 Google 인증 광고 CMP가 아니며 이를 대체하지 않습니다.'),
+            ('문의·외부 서비스·공유', '문의 링크를 선택하면 Google Forms가 열리며 양식을 자동으로 삽입하지 않습니다. 입력한 정보와 양식이 안내하는 계정 정보는 Google Forms 및 수신자가 처리합니다. 비밀번호 등 민감한 정보는 적지 마세요. 기기의 공유 기능은 직접 선택한 대상으로 결과를 보내며 클립보드 복사와 다운로드한 카드의 전달 여부는 이용자가 결정합니다.'),
+            ('이용자의 선택과 문의', '분석 거부, 브라우저의 사이트 데이터 삭제, Google 광고 설정 변경을 이용할 수 있습니다. 개인정보 질문은 문의 페이지로 전달해 주세요. 요청을 확인하는 데 필요한 설명만 적고 불필요한 개인정보는 보내지 마세요. 처리 방식이 바뀌면 이 안내를 갱신합니다.'),
         ],
         'contactSections':[
             ('재현할 수 있는 설명을 보내 주세요','게임 이름, 모드·레벨, 기기·브라우저와 문제가 발생한 순서를 알려 주세요. 기대한 동작과 실제 결과를 함께 적으면 도움이 됩니다. 도전 링크는 같은 문제를 확인하는 데 쓸 수 있지만 계정 비밀번호, 결제 정보나 개인 계정 자료는 보내지 마세요.'),
@@ -86,14 +91,16 @@ COPY = {
             ('見やすい立体表現','メインの2作品では独自のローポリモデルをWebGLで描画し、遠近感・奥行き・照明を表現します。パズル10作品はHTML・CSS・Canvasで立体感のある盤面を描きます。効果音はブラウザ内で合成します。3DゲームにはWebGLが必要で、速度は端末により異なります。各ページでタッチとキーボードの操作を説明します。'),
             ('説明の改善と運営','実際の機能に合わせてガイドを見直します。遊びの提案は医療効果や学習成果の保証ではありません。不具合や翻訳の指摘はゲーム名と再現手順を添えてご連絡ください。広告クリックは利用条件ではなく、任意の分析は許可前には動作しません。')
         ],
-        'privacySections':[
-            ('対象とホスティング','この方針はpuzzlevault.pages.devに適用されます。アカウントは不要です。Cloudflareはサイトの配信と保護のため、IPアドレス、要求URL、ブラウザ情報などの通信情報を処理します。これは端末内のゲーム記録とは別です。'),
-            ('端末内の保存','pv_で始まる項目に得点、経験値、ミッション、連続記録、音声、言語、プライバシー設定を保存します。セッション保存には一時的なヒントや回数が入り、pv_lang Cookieは言語を記憶します。公開ゲームファイルはオフライン用にキャッシュします。記録は同期されず、サイトデータ削除で失われる場合があります。'),
-            ('任意のGoogle Analytics','分析は初期状態で無効です。許可するとページ閲覧、端末・ブラウザ情報、ゲーム完了や共有成功などのイベントを送信し、_gaなどのCookieを使う場合があります。共有イベントに本文や挑戦URLは入れません。拒否しても遊べます。現在Microsoft Clarityのセッション記録は読み込みません。'),
-            ('設定の変更','下部の設定から変更できます。プレイを再開させないため許可の変更は次のページから適用します。取り消すと現在ページの追加分析を無効にし、アクセス可能な自サイトの分析Cookieを削除します。送信済みのデータは取り消せません。保存を拒否する環境では選択は現在ページのみ有効です。'),
-            ('広告','AdSense確認用メタデータがあっても広告配信を意味しません。現在は広告タグを自動読み込みしません。有効化前に運営者は必要な認証済み同意管理サービスと配置を設定する必要があります。分析設定はGoogle認証済み広告CMPの代わりにはなりません。広告提供時の識別子やCookieはその同意画面で説明されます。'),
-            ('お問い合わせと共有','フォームはクリック時だけGoogle Formsで開き、自動埋め込みしません。入力内容やフォームで表示されるアカウント情報はGoogleと受信者が処理します。パスワードなどは送らないでください。共有先やコピーした結果・画像の送付先はご自身で選びます。'),
-            ('選択と連絡','分析の拒否、ブラウザでのサイトデータ削除、Google広告設定を利用できます。疑問はお問い合わせページから、不要な個人情報を含めずにご連絡ください。扱いが変わるとこの方針を更新します。')
+        'privacySections': [
+            ('対象とホスティング', 'この方針はpuzzlevault.pages.devに適用されます。アカウントは不要です。Cloudflareはサイトの配信と保護のため、IPアドレス、要求URL、ブラウザ情報などの通信情報を処理します。これは端末内のゲーム記録とは別です。'),
+            ('端末内の保存', 'pv_で始まる項目に得点、経験値、ミッション、連続記録、音声、言語、プライバシー設定を保存します。セッション保存には一時的なヒントや回数が入り、pv_lang Cookieは言語を記憶します。公開ゲーム・学習ファイルはオフライン用にキャッシュします。記録は同期されず、サイトデータ削除で失われる場合があります。'),
+            ('英語学習の記録とバックアップ', ['英語学習室は読書の進捗、練習結果と誤答、作文、保存した表現、復習予定、学習設定をこのブラウザーに保存します。保存キーはpv_english_reading_v2とpv_english_quest_v1です。これらの記録をアプリのサーバーへ自動送信したり、アカウントと同期したりしません。サイトデータを削除すると記録が失われる場合があります。', '設定からJSONバックアップをダウンロードし、読み込めます。自分で書いた回答が含まれる場合があるため、自分で管理できる場所に保管してください。study-english2.pages.devの記録はPuzzleVaultへ自動移行されません。元のアプリでバックアップし、こちらで読み込んでプレビューを確認してから復元します。復元を確定すると、対象となる現在の記録がバックアップの内容に置き換わります。'], 'english-learning-data'),
+            ('端末の音声合成とマイク録音', ['テキスト再生にはブラウザーの音声合成を使用します。一部の音声はネットワークサービスを利用し、端末や音声の提供者が読み上げるテキストを処理する場合があります。利用可否や品質はブラウザーとインストール済みの音声によって異なります。', '録音ボタンを押したときだけマイクの許可を求めます。録音は1回につき最大60秒です。アプリは音声をアプリのサーバーへ送信せず、現在の画面のメモリーに一時保存します。文・モード・画面の変更や再読み込みで消去され、JSONバックアップには含まれません。ブラウザーの設定でマイクへのアクセスを拒否・取り消しできます。'], 'english-audio'),
+            ('任意のGoogle Analytics', '分析は初期状態で無効です。許可するとページ閲覧、端末・ブラウザ情報、ゲーム完了や共有成功などのイベントを送信し、_gaなどのCookieを使う場合があります。共有イベントに本文や挑戦URLは入れません。拒否しても遊べます。現在Microsoft Clarityのセッション記録は読み込みません。'),
+            ('設定の変更', '下部の設定から変更できます。プレイを再開させないため許可の変更は次のページから適用します。取り消すと現在ページの追加分析を無効にし、アクセス可能な自サイトの分析Cookieを削除します。送信済みのデータは取り消せません。保存を拒否する環境では選択は現在ページのみ有効です。'),
+            ('広告', 'AdSense確認用メタデータがあっても広告配信を意味しません。現在は広告タグを自動読み込みしません。有効化前に運営者は必要な認証済み同意管理サービスと配置を設定する必要があります。分析設定はGoogle認証済み広告CMPの代わりにはなりません。広告提供時の識別子やCookieはその同意画面で説明されます。'),
+            ('お問い合わせと共有', 'フォームはクリック時だけGoogle Formsで開き、自動埋め込みしません。入力内容やフォームで表示されるアカウント情報はGoogleと受信者が処理します。パスワードなどは送らないでください。共有先やコピーした結果・画像の送付先はご自身で選びます。'),
+            ('選択と連絡', '分析の拒否、ブラウザでのサイトデータ削除、Google広告設定を利用できます。疑問はお問い合わせページから、不要な個人情報を含めずにご連絡ください。扱いが変わるとこの方針を更新します。'),
         ],
         'contactSections':[
             ('再現できる情報を','ゲーム名、モードやレベル、端末・ブラウザ、問題が起きた操作順をお知らせください。期待した結果と実際の動作を区別すると役立ちます。挑戦リンクは再現に使えますが、認証情報や決済情報は送らないでください。'),
@@ -119,14 +126,16 @@ COPY = {
             ('立体表现与清晰操作','两款主打游戏使用自行制作的低多边形模型，由WebGL呈现透视、深度和光照。十款棋盘益智游戏使用HTML、CSS与Canvas表现凸起方块与阴影。音效在浏览器中合成。3D游戏需要WebGL支持，流畅度取决于设备。每个页面都有触控按钮和键盘操作说明。'),
             ('内容维护与运营','指南会随实际功能和错误反馈更新。技巧不是医疗效果或学习成果的保证。请通过联系页面提供游戏名、模式与复现步骤。基础游戏不要求点击广告，可选分析在允许前保持关闭。')
         ],
-        'privacySections':[
-            ('范围与托管','本政策适用于puzzlevault.pages.dev。游戏无需账号。Cloudflare为交付和保护网站处理IP地址、请求网址、浏览器信息等网络请求数据；这些与设备内的游戏记录不同。'),
-            ('本地数据','pv_开头的存储项保存分数、经验、任务、连续记录、声音、语言和隐私选择。会话存储可包含临时提示与次数；pv_lang Cookie记住语言。服务工作线程缓存公开游戏文件以供离线使用。记录不与账号同步，清除网站数据可能导致丢失。'),
-            ('可选的Google Analytics','默认关闭。允许分析后，可发送页面访问、设备和浏览器信息以及游戏完成、分享成功等事件，并可能使用_ga等Cookie。分享事件不包含分享正文或挑战网址。拒绝不影响游戏。当前网站不加载Microsoft Clarity会话记录。'),
-            ('更改选择','可以使用页脚或下方按钮更改选择。允许变更从下一页生效，以免重启正在进行的游戏。撤回许可会停用当前页面后续分析并移除可访问的本域分析Cookie，但不能撤回已发送的数据。存储被阻止时，选择只对当前页面有效。'),
-            ('广告','AdSense验证元数据不代表正在展示广告。当前网站不自动加载广告标签。启用前，运营者需配置适用的认证同意管理平台及广告位置。广告服务可能按同意界面的说明处理标识符和Cookie。这里的分析选择不是Google认证广告CMP，不能取代它。'),
-            ('反馈与分享','仅在点击链接时打开Google Forms，不自动嵌入。输入的信息以及表单披露的账号信息由Google和接收者处理。不要提交密码等敏感信息。您自行选择分享目的地，并决定如何发送复制结果或下载的卡片。'),
-            ('您的选择与联系','您可以拒绝分析、通过浏览器清除网站数据、调整Google广告设置，或通过联系页面提出隐私问题。请只提供必要说明，不发送多余个人资料。处理方式变化时会更新本政策。')
+        'privacySections': [
+            ('范围与托管', '本政策适用于puzzlevault.pages.dev的游戏与英语学习室。游戏和学习均无需账号。Cloudflare为交付和保护网站处理IP地址、请求网址、浏览器信息等网络请求数据；这些与设备内的游戏记录不同。'),
+            ('本地数据', 'pv_开头的存储项保存分数、经验、任务、连续记录、声音、语言和隐私选择。会话存储可包含临时提示与次数；pv_lang Cookie记住语言。服务工作线程缓存公开游戏与学习文件以供离线使用。记录不与账号同步，清除网站数据可能导致丢失。'),
+            ('英语学习记录与备份', ['英语学习室会在此浏览器中保存阅读进度、练习结果和错题、写作草稿、收藏表达、复习计划及学习设置。存储键为pv_english_reading_v2和pv_english_quest_v1。这些记录不会自动发送到应用服务器，也不会与账号同步。清除网站数据可能导致记录丢失。', '您可以在设置中下载或导入JSON备份。备份可能包含您自己写的答案，请妥善保存在自己管理的位置。study-english2.pages.dev上的记录不会自动迁移至PuzzleVault。请先在原应用中导出备份，再在此处导入，检查预览后确认恢复。确认恢复将以备份内容替换相应的当前记录。'], 'english-learning-data'),
+            ('设备语音与麦克风录音', ['文本播放使用浏览器的语音合成功能。部分语音使用网络服务，设备或语音服务商可能处理要朗读的文本。可用性和音质取决于浏览器及已安装的语音。', '只有当您点击录音按钮时才请求麦克风权限。每次录音最长60秒。应用不会将录音发送到应用服务器；音频仅临时保存在当前页面的内存中。切换句子、模式、页面或刷新时会清除录音，JSON备份也不包含录音。您可以在浏览器设置中拒绝或撤销麦克风访问权限。'], 'english-audio'),
+            ('可选的Google Analytics', '默认关闭。允许分析后，可发送页面访问、设备和浏览器信息以及游戏完成、分享成功等事件，并可能使用_ga等Cookie。分享事件不包含分享正文或挑战网址。拒绝不影响游戏。当前网站不加载Microsoft Clarity会话记录。'),
+            ('更改选择', '可以使用页脚或下方按钮更改选择。允许变更从下一页生效，以免重启正在进行的游戏。撤回许可会停用当前页面后续分析并移除可访问的本域分析Cookie，但不能撤回已发送的数据。存储被阻止时，选择只对当前页面有效。'),
+            ('广告', 'AdSense验证元数据不代表正在展示广告。当前网站不自动加载广告标签。启用前，运营者需配置适用的认证同意管理平台及广告位置。广告服务可能按同意界面的说明处理标识符和Cookie。这里的分析选择不是Google认证广告CMP，不能取代它。'),
+            ('反馈与分享', '仅在点击链接时打开Google Forms，不自动嵌入。输入的信息以及表单披露的账号信息由Google和接收者处理。不要提交密码等敏感信息。您自行选择分享目的地，并决定如何发送复制结果或下载的卡片。'),
+            ('您的选择与联系', '您可以拒绝分析、通过浏览器清除网站数据、调整Google广告设置，或通过联系页面提出隐私问题。请只提供必要说明，不发送多余个人资料。处理方式变化时会更新本政策。'),
         ],
         'contactSections':[
             ('提供可复现的信息','请说明游戏名、模式或关卡、设备和浏览器、导致问题的操作步骤，以及预期和实际结果。挑战链接可帮助复现题目，但不要发送账号凭证、支付信息或私人账户资料。'),
@@ -152,14 +161,16 @@ COPY = {
             ('Gráficos con profundidad','Las dos aventuras usan modelos de pocos polígonos creados para el proyecto y dibujados con WebGL, perspectiva, profundidad e iluminación. Los diez puzles usan HTML, CSS y Canvas con fichas elevadas y sombras. El audio se sintetiza en el navegador. Los juegos 3D requieren WebGL y su rendimiento depende del dispositivo. Cada página explica sus botones táctiles y controles de teclado.'),
             ('Cuidar el contenido y el proyecto','Revisamos las guías cuando cambian las funciones o se comunican errores. Los consejos no garantizan beneficios médicos ni educativos. Envía el juego, modo y pasos del problema por la página de contacto. No hace falta pulsar anuncios para jugar y la analítica opcional no se inicia sin permiso.')
         ],
-        'privacySections':[
-            ('Ámbito y alojamiento','Esta política corresponde a puzzlevault.pages.dev. No necesitas una cuenta. Cloudflare procesa solicitudes de red, como IP, URL y datos del navegador, para entregar y proteger el sitio. Es distinto del progreso guardado en el dispositivo.'),
-            ('Datos locales','Las claves pv_ guardan puntuaciones, experiencia, misiones, rachas, sonido, idioma y privacidad. El almacenamiento de sesión puede incluir pistas o contadores temporales. La cookie pv_lang recuerda el idioma y el service worker guarda archivos públicos para uso sin conexión. Los registros no se sincronizan; borrar datos puede eliminarlos.'),
-            ('Google Analytics opcional','Está desactivado por defecto. Si lo permites, puede recibir visitas, información del dispositivo y eventos como completar partidas o compartir con éxito, y usar cookies como _ga. El evento de compartir no contiene el mensaje ni el enlace del reto. Rechazarlo no limita los juegos. La versión actual no carga grabaciones de Microsoft Clarity.'),
-            ('Cambiar tu elección','Usa las opciones del pie de página o el botón inferior. Los cambios de permiso se aplican desde la próxima página para no reiniciar una partida. Al retirar el permiso se desactiva la recogida posterior y se eliminan las cookies propias de analítica accesibles. No se deshacen datos ya enviados. Si el navegador bloquea el almacenamiento, la elección dura esta página.'),
-            ('Publicidad','Los metadatos de verificación de AdSense no implican que se muestren anuncios. El sitio actual no carga etiquetas publicitarias automáticamente. Antes de activarlas se necesita la plataforma de consentimiento certificada y las ubicaciones aplicables. Los identificadores y cookies se explicarán en ese flujo. Estas opciones de analítica no sustituyen una CMP publicitaria certificada por Google.'),
-            ('Comentarios y servicios externos','Google Forms se abre al elegir el enlace y no se incrusta automáticamente. Google y el destinatario procesan lo que envíes y la información de cuenta indicada por el formulario. No incluyas contraseñas ni datos sensibles. Tú eliges el destino de un resultado compartido, copiado o descargado.'),
-            ('Opciones y contacto','Puedes rechazar la analítica, borrar datos del sitio en el navegador, ajustar la publicidad de Google o consultar dudas en la página de contacto. Proporciona solo la información necesaria. Actualizaremos esta política cuando cambie el tratamiento.')
+        'privacySections': [
+            ('Ámbito y alojamiento', 'Esta política corresponde a puzzlevault.pages.dev. No necesitas una cuenta. Cloudflare procesa solicitudes de red, como IP, URL y datos del navegador, para entregar y proteger el sitio. Es distinto del progreso guardado en el dispositivo.'),
+            ('Datos locales', 'Las claves pv_ guardan puntuaciones, experiencia, misiones, rachas, sonido, idioma y privacidad. El almacenamiento de sesión puede incluir pistas o contadores temporales. La cookie pv_lang recuerda el idioma y el service worker guarda archivos públicos para uso sin conexión. Los registros no se sincronizan; borrar datos puede eliminarlos.'),
+            ('Registros de aprendizaje y copias de seguridad', ['La sala de inglés guarda en este navegador el progreso de lectura, los resultados y errores de práctica, los textos que escribes, las expresiones guardadas, los repasos y los ajustes. Las claves son pv_english_reading_v2 y pv_english_quest_v1. Estos registros no se envían automáticamente al servidor de la aplicación ni se sincronizan con una cuenta. Borrar los datos del sitio puede eliminarlos.', 'Puedes descargar e importar una copia JSON desde los ajustes. Puede contener tus respuestas escritas: guárdala en un lugar que controles. Los registros de study-english2.pages.dev no se trasladan automáticamente a PuzzleVault. Exporta la copia desde la aplicación original, impórtala aquí, revisa la vista previa y confirma la restauración. Al confirmarla, se sustituyen los registros actuales correspondientes por los de la copia.'], 'english-learning-data'),
+            ('Voz del dispositivo y grabación con micrófono', ['La reproducción de texto usa la síntesis de voz del navegador. Algunas voces utilizan servicios de red y el proveedor del dispositivo o de la voz puede procesar el texto que se reproduce. La disponibilidad y la calidad dependen del navegador y de las voces instaladas.', 'Solo se solicita permiso para el micrófono cuando pulsas el control de grabación. Cada grabación dura como máximo 60 segundos. La aplicación no envía el audio a su servidor: queda temporalmente en la memoria de la pantalla actual y se borra al cambiar de frase, modo o pantalla, o al recargar. Las grabaciones no se incluyen en las copias JSON. Puedes denegar o retirar el acceso al micrófono desde los ajustes del navegador.'], 'english-audio'),
+            ('Google Analytics opcional', 'Está desactivado por defecto. Si lo permites, puede recibir visitas, información del dispositivo y eventos como completar partidas o compartir con éxito, y usar cookies como _ga. El evento de compartir no contiene el mensaje ni el enlace del reto. Rechazarlo no limita los juegos. La versión actual no carga grabaciones de Microsoft Clarity.'),
+            ('Cambiar tu elección', 'Usa las opciones del pie de página o el botón inferior. Los cambios de permiso se aplican desde la próxima página para no reiniciar una partida. Al retirar el permiso se desactiva la recogida posterior y se eliminan las cookies propias de analítica accesibles. No se deshacen datos ya enviados. Si el navegador bloquea el almacenamiento, la elección dura esta página.'),
+            ('Publicidad', 'Los metadatos de verificación de AdSense no implican que se muestren anuncios. El sitio actual no carga etiquetas publicitarias automáticamente. Antes de activarlas se necesita la plataforma de consentimiento certificada y las ubicaciones aplicables. Los identificadores y cookies se explicarán en ese flujo. Estas opciones de analítica no sustituyen una CMP publicitaria certificada por Google.'),
+            ('Comentarios y servicios externos', 'Google Forms se abre al elegir el enlace y no se incrusta automáticamente. Google y el destinatario procesan lo que envíes y la información de cuenta indicada por el formulario. No incluyas contraseñas ni datos sensibles. Tú eliges el destino de un resultado compartido, copiado o descargado.'),
+            ('Opciones y contacto', 'Puedes rechazar la analítica, borrar datos del sitio en el navegador, ajustar la publicidad de Google o consultar dudas en la página de contacto. Proporciona solo la información necesaria. Actualizaremos esta política cuando cambie el tratamiento.'),
         ],
         'contactSections':[
             ('Describe cómo reproducirlo','Incluye juego, modo o nivel, dispositivo y navegador, pasos, resultado esperado y resultado real. Un enlace de reto ayuda a reproducir la secuencia; no envíes credenciales, datos de pago ni información privada de cuentas.'),
@@ -185,11 +196,17 @@ def refresh():
         for page in ('about', 'privacy', 'contact', 'terms'):
             target = ROOT / (page + '.html' if lang == 'en' else lang + '/' + page + '.html')
             source = target.read_text(encoding='utf-8')
-            blocks = [f'<main class="pv-editorial"><h1>{html.escape(copy[page])}</h1>', f'<p class="pv-editorial-meta">{copy["updated"]}: <time datetime="{DATE}">{DATE}</time></p>']
+            page_date = PAGE_DATES.get(page, DATE)
+            blocks = [f'<main class="pv-editorial"><h1>{html.escape(copy[page])}</h1>', f'<p class="pv-editorial-meta">{copy["updated"]}: <time datetime="{page_date}">{page_date}</time></p>']
             if page == 'contact':
                 blocks.append(f'<div class="pv-editorial-callout"><a class="pv-btn pv-btn-primary" href="{FORM}" target="_blank" rel="noopener noreferrer">{copy["form"]} ↗</a></div>')
-            for heading, paragraph in copy[page + 'Sections']:
-                blocks.append(f'<section><h2>{html.escape(heading)}</h2><p>{html.escape(paragraph)}</p></section>')
+            for section in copy[page + 'Sections']:
+                heading, paragraphs = section[:2]
+                identity = f' id="{html.escape(section[2], quote=True)}"' if len(section) > 2 else ''
+                if isinstance(paragraphs, str):
+                    paragraphs = [paragraphs]
+                content = ''.join(f'<p>{html.escape(paragraph)}</p>' for paragraph in paragraphs)
+                blocks.append(f'<section{identity}><h2>{html.escape(heading)}</h2>{content}</section>')
             if page == 'privacy':
                 blocks.append(f'<button type="button" class="pv-btn pv-btn-secondary" data-privacy-settings>{copy["settings"]}</button>')
                 blocks.append('<p><a href="https://policies.google.com/technologies/partner-sites">Google — partner sites</a> · <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare — privacy</a> · <a href="https://myadcenter.google.com/">Google — My Ad Center</a></p>')

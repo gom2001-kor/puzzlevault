@@ -1,2 +1,7 @@
 __pycache__/
 *.py[cod]
+node_modules/
+.npm-cache/
+*.tsbuildinfo
+dist/
+apps/english/docs/screenshots/

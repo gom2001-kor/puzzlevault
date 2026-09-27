@@ -39,6 +39,7 @@ const CROSS_PROMO_MAP = {
 const NAV_LINKS = [
     { i18nKey: 'common.home', href: '/' },
     { i18nKey: 'common.games', href: '/#games' },
+    { i18nKey: 'common.learn', href: '/learn/english/' },
     { i18nKey: 'common.blog', href: '/blog/' },
     { i18nKey: 'common.about', href: '/about.html' },
 ];
@@ -51,7 +52,7 @@ function getLocalizedPath(href) {
     if (href === '/') return `/${lang}/`;
     if (href === '/#games') return `/${lang}/#games`;
     if (href === '/blog/') return `/blog/${lang}/`;
-    if (href.startsWith('/games/')) return href;
+    if (href.startsWith('/games/') || href.startsWith('/learn/')) return href;
     if (href.startsWith('/')) return `/${lang}${href}`;
     return href;
 }
@@ -205,6 +206,7 @@ function renderFooter() {
     links.className = 'pv-footer-links';
 
     const footerLinks = [
+        { i18nKey: 'common.learn', href: '/learn/english/' },
         { i18nKey: 'common.about', href: '/about.html' },
         { i18nKey: 'common.privacy', href: '/privacy.html' },
         { i18nKey: 'common.terms', href: '/terms.html' },

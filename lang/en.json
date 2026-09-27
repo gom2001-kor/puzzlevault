@@ -1,5 +1,6 @@
 {
     "common": {
+        "learn": "Learn English",
         "home": "Home",
         "games": "Games",
         "blog": "Blog",
@@ -440,5 +441,25 @@
         "free": "Free to play",
         "account": "No account required",
         "browser": "Play in your browser"
+    },
+    "learning": {
+        "kicker": "PUZZLEVAULT · ENGLISH READING ROOM",
+        "title": "A new kind of adventure. One sentence at a time.",
+        "intro": "Read, listen, speak, write and revisit what you learn. Explore eight English texts, then turn vocabulary, sentence building and comprehension into small challenges.",
+        "language": "The interface and learning explanations are in Korean.",
+        "open": "Open the English learning room",
+        "library": "Browse the texts",
+        "free": "Free to use",
+        "account": "No account",
+        "site": "Here on PuzzleVault",
+        "texts": "English texts",
+        "segments": "selected segments",
+        "meaning": "Word meanings",
+        "assembly": "Build sentences",
+        "understanding": "Check understanding",
+        "modeLabel": "Three ways to explore English",
+        "transferTitle": "Already using Little by Little?",
+        "transfer": "Your records do not move automatically between websites. In the original app, open Settings and download a full JSON backup. In this learning room, open Settings and import that backup, review the preview, then confirm restoration.",
+        "transferLink": "Open the original app settings"
     }
 }

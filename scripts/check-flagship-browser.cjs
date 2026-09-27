@@ -82,13 +82,13 @@ let activeBrowser;
  const offline=await browser.newContext({viewport:{width:390,height:844}}),op=await offline.newPage();
  await op.goto(base+'/');await op.evaluate(()=>navigator.serviceWorker.ready);await op.reload();
  await op.waitForFunction(()=>!!navigator.serviceWorker.controller);
- assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/pv3d.js?v=17'))),true);
- assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/flagship.js?v=17'))),true);
+ assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/pv3d.js?v=18'))),true);
+ assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/flagship.js?v=18'))),true);
  await offline.setOffline(true);
  for(const game of ['mosslight','cloudweft']){await op.goto(base+'/games/'+game+'.html?lang=ko');await op.waitForFunction(id=>id==='mosslight'?!!window.PVMosslight:!!window.Cloudweft?.inspect,game);await op.locator(game==='mosslight'?'#ml-overlay .ml-primary':'#sf-start').click();}
- checks.push('Version17 cache starts both 3D games offline with localized URLs');await offline.close();
+ checks.push('Version18 cache starts both 3D games offline with localized URLs');await offline.close();
  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
- const report={date:'2026-09-27',browser:'Microsoft Edge / Chromium, headless WebGL',checks,errors,externalRequests:external};
+ const report={date:'2026-09-28',browser:'Microsoft Edge / Chromium, headless WebGL',checks,errors,externalRequests:external};
  fs.writeFileSync('docs/flagship-browser-checks.json',JSON.stringify(report,null,2)+'\n');
  console.log(JSON.stringify(report,null,2));await browser.close();
 })().catch(async e=>{console.error(e);if(activeBrowser)await activeBrowser.close();process.exit(1);});

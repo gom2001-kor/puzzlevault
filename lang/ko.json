@@ -1,5 +1,6 @@
 {
     "common": {
+        "learn": "영어 학습",
         "home": "홈",
         "games": "게임",
         "blog": "블로그",
@@ -440,5 +441,25 @@
         "free": "무료 플레이",
         "account": "회원가입 없이",
         "browser": "브라우저에서 바로"
+    },
+    "learning": {
+        "kicker": "PUZZLEVAULT · ENGLISH READING ROOM",
+        "title": "영어도, 한 문장씩 모험처럼.",
+        "intro": "읽고, 듣고, 말하고, 쓰고, 다시 기억해 보세요. 8편의 영어 원문을 읽고 단어 뜻, 문장 조립, 내용 이해를 작은 도전으로 이어 갑니다.",
+        "language": "화면과 학습 해설은 한국어로 제공됩니다.",
+        "open": "영어 학습실 열기",
+        "library": "읽을거리 둘러보기",
+        "free": "무료 이용",
+        "account": "계정 없이",
+        "site": "PuzzleVault 안에서",
+        "texts": "영어 원문",
+        "segments": "선정 학습 구간",
+        "meaning": "단어 뜻",
+        "assembly": "문장 조립",
+        "understanding": "내용 이해",
+        "modeLabel": "세 가지 방식으로 즐기는 영어 탐험",
+        "transferTitle": "기존 Little by Little 학습 기록이 있나요?",
+        "transfer": "서로 다른 사이트의 기록은 자동으로 옮겨지지 않습니다. 기존 앱의 설정에서 전체 기록을 JSON으로 백업한 뒤, 이 학습실 설정에서 백업을 불러와 미리보기를 확인하고 복원을 진행하세요.",
+        "transferLink": "기존 앱의 설정 열기"
     }
 }

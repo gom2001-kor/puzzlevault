@@ -1,0 +1,13 @@
+{
+  "date": "2026-09-28",
+  "checks": [
+    "Daily course uses verified source questions; drafts and feedback resume after reload; first completion awards XP once",
+    "Wrong answers can enter the reading review list; review and repeated daily completion do not duplicate XP or alter game/reading completion records",
+    "Malformed quest storage is preserved; temporary progress survives the round trip to its source lesson",
+    "The version18 root cache includes every hashed learning bundle; reading, quests and an existing puzzle start offline",
+    "Static learning/content/backup/source information remains readable without JavaScript"
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "microphoneTested": false
+}

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from collections import Counter
 from html.parser import HTMLParser
@@ -15,7 +16,7 @@ from pathlib import Path
 from urllib.parse import unquote, urljoin, urlsplit
 
 SITE = 'https://puzzlevault.pages.dev'
-EXCLUDED = {'.git', '.agent', '.agents', '.codex', 'node_modules', 'docs', 'tests', 'scripts'}
+EXCLUDED = {'.git', '.agent', '.agents', '.codex', 'node_modules', 'docs', 'tests', 'scripts', 'apps', '.npm-cache'}
 VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'}
 TRACKERS = ('googletagmanager.com', 'google-analytics.com', 'googlesyndication.com', 'doubleclick.net', 'clarity.ms')
 CLAIMS = {
@@ -28,11 +29,11 @@ CLAIMS = {
 
 
 def public_html(root: Path):
-    for path in sorted(root.rglob('*.html')):
-        rel = path.relative_to(root)
-        if set(rel.parts) & EXCLUDED or path.name in {'solution.html', '_template.html'}:
-            continue
-        yield path
+    for folder, directories, files in os.walk(root):
+        directories[:] = sorted(name for name in directories if name not in EXCLUDED)
+        for name in sorted(files):
+            if name.endswith('.html') and name not in {'solution.html', '_template.html'}:
+                yield Path(folder) / name
 
 
 class Page(HTMLParser):

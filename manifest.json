@@ -1,7 +1,7 @@
 {
   "name": "PuzzleVault",
   "short_name": "PuzzleVault",
-  "description": "Two original 3D adventures and ten free browser puzzles, with daily challenges and local progress.",
+  "description": "Two original 3D adventures, ten browser puzzles, and an English reading room with Korean explanations and daily learning quests.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -22,5 +22,9 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["games", "entertainment", "education"]
+  "categories": [
+    "games",
+    "entertainment",
+    "education"
+  ]
 }

@@ -3,7 +3,7 @@
    Cache game HTML/CSS/JS for offline play
    =================================================== */
 
-const CACHE_VERSION = 17;
+const CACHE_VERSION = 18;
 const CACHE_NAME = 'puzzlevault-v' + CACHE_VERSION;
 const ASSETS = [
     '/',
@@ -71,6 +71,20 @@ const ASSETS = [
     '/games/hexmatch-logic.js',
 ];
 
+// ENGLISH_ASSETS_START
+ASSETS.push(
+    "/learn/english/",
+    "/learn/english/THIRD-PARTY-NOTICES.txt",
+    "/learn/english/assets/index-D7O7a8ru.js",
+    "/learn/english/assets/index-DEP4q_MK.css",
+    "/learn/english/assets/learning-guides-Ba1fNu86.js",
+    "/learn/english/assets/reading-library-BnTD4AHA.js",
+    "/learn/english/assets/vendor-CfaPcH2q.js",
+    "/learn/english/index.html",
+    "/css/learning.css"
+);
+// ENGLISH_ASSETS_END
+
 // Keep the same privacy and support information available with offline games.
 for (const language of ['ko', 'ja', 'zh', 'es']) {
     for (const page of ['about', 'privacy', 'terms', 'contact']) {
@@ -79,7 +93,7 @@ for (const language of ['ko', 'ja', 'zh', 'es']) {
 }
 
 // HTML references versioned assets so an older worker cannot serve stale game code.
-ASSETS.push(...ASSETS.filter(asset => /\.(css|js|json)$/.test(asset)).map(asset => asset + '?v=' + CACHE_VERSION));
+ASSETS.push(...ASSETS.filter(asset => /\.(css|js|json)$/.test(asset) && !asset.startsWith('/learn/english/assets/')).map(asset => asset + '?v=' + CACHE_VERSION));
 
 // Install: precache all core assets
 self.addEventListener('install', event => {
