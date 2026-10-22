@@ -35,7 +35,8 @@ let activeBrowser;
   const before=await state(game);await page.keyboard.down('ArrowUp');await page.waitForTimeout(300);await page.keyboard.up('ArrowUp');
   assert.ok((await state(game)).z < before.z || (await state(game)).player?.z < before.player?.z);
   if(game==='mosslight'){
-   await page.keyboard.press('q');await page.waitForTimeout(80);assert.equal((await state(game)).gardens.length,1);
+   // Movement is the only input; ability keys stay inert while their config.features flags are off.
+   await page.keyboard.press('q');await page.waitForTimeout(80);assert.equal((await state(game)).gardens.length,0);
   }else{
    await page.keyboard.press('Space');await page.waitForTimeout(140);assert.ok((await state(game)).y>.3);
    await page.keyboard.press('e');await page.waitForTimeout(100);assert.equal((await state(game)).phase,1);
@@ -82,8 +83,8 @@ let activeBrowser;
  const offline=await browser.newContext({viewport:{width:390,height:844}}),op=await offline.newPage();
  await op.goto(base+'/');await op.evaluate(()=>navigator.serviceWorker.ready);await op.reload();
  await op.waitForFunction(()=>!!navigator.serviceWorker.controller);
- assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/pv3d.js?v=20'))),true);
- assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/flagship.js?v=20'))),true);
+ assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/pv3d.js?v=21'))),true);
+ assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/flagship.js?v=21'))),true);
  await offline.setOffline(true);
  for(const game of ['mosslight','cloudweft']){await op.goto(base+'/games/'+game+'.html?lang=ko');await op.waitForFunction(id=>id==='mosslight'?!!window.PVMosslight:!!window.Cloudweft?.inspect,game);await op.locator(game==='mosslight'?'#ml-overlay .ml-primary':'#sf-start').click();}
  checks.push('Version18 cache starts both 3D games offline with localized URLs');await offline.close();
