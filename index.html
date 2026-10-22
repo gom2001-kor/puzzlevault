@@ -42,10 +42,9 @@
   <meta name="twitter:description"
     content="Play 12 free browser games: two original 3D adventures and ten puzzles. Restore a forest, explore floating islands, or try a quick daily challenge. No download.">
 
-  <link rel="stylesheet" href="/css/global.css?v=19">
-  <link rel="stylesheet" href="/css/arcade.css?v=19">
-  <link rel="stylesheet" href="/css/flagship.css?v=19">
-  <link rel="stylesheet" href="/css/learning.css?v=19">
+  <link rel="stylesheet" href="/css/global.css?v=20">
+  <link rel="stylesheet" href="/css/arcade.css?v=20">
+  <link rel="stylesheet" href="/css/flagship.css?v=20">
 
   <!-- Schema.org -->
   <script type="application/ld+json">
@@ -252,100 +251,45 @@
       box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
     }
 
-    /* All Games */
-    .games-section {
-      padding: 40px 0;
+    /* Mini games */
+    .mini-games {
+      padding: 32px 0 40px;
     }
 
-    .all-games-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+    .mini-games h2 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 12px;
     }
 
-    @media (min-width: 480px) {
-      .all-games-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-      }
-    }
-
-    @media (min-width: 768px) {
-      .all-games-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .all-games-grid {
-        grid-template-columns: repeat(5, 1fr);
-      }
-    }
-
-    .game-card-link {
+    .mini-games-row {
       display: flex;
-      flex-direction: column;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: thin;
+    }
+
+    .mini-game {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--pv-text);
       background: var(--pv-card-bg);
       border: 1px solid var(--pv-border);
-      border-radius: var(--pv-radius);
-      overflow: hidden;
-      transition: all 0.25s ease;
+      border-radius: 100px;
       text-decoration: none;
-      color: inherit;
+      white-space: nowrap;
+      transition: border-color 0.2s ease;
     }
 
-    .game-card-link:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    .mini-game:hover {
       border-color: var(--pv-blue);
-    }
-
-    .game-card-icon {
-      font-size: 2.8rem;
-      text-align: center;
-      padding: 24px 0 8px;
-      transition: transform 0.3s ease;
-    }
-
-    .game-card-link:hover .game-card-icon {
-      transform: scale(1.15);
-    }
-
-    .game-card-body {
-      padding: 8px 14px 18px;
-      text-align: center;
-      flex: 1;
-    }
-
-    .game-card-name {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-      color: var(--pv-text);
-    }
-
-    .game-card-desc {
-      font-size: 0.78rem;
-      color: var(--pv-text-secondary);
-      line-height: 1.4;
-    }
-
-    .game-card-play {
-      display: block;
-      text-align: center;
-      padding: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--pv-blue);
-      background: rgba(37, 99, 235, 0.06);
-      border-top: 1px solid var(--pv-border);
-      transition: all 0.2s ease;
-      margin-top: auto;
-    }
-
-    .game-card-link:hover .game-card-play {
-      background: var(--pv-blue);
-      color: #fff;
     }
 
     /* Blog preview */
@@ -494,8 +438,8 @@
       text-overflow: ellipsis;
     }
   </style>
-    <link rel="stylesheet" href="/css/site-quality.css?v=19">
-    <script defer src="/js/privacy-controls.js?v=19"></script>
+    <link rel="stylesheet" href="/css/site-quality.css?v=20">
+    <script defer src="/js/privacy-controls.js?v=20"></script>
 </head>
 
 <body class="arcade-home">
@@ -600,45 +544,6 @@
         </article></div>
       <div class="flagship-footnote"><span data-i18n="flagship.free">Free to play</span><span data-i18n="flagship.account">No account required</span><span data-i18n="flagship.browser">Play in your browser</span></div>
     </section>
-    <section class="pv-learning" id="english-learning" aria-labelledby="pv-learning-title">
-      <div class="pv-learning-card">
-        <div class="pv-learning-copy">
-          <p class="pv-learning-kicker"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5v15h-5a4 4 0 0 0-4 2 4 4 0 0 0-4-2H3Z"/><path d="M12 8v13"/></svg><span data-i18n="learning.kicker">PUZZLEVAULT · ENGLISH READING ROOM</span></p>
-          <h2 id="pv-learning-title" data-i18n="learning.title">A new kind of adventure. One sentence at a time.</h2>
-          <p class="pv-learning-intro" data-i18n="learning.intro">Read, listen, speak, write and revisit what you learn. Explore eight English texts, then turn vocabulary, sentence building and comprehension into small challenges.</p>
-          <p class="pv-learning-language"><span aria-hidden="true">가</span><span data-i18n="learning.language">The interface and learning explanations are in Korean.</span></p>
-          <div class="pv-learning-actions"><a class="pv-learning-open" href="/learn/english/"><span data-i18n="learning.open">Open the English learning room</span><span aria-hidden="true">↗</span></a><a class="pv-learning-library" href="/learn/english/guides/"><span data-i18n="learning.library">Read the study guides</span></a></div>
-          <ul class="pv-learning-perks"><li><span data-i18n="learning.free">Free to use</span></li><li><span data-i18n="learning.account">No account</span></li><li><span data-i18n="learning.site">Here on PuzzleVault</span></li></ul>
-        </div>
-        <div class="pv-learning-preview">
-          <svg class="pv-learning-book" viewBox="0 0 300 166" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><ellipse cx="151" cy="149" rx="99" ry="11" fill="#6d4caa" opacity=".12"/><path d="M52 38q52-16 97 6 45-22 99-6v102q-54-10-99 9-44-19-97-9Z" fill="#a88fdb"/><path d="M57 31q51-15 92 9v100q-45-22-92-8Z" fill="#fffdfa"/><path d="M149 40q46-24 93-9v101q-46-14-93 8Z" fill="#f5eeff"/><path d="M149 42v94" stroke="#d7c5ec" stroke-width="2"/><path d="m72 54 60 5m-60 9 60 5m-60 9 44 4m52-27 57-5m-57 20 57-5m-57 20 39-4" fill="none" stroke="#bfaecc" stroke-width="3" stroke-linecap="round"/><path d="m191 32 18-3v32l-9-6-9 9Z" fill="#a979cf"/><rect x="86" y="94" width="99" height="30" rx="8" transform="rotate(-7 86 94)" fill="#6d28d9"/><text x="99" y="114" transform="rotate(-7 86 94)" fill="white" font-size="12" font-family="system-ui,sans-serif" font-weight="600">little by little.</text><path d="M43 23v12m-6-6h12m209 66v10m-5-5h10" stroke="#a78bce" stroke-width="2" stroke-linecap="round"/><circle cx="252" cy="18" r="4" fill="#c4b5fd"/><circle cx="27" cy="100" r="3" fill="#c4b5fd"/></svg>
-          <div class="pv-learning-numbers"><div><strong>8</strong><span data-i18n="learning.texts">English texts</span></div><div><strong>69</strong><span data-i18n="learning.segments">selected segments</span></div></div>
-          <ul class="pv-learning-modes"><li><span data-i18n="learning.meaning">Word meanings</span></li><li><span data-i18n="learning.assembly">Build sentences</span></li><li><span data-i18n="learning.understanding">Check understanding</span></li></ul>
-          <p class="pv-learning-preview-label" data-i18n="learning.modeLabel">Three ways to explore English</p>
-        </div>
-        <details class="pv-learning-transfer"><summary data-i18n="learning.transferTitle">Already using Little by Little?</summary><p data-i18n="learning.transfer">Your records do not move automatically between websites. In the original app, open Settings and download a full JSON backup. In this learning room, open Settings and import that backup, review the preview, then confirm restoration.</p><a href="https://study-english2.pages.dev/#/settings" data-i18n="learning.transferLink">Open the original app settings</a></details>
-      </div>
-    </section>
-    <section class="arcade-hero">
-      <div class="arcade-hero-copy">
-        <span class="arcade-eyebrow"><span data-i18n="arcade.eyebrow">YOUR DAILY DOSE OF PLAY</span></span>
-        <h2 data-i18n="arcade.heroTitle">A little challenge.
-A bigger little victory.</h2>
-        <p class="arcade-intro" data-i18n="arcade.intro">Ten puzzles, fresh daily missions, and a 30-second challenge to send to your friends. Your next personal best starts here.</p>
-        <div class="arcade-actions"><a class="arcade-primary" href="/games/quickcalc.html?mode=blitz" data-arcade-start><span data-i18n="arcade.start">Take the 30-second challenge</span> <span aria-hidden="true">↗</span></a><a class="arcade-secondary" href="#games"><span data-i18n="arcade.browse">Explore games</span></a></div>
-        <div class="arcade-note"><span data-i18n="arcade.free">Free to play</span><span data-i18n="arcade.noAccount">No sign-up</span><span data-i18n="arcade.instant">Instant play</span></div>
-      </div>
-      <div class="arcade-preview-wrap">
-        <div class="arcade-preview">
-          <div class="arcade-preview-top"><span data-i18n="arcade.previewLabel">QUICKCALC · WARM-UP</span><span class="arcade-time">00:30</span></div>
-          <div class="arcade-question" aria-label="8 × 7 = ?"><span class="arcade-number">8</span><small>×</small><span class="arcade-number">7</span><small>=</small><span class="arcade-answer" id="arcade-answer">?</span></div>
-          <div class="arcade-choices"><button class="arcade-choice" data-answer="48">48</button><button class="arcade-choice" data-answer="56">56</button><button class="arcade-choice" data-answer="64">64</button></div>
-          <p class="arcade-preview-feedback" id="arcade-preview-feedback" role="status"><span data-i18n="arcade.previewHint">Tap an answer. Give your brain a little warm-up.</span></p>
-        </div>
-        <div class="arcade-floating">↗ <span data-i18n="arcade.floating">Your friends. The same challenge.</span></div>
-      </div>
-    </section>
-    <div class="arcade-strip"><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↻</span><div><strong><span data-i18n="arcade.strip1">A new reason to play</span></strong><small><span data-i18n="arcade.strip1Sub">Three fresh missions, every day</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">✦</span><div><strong><span data-i18n="arcade.strip2">Make every round count</span></strong><small><span data-i18n="arcade.strip2Sub">Earn XP and collect milestones</span></small></div></div><div class="arcade-strip-item"><span class="arcade-strip-icon" aria-hidden="true">↗</span><div><strong><span data-i18n="arcade.strip3">Pass the challenge on</span></strong><small><span data-i18n="arcade.strip3Sub">Same questions. Your own record.</span></small></div></div></div>
 
     <div class="pv-container">
       <!-- ===== Daily Challenges ===== -->
@@ -647,16 +552,6 @@ A bigger little victory.</h2>
         <div class="arcade-hub-grid"><div class="arcade-missions" id="arcade-missions"></div><aside class="arcade-passport" id="arcade-passport"></aside></div>
         <div class="arcade-resume" id="arcade-resume" hidden></div>
         <button class="arcade-secondary" id="arcade-share" style="margin-top:16px;font-size:.78rem;min-height:40px">↗ <span data-i18n="arcade.share">Share today’s progress</span></button>
-      </section>
-
-      <!-- ===== All Games Grid ===== -->
-      <section class="games-section" id="games">
-        <div class="section-heading">
-          <h2 data-i18n="arcade.gamesTitle">Find your next favorite</h2>
-          <p data-i18n="arcade.gamesSub">Two 3D adventures and ten puzzles. Choose your kind of play.</p>
-        </div>
-        <div class="arcade-filters" role="group" aria-label="Explore games"><button class="arcade-filter" data-filter="all" aria-pressed="true"><span data-i18n="arcade.all">All games</span></button><button class="arcade-filter" data-filter="adventure" aria-pressed="false"><span data-i18n="arcade.adventure">3D adventures</span></button><button class="arcade-filter" data-filter="quick" aria-pressed="false"><span data-i18n="arcade.quick">Quick thinking</span></button><button class="arcade-filter" data-filter="logic" aria-pressed="false"><span data-i18n="arcade.logic">Logic & strategy</span></button><button class="arcade-filter" data-filter="relax" aria-pressed="false"><span data-i18n="arcade.relax">Find your flow</span></button></div>
-        <div class="all-games-grid anim-stagger" id="all-games-grid"><a class="game-card-link" href="/games/mosslight.html?lang=en"><div class="game-card-icon" aria-hidden="true">🌿</div><div class="game-card-body"><div class="game-card-name" data-i18n="games.mosslight.name">Mosslight Wardens</div><div class="game-card-desc" data-i18n="games.mosslight.tagline">Restore the forest and shape your own 3D adventure</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/cloudweft.html?lang=en"><div class="game-card-icon" aria-hidden="true">☁️</div><div class="game-card-body"><div class="game-card-name" data-i18n="games.cloudweft.name">Cloudweft Passage</div><div class="game-card-desc" data-i18n="games.cloudweft.tagline">Switch sun and moon to cross the floating isles</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/numvault.html"><div class="game-card-icon" aria-hidden="true">🔢</div><div class="game-card-body"><div class="game-card-name">NumVault</div><div class="game-card-desc" data-i18n="games.numvault.tagline">Crack the secret number code</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/gridsmash.html"><div class="game-card-icon" aria-hidden="true">🧱</div><div class="game-card-body"><div class="game-card-name">GridSmash</div><div class="game-card-desc" data-i18n="games.gridsmash.tagline">Place blocks, clear lines, chase combos</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/patternpop.html"><div class="game-card-icon" aria-hidden="true">🧠</div><div class="game-card-body"><div class="game-card-name">PatternPop</div><div class="game-card-desc" data-i18n="games.patternpop.tagline">How sharp is your memory?</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/sortstack.html"><div class="game-card-icon" aria-hidden="true">📚</div><div class="game-card-body"><div class="game-card-name">SortStack</div><div class="game-card-desc" data-i18n="games.sortstack.tagline">Sort the colors into stacks</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/quickcalc.html"><div class="game-card-icon" aria-hidden="true">⚡</div><div class="game-card-body"><div class="game-card-name">QuickCalc</div><div class="game-card-desc" data-i18n="games.quickcalc.tagline">Race against time with mental math</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/tileturn.html"><div class="game-card-icon" aria-hidden="true">🔄</div><div class="game-card-body"><div class="game-card-name">TileTurn</div><div class="game-card-desc" data-i18n="games.tileturn.tagline">Flip tiles to light them all</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/colorflow.html"><div class="game-card-icon" aria-hidden="true">🎨</div><div class="game-card-body"><div class="game-card-name">ColorFlow</div><div class="game-card-desc" data-i18n="games.colorflow.tagline">Connect matching colors, fill the grid</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/pipelink.html"><div class="game-card-icon" aria-hidden="true">🔧</div><div class="game-card-body"><div class="game-card-name">PipeLink</div><div class="game-card-desc" data-i18n="games.pipelink.tagline">Route energy through the circuit</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/mergechain.html"><div class="game-card-icon" aria-hidden="true">🔮</div><div class="game-card-body"><div class="game-card-name">MergeChain</div><div class="game-card-desc" data-i18n="games.mergechain.tagline">Drop and merge numbers to 2048</div></div><div class="game-card-play">Play ▸</div></a><a class="game-card-link" href="/games/hexmatch.html"><div class="game-card-icon" aria-hidden="true">⬡</div><div class="game-card-body"><div class="game-card-name">HexMatch</div><div class="game-card-desc" data-i18n="games.hexmatch.tagline">Match hex tiles in chain reactions</div></div><div class="game-card-play">Play ▸</div></a></div>
       </section>
 
       <!-- ===== Ad Slot ===== -->
@@ -703,19 +598,25 @@ A bigger little victory.</h2>
           </div>
         </div>
       </section>
+
+      <!-- ===== Mini Games ===== -->
+      <section class="mini-games" id="games" aria-labelledby="mini-games-title">
+        <h2 id="mini-games-title" data-i18n="landing.miniGames">Mini games</h2>
+        <div class="mini-games-row" id="all-games-grid"><a class="mini-game" href="/games/numvault.html"><span aria-hidden="true">🔢</span><span>NumVault</span></a><a class="mini-game" href="/games/gridsmash.html"><span aria-hidden="true">🧱</span><span>GridSmash</span></a><a class="mini-game" href="/games/patternpop.html"><span aria-hidden="true">🧠</span><span>PatternPop</span></a><a class="mini-game" href="/games/sortstack.html"><span aria-hidden="true">📚</span><span>SortStack</span></a><a class="mini-game" href="/games/quickcalc.html"><span aria-hidden="true">⚡</span><span>QuickCalc</span></a><a class="mini-game" href="/games/tileturn.html"><span aria-hidden="true">🔄</span><span>TileTurn</span></a><a class="mini-game" href="/games/colorflow.html"><span aria-hidden="true">🎨</span><span>ColorFlow</span></a><a class="mini-game" href="/games/pipelink.html"><span aria-hidden="true">🔧</span><span>PipeLink</span></a><a class="mini-game" href="/games/mergechain.html"><span aria-hidden="true">🔮</span><span>MergeChain</span></a><a class="mini-game" href="/games/hexmatch.html"><span aria-hidden="true">⬡</span><span>HexMatch</span></a></div>
+      </section>
     </div>
   </main>
 
   <footer id="pv-footer"><nav class="pv-static-footer"><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a><a href="/blog/">Blog</a><a href="/learn/english/">Learn English</a></nav></footer>
 
-  <script src="/js/blog-data.js?v=19"></script>
-  <script src="/js/i18n.js?v=19"></script>
-  <script src="/js/progression.js?v=19"></script>
-  <script src="/js/common.js?v=19"></script>
-  <script src="/js/share.js?v=19"></script>
-  <script src="/js/arcade.js?v=19"></script>
-  <script src="/js/flagship.js?v=19"></script>
-  <script src="/js/adsense.js?v=19"></script>
+  <script src="/js/blog-data.js?v=20"></script>
+  <script src="/js/i18n.js?v=20"></script>
+  <script src="/js/progression.js?v=20"></script>
+  <script src="/js/common.js?v=20"></script>
+  <script src="/js/share.js?v=20"></script>
+  <script src="/js/arcade.js?v=20"></script>
+  <script src="/js/flagship.js?v=20"></script>
+  <script src="/js/adsense.js?v=20"></script>
   <script>
     /* === Daily Challenge featured games === */
     const DAILY_FEATURED = ['numvault', 'gridsmash', 'colorflow'];
@@ -740,23 +641,17 @@ A bigger little victory.</h2>
         });
       }
 
-      /* --- All Games Grid --- */
+      /* --- Mini games row (the two 3D adventures are featured in the hero) --- */
       const gamesGrid = document.getElementById('all-games-grid');
       if (gamesGrid) {
         gamesGrid.innerHTML = '';
         Object.entries(PV_GAMES).forEach(([id, game]) => {
-          const card = document.createElement('a');
-          card.className = 'game-card-link';
-          card.href = getLocalizedGamePath(game.path);
-          card.innerHTML = `
-            <div class="game-card-icon">${game.emoji}</div>
-            <div class="game-card-body">
-              <div class="game-card-name">${getGameName(id)}</div>
-              <div class="game-card-desc" data-i18n="games.${id}.tagline">${game.tagline}</div>
-            </div>
-            <div class="game-card-play" data-i18n="landing.playBtn">Play ▸</div>
-          `;
-          gamesGrid.appendChild(card);
+          if (id === 'mosslight' || id === 'cloudweft') return;
+          const link = document.createElement('a');
+          link.className = 'mini-game';
+          link.href = getLocalizedGamePath(game.path);
+          link.innerHTML = `<span aria-hidden="true">${game.emoji}</span><span>${getGameName(id)}</span>`;
+          gamesGrid.appendChild(link);
         });
       }
 

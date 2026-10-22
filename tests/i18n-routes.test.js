@@ -48,11 +48,22 @@ test('English article routes keep English while localized article and policy rou
     }
 });
 
-test('shared games and the dynamic home retain saved language preferences', async () => {
-    for (const pathname of ['/games/quickcalc.html', '/quickcalc', '/', '/index.html']) {
+test('shared games retain saved language preferences', async () => {
+    for (const pathname of ['/games/quickcalc.html', '/quickcalc']) {
         const result = await initialize({ pathname, saved: 'ko', browser: 'en-US' });
         assert.equal(result.language, 'ko', pathname);
     }
+});
+
+test('the root home is English regardless of saved or browser language', async () => {
+    for (const pathname of ['/', '/index.html']) {
+        for (const [saved, browser] of [['ko', 'en-US'], [null, 'ko-KR'], ['ja', 'zh-CN']]) {
+            const result = await initialize({ pathname, saved, browser });
+            assert.equal(result.language, 'en', `${pathname} ${saved} ${browser}`);
+        }
+    }
+    const korean = await initialize({ pathname: '/ko/', saved: 'en', browser: 'en-US' });
+    assert.equal(korean.language, 'ko');
 });
 
 test('guide links select a supported game language without overriding static article routes', async () => {

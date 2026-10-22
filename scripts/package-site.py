@@ -37,7 +37,7 @@ def package_site(directory=False):
                 shutil.copyfile(file, destination)
     print(str(target))
     print(str(len(files)) + ' public assets; ' + str(target.stat().st_size) + ' bytes')
-    print('Static upload only. Existing functions/_middleware.js remains in the repository for CLI deployments.')
+    print('Static upload only.')
     if directory:
         print('Static deployment directory: ' + str(output))
 
