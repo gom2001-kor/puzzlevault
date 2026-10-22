@@ -54,7 +54,21 @@ test('flagship discovery stays accessible without JavaScript in every language',
             assert.ok(read('_redirects').includes(`/games/${id}.html`));
         }
         for (const [, key] of html.matchAll(/data-i18n="flagship\.([^"]+)"/g)) assert.ok(strings.flagship[key], `${lang}.${key}`);
-        assert.match(html, /data-filter="adventure"/);
+    }
+});
+
+test('the home hero holds only the two adventures and the puzzles sit in a final mini games row', () => {
+    const puzzles = ['numvault', 'gridsmash', 'patternpop', 'sortstack', 'quickcalc', 'tileturn', 'colorflow', 'pipelink', 'mergechain', 'hexmatch'];
+    for (const file of homes) {
+        const html = read(file).replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
+        const hero = html.slice(html.indexOf('id="adventures"'), html.indexOf('</section>', html.indexOf('id="adventures"')));
+        assert.equal((hero.match(/<article class="flagship-card/g) || []).length, 2, file);
+        for (const removed of ['id="english-learning"', 'class="arcade-hero"', 'class="arcade-strip"', 'data-filter=']) assert.ok(!html.includes(removed), `${file}: ${removed}`);
+        assert.match(html, /href="\/learn\/english\/"/, file);
+        const row = html.slice(html.indexOf('id="all-games-grid"'));
+        assert.ok(html.indexOf('id="games"') > html.indexOf('class="stats-section"'), file);
+        assert.ok(row.indexOf('</main>') > 0 && row.lastIndexOf('<section', row.indexOf('</main>')) === -1, `${file}: mini games is the last section`);
+        assert.deepEqual([...row.slice(0, row.indexOf('</div>')).matchAll(/href="\/games\/([a-z]+)\.html"/g)].map(match => match[1]), puzzles, file);
     }
 });
 

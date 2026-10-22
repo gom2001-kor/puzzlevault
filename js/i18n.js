@@ -20,9 +20,9 @@ const I18n = {
         try { saved = localStorage.getItem('pv_lang'); } catch (_) { /* Browser storage can be disabled. */ }
         const pathname = window.location.pathname;
         const localizedRoute = pathname.match(/^\/(?:blog\/)?(ko|ja|zh|es)(?:\/|$)/);
-        // Static editorial/policy pages have their language in the URL, including English.
-        // Game pages and the dynamic home page continue to use the player's preference.
-        const englishStaticRoute = /^\/(?:about|privacy|contact|terms)(?:\.html|\/)?$/.test(pathname) || /^\/blog\/posts(?:\/|$)/.test(pathname) || /^\/blog(?:\/(?:index|editorial)(?:\.html)?)?\/?$/.test(pathname);
+        // Home, editorial and policy pages have their language in the URL; the root home is English.
+        // Game pages continue to use the player's preference.
+        const englishStaticRoute = /^\/(?:index\.html)?$/.test(pathname) || /^\/(?:about|privacy|contact|terms)(?:\.html|\/)?$/.test(pathname) || /^\/blog\/posts(?:\/|$)/.test(pathname) || /^\/blog(?:\/(?:index|editorial)(?:\.html)?)?\/?$/.test(pathname);
         const routeLanguage = localizedRoute ? localizedRoute[1] : englishStaticRoute ? 'en' : null;
         const requestedGameLanguage = /^\/games\//.test(pathname) ? new URLSearchParams(window.location.search || '').get('lang') : null;
         if (routeLanguage) {
@@ -38,7 +38,7 @@ const I18n = {
             this.currentLang = match ? match.code : 'en';
         }
 
-        // Sync cookie for Cloudflare Pages Functions middleware
+        // Remember the language choice (described in the privacy policy as the pv_lang cookie)
         document.cookie = `pv_lang=${this.currentLang}; path=/; max-age=31536000`;
 
         // 3. Load language file
@@ -51,14 +51,14 @@ const I18n = {
 
     async loadLang(langCode) {
         try {
-            const resp = await fetch('/lang/' + langCode + '.json?v=19');
+            const resp = await fetch('/lang/' + langCode + '.json?v=20');
             if (!resp.ok) throw new Error('Language file not found');
             this.translations = await resp.json();
             this.currentLang = langCode;
         } catch (e) {
             if (langCode !== 'en') {
                 try {
-                    const resp = await fetch('/lang/en.json?v=19');
+                    const resp = await fetch('/lang/en.json?v=20');
                     if (resp.ok) {
                         this.translations = await resp.json();
                         this.currentLang = 'en';
