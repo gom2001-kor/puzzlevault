@@ -32,8 +32,8 @@ test('explicit daily seed exactly matches the shared UTC seed algorithm',()=>{
 
 test('Mosslight seeded islands reproduce encounters without carrying daily upgrades',()=>{
     const a=C.makeRun({seed:4242,mode:'daily'}),b=C.makeRun({seed:4242,mode:'daily'});
-    assert.deepEqual(a.enemies,b.enemies);assert.equal(a.zone,0);assert.deepEqual(a.upgrades,[]);assert.equal(a.player.hp,6);
-    assert.notEqual(C.makeRun({seed:4243}).enemies[0].timer,a.enemies[0].timer);
+    assert.deepEqual(a.enemies,b.enemies);assert.deepEqual(a.spawns,b.spawns);assert.equal(a.zone,0);assert.deepEqual(a.upgrades,[]);assert.equal(a.player.hp,6);
+    assert.notEqual(C.makeRun({seed:4243,zone:1}).enemies[0].timer,C.makeRun({seed:4242,zone:1}).enemies[0].timer);
 });
 test('movement normalizes diagonals and cannot pass through trees or the island edge',()=>{
     const a=C.makeRun(),b=C.makeRun();a.enemies=[];b.enemies=[];
@@ -47,7 +47,7 @@ test('all island seeds, beacons and enemy starts are reachable through the colli
         const s=C.makeRun({zone,upgrades:Array(zone).fill('root')});
         const seen=new Set(),queue=[[0,14]],step=.5;
         while(queue.length){const [x,z]=queue.shift(),key=x+','+z;if(seen.has(key)||!C.canStand(s,x*step,z*step))continue;seen.add(key);for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]])queue.push([x+dx,z+dz]);}
-        for(const point of [...s.seeds,...s.beacons,s.shrine,...s.enemies])assert.ok([...seen].some(k=>{const [x,z]=k.split(',').map(Number);return Math.hypot(x*step-point.x,z*step-point.z)<.8;}),`zone ${zone}: ${point.x},${point.z}`);
+        for(const point of [...s.seeds,...s.beacons,s.shrine,...s.enemies,...s.spawns])assert.ok([...seen].some(k=>{const [x,z]=k.split(',').map(Number);return Math.hypot(x*step-point.x,z*step-point.z)<.8;}),`zone ${zone}: ${point.x},${point.z}`);
     }
 });
 test('gardens (switched on) consume their own charges, heal, strengthen shots and expire',()=>withFeatures(['garden'],()=>{
@@ -58,7 +58,7 @@ test('gardens (switched on) consume their own charges, heal, strengthen shots an
     advance(s,13);assert.equal(s.gardens.length,0);advance(s,4);assert.equal(s.gardenCharges,2);
 }));
 test('enemy attack warns first and dash (switched on) prevents damage during its invulnerable window',()=>withFeatures(['dash'],()=>{
-    const s=C.makeRun();s.player.x=0;s.player.z=0;const e={id:0,x:1,z:0,hp:3,maxHP:3,alive:true,boss:false,phase:'stalk',timer:0,flash:0};s.enemies=[e];
+    const s=C.makeRun({zone:1});s.player.x=0;s.player.z=0;const e={id:0,x:1,z:0,hp:3,maxHP:3,alive:true,boss:false,phase:'stalk',timer:0,flash:0};s.enemies=[e];
     C.tick(s,{},.05);assert.equal(e.phase,'warn');assert.equal(s.player.hp,6);advance(s,.5);assert.equal(s.player.hp,6);
     e.phase='rush';e.timer=.3;e.x=.4;e.aimX=-1;e.aimZ=0;e.hit=false;C.dash(s);C.tick(s,{},.05);assert.equal(s.player.hp,6);
     s.player.invuln=0;s.player.dash=0;e.x=s.player.x+.3;e.z=s.player.z;e.hit=false;C.tick(s,{},.05);assert.equal(s.player.hp,5);
@@ -81,7 +81,7 @@ test('the lantern fires every 0.8 seconds at the nearest creature in range and n
     assert.equal(idle.shots.length,0);assert.equal(idle.enemies[0].hp,20);assert.equal(idle.attackCD,0);
 });
 test('beacons light after 2 seconds inside their ring, leaving resets the timer, and three beacons win',()=>{
-    const s=C.makeRun();s.enemies=[];const [a,b,c]=s.beacons;assert.equal(s.beacons.length,3);
+    const s=C.makeRun({zone:1});s.enemies=[];const [a,b,c]=s.beacons;assert.equal(s.beacons.length,3);
     s.player.x=a.x+1.4;s.player.z=a.z;advance(s,1.5);assert.equal(a.lit,false);
     s.player.x=a.x+1.6;C.tick(s,{},.05);assert.equal(a.charge,0);
     s.player.x=a.x;advance(s,1.9);assert.equal(a.lit,false);advance(s,.15);assert.equal(a.lit,true);assert.equal(s.restored,1);assert.equal(s.phase,'playing');assert.equal(s.event,'beacon');
@@ -113,7 +113,7 @@ test('casters warn then fire three aimed bolts; pausing freezes the volley',()=>
     assert.ok(s.projectiles.some(p=>Math.abs(p.vx)<.01&&p.vz>0));s.phase='paused';const before=JSON.stringify(s);advance(s,4);assert.equal(JSON.stringify(s),before);
 });
 test('brute ground strikes have a visible delay and only damage within the marked circle',()=>{
-    const s=C.makeRun();s.player.x=0;s.player.z=0;const e={id:0,x:1.5,z:0,hp:8,maxHP:8,alive:true,type:'brute',phase:'stalk',timer:0,flash:0};s.enemies=[e];
+    const s=C.makeRun({zone:1});s.player.x=0;s.player.z=0;const e={id:0,x:1.5,z:0,hp:8,maxHP:8,alive:true,type:'brute',phase:'stalk',timer:0,flash:0};s.enemies=[e];
     C.tick(s,{},.05);assert.equal(e.attackType,'slam');assert.equal(s.hazards.length,1);assert.ok(s.hazards[0].delay>1);assert.equal(s.player.hp,6);advance(s,.7);assert.equal(s.player.hp,6);
     s.player.x=-4;advance(s,.7);assert.equal(s.player.hp,6);
     s.hazards=[{x:s.player.x,z:s.player.z,radius:2,delay:0,life:.5,hit:false}];C.tick(s,{},.05);assert.equal(s.player.hp,4.5);advance(s,.3);assert.equal(s.player.hp,4.5);
@@ -134,3 +134,26 @@ test('Wildflare improves Bloom damage and the final guardian changes attack belo
     boss.hp=boss.maxHP/2;boss.phase='stalk';C.tick(s,{},.05);assert.equal(boss.rage,true);assert.equal(boss.phase,'rest');assert.equal(s.event,'rage');
     advance(s,1.75);C.tick(s,{},.05);assert.equal(boss.attackType,'slam');assert.equal(s.hazards.length,2);advance(s,1.1);assert.equal(s.projectiles.length,5);
 }));
+
+// Island 1 onboarding timeline (see the ZONES[0] comment in mosslight-logic.js).
+test('island 1 starts 4 units from the first beacon on a clear path, with no creatures for 5 seconds',()=>{
+    const s=C.makeRun({seed:9}),first=s.beacons[0];
+    assert.ok(Math.abs(C.distance(s.player,first)-4)<1e-9);
+    for(let i=0;i<=40;i++){const x=s.player.x+(first.x-s.player.x)*i/40,z=s.player.z+(first.z-s.player.z)*i/40;assert.ok(C.canStand(s,x,z),`blocked at ${x},${z}`);}
+    assert.equal(s.enemies.length,0);advance(s,4.95);assert.equal(s.enemies.length,0);
+});
+test('island 1 sends one slow two-shot creature at 5 s, then two regular creatures at 20 s',()=>{
+    const s=C.makeRun({seed:9});s.player.x=0;s.player.z=3.4;
+    advance(s,5.05);assert.equal(s.enemies.length,1);const weak=s.enemies[0];assert.equal(weak.hp,2);assert.ok(weak.speed<1);
+    let shots=0,previous=s.attackCD;if(s.attackCD>0)shots++;
+    while(weak.alive&&s.time<12){C.tick(s,{},.05);if(s.attackCD>previous)shots++;previous=s.attackCD;}
+    assert.equal(weak.alive,false);assert.ok(shots>=1&&shots<=2,`${shots} shots`);assert.ok(s.time<8);assert.equal(s.bursts.length,1);assert.equal(s.event,'defeat');
+    advance(s,19.9-s.time);assert.equal(s.enemies.length,1);advance(s,.15);assert.equal(s.enemies.filter(e=>e.alive).length,2);
+    assert.ok(s.enemies.slice(1).every(e=>e.hp===3&&!e.speed));
+});
+test('the first beacon lights at 10 s at the earliest, and no damage lands before it burns',()=>{
+    const s=C.makeRun({seed:9});s.player.x=0;s.player.z=3.4;s.hazards=[{x:0,z:3.4,radius:3,delay:0,life:20,hit:false}];
+    advance(s,9.9);assert.equal(s.beacons[0].lit,false);assert.equal(s.player.hp,6);assert.equal(s.phase,'playing');
+    advance(s,.15);assert.equal(s.beacons[0].lit,true);assert.ok(s.beacons[0].litAt>=10-1e-9&&s.beacons[0].litAt<10.1);assert.equal(s.restored,1);
+    C.tick(s,{},.05);assert.equal(s.player.hp,4.5);
+});

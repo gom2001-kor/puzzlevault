@@ -2,7 +2,13 @@
 (function (root) {
     'use strict';
     const ZONES = [
-        { name: 'glade', ground: '#224d45', accent: '#86efac', obstacles: [[-4, 3, 1.1], [4, 0, 1.2], [-3, -5, 1], [6, -6, 1]], seeds: [[-6, 5], [6, 4], [-6, -2], [5, -4], [0, -7]], enemies: [[-5, 2], [5, 2], [-5, -4], [4, -6], [0, -5]] },
+        // Island 1 onboarding timeline, in seconds from the start of the run: no creatures until 5 s, a slow two-shot
+        // creature on the path at 5 s, the first beacon wakes at 8 s (so it lights at 10 s at the earliest), two
+        // regular creatures at 20 s and two more at 40 s. Until the first beacon burns the player takes no damage,
+        // status messages stay quiet for 30 s, and fog covers the island except around lit beacons.
+        { name: 'glade', ground: '#224d45', accent: '#86efac', obstacles: [[-4, 3, 1.1], [4, 0, 1.2], [-3, -5, 1], [6, -6, 1]], seeds: [[-6, 5], [6, 4], [-6, -2], [5, -4], [0, -7]],
+            start: [0, 7.4], beacons: [[0, 3.4], [-7.2, .5], [2, -6]], wake: [8, 0, 0], fog: true, grace: true, quiet: 30, hint: true,
+            enemies: [[0, -2.6, { spawn: 5, type: 'stalker', hp: 2, speed: .5, timer: 99 }], [-5, -4, { spawn: 20, type: 'stalker' }], [5, -3, { spawn: 20, type: 'caster' }], [-6, 3, { spawn: 40, type: 'brute' }], [4, -6, { spawn: 40, type: 'stalker' }]] },
         { name: 'terrace', ground: '#253c59', accent: '#93c5fd', obstacles: [[-3, 4, 1.3], [3, 0, 1.1], [-4, -3, 1.1], [5, -6, 1.2]], seeds: [[-6, 6], [6, 5], [-6, -5], [6, -2], [0, -7]], enemies: [[-6, 2], [5, 3], [-6, -2], [5, -4], [-2, -7], [2, -7]] },
         { name: 'heart', ground: '#433953', accent: '#c4b5fd', obstacles: [[-4, 4, 1.2], [4, 4, 1.2], [-6, -3, 1.1], [6, -3, 1.1]], seeds: [[-6, 6], [6, 6], [-7, -1], [7, -1], [0, -7]], enemies: [[-5, 1], [5, 1], [-4, -6], [4, -6], [0, -5, true]] }
     ];
@@ -40,11 +46,14 @@
     function loadZone(s) {
         const random = rng(s.seed + s.zone * 991), spec = ZONES[s.zone];
         s.maxHP = 6 + s.upgrades.filter(x => x === 'root').length * 2;
-        s.player = { x: 0, z: 7.4, hp: s.maxHP, facingX: 0, facingZ: -1, invuln: 0, dash: 0 };
-        s.attackCD = 0; s.dashCD = 0; s.gardenCD = 0; s.gardenCharges = 2; s.gardenRegen = 0; s.gardens = []; s.collected = 0; s.restored = 0; s.beacons = BEACONS.map(([x,z], i) => ({ x, z, id: i, lit: false, charge: 0 })); s.seeds = spec.seeds.map(([x,z], i) => ({ x, z, id: i, taken: false }));
-        s.energy=25; s.bloom=0; s.shots=[]; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
+        const [startX, startZ] = spec.start || [0, 7.4];
+        s.time = 0; s.player = { x: startX, z: startZ, hp: s.maxHP, facingX: 0, facingZ: -1, invuln: 0, dash: 0 };
+        s.attackCD = 0; s.dashCD = 0; s.gardenCD = 0; s.gardenCharges = 2; s.gardenRegen = 0; s.gardens = []; s.collected = 0; s.restored = 0; s.beacons = (spec.beacons || BEACONS).map(([x,z], i) => ({ x, z, id: i, lit: false, charge: 0, wake: (spec.wake || [])[i] || 0, litAt: -1 })); s.seeds = spec.seeds.map(([x,z], i) => ({ x, z, id: i, taken: false }));
+        s.energy=25; s.bloom=0; s.shots=[]; s.bursts=[]; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
         s.shrine={x:-7,z:-6,used:false};
-        s.enemies = spec.enemies.map(([x,z,boss],i) => {const type=boss?'boss':['stalker','caster','brute'][i%3],hp=boss?26:type==='brute'?5+s.zone:3+s.zone;return {id:i,x,z,type,boss:!!boss,hp,maxHP:hp,phase:'stalk',timer:1+random(),aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0};});
+        // An enemy entry is [x, z, boss] or [x, z, { spawn, type, hp, speed, timer }]; spawn > 0 holds it back until that second.
+        const all = spec.enemies.map(([x,z,extra],i) => {const o=extra&&typeof extra==='object'?extra:{boss:!!extra},type=o.boss?'boss':o.type||['stalker','caster','brute'][i%3],hp=o.hp||(o.boss?26:type==='brute'?5+s.zone:3+s.zone);return {id:i,x,z,type,boss:!!o.boss,hp,maxHP:hp,phase:'stalk',timer:o.timer??1+random(),speed:o.speed||0,spawn:o.spawn||0,aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0};});
+        s.enemies = all.filter(e => !e.spawn); s.spawns = all.filter(e => e.spawn).sort((a,b) => a.spawn-b.spawn);
         s.phase = 'playing'; event(s, 'enter');
     }
     function event(s, name) { s.event = name; s.eventId++; }
@@ -59,7 +68,7 @@
     function inGarden(s) { return s.gardens.some(g => g.life > 0 && distance(g,s.player) < g.radius); }
     function strike(s,e,power) {
         e.hp=Math.max(0,e.hp-power);e.flash=.2;
-        if(e.hp===0&&e.alive){e.alive=false;s.kills++;s.zoneKills++;s.score+=e.boss?600:90+s.zone*30;s.energy=clamp(s.energy+12,0,100);}
+        if(e.hp===0&&e.alive){e.alive=false;s.bursts.push({x:e.x,z:e.z,life:.6});event(s,'defeat');s.kills++;s.zoneKills++;s.score+=e.boss?600:90+s.zone*30;s.energy=clamp(s.energy+12,0,100);}
     }
     // Fires automatically from tick(): one light shot at the nearest creature in range.
     function attack(s) {
@@ -95,7 +104,7 @@
     // Beacons light themselves after config.beaconTime inside their ring; the run is won when all three burn.
     function lightBeacon(s,b) {
         if(b.lit)return false;
-        b.lit=true;b.charge=config.beaconTime;s.restored++;s.score+=500;
+        b.lit=true;b.charge=config.beaconTime;b.litAt=s.time;s.restored++;s.score+=500;
         if(s.beacons.every(x=>x.lit)){s.phase='won';event(s,'won');}else event(s,'beacon');
         return true;
     }
@@ -109,14 +118,16 @@
         if (s.phase !== 'upgrade' || !['root','pulse','wind'].includes(upgrade) || (upgrade === 'wind' && s.upgrades.includes('wind'))) return false;
         s.upgrades.push(upgrade); s.zone++; loadZone(s); return true;
     }
-    function hurt(s,amount){if(s.player.invuln>0)return false;s.player.hp-=amount;s.player.invuln=1.1;event(s,'hurt');return true;}
+    function hurt(s,amount){if(s.player.invuln>0||(ZONES[s.zone].grace&&!s.beacons.some(b=>b.lit)))return false;s.player.hp-=amount;s.player.invuln=1.1;event(s,'hurt');return true;}
     function volley(s,e,count=1){
         const base=Math.atan2(e.aimZ,e.aimX);
         for(let i=0;i<count;i++){const a=base+(i-(count-1)/2)*.23;s.projectiles.push({x:e.x,z:e.z,vx:Math.cos(a)*4.8,vz:Math.sin(a)*4.8,life:4.2,boss:e.boss});}
     }
     function tick(s,input={},dt=0){
         if(s.phase!=='playing'||!Number.isFinite(dt)||dt<=0)return;
-        dt=Math.min(dt,.05);s.elapsed+=dt;
+        dt=Math.min(dt,.05);s.elapsed+=dt;s.time+=dt;
+        while(s.spawns.length&&s.spawns[0].spawn<=s.time+1e-9)s.enemies.push(s.spawns.shift());
+        s.bursts=s.bursts.filter(b=>(b.life-=dt)>0);
         for(const key of ['attackCD','dashCD','gardenCD','bloom'])s[key]=Math.max(0,s[key]-dt);
         s.player.invuln=Math.max(0,s.player.invuln-dt);
         if(config.features.garden){const regen=s.boon==='renewal'?12:18;s.gardenRegen+=dt;if(s.gardenRegen>=regen){s.gardenRegen-=regen;s.gardenCharges=Math.min(3,s.gardenCharges+1);}}
@@ -127,7 +138,7 @@
         if(s.player.dash>0){s.player.dash=Math.max(0,s.player.dash-dt);move(s,s.player,s.player.facingX*11*dt,s.player.facingZ*11*dt);}
         else move(s,s.player,x*3.8*dt,z*3.8*dt);
         for(const seed of s.seeds)if(!seed.taken&&distance(seed,s.player)<.85){seed.taken=true;s.collected++;s.score+=45;s.energy=clamp(s.energy+8,0,100);event(s,'seed');}
-        for(const b of s.beacons){if(b.lit)continue;b.charge=distance(b,s.player)<=config.beaconRadius?b.charge+dt:0;if(b.charge>=config.beaconTime-1e-9)lightBeacon(s,b);}
+        for(const b of s.beacons){if(b.lit)continue;b.charge=s.time>b.wake&&distance(b,s.player)<=config.beaconRadius?b.charge+Math.min(dt,s.time-b.wake):0;if(b.charge>=config.beaconTime-1e-9)lightBeacon(s,b);}
         if(s.phase!=='playing')return;
         attack(s);
         s.shots=s.shots.filter(shot=>{shot.life-=dt;shot.x+=shot.vx*dt;shot.z+=shot.vz*dt;const e=s.enemies.find(e=>e.alive&&distance(e,shot)<(e.boss?.95:.6));if(e){strike(s,e,shot.power);s.energy=clamp(s.energy+10,0,100);return false;}return shot.life>0;});
@@ -137,7 +148,8 @@
             if(e.boss&&!e.rage&&e.hp<=e.maxHP/2){e.rage=true;e.phase='rest';e.timer=1.4;event(s,'rage');}
             if(e.phase==='stalk'){
                 const reach=type==='caster'?6.7:type==='brute'?3.6:4.3;
-                if(d<10&&d>(type==='caster'?5:1.65))move(s,e,dx*dt*(e.boss?.95:type==='brute'?.85:1.35),dz*dt*(e.boss?.95:type==='brute'?.85:1.35));
+                const pace=e.speed||(e.boss?.95:type==='brute'?.85:1.35);
+                if(d<10&&d>(type==='caster'?5:1.65))move(s,e,dx*dt*pace,dz*dt*pace);
                 if(type==='caster'&&d<3.2)move(s,e,-dx*dt*1.1,-dz*dt*1.1);
                 if(e.timer<=0&&d<reach){
                     e.phase='warn';e.timer=e.boss?1.05:type==='brute'?1.15:.85;e.aimX=dx;e.aimZ=dz;e.hit=false;
@@ -200,38 +212,57 @@
         es:{intro:'Muévete. Enciende los faros. Sobrevive.',objective:'Enciende 3 faros · quédate 2 segundos en su círculo',beaconLit:'Faro encendido.',hurt:'Apártate cuando una criatura se vuelva ámbar.',won:'La isla despierta.',wonText:'Los tres faros de esta isla vuelven a brillar.',unlocked:'Ya puedes elegir las islas 2 y 3 en la pantalla de inicio.',lostText:'La expedición terminó. Tu farol dispara solo a la criatura más cercana. Sigue moviéndote y esquiva el ámbar.'}
     };
     for(const code of Object.keys(SURVIVOR))Object.assign(TEXT[code],SURVIVOR[code]);
-    let state=null,renderer=null,last=0,frame=0,seenEvent=0,seenPhase='',overlayKind='start',soundEnabled=true,camera=[0,11.8,17],lastHud=0,adPending=false,contextLost=false,lastEnvironment=-1;
+    // Island 1 onboarding copy. The movement hint lives only in moveHintKeys / moveHintTouch, so a later joystick swaps text here.
+    const ONBOARDING={
+        en:{start:'Start',beaconsHud:'Beacons',moveHintKeys:'Move with WASD / arrow keys',moveHintTouch:'Use the arrows to move'},
+        ko:{start:'시작',beaconsHud:'봉화',moveHintKeys:'WASD / 방향키로 이동',moveHintTouch:'방향 버튼으로 이동'},
+        ja:{start:'スタート',beaconsHud:'灯台',moveHintKeys:'WASD / 矢印キーで移動',moveHintTouch:'方向ボタンで移動'},
+        zh:{start:'开始',beaconsHud:'灯塔',moveHintKeys:'WASD / 方向键移动',moveHintTouch:'用方向按钮移动'},
+        es:{start:'Empezar',beaconsHud:'Faros',moveHintKeys:'Muévete con WASD / flechas',moveHintTouch:'Usa las flechas para moverte'}
+    };
+    for(const code of Object.keys(ONBOARDING))Object.assign(TEXT[code],ONBOARDING[code]);
+    let state=null,renderer=null,last=0,frame=0,selectedIsland=0,hintTimer=0,seenEvent=0,seenPhase='',overlayKind='start',soundEnabled=true,camera=[0,11.8,17],lastHud=0,adPending=false,contextLost=false,lastEnvironment=-1;
     const keys=new Set(),held=new Set(),$=id=>document.getElementById(id),lang=()=>typeof I18n!=='undefined'&&TEXT[I18n.currentLang]?I18n.currentLang:'en',t=key=>TEXT[lang()][key]||TEXT.en[key]||key;
     const storage={get(k,fallback=null){try{const v=localStorage.getItem('pv_mosslight_'+k);return v===null?fallback:JSON.parse(v);}catch(_){return fallback;}},set(k,v){try{localStorage.setItem('pv_mosslight_'+k,JSON.stringify(v));}catch(_){}},remove(k){try{localStorage.removeItem('pv_mosslight_'+k);}catch(_){}}};
     const clock=n=>`${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`;
     const sfx=name=>{if(soundEnabled&&typeof SFX!=='undefined')try{SFX.play(name);}catch(_){};};
     const makeId=()=>root.crypto&&typeof root.crypto.randomUUID==='function'?root.crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
-    function saved(){return validCheckpoint(storage.get('checkpoint'));}
-    // Islands 2 and 3 open after the first island is won; Daily always uses island 1.
+    // Islands 2 and 3 open after the first island is won; Daily always uses island 1. Runs have no mid-run save:
+    // the start screen preselects the island opened last instead.
     function unlockedIslands(){return clamp(Math.floor(Number(storage.get('unlocked',1))||1),1,3);}
+    function lastIsland(){return clamp(Math.floor(Number(storage.get('lastIsland',0))||0),0,unlockedIslands()-1);}
     function start(mode='story',resume=false,courseDate=null,zone=0){
         if(!renderer||adPending||contextLost)return;
-        const date=mode==='daily'&&validDailyDate(courseDate)?courseDate:new Date().toISOString().slice(0,10),cp=resume&&mode==='story'?saved():null;
+        const date=mode==='daily'&&validDailyDate(courseDate)?courseDate:new Date().toISOString().slice(0,10);
         const seed=mode==='daily'?dailySeedForDate(date):(Date.now()>>>0)||1,island=mode==='daily'||zone>=unlockedIslands()?0:zone;
-        state=makeRun(cp?{...cp,roundId:makeId()}:{seed,mode,date,zone:island,roundId:makeId()});
-        seenEvent=0;seenPhase='';clearInput();camera=[0,11.8,17];hideOverlay();$('ml-canvas').focus({preventScroll:true});saveCheckpoint();updateHUD(true);sfx('tap');if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
+        state=makeRun({seed,mode,date,zone:island,roundId:makeId()});if(mode==='story')storage.set('lastIsland',island);
+        seenEvent=0;seenPhase='';clearInput();camera=[state.player.x*.78,11.8,state.player.z*.78+12.5];hideOverlay();$('ml-canvas').focus({preventScroll:true});updateHUD(true);sfx('tap');showMoveHint();if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
     }
-    function saveCheckpoint(){if(state&&state.mode==='story'&&state.phase==='playing')storage.set('checkpoint',checkpoint(state));}
+    // The only text in the first 30 seconds of island 1: a 2-second movement hint that fades in and out.
+    function showMoveHint(){
+        const hint=$('ml-hint');clearTimeout(hintTimer);hint.hidden=true;if(ZONES[state.zone].quiet)$('ml-status').textContent='';
+        if(!ZONES[state.zone].hint)return;
+        hint.textContent=t(matchMedia('(pointer: coarse)').matches?'moveHintTouch':'moveHintKeys');void hint.offsetWidth;hint.hidden=false;hintTimer=setTimeout(()=>{hint.hidden=true;},2000);
+    }
     function clearInput(){keys.clear();held.clear();document.querySelectorAll('[data-dir]').forEach(b=>b.classList.remove('pressed'));}
     function pause(){if(!state||!['playing','paused'].includes(state.phase)||(state.phase==='paused'&&contextLost))return;clearInput();state.phase=state.phase==='playing'?'paused':'playing';if(state.phase==='paused')showOverlay('pause');else hideOverlay();updateHUD(true);}
     function hideOverlay(){$('ml-overlay').hidden=true;overlayKind='';}
-    function showOverlay(kind){overlayKind=kind;clearInput();$('ml-overlay').hidden=false;renderOverlay();}
+    function showOverlay(kind){overlayKind=kind;if(kind==='start')selectedIsland=lastIsland();clearInput();$('ml-overlay').hidden=false;renderOverlay();}
     function button(label,fn,className=''){const b=document.createElement('button');b.type='button';b.textContent=label;b.className='ml-button '+className;b.addEventListener('click',fn);return b;}
     function renderOverlay(){
         const box=$('ml-overlay-content');box.replaceChildren();
         const title=document.createElement('h2'),p=document.createElement('p'),actions=document.createElement('div');actions.className='ml-overlay-actions';
         if(overlayKind==='start'){
             title.textContent='Mosslight Wardens';p.textContent=t('intro');const requested=dailyRequest(root.location.search);
-            if(requested.daily){actions.append(button(`${t('sharedDaily')} · ${requested.date} UTC`,()=>start('daily',false,requested.date),'ml-primary'),button(t('start'),()=>start('story')));}
-            else actions.append(button(t('start'),()=>start('story'),'ml-primary'));
-            for(let zone=1;zone<3;zone++){const open=unlockedIslands()>zone,b=button(`${open?'':'🔒 '}${t('zone')} ${zone+1} · ${t(ZONES[zone].name)}`,()=>start('story',false,null,zone));b.disabled=!open;actions.append(b);}
-            actions.append(button(t('todayDaily'),()=>start('daily')));if(saved())actions.append(button(t('resume'),()=>start('story',true)));
-            const note=document.createElement('small');note.textContent=t('dailyNote')+' '+t('checkpoint');actions.append(note);
+            // A shared daily link always opens that day's course; players who have not won island 1 see one Start button.
+            if(requested.daily)actions.append(button(requested.date===new Date().toISOString().slice(0,10)?t('todayDaily'):`${t('sharedDaily')} · ${requested.date} UTC`,()=>start('daily',false,requested.date),'ml-primary'));
+            else if(unlockedIslands()<2)actions.append(button(t('start'),()=>start('story'),'ml-primary'));
+            else{
+                const cards=document.createElement('div');cards.className='ml-islands';cards.setAttribute('role','group');
+                for(let zone=0;zone<3;zone++){const card=button(`${t('zone')} ${zone+1} · ${t(ZONES[zone].name)}`,()=>{selectedIsland=zone;cards.querySelectorAll('.ml-island').forEach((other,i)=>other.setAttribute('aria-pressed',String(i===zone)));},'ml-island');card.setAttribute('aria-pressed',String(zone===selectedIsland));cards.append(card);}
+                const note=document.createElement('small');note.textContent=t('dailyNote');
+                actions.append(cards,button(t('start'),()=>start('story',false,null,selectedIsland),'ml-primary'),button(t('todayDaily'),()=>start('daily')),note);
+            }
         }else if(overlayKind==='pause'){
             title.textContent=t('paused');p.textContent=t('pausedText');actions.append(button(t('resumePlay'),pause,'ml-primary'),button(t('back'),()=>{state=null;showOverlay('start');updateHUD(true);}));
         }else if(overlayKind==='shrine'){
@@ -240,7 +271,7 @@
         }else if(overlayKind==='upgrade'){
             title.textContent=t('upgrade');p.textContent=t('upgradeText');
             for(const [id,label,desc] of [['root','root','rootDesc'],['pulse','pulseUpgrade','pulseDesc'],['wind','wind','windDesc']]){
-                const b=button('',()=>{if(!chooseUpgrade(state,id))return;saveCheckpoint();hideOverlay();updateHUD(true);sfx('clear');});const strong=document.createElement('strong'),small=document.createElement('span');strong.textContent=t(label);small.textContent=t(desc);b.append(strong,small);if(id==='wind'&&state.upgrades.includes('wind')){b.disabled=true;strong.textContent+=' ✓';}actions.append(b);
+                const b=button('',()=>{if(!chooseUpgrade(state,id))return;hideOverlay();updateHUD(true);sfx('clear');});const strong=document.createElement('strong'),small=document.createElement('span');strong.textContent=t(label);small.textContent=t(desc);b.append(strong,small);if(id==='wind'&&state.upgrades.includes('wind')){b.disabled=true;strong.textContent+=' ✓';}actions.append(b);
             }
         }else{
             const won=state&&state.phase==='won';title.textContent=t(won?'won':'lost');p.textContent=t(won?'wonText':'lostText')+(won&&state.zone===0?' '+t('unlocked'):'');
@@ -274,6 +305,7 @@
         if(terrainCache.has(zone))return terrainCache.get(zone);
         const a=[],spec=ZONES[zone],random=rng(812+zone*56),greens=[['#4c7651','#6f9558','#87a96b'],['#3f776f','#60938a','#80b19b'],['#49635e','#668377','#8b9d78']][zone];
         a.push(obj('bevelbox',0,-.55,0,19,1.1,19,greens[0]),obj('bevelbox',0,-1.5,0,17.8,1.2,17.8,'#354e45'),obj('bevelbox',0,-2.3,0,14.6,1.1,14.6,'#293b37'));
+        for(const slab of a)slab.ground=true;
         // Individually shaped rock shelves and moss pillows soften the island silhouette.
         for(let i=0;i<32;i++){const side=i%4,n=Math.floor(i/4),v=-8.4+n*2.4,x=side<2?(side===0?-9:9):v,z=side<2?v:(side===2?-9:9);a.push(obj('sphere',x,-.68-random()*.6,z,2.3+random(),1.6,2.5, i%3?'#526753':'#748866',random()*3));if(i%3===0)a.push(obj('sphere',x*.96,-.08,z*.96,1.8,.35,1.7,greens[1]));}
         for(let i=0;i<13;i++){const z=7.7-i*1.35,x=Math.sin(i*.75)*.55;a.push(obj('sphere',x,.024,z,1.4,.08,1.15,'#9d9c7c',i*.3),obj('bevelbox',x+.27,.04,z-.12,.6,.055,.48,'#b0ad8b',i*.21));}
@@ -295,16 +327,39 @@
         }
         // Distant islands make a complete forest world rather than an isolated game board.
         for(const [x,z,scale]of[[-17,-13,1],[16,-18,1.4],[-21,7,.8],[21,4,.8]]){a.push(obj('sphere',x,-2.3,z,8*scale,3*scale,7*scale,'#294c43'));for(let j=0;j<3;j++)a.push(obj('sphere',x+(j-1)*1.8*scale,.1*scale,z,3.2*scale,3.5*scale,3*scale,'#3d6e59'));}
+        // Low mist puffs for fogged islands; each fades out inside a lit beacon's clearing.
+        if(spec.fog)for(let i=0;i<34;i++)a.push({...obj('sphere',(random()-.5)*17,.55+random()*.5,(random()-.5)*17,2.6+random()*1.6,.65,2.4+random()*1.4,'#c7d2c9',random()*3,.16),mist:true,castShadow:false});
         terrainCache.set(zone,a);return a;
     }
+    const FOG='#3d4a44',fogged=new Map();
+    // Mixes a colour toward the fog in 16 steps so the renderer's colour cache stays small.
+    function fogColor(color,amount){
+        const step=Math.round(clamp(amount,0,1)*16);if(!step||!/^#[0-9a-f]{6}$/i.test(color))return color;const key=color+step;
+        if(!fogged.has(key)){const [from,to]=[color,FOG].map(c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16))),f=step/16*.62;fogged.set(key,'#'+from.map((v,i)=>Math.round(v+(to[i]-v)*f).toString(16).padStart(2,'0')).join(''));}
+        return fogged.get(key);
+    }
     function scene(s,time){
-        const spec=ZONES[s.zone],p=s.player,objects=terrain(s.zone).map(o=>o.treeZ>p.z-1&&Math.hypot(o.treeX-p.x,o.treeZ-p.z)<3?{...o,opacity:.28}:o);
+        const spec=ZONES[s.zone],p=s.player;
+        // Fog islands are dimmed everywhere except within 8 of a lit beacon; each clearing fades in over 1 second.
+        const clearings=spec.fog?s.beacons.filter(b=>b.lit).map(b=>({x:b.x,z:b.z,t:clamp(s.time-b.litAt,0,1)})):[];
+        const fogAt=(x,z)=>{if(!spec.fog)return 0;let clear=0;for(const c of clearings)if(Math.hypot(x-c.x,z-c.z)<8)clear=Math.max(clear,c.t);return 1-clear;};
+        const objects=terrain(s.zone).map(o=>{
+            const faded=o.treeZ>p.z-1&&Math.hypot(o.treeX-p.x,o.treeZ-p.z)<3;
+            if(!spec.fog)return faded?{...o,opacity:.28}:o;
+            const f=o.ground?1:fogAt(o.x,o.z);
+            return o.mist?{...o,opacity:o.opacity*f}:{...o,color:fogColor(o.color,f),opacity:faded?.28:o.opacity};
+        }).filter(o=>!o.mist||o.opacity>.01);
+        for(const c of clearings)objects.push(obj('disk',c.x,.012,c.z,16,1,16,'#86c66f',0,.42*c.t,.15));
         const glow=(shape,x,y,z,sx,sy,sz,color,ry=0,opacity=1)=>({...obj(shape,x,y,z,sx,sy,sz,color,ry,opacity,.7),castShadow:false});
         const shadow=(x,z,r)=>objects.push(obj('disk',x,.022,z,r,1,r,'#102f2a',0,.15));
+        // The next unlit beacon pulses softly to say "go here"; beacons still under fog are dimmed.
+        const target=s.beacons.find(b=>!b.lit);
         for(const b of s.beacons){
-            shadow(b.x,b.z,2.5);objects.push(obj('cylinder',b.x,.12,b.z,2.3,.23,2.3,'#9a9d7b'),obj('cylinder',b.x,.33,b.z,1.6,.23,1.6,'#657c67'),obj('bevelbox',b.x,.82,b.z,.62,.96,.62,'#dbcb96',Math.PI/4));
-            for(let i=0;i<4;i++){const a=i*Math.PI/2;objects.push(obj('bevelbox',b.x+Math.cos(a)*.56,.8,b.z+Math.sin(a)*.56,.2,1,.2,'#8c9c77',a));}
-            objects.push(glow('sphere',b.x,1.68+Math.sin(time)*.05,b.z,.53,.75,.53,b.lit?'#fff1af':spec.accent),obj('torus',b.x,1.68,b.z,1.1,.12,1.1,'#d8b45b',time*.3));ring(objects,b.x,b.z,config.beaconRadius,b.lit?'#fde68a':'#86a186',.035,.8);
+            const f=b.lit?0:fogAt(b.x,b.z),c=color=>fogColor(color,f),guide=b===target,blink=guide?.5+.5*Math.sin(time*3.2):0,size=1+blink*.22;
+            shadow(b.x,b.z,2.5);objects.push(obj('cylinder',b.x,.12,b.z,2.3,.23,2.3,c('#9a9d7b')),obj('cylinder',b.x,.33,b.z,1.6,.23,1.6,c('#657c67')),obj('bevelbox',b.x,.82,b.z,.62,.96,.62,c('#dbcb96'),Math.PI/4));
+            for(let i=0;i<4;i++){const a=i*Math.PI/2;objects.push(obj('bevelbox',b.x+Math.cos(a)*.56,.8,b.z+Math.sin(a)*.56,.2,1,.2,c('#8c9c77'),a));}
+            objects.push(glow('sphere',b.x,1.68+Math.sin(time)*.05,b.z,.53*size,.75*size,.53*size,b.lit?'#fff1af':guide?spec.accent:c(spec.accent),0,b.lit?1:guide?.55+.45*blink:.6),obj('torus',b.x,1.68,b.z,1.1,.12,1.1,c('#d8b45b'),time*.3));
+            ring(objects,b.x,b.z,config.beaconRadius,b.lit?'#fde68a':guide&&s.time>=b.wake?'#d9f99d':c('#86a186'),.035,.8);
             if(!b.lit&&b.charge>0)ring(objects,b.x,b.z,config.beaconRadius*b.charge/config.beaconTime,'#fde68a',.06,.9);
         }
         const shrine=s.shrine;if(config.features.attune){shadow(shrine.x,shrine.z,1.8);objects.push(obj('cylinder',shrine.x,.19,shrine.z,1.4,.4,1.4,'#767966'),obj('torus',shrine.x,.44,shrine.z,1.2,.12,1.2,'#b59b60'));
@@ -313,6 +368,7 @@
         for(const seed of s.seeds)if(!seed.taken){const y=.7+Math.sin(time*2+seed.id)*.13;shadow(seed.x,seed.z,.6);objects.push(glow('sphere',seed.x,y,seed.z,.32,.48,.32,'#ffe49a'),obj('sphere',seed.x-.15,y+.22,seed.z,.28,.12,.15,'#86efac',-.4),obj('torus',seed.x,.1,seed.z,.65,.035,.65,'#d3c47c'));}
         for(const g of s.gardens){objects.push(obj('disk',g.x,.03,g.z,g.radius*2,1,g.radius*2,'#86efac',0,.13,.3));ring(objects,g.x,g.z,g.radius,g.life>3?'#b5efb5':'#fde68a',.07,.8);for(let i=0;i<9;i++){const a=i*Math.PI*2/9,x=g.x+Math.cos(a)*1.65,z=g.z+Math.sin(a)*1.65;objects.push(obj('sphere',x,.13,z,.44,.17,.35,'#659b67'),glow('sphere',x,.34+Math.sin(time*2+i)*.05,z,.15,.16,.15,'#e9f5b4'));}}
         for(const h of s.hazards){const warning=h.delay>0;objects.push(obj('disk',h.x,.055,h.z,h.radius*2,1,h.radius*2,warning?'#fbbf24':'#f43f5e',0,warning?.12:.4,.5));ring(objects,h.x,h.z,h.radius,warning?'#fbbf24':'#fb7185',.08);if(warning)ring(objects,h.x,h.z,h.radius*clamp(1-h.delay/1.2,.1,1),'#fde68a',.085,.6);}
+        for(const burst of s.bursts){const age=1-burst.life/.6,size=.04+.2*(1-age);for(let i=0;i<8;i++){const a=i*Math.PI/4,r=.3+age*1.3;objects.push(glow('sphere',burst.x+Math.cos(a)*r,.6+age*.5,burst.z+Math.sin(a)*r,size,size,size,'#e9f5b4',0,1-age));}}
         for(const shot of s.shots){objects.push(glow('sphere',shot.x,.7,shot.z,.3,.3,.3,'#fff3b0'));objects.push(glow('sphere',shot.x-shot.vx*.03,.7,shot.z-shot.vz*.03,.2,.2,.2,'#d8f5cf',0,.6));}
         for(const bolt of s.projectiles){objects.push(glow('sphere',bolt.x,.64,bolt.z,.28,.28,.28,'#e9bcff'));objects.push(glow('sphere',bolt.x-bolt.vx*.035,.64,bolt.z-bolt.vz*.035,.18,.18,.18,'#c4b5fd',0,.6));}
         for(const e of s.enemies){
@@ -346,7 +402,7 @@
         if(state&&state.phase==='playing'){
             const west=keys.has('a')||keys.has('arrowleft')||held.has('west'),east=keys.has('d')||keys.has('arrowright')||held.has('east'),north=keys.has('w')||keys.has('arrowup')||held.has('north'),south=keys.has('s')||keys.has('arrowdown')||held.has('south');
             tick(state,{x:Number(east)-Number(west),z:Number(south)-Number(north)},dt);
-            if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',beacon:'beaconLit',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',bloom:'bloomEvent',rage:'rage',shrineLocked:'shrineLocked',blessing:'blessing'}[state.event];if(eventKey)$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='beacon')sfx('clear');else if(state.event==='hurt')sfx('wrong');else if(state.event==='pulse'||state.event==='charged')sfx('tap');else if(state.event==='garden')sfx('hint');else if(state.event==='bloom')sfx('combo');}
+            if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',beacon:'beaconLit',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',bloom:'bloomEvent',rage:'rage',shrineLocked:'shrineLocked',blessing:'blessing'}[state.event];if(eventKey&&state.time>=(ZONES[state.zone].quiet||0))$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='beacon')sfx('clear');else if(state.event==='defeat')sfx('combo');else if(state.event==='hurt')sfx('wrong');else if(state.event==='pulse'||state.event==='charged')sfx('tap');else if(state.event==='garden')sfx('hint');else if(state.event==='bloom')sfx('combo');}
         }
         if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='shrine'){sfx('hint');showOverlay('shrine');}else if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(['won','lost'].includes(state.phase))finish();}
         if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const target=[p.x*.78,0,p.z*.78];camera[0]+=(target[0]-camera[0])*smoothing;camera[1]=11.8;camera[2]+=(target[2]+12.5-camera[2])*smoothing;renderer.render(scene(active,reduced?0:now/1000),{eye:camera,target:[camera[0],.25,camera[2]-13.5],fov:49});}

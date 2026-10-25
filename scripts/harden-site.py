@@ -29,7 +29,7 @@ def harden(include_games=True):
             return '' if any(term in script for term in ('pagead2.googlesyndication.com','googletagmanager.com/gtag','gtag(\'config\'','clarity.ms/tag/')) else script
         source = re.sub(r'<script\b[^>]*>[\s\S]*?</script>', strip_tracking, source)
         if '/js/privacy-controls.js' not in source:
-            source = source.replace('</head>', '    <link rel="stylesheet" href="/css/site-quality.css?v=21">\n    <script defer src="/js/privacy-controls.js?v=21"></script>\n</head>')
+            source = source.replace('</head>', '    <link rel="stylesheet" href="/css/site-quality.css?v=22">\n    <script defer src="/js/privacy-controls.js?v=22"></script>\n</head>')
         nav = f'<header id="pv-header"><nav class="pv-static-nav" aria-label="{html.escape(common["home"])}"><a href="{base}">🧩 PuzzleVault</a><a href="{base}#games">{common["games"]}</a><a href="{blog}">{common["blog"]}</a><a href="{base}about.html">{common["about"]}</a></nav></header>'
         source = re.sub(r'<header\b[^>]*id="pv-header"[^>]*>[\s\S]*?</header>', lambda _: nav, source)
         links = ''.join(f'<a href="{base}{name}.html">{common[name]}</a>' for name in ('about','privacy','terms','contact'))
@@ -47,7 +47,7 @@ def harden(include_games=True):
         # Advertising is not currently active. Do not promise an ad for a free action.
         source = source.replace('(Ad)', '').replace('(광고)', '')
         # Every changed asset gets a distinct cache key across already-installed workers.
-        source = re.sub(r'((?:src|href)="/(?:js|css|games)/[^"?]+\.(?:js|css))(?:\?v=\d+)?"',r'\1?v=21"',source)
+        source = re.sub(r'((?:src|href)="/(?:js|css|games)/[^"?]+\.(?:js|css))(?:\?v=\d+)?"',r'\1?v=22"',source)
         source = '\n'.join(line.rstrip() for line in source.splitlines()) + '\n'
         path.write_text(source,encoding='utf-8')
         count += 1
