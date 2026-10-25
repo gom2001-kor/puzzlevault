@@ -24,7 +24,7 @@ function shell({title, description, url, body, type='Article'}) {
 <meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}">
 <meta property="og:type" content="${type==='Article'?'article':'website'}"><meta property="og:url" content="${SITE+url}">
 <meta property="og:image" content="${SITE}/images/og-default.png"><meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="/css/english-guides.css?v=24">
+<link rel="stylesheet" href="/css/english-guides.css?v=25">
 <script type="application/ld+json">${JSON.stringify(schema).replace(/</g, '\\u003c')}</script>
 </head><body>
 <a class="skip" href="#main">본문 바로가기</a>

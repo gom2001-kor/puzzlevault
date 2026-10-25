@@ -177,6 +177,10 @@ test('guards that hold their ground keep beacons 2 and 3 dark until every one of
     advance(s,5);assert.equal(second.lit,false);assert.ok(guards.every(e=>C.distance(e,second)<C.config.beaconClearRadius));
     while(!second.lit&&s.time<40)C.tick(s,{},.05);
     assert.equal(second.lit,true);assert.ok(guards.every(e=>!e.alive));
+    // Waiting nearby does not pull beacon 3's guards out of its clear radius.
+    const third=s.beacons[2],keepers=s.enemies.filter(e=>e.alive&&C.distance(e,third)<C.config.beaconClearRadius);
+    s.player.x=third.x-6.5;s.player.z=third.z;s.player.hp=99;advance(s,90);
+    assert.equal(keepers.length,3);assert.ok(keepers.every(e=>C.distance(e,third)<C.config.beaconClearRadius));
 });
 
 // Pace of island 1 with scripted players (60 fps): the route is beacon 1, beacon 2, then around a tree to beacon 3.
