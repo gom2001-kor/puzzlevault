@@ -34,7 +34,34 @@
         light: { min: .35, max: 1, ease: 1.2 },                    // scene light at 0/3 and 3/3 beacons, seconds to settle
         victory: { time: 2, height: 21, distance: 24 }             // zoom-out before the result screen
     };
+    // Follow camera. pitch is the downward angle in degrees (the original rig was ~40.6); the distance is chosen
+    // so the ground visible at the bottom edge of the screen stays the same as the original rig.
+    config.camera = { pitch: 48, fov: 49 };
+    // Keeping the fight readable behind trees, rocks and mist. Each feature can be switched off on its own.
+    config.visibility = {
+        steepCamera: true,                                 // use config.camera.pitch instead of the original angle
+        fade: true, fadeAlpha: .25, fadeTime: .2,          // occluders on a camera ray fade to fadeAlpha over fadeTime s
+        maxRays: 8, enemyRange: 6,                         // rays: the player plus the nearest creatures within enemyRange
+        silhouette: true, silhouetteAlpha: .45, playerColor: '#9be36a', enemyColor: '#b48cf2'
+    };
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+    // Camera eye and look-at point for a player at (px, pz); see config.camera.
+    const LEGACY_CAMERA = { height: 11.55, back: 13.5 };
+    function cameraPose(px, pz, steep = config.visibility.steepCamera) {
+        const look = [px * .78, .25, pz * .78 - 1], legacyPitch = Math.atan2(LEGACY_CAMERA.height, LEGACY_CAMERA.back), half = config.camera.fov * Math.PI / 360;
+        const pitch = steep ? config.camera.pitch * Math.PI / 180 : legacyPitch, legacyDistance = Math.hypot(LEGACY_CAMERA.height, LEGACY_CAMERA.back);
+        // Horizontal reach from the look point to the bottom edge of the view, per unit of camera distance.
+        const reach = angle => Math.cos(angle) - Math.sin(angle) / Math.tan(angle + half);
+        const distance = steep ? legacyDistance * reach(legacyPitch) / reach(pitch) : legacyDistance;
+        return { eye: [look[0], look[1] + distance * Math.sin(pitch), look[2] + distance * Math.cos(pitch)], look, pitch, distance };
+    }
+    // True when the segment a-b passes through the ellipsoid {x, y, z, rx, ry, rz}.
+    function segmentHitsEllipsoid(a, b, e) {
+        const p = [(a[0] - e.x) / e.rx, (a[1] - e.y) / e.ry, (a[2] - e.z) / e.rz], q = [(b[0] - e.x) / e.rx, (b[1] - e.y) / e.ry, (b[2] - e.z) / e.rz];
+        const d = [q[0] - p[0], q[1] - p[1], q[2] - p[2]], len = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
+        const t = len ? clamp(-(p[0] * d[0] + p[1] * d[1] + p[2] * d[2]) / len, 0, 1) : 0;
+        return (p[0] + d[0] * t) ** 2 + (p[1] + d[1] * t) ** 2 + (p[2] + d[2] * t) ** 2 < 1;
+    }
     const distance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
     function rng(seed) { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
     function validDailyDate(value) {
@@ -219,7 +246,7 @@
         return { ...value,upgrades:value.upgrades.slice() };
     }
     function markRecorded(s){if(!['won','lost'].includes(s.phase)||s.recorded)return false;s.recorded=true;return true;}
-    const Core={ZONES,BEACONS,config,lightBeacon,makeRun,loadZone,canStand,move,inGarden,attack,dash,plant,bloom,chooseBoon,interact,chooseUpgrade,tick,checkpoint,validCheckpoint,markRecorded,distance,validDailyDate,dailySeedForDate,dailyRequest,resultURL};
+    const Core={ZONES,BEACONS,config,cameraPose,segmentHitsEllipsoid,lightBeacon,makeRun,loadZone,canStand,move,inGarden,attack,dash,plant,bloom,chooseBoon,interact,chooseUpgrade,tick,checkpoint,validCheckpoint,markRecorded,distance,validDailyDate,dailySeedForDate,dailyRequest,resultURL};
     if(typeof module!=='undefined'&&module.exports)module.exports=Core;
     root.MosslightCore=Core;
     if(typeof document==='undefined')return;
@@ -275,7 +302,7 @@
         const date=mode==='daily'&&validDailyDate(courseDate)?courseDate:new Date().toISOString().slice(0,10);
         const seed=mode==='daily'?dailySeedForDate(date):(Date.now()>>>0)||1,island=mode==='daily'||zone>=unlockedIslands()?0:zone;
         state=makeRun({seed,mode,date,zone:island,roundId:makeId()});if(mode==='story')storage.set('lastIsland',island);
-        seenEvent=0;seenPhase='';resetJuice();clearInput();camera=[state.player.x*.78,11.8,state.player.z*.78+12.5];hideOverlay();$('ml-canvas').focus({preventScroll:true});updateHUD(true);sfx('tap');showMoveHint();if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
+        seenEvent=0;seenPhase='';resetJuice();clearInput();camera=cameraPose(state.player.x,state.player.z).eye.slice();hideOverlay();$('ml-canvas').focus({preventScroll:true});updateHUD(true);sfx('tap');showMoveHint();if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
     }
     // The only text in the first 30 seconds of island 1: a 2-second movement hint that fades in and out.
     function showMoveHint(){
@@ -351,20 +378,28 @@
         // Fog islands get a 10x10 grid of thin ground tiles so a beacon's light ring recolours the floor only
         // where it has passed and never past the island edge.
         if(spec.fog)for(let i=0;i<10;i++)for(let j=0;j<10;j++)a.push({...obj('plane',-8.55+i*1.9,.008,-8.55+j*1.9,1.9,1,1.9,'#6a9b5a'),castShadow:false});
+        // Occluders for the visibility system: bounding ellipsoids taken from each object's own size. A tree's parts
+        // share one id so the whole tree fades together; rocks and mist puffs are one occluder each.
+        const occluders=[];let nextOcc=0;
+        const mark=(from,shared)=>{const id=shared?nextOcc++:0;for(let i=from;i<a.length;i++){const o=a[i];if(o.shape==='disk')continue;o.occ=shared?id:nextOcc++;occluders.push({id:o.occ,x:o.x,y:o.y,z:o.z,rx:Math.max(.05,o.sx/2),ry:Math.max(.05,o.sy/2),rz:Math.max(.05,o.sz/2),soft:!!o.mist});}};
+        const rocks=a.length;
         // Individually shaped rock shelves and moss pillows soften the island silhouette.
         for(let i=0;i<32;i++){const side=i%4,n=Math.floor(i/4),v=-8.4+n*2.4,x=side<2?(side===0?-9:9):v,z=side<2?v:(side===2?-9:9);a.push(obj('sphere',x,-.68-random()*.6,z,2.3+random(),1.6,2.5, i%3?'#526753':'#748866',random()*3));if(i%3===0)a.push(obj('sphere',x*.96,-.08,z*.96,1.8,.35,1.7,greens[1]));}
+        mark(rocks,false);
         for(let i=0;i<13;i++){const z=7.7-i*1.35,x=Math.sin(i*.75)*.55;a.push(obj('sphere',x,.024,z,1.4,.08,1.15,'#9d9c7c',i*.3),obj('bevelbox',x+.27,.04,z-.12,.6,.055,.48,'#b0ad8b',i*.21));}
         for(const [x,z,r]of spec.obstacles){
+            const tree=a.length;
             a.push(obj('disk',x,.016,z,r*3.3,1,r*3.3,'#213d32',0,.14),obj('cylinder',x,1.15,z,r*.67,2.3,r*.67,'#806b4c'));
             for(let k=0;k<5;k++){const angle=k*Math.PI*.4;a.push(obj('bevelbox',x+Math.cos(angle)*.42,.15,z+Math.sin(angle)*.42,.3,.27,1.25,'#806b4c',Math.PI/2-angle));}
             const clusters=[[0,3.3,0,2.5],[-.85,2.7,.25,1.9],[.82,2.85,.3,2],[.1,2.9,-.85,2.1],[-.35,3.8,-.12,1.8]];
             for(const [dx,y,dz,size]of clusters){const leaf=obj('sphere',x+dx*r,y*r,z+dz*r,size*r,size*.78*r,size*r,greens[Math.floor(random()*3)]);leaf.treeX=x;leaf.treeZ=z;a.push(leaf);}
             a.push(obj('sphere',x-.25,1.08,z+.34,.16,.2,.1,'#c0ad83'),obj('sphere',x+.08,1.23,z+.35,.12,.13,.09,'#c0ad83'));
+            mark(tree,true);
         }
         for(let i=0;i<100;i++){
             const x=(random()-.5)*17.5,z=(random()-.5)*17.5;
             if(Math.abs(x)<1.1||spec.obstacles.some(([ox,oz,r])=>Math.hypot(x-ox,z-oz)<r+.2))continue;
-            if(i%4===0){a.push(obj('sphere',x,.14,z,.5+random()*.4,.3,.6,'#9b9d82',random()*3));}
+            if(i%4===0){const rock=a.length;a.push(obj('sphere',x,.14,z,.5+random()*.4,.3,.6,'#9b9d82',random()*3));mark(rock,false);}
             else if(i%5===0){a.push(obj('cylinder',x,.16,z,.1,.3,.1,'#e7d8ad'),obj('sphere',x,.31,z,.4,.2,.38,zone===2?'#c4b5fd':'#fca5a5'));a.push(obj('sphere',x+.08,.39,z,.055,.03,.055,'#fff4df'));}
             else{a.push(obj('cone',x,.17,z,.16,.36,.15,greens[2]),obj('cone',x+.13,.12,z+.06,.14,.27,.15,greens[1]));}
         }
@@ -373,8 +408,8 @@
         // Distant islands make a complete forest world rather than an isolated game board.
         for(const [x,z,scale]of[[-17,-13,1],[16,-18,1.4],[-21,7,.8],[21,4,.8]]){a.push(obj('sphere',x,-2.3,z,8*scale,3*scale,7*scale,'#294c43'));for(let j=0;j<3;j++)a.push(obj('sphere',x+(j-1)*1.8*scale,.1*scale,z,3.2*scale,3.5*scale,3*scale,'#3d6e59'));}
         // Low mist puffs for fogged islands; each fades out inside a lit beacon's clearing.
-        if(spec.fog)for(let i=0;i<34;i++)a.push({...obj('sphere',(random()-.5)*17,.55+random()*.5,(random()-.5)*17,2.6+random()*1.6,.65,2.4+random()*1.4,'#c7d2c9',random()*3,.16),mist:true,castShadow:false});
-        terrainCache.set(zone,a);return a;
+        if(spec.fog){const mist=a.length;for(let i=0;i<34;i++)a.push({...obj('sphere',(random()-.5)*17,.55+random()*.5,(random()-.5)*17,2.6+random()*1.6,.65,2.4+random()*1.4,'#c7d2c9',random()*3,.16),mist:true,castShadow:false});mark(mist,false);}
+        a.occluders=occluders;terrainCache.set(zone,a);return a;
     }
     const FOG='#3d4a44',fogged=new Map();
     // Mixes a colour toward the fog in 16 steps so the renderer's colour cache stays small.
@@ -391,7 +426,23 @@
         for(let i=0;i<count;i++){const q=POOL[poolCursor];poolCursor=(poolCursor+1)%POOL.length;const a=Math.random()*Math.PI*2,v=speed*(.5+Math.random()*.7);
             q.life=q.max=life;q.x=x;q.y=y;q.z=z;q.vx=Math.cos(a)*v;q.vz=Math.sin(a)*v;q.vy=1+Math.random()*1.5;q.size=size;q.desc.color=color;}
     }
-    function resetJuice(){for(const q of POOL)q.life=0;dying.length=0;shake=0;hitChain=0;lastHitAt=-9;victoryAt=0;fxTime=0;ringStart={};}
+    // ---- Visibility: up to config.visibility.maxRays camera rays (player + nearest creatures within enemyRange) are
+    // tested against the occluder ellipsoids every frame. Hit occluders fade to fadeAlpha over fadeTime and back;
+    // characters behind a solid occluder get an x-ray silhouette.
+    const occAlpha=new Map(),xrayIds=new Set();let xrayPlayer=false;
+    function updateVisibility(s,eye,dt){
+        const vis=config.visibility,hit=new Set();xrayIds.clear();xrayPlayer=false;
+        if(vis.fade||vis.silhouette){
+            const occluders=terrain(s.zone).occluders,targets=[{point:[s.player.x,.9,s.player.z]}];
+            for(const e of s.enemies.filter(e=>e.alive&&distance(e,s.player)<=vis.enemyRange).sort((a,b)=>distance(a,s.player)-distance(b,s.player)).slice(0,vis.maxRays-1))
+                targets.push({enemy:e,point:[e.x,.8*(e.boss?1.65:e.type==='brute'?1.25:1),e.z]});
+            for(const t of targets){let solid=false;for(const o of occluders)if(segmentHitsEllipsoid(eye,t.point,o)){hit.add(o.id);if(!o.soft)solid=true;}if(solid){if(t.enemy)xrayIds.add(t.enemy.id);else xrayPlayer=true;}}
+        }
+        const step=dt*(1-vis.fadeAlpha)/Math.max(.001,vis.fadeTime);
+        if(vis.fade)for(const id of hit)if(!occAlpha.has(id))occAlpha.set(id,1);
+        for(const [id,a] of occAlpha){const target=vis.fade&&hit.has(id)?vis.fadeAlpha:1,next=a<target?Math.min(target,a+step):Math.max(target,a-step);if(next>=1)occAlpha.delete(id);else occAlpha.set(id,next);}
+    }
+    function resetJuice(){occAlpha.clear();xrayIds.clear();xrayPlayer=false;for(const q of POOL)q.life=0;dying.length=0;shake=0;hitChain=0;lastHitAt=-9;victoryAt=0;fxTime=0;ringStart={};}
     // Synthesized tones on the shared Web Audio context, so no audio files ship with the game.
     function tone(freq,length,volume,{type='triangle',attack=.005,harmonic=0}={}){
         if(!soundEnabled||typeof SFX==='undefined')return;
@@ -421,11 +472,14 @@
         // has passed returns to full colour (soft 1-unit edge) and stays that way.
         const g=juice.ignite,rings=s.beacons.filter(b=>b.lit).map(b=>{const age=s===state&&ringStart[b.id]!==undefined?fxTime-ringStart[b.id]:g.time;return {x:b.x,z:b.z,age,r:g.radius*clamp(age/g.time,0,1)};});
         const fogAt=(x,z)=>{if(!spec.fog)return 0;let f=1;for(const c of rings)f=Math.min(f,clamp(Math.hypot(x-c.x,z-c.z)-(c.r-1),0,1));return f;};
+        // Occluders on a camera ray carry their fade alpha (see updateVisibility); solid ones also write depth first
+        // so a faded tree shows only its front surface.
         const objects=terrain(s.zone).map(o=>{
-            const faded=o.treeZ>p.z-1&&Math.hypot(o.treeX-p.x,o.treeZ-p.z)<3;
-            if(!spec.fog)return faded?{...o,opacity:.28}:o;
-            const f=o.ground?1:fogAt(o.x,o.z);
-            return o.mist?{...o,opacity:o.opacity*f}:{...o,color:fogColor(o.color,f),opacity:faded?.28:o.opacity};
+            const alpha=s===state&&o.occ!==undefined?occAlpha.get(o.occ):undefined;
+            let r=o;
+            if(spec.fog){const f=o.ground?1:fogAt(o.x,o.z);r=o.mist?{...o,opacity:o.opacity*f}:{...o,color:fogColor(o.color,f)};}
+            if(alpha!==undefined){if(r===o)r={...o};r.opacity*=alpha;if(o.opacity>=.995)r.depthWrite=true;}
+            return r;
         }).filter(o=>!o.mist||o.opacity>.01);
         for(const c of rings){
             if(c.age<g.time)ring(objects,c.x,c.z,Math.max(.1,c.r),'#fff3c4',.25,1-c.age/g.time);
@@ -454,9 +508,10 @@
         for(const shot of s.shots){objects.push(glow('sphere',shot.x,.7,shot.z,.3,.3,.3,'#fff3b0'));objects.push(glow('sphere',shot.x-shot.vx*.03,.7,shot.z-shot.vz*.03,.2,.2,.2,'#d8f5cf',0,.6));}
         for(const bolt of s.projectiles){objects.push(glow('sphere',bolt.x,.64,bolt.z,.28,.28,.28,'#e9bcff'));objects.push(glow('sphere',bolt.x-bolt.vx*.035,.64,bolt.z-bolt.vz*.035,.18,.18,.18,'#c4b5fd',0,.6));}
         // k < 1 draws a defeated creature shrinking away over juice.defeat.shrink seconds.
+        const xraySilhouette=e=>s===state&&config.visibility.silhouette&&xrayIds.has(e.id);
         const drawEnemy=(e,k=1)=>{
             const type=e.type||'stalker',scale=(e.boss?1.65:type==='brute'?1.25:1)*k,angle=Math.atan2(p.x-e.x,p.z-e.z),bob=Math.sin(time*3+e.id)*.05*k,col=e.flash>0?'#ffffff':e.phase==='warn'?'#d9a345':type==='caster'?'#697ea6':type==='brute'?'#796b88':'#81957b';
-            shadow(e.x,e.z,scale*1.35);
+            shadow(e.x,e.z,scale*1.35);const body=objects.length;
             if(type==='caster'){
                 objects.push(obj('sphere',e.x,.85*k+bob,e.z,.73*k,.83*k,.73*k,col),obj('torus',e.x,.67*k+bob,e.z,1.1*k,.16*k,1.1*k,'#b9a6d7',time),glow('sphere',e.x,.96*k+bob,e.z+.36*k,.24*k,.16*k,.12*k,'#eed5ff'));
                 for(let i=0;i<3;i++){const a=time+i*Math.PI*2/3;objects.push(obj('octa',e.x+Math.cos(a)*.6*k,1.1*k+bob,e.z+Math.sin(a)*.6*k,.18*k,.35*k,.18*k,'#bcaee7',a));}
@@ -466,6 +521,7 @@
                 objects.push(glow('bevelbox',e.x+Math.sin(angle)*.35*scale,1.13*scale,e.z+Math.cos(angle)*.35*scale,.35*scale,.09,.07,e.rage?'#fb7185':'#e3f4bd',angle));
             }
             if(k<1)return;
+            if(xraySilhouette(e))for(let i=body;i<objects.length;i++)if(objects[i].castShadow!==false&&objects[i].opacity>=.995){objects[i].xray=config.visibility.enemyColor;objects[i].xrayOpacity=config.visibility.silhouetteAlpha;}
             if(e.hp<e.maxHP||e.boss){const width=1.2*scale,y=1.88*scale;objects.push(obj('bevelbox',e.x,y,e.z,width,.075,.1,'#263c36'),obj('bevelbox',e.x-(1-e.hp/e.maxHP)*width/2,y+.005,e.z,width*e.hp/e.maxHP,.08,.12,e.rage?'#fb7185':'#e9bd92'));}
             if(e.phase==='warn'&&e.attackType!=='slam'){ring(objects,e.x,e.z,scale*.9,'#fbbf24',.065);for(let i=1;i<5;i++)objects.push(glow('bevelbox',e.x+e.aimX*i*.55,.08,e.z+e.aimZ*i*.55,.14,.04,.25,'#fde68a',Math.atan2(e.aimX,e.aimZ)));}
         };
@@ -473,7 +529,8 @@
         if(s===state)for(const d of dying)drawEnemy(d.e,Math.max(.02,1-d.age/juice.defeat.shrink));
         // While invulnerable after a hit the guardian blinks (skipped with reduced motion, where time is 0).
         const angle=Math.atan2(p.facingX,p.facingZ),walk=s.moving?Math.sin(time*13)*.11:0,bob=s.moving?Math.abs(walk)*.4:Math.sin(time*2)*.018,skin='#e8c797',blinkOff=p.invuln>0&&time>0&&Math.floor(time*juice.hurt.blink)%2===0;shadow(p.x,p.z,1.15);
-        const part=(shape,lx,y,lz,sx,sy,sz,color,emissive=0)=>{if(blinkOff)return;objects.push(obj(shape,p.x+Math.cos(angle)*lx+Math.sin(angle)*lz,y+bob,p.z-Math.sin(angle)*lx+Math.cos(angle)*lz,sx,sy,sz,color,angle,1,emissive));};
+        const playerXray=s===state&&config.visibility.silhouette&&xrayPlayer;
+        const part=(shape,lx,y,lz,sx,sy,sz,color,emissive=0)=>{if(blinkOff)return;const o=obj(shape,p.x+Math.cos(angle)*lx+Math.sin(angle)*lz,y+bob,p.z-Math.sin(angle)*lx+Math.cos(angle)*lz,sx,sy,sz,color,angle,1,emissive);if(playerXray){o.xray=config.visibility.playerColor;o.xrayOpacity=config.visibility.silhouetteAlpha;}objects.push(o);};
         part('bevelbox',-.18,.16+walk,.02,.25,.3,.42,'#624f3e');part('bevelbox',.18,.16-walk,.02,.25,.3,.42,'#624f3e');
         part('sphere',0,.65,0,.72,.83,.62,'#27785b');part('bevelbox',0,.7,-.34,.47,.56,.28,'#9c7747');part('bevelbox',0,.62,.03,.74,.14,.6,'#ac8950');
         part('sphere',0,1.2,.03,.68,.65,.65,skin);part('sphere',0,1.39,-.1,.79,.58,.77,'#37734e');part('bevelbox',0,1.54,.11,.85,.11,.75,'#4d8755');
@@ -496,16 +553,17 @@
         // A win holds on a slow zoom-out for juice.victory.time before the result screen.
         if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='shrine'){sfx('hint');showOverlay('shrine');}else if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(state.phase==='won')victoryAt=now;else if(state.phase==='lost')finish();}
         if(state&&state.phase==='won'&&victoryAt&&now-victoryAt>=juice.victory.time*1000)finish();
-        if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const target=[p.x*.78,0,p.z*.78];camera[0]+=(target[0]-camera[0])*smoothing;camera[1]=11.8;camera[2]+=(target[2]+12.5-camera[2])*smoothing;
+        if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const pose=cameraPose(p.x,p.z);for(let i=0;i<3;i++)camera[i]+=(pose.eye[i]-camera[i])*smoothing;
             // Scene light follows the number of lit beacons (juice.light.min at 0/3, max at 3/3).
             const lightTarget=juice.light.min+(juice.light.max-juice.light.min)*active.beacons.filter(b=>b.lit).length/active.beacons.length;
             lightNow=lightNow<0||reduced?lightTarget:lightNow+(lightTarget-lightNow)*Math.min(1,dt*3/juice.light.ease);
             if(Math.abs(lightNow-renderer.lightScale)>.003)renderer.setEnvironment({lightScale:+lightNow.toFixed(3)});
-            let eye=camera,look=[camera[0],.25,camera[2]-13.5];
+            let eye=camera,look=[camera[0]+pose.look[0]-pose.eye[0],pose.look[1],camera[2]+pose.look[2]-pose.eye[2]];
             if(state&&state.phase==='won'&&victoryAt){const k=clamp((now-victoryAt)/1000/juice.victory.time,0,1),ease=k*k*(3-2*k),wide=[0,juice.victory.height,juice.victory.distance];eye=eye.map((v,i)=>v+(wide[i]-v)*ease);look=look.map(v=>v*(1-ease));}
             if(shake>0&&!reduced){const a=juice.shake.amplitude*shake/juice.shake.time,ox=(Math.random()*2-1)*a,oy=(Math.random()*2-1)*a;eye=[eye[0]+ox,eye[1]+oy,eye[2]];look=[look[0]+ox,look[1]+oy,look[2]];}
             shake=Math.max(0,shake-dt);
-            renderer.render(scene(active,reduced?0:now/1000),{eye,target:look,fov:49});}
+            if(state)updateVisibility(state,eye,dt);
+            renderer.render(scene(active,reduced?0:now/1000),{eye,target:look,fov:config.camera.fov});}
         updateHUD();
     }
     function boot(){

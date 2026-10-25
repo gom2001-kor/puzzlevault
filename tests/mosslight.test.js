@@ -210,3 +210,20 @@ test('taking a hit grants 0.5 s of invulnerability and reports it; a lit beacon 
     assert.equal(s.player.hp,4.5);assert.ok(Math.abs(s.player.invuln-C.config.juice.hurt.invuln)<1e-9);assert.ok(s.fx.some(f=>f.type==='hurt'));
     const b=s.beacons[0];s.player.x=b.x;s.player.z=b.z;advance(s,2.05);assert.equal(b.lit,true);assert.ok(s.fx.some(f=>f.type==='beacon'&&f.x===b.x&&f.z===b.z));
 });
+
+// Visibility behind trees (config.camera, config.visibility).
+test('the steeper camera tilts by config.camera.pitch, keeps the ground at the bottom edge, and can be switched off',()=>{
+    const legacy=C.cameraPose(2,3,false),steep=C.cameraPose(2,3,true);
+    assert.deepEqual(legacy.eye.map(v=>+v.toFixed(6)),[1.56,11.8,14.84]);assert.deepEqual(legacy.look.map(v=>+v.toFixed(6)),[1.56,.25,1.34]);
+    assert.ok(Math.abs(steep.pitch*180/Math.PI-C.config.camera.pitch)<1e-9);
+    const tilt=C.config.camera.pitch-legacy.pitch*180/Math.PI;assert.ok(tilt>=5&&tilt<=10,`tilt ${tilt.toFixed(2)} deg`);
+    const half=C.config.camera.fov*Math.PI/360,bottom=pose=>pose.look[2]+pose.distance*Math.cos(pose.pitch)-pose.distance*Math.sin(pose.pitch)/Math.tan(pose.pitch+half);
+    assert.ok(Math.abs(bottom(steep)-bottom(legacy))<1e-9,'same ground reach at the bottom of the view');
+    assert.deepEqual(Object.keys(C.config.visibility).filter(k=>typeof C.config.visibility[k]==='boolean').sort(),['fade','silhouette','steepCamera']);
+});
+test('camera rays detect ellipsoid occluders between the eye and a target only',()=>{
+    const eye=[0,14,12],player=[0,.9,0],tree={x:0,y:3,z:3,rx:2,ry:1.5,rz:2};
+    assert.equal(C.segmentHitsEllipsoid(eye,player,tree),true);
+    assert.equal(C.segmentHitsEllipsoid(eye,player,{...tree,x:5}),false,'off to the side');
+    assert.equal(C.segmentHitsEllipsoid(eye,player,{...tree,z:-4,y:1}),false,'behind the target');
+});
