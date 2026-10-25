@@ -121,7 +121,7 @@
         #else
         precision mediump float;
         #endif
-        uniform vec3 uEye; uniform vec3 uFog; uniform vec3 uLight;
+        uniform vec3 uEye; uniform vec3 uFog; uniform vec3 uLight; uniform float uAmbient;
         uniform vec2 uFogRange; uniform sampler2D uShadowMap;
         uniform float uPass; uniform float uHasShadow; uniform float uDisk; uniform float uShadowTexel;
         varying PV_PRECISION vec3 vWorld; varying PV_PRECISION vec3 vNormal; varying PV_PRECISION vec4 vColor;
@@ -159,7 +159,7 @@
             float spec=pow(max(dot(n,normalize(key+view)),0.0),mix(80.0,9.0,rough))*(1.0-rough)*.55;
             float rim=pow(1.0-max(dot(n,view),0.0),3.0)*.13;
             vec3 base=pow(max(vColor.rgb,vec3(.0)),vec3(2.2));
-            vec3 ambient=mix(vec3(.19,.25,.28),vec3(.60,.72,.82),n.y*.5+.5)*.72;
+            vec3 ambient=mix(vec3(.19,.25,.28),vec3(.60,.72,.82),n.y*.5+.5)*.72*uAmbient;
             vec3 lit=base*(ambient+uLight*diffuse*.82*visibility)+uLight*spec*visibility+base*rim+base*vSurface.x*2.5;
             vec3 result=pow(max(lit,vec3(.0)),vec3(.454545));
             result=result/(vec3(1.0)+result*.12);
@@ -214,6 +214,8 @@
             this.skyTop=color(this.options.skyTop||this.options.clear||'#1c4a55');
             this.skyBottom=color(this.options.skyBottom||this.options.clear||'#395f64');
             this.light=color(this.options.lightColor||'#ffe1ac');
+            // lightScale dims ambient and directional light together (1 = unchanged).
+            this.lightScale=Math.max(0,finite(this.options.lightScale,1));this.sceneLight=this.light.map(v=>v*this.lightScale);
             this.fogNear=finite(this.options.fogNear,30);this.fogFar=Math.max(this.fogNear+1,finite(this.options.fogFar,100));
             this.bloom=Math.max(0,Math.min(.4,finite(this.options.bloom,.12)));
         }
@@ -236,7 +238,7 @@
             const varyingPrecision=precision&&precision.precision>0?'highp':'mediump';
             this.programMain=this.program(VS.replaceAll('PV_PRECISION',varyingPrecision),FS.replaceAll('PV_PRECISION',varyingPrecision));this.programSky=this.program(QUAD_VS,SKY_FS,['aPosition']);this.programPost=this.program(QUAD_VS,POST_FS,['aPosition']);
             const locations=(program,names)=>Object.fromEntries(names.map(n=>[n,gl.getUniformLocation(program,'u'+n)]));
-            this.u=locations(this.programMain,['VP','ShadowVP','Eye','Fog','Light','FogRange','ShadowMap','Pass','HasShadow','Disk','ShadowTexel']);
+            this.u=locations(this.programMain,['VP','ShadowVP','Eye','Fog','Light','Ambient','FogRange','ShadowMap','Pass','HasShadow','Disk','ShadowTexel']);
             this.sky=locations(this.programSky,['Top','Bottom','Light']);this.post=locations(this.programPost,['Scene','Texel','Bloom']);
             this.meshes={};this.groups={};this.shadowGroups={};
             for(const shape of SHAPES){
@@ -309,7 +311,7 @@
             }
             gl.enable(gl.DITHER);gl.bindFramebuffer(gl.FRAMEBUFFER,this.sceneTarget?this.sceneTarget.buffer:null);gl.viewport(0,0,width,height);gl.clearColor(...this.clear,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
             gl.useProgram(this.programSky);gl.uniform3fv(this.sky.Top,this.skyTop);gl.uniform3fv(this.sky.Bottom,this.skyBottom);gl.uniform3fv(this.sky.Light,this.light);this.fullScreen(this.programSky);
-            gl.useProgram(this.programMain);gl.enable(gl.DEPTH_TEST);gl.uniform1f(this.u.Pass,1);gl.uniformMatrix4fv(this.u.VP,false,vp);gl.uniform3fv(this.u.Eye,eye);gl.uniform3fv(this.u.Fog,this.skyBottom);gl.uniform3fv(this.u.Light,this.light);gl.uniform2f(this.u.FogRange,this.fogNear,this.fogFar);
+            gl.useProgram(this.programMain);gl.enable(gl.DEPTH_TEST);gl.uniform1f(this.u.Pass,1);gl.uniformMatrix4fv(this.u.VP,false,vp);gl.uniform3fv(this.u.Eye,eye);gl.uniform3fv(this.u.Fog,this.skyBottom);gl.uniform3fv(this.u.Light,this.sceneLight);gl.uniform1f(this.u.Ambient,this.lightScale);gl.uniform2f(this.u.FogRange,this.fogNear,this.fogFar);
             gl.uniform1f(this.u.HasShadow,this.shadowTarget?1:0);gl.uniform1f(this.u.ShadowTexel,this.shadowTarget?1/this.shadowTarget.width:0);gl.uniform1i(this.u.ShadowMap,0);gl.bindTexture(gl.TEXTURE_2D,this.shadowTarget?this.shadowTarget.texture:null);
             for(const shape of SHAPES)this.batch(shape,this.groups[shape]);
             if(transparent.length){const distance=o=>(finite(o.x,0)-eye[0])**2+(finite(o.y,0)-eye[1])**2+(finite(o.z,0)-eye[2])**2;transparent.sort((a,b)=>distance(b)-distance(a));gl.enable(gl.BLEND);gl.depthMask(false);

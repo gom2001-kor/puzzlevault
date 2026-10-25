@@ -21,6 +21,19 @@
     const BEACONS = [[0, -1], [-6.5, 1], [6.5, 1.5]];
     // Survivor rules: movement is the only input. Disabled abilities keep their code and can be switched back on here.
     const config = { features: { dash: false, garden: false, attune: false, bloom: false }, pulseInterval: .8, pulseRange: 6, shotSpeed: 9, beaconRadius: 1.5, beaconTime: 2, beaconClearRadius: 3 };
+    // Feedback ("juice") tuning in one place. Seconds, world units, Hz and 0-1 volumes.
+    config.juice = {
+        shake: { time: .08, amplitude: .15 },                       // camera shake on every pulse hit
+        knockback: { distance: .6, flash: .1 },                    // push along the shot, white flash time
+        hitParticles: { min: 6, max: 10, life: .4, speed: 2.4, size: .13, color: '#bbf7d0' },
+        hitSound: { base: 520, step: 1.09, steps: 5, chain: 1, length: .07, volume: .16 }, // pitch rises per hit within `chain` s
+        defeat: { shrink: .2, particles: 12, life: .6, speed: 3, size: .16, color: '#fef3c7' },
+        orb: { pickup: 2, pull: 10, size: .2, color: '#a7f3d0' },  // experience orbs: counted only, not shown
+        hurt: { vignette: .15, invuln: .5, blink: 14 },            // red edge time, invulnerable time, blinks per second
+        ignite: { radius: 10, time: 1, sound: .8, volume: .22 },   // light ring reach and spread time, warm tone length
+        light: { min: .35, max: 1, ease: 1.2 },                    // scene light at 0/3 and 3/3 beacons, seconds to settle
+        victory: { time: 2, height: 21, distance: 24 }             // zoom-out before the result screen
+    };
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const distance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
     function rng(seed) { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -55,7 +68,7 @@
         const [startX, startZ] = spec.start || [0, 7.4];
         s.time = 0; s.player = { x: startX, z: startZ, hp: s.maxHP, facingX: 0, facingZ: -1, invuln: 0, dash: 0 };
         s.attackCD = 0; s.dashCD = 0; s.gardenCD = 0; s.gardenCharges = 2; s.gardenRegen = 0; s.gardens = []; s.collected = 0; s.restored = 0; s.beacons = (spec.beacons || BEACONS).map(([x,z], i) => ({ x, z, id: i, lit: false, charge: 0, blocked: false, litAt: -1 })); s.seeds = spec.seeds.map(([x,z], i) => ({ x, z, id: i, taken: false }));
-        s.energy=25; s.bloom=0; s.shots=[]; s.bursts=[]; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
+        s.energy=25; s.bloom=0; s.shots=[]; s.fx=[]; s.orbs=[]; s.xp=s.xp||0; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
         s.shrine={x:-7,z:-6,used:false};
         // An enemy entry is [x, z, boss] or [x, z, { spawn, type, hp, speed, timer }]; spawn > 0 holds it back until that second.
         const all = spec.enemies.map(([x,z,extra],i) => {const o=extra&&typeof extra==='object'?extra:{boss:!!extra},type=o.boss?'boss':o.type||['stalker','caster','brute'][i%3],hp=o.hp||(o.boss?26:type==='brute'?5+s.zone:3+s.zone);return {id:i,x,z,type,boss:!!o.boss,hp,maxHP:hp,phase:'stalk',timer:o.timer??1+random(),speed:o.speed||0,spawn:o.spawn||0,aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0};});
@@ -73,9 +86,12 @@
         if (canStand(s, actor.x, actor.z+dz)) actor.z += dz;
     }
     function inGarden(s) { return s.gardens.some(g => g.life > 0 && distance(g,s.player) < g.radius); }
-    function strike(s,e,power) {
-        e.hp=Math.max(0,e.hp-power);e.flash=.2;
-        if(e.hp===0&&e.alive){e.alive=false;s.bursts.push({x:e.x,z:e.z,life:.6});event(s,'defeat');s.kills++;s.zoneKills++;s.score+=e.boss?600:90+s.zone*30;s.energy=clamp(s.energy+12,0,100);}
+    // Presentation events for the interface (several can happen in one tick); the UI drains s.fx every frame.
+    function fx(s,item){if(s.fx.length<256)s.fx.push(item);}
+    function strike(s,e,power,dirX=0,dirZ=0) {
+        const juice=config.juice;e.hp=Math.max(0,e.hp-power);e.flash=juice.knockback.flash;
+        if(dirX||dirZ){fx(s,{type:'hit',x:e.x,z:e.z,dx:dirX,dz:dirZ});if(e.hp>0)move(s,e,dirX*juice.knockback.distance,dirZ*juice.knockback.distance);}
+        if(e.hp===0&&e.alive){e.alive=false;fx(s,{type:'defeat',x:e.x,z:e.z,enemy:{...e}});s.orbs.push({x:e.x,z:e.z,pulled:false});event(s,'defeat');s.kills++;s.zoneKills++;s.score+=e.boss?600:90+s.zone*30;s.energy=clamp(s.energy+12,0,100);}
     }
     // Fires automatically from tick(): one light shot at the nearest creature in range.
     function attack(s) {
@@ -111,7 +127,7 @@
     // Beacons light themselves after config.beaconTime inside their ring; the run is won when all three burn.
     function lightBeacon(s,b) {
         if(b.lit)return false;
-        b.lit=true;b.charge=config.beaconTime;b.litAt=s.time;s.restored++;s.score+=500;
+        b.lit=true;b.charge=config.beaconTime;b.litAt=s.time;s.restored++;s.score+=500;fx(s,{type:'beacon',x:b.x,z:b.z});
         const stream=ZONES[s.zone].stream;if(stream&&!s.streamAt)s.streamAt=s.time+stream.every;
         if(s.beacons.every(x=>x.lit)){s.phase='won';event(s,'won');}else event(s,'beacon');
         return true;
@@ -134,7 +150,7 @@
         if (s.phase !== 'upgrade' || !['root','pulse','wind'].includes(upgrade) || (upgrade === 'wind' && s.upgrades.includes('wind'))) return false;
         s.upgrades.push(upgrade); s.zone++; loadZone(s); return true;
     }
-    function hurt(s,amount){if(s.player.invuln>0||(ZONES[s.zone].grace&&!s.beacons.some(b=>b.lit)))return false;s.player.hp-=amount;s.player.invuln=1.1;event(s,'hurt');return true;}
+    function hurt(s,amount){if(s.player.invuln>0||(ZONES[s.zone].grace&&!s.beacons.some(b=>b.lit)))return false;s.player.hp-=amount;s.player.invuln=config.juice.hurt.invuln;fx(s,{type:'hurt'});event(s,'hurt');return true;}
     function volley(s,e,count=1){
         const base=Math.atan2(e.aimZ,e.aimX);
         for(let i=0;i<count;i++){const a=base+(i-(count-1)/2)*.23;s.projectiles.push({x:e.x,z:e.z,vx:Math.cos(a)*4.8,vz:Math.sin(a)*4.8,life:4.2,boss:e.boss});}
@@ -145,7 +161,9 @@
         while(s.spawns.length&&s.spawns[0].spawn<=s.time+1e-9)s.enemies.push(s.spawns.shift());
         const stream=ZONES[s.zone].stream;
         while(stream&&s.streamAt&&s.time>=s.streamAt-1e-9){for(let n=s.time>=stream.doubleAfter?2:1;n>0;n--)streamEnemy(s,stream);s.streamAt+=stream.every;}
-        s.bursts=s.bursts.filter(b=>(b.life-=dt)>0);
+        // Experience orbs: once the player is within pickup range they fly in and are counted (s.xp).
+        const orb=config.juice.orb;
+        s.orbs=s.orbs.filter(o=>{const d=distance(o,s.player);if(d<=orb.pickup)o.pulled=true;if(!o.pulled)return true;const step=Math.min(d,orb.pull*dt);o.x+=(s.player.x-o.x)/(d||1)*step;o.z+=(s.player.z-o.z)/(d||1)*step;if(d-step>.35)return true;s.xp++;fx(s,{type:'orb'});return false;});
         for(const key of ['attackCD','dashCD','gardenCD','bloom'])s[key]=Math.max(0,s[key]-dt);
         s.player.invuln=Math.max(0,s.player.invuln-dt);
         if(config.features.garden){const regen=s.boon==='renewal'?12:18;s.gardenRegen+=dt;if(s.gardenRegen>=regen){s.gardenRegen-=regen;s.gardenCharges=Math.min(3,s.gardenCharges+1);}}
@@ -161,7 +179,7 @@
         for(const b of s.beacons){if(b.lit)continue;b.blocked=s.enemies.some(e=>e.alive&&distance(e,b)<config.beaconClearRadius);if(distance(b,s.player)>config.beaconRadius)b.charge=0;else if(!b.blocked)b.charge+=dt;if(b.charge>=config.beaconTime-1e-9)lightBeacon(s,b);}
         if(s.phase!=='playing')return;
         attack(s);
-        s.shots=s.shots.filter(shot=>{shot.life-=dt;shot.x+=shot.vx*dt;shot.z+=shot.vz*dt;const e=s.enemies.find(e=>e.alive&&distance(e,shot)<(e.boss?.95:.6));if(e){strike(s,e,shot.power);s.energy=clamp(s.energy+10,0,100);return false;}return shot.life>0;});
+        s.shots=s.shots.filter(shot=>{shot.life-=dt;shot.x+=shot.vx*dt;shot.z+=shot.vz*dt;const e=s.enemies.find(e=>e.alive&&distance(e,shot)<(e.boss?.95:.6));if(e){const speed=Math.hypot(shot.vx,shot.vz)||1;strike(s,e,shot.power,shot.vx/speed,shot.vz/speed);s.energy=clamp(s.energy+10,0,100);return false;}return shot.life>0;});
         for(const e of s.enemies){
             if(!e.alive)continue;e.flash=Math.max(0,e.flash-dt);e.timer-=dt;
             const d=distance(e,s.player),dx=(s.player.x-e.x)/(d||1),dz=(s.player.z-e.z)/(d||1),type=e.type||'stalker';
@@ -257,7 +275,7 @@
         const date=mode==='daily'&&validDailyDate(courseDate)?courseDate:new Date().toISOString().slice(0,10);
         const seed=mode==='daily'?dailySeedForDate(date):(Date.now()>>>0)||1,island=mode==='daily'||zone>=unlockedIslands()?0:zone;
         state=makeRun({seed,mode,date,zone:island,roundId:makeId()});if(mode==='story')storage.set('lastIsland',island);
-        seenEvent=0;seenPhase='';clearInput();camera=[state.player.x*.78,11.8,state.player.z*.78+12.5];hideOverlay();$('ml-canvas').focus({preventScroll:true});updateHUD(true);sfx('tap');showMoveHint();if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
+        seenEvent=0;seenPhase='';resetJuice();clearInput();camera=[state.player.x*.78,11.8,state.player.z*.78+12.5];hideOverlay();$('ml-canvas').focus({preventScroll:true});updateHUD(true);sfx('tap');showMoveHint();if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
     }
     // The only text in the first 30 seconds of island 1: a 2-second movement hint that fades in and out.
     function showMoveHint(){
@@ -362,18 +380,54 @@
         if(!fogged.has(key)){const [from,to]=[color,FOG].map(c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16))),f=step/16*.62;fogged.set(key,'#'+from.map((v,i)=>Math.round(v+(to[i]-v)*f).toString(16).padStart(2,'0')).join(''));}
         return fogged.get(key);
     }
+    // ---- Feedback ("juice") runtime. Particles come from a fixed pool whose render descriptors are reused every
+    // frame; fxTime is a presentation clock that keeps running through the victory zoom but stops while paused.
+    const juice=config.juice,POOL=Array.from({length:160},()=>({life:0,max:1,x:0,y:0,z:0,vx:0,vy:0,vz:0,size:.1,desc:{...obj('sphere',0,0,0,.1,.1,.1,'#ffffff',0,1,.7),castShadow:false}}));
+    let poolCursor=0,shake=0,hitChain=0,lastHitAt=-9,victoryAt=0,lightNow=-1,fxTime=0,ringStart={};const dying=[];
+    function emit(x,z,count,{life,speed,size,color},y=.6){
+        for(let i=0;i<count;i++){const q=POOL[poolCursor];poolCursor=(poolCursor+1)%POOL.length;const a=Math.random()*Math.PI*2,v=speed*(.5+Math.random()*.7);
+            q.life=q.max=life;q.x=x;q.y=y;q.z=z;q.vx=Math.cos(a)*v;q.vz=Math.sin(a)*v;q.vy=1+Math.random()*1.5;q.size=size;q.desc.color=color;}
+    }
+    function resetJuice(){for(const q of POOL)q.life=0;dying.length=0;shake=0;hitChain=0;lastHitAt=-9;victoryAt=0;fxTime=0;ringStart={};}
+    // Synthesized tones on the shared Web Audio context, so no audio files ship with the game.
+    function tone(freq,length,volume,{type='triangle',attack=.005,harmonic=0}={}){
+        if(!soundEnabled||typeof SFX==='undefined')return;
+        try{SFX.init();const ctx=SFX.ctx;if(!ctx||!SFX.enabled)return;const now=ctx.currentTime,gain=ctx.createGain(),filter=ctx.createBiquadFilter();
+            filter.type='lowpass';filter.frequency.value=Math.min(12000,freq*4);filter.connect(gain);gain.connect(ctx.destination);
+            gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(volume,now+attack);gain.gain.exponentialRampToValueAtTime(.0001,now+length);
+            for(const [ratio,share] of harmonic?[[1,1],[1.5,harmonic],[2,harmonic*.5]]:[[1,1]]){const osc=ctx.createOscillator(),mix=ctx.createGain();osc.type=type;osc.frequency.value=freq*ratio;mix.gain.value=share;osc.connect(mix);mix.connect(filter);osc.start(now);osc.stop(now+length+.05);}
+        }catch(_){}
+    }
+    function playFx(items){
+        for(const f of items){
+            if(f.type==='hit'){
+                shake=juice.shake.time;const c=juice.hitParticles;emit(f.x,f.z,c.min+Math.floor(Math.random()*(c.max-c.min+1)),c);
+                const h=juice.hitSound;hitChain=fxTime-lastHitAt<=h.chain?Math.min(hitChain+1,h.steps-1):0;lastHitAt=fxTime;tone(h.base*h.step**hitChain,h.length,h.volume);
+            }else if(f.type==='defeat'){dying.push({e:f.enemy,age:0});emit(f.x,f.z,juice.defeat.particles,juice.defeat,.8);}
+            else if(f.type==='hurt'){const v=$('ml-vignette');v.style.animationDuration=juice.hurt.vignette+'s';v.classList.remove('on');void v.offsetWidth;v.classList.add('on');}
+            else if(f.type==='beacon'){const g=juice.ignite,lit=state.beacons.find(b=>b.lit&&ringStart[b.id]===undefined);if(lit)ringStart[lit.id]=fxTime;tone(196,g.sound,g.volume,{type:'sine',attack:.08,harmonic:.5});tone(294,g.sound,g.volume*.6,{attack:.14});}
+        }
+    }
+    function stepJuice(dt){
+        fxTime+=dt;for(const q of POOL)if(q.life>0){q.life-=dt;q.x+=q.vx*dt;q.z+=q.vz*dt;q.vy-=5*dt;q.y=Math.max(.05,q.y+q.vy*dt);}
+        for(let i=dying.length-1;i>=0;i--)if((dying[i].age+=dt)>=juice.defeat.shrink)dying.splice(i,1);
+    }
     function scene(s,time){
         const spec=ZONES[s.zone],p=s.player;
-        // Fog islands are dimmed everywhere except within 8 of a lit beacon; each clearing fades in over 1 second.
-        const clearings=spec.fog?s.beacons.filter(b=>b.lit).map(b=>({x:b.x,z:b.z,t:clamp(s.time-b.litAt,0,1)})):[];
-        const fogAt=(x,z)=>{if(!spec.fog)return 0;let clear=0;for(const c of clearings)if(Math.hypot(x-c.x,z-c.z)<8)clear=Math.max(clear,c.t);return 1-clear;};
+        // A lit beacon sends a ring of light out to ignite.radius over ignite.time; on fog islands everything the ring
+        // has passed returns to full colour (soft 1-unit edge) and stays that way.
+        const g=juice.ignite,rings=s.beacons.filter(b=>b.lit).map(b=>{const age=s===state&&ringStart[b.id]!==undefined?fxTime-ringStart[b.id]:g.time;return {x:b.x,z:b.z,age,r:g.radius*clamp(age/g.time,0,1)};});
+        const fogAt=(x,z)=>{if(!spec.fog)return 0;let f=1;for(const c of rings)f=Math.min(f,clamp(Math.hypot(x-c.x,z-c.z)-(c.r-1),0,1));return f;};
         const objects=terrain(s.zone).map(o=>{
             const faded=o.treeZ>p.z-1&&Math.hypot(o.treeX-p.x,o.treeZ-p.z)<3;
             if(!spec.fog)return faded?{...o,opacity:.28}:o;
             const f=o.ground?1:fogAt(o.x,o.z);
             return o.mist?{...o,opacity:o.opacity*f}:{...o,color:fogColor(o.color,f),opacity:faded?.28:o.opacity};
         }).filter(o=>!o.mist||o.opacity>.01);
-        for(const c of clearings)objects.push(obj('disk',c.x,.012,c.z,16,1,16,'#86c66f',0,.42*c.t,.15));
+        for(const c of rings){
+            if(spec.fog&&c.r>0)objects.push(obj('disk',c.x,.012,c.z,c.r*2,1,c.r*2,'#86c66f',0,.42,.15));
+            if(c.age<g.time)ring(objects,c.x,c.z,Math.max(.1,c.r),'#fff3c4',.25,1-c.age/g.time);
+        }
         const glow=(shape,x,y,z,sx,sy,sz,color,ry=0,opacity=1)=>({...obj(shape,x,y,z,sx,sy,sz,color,ry,opacity,.7),castShadow:false});
         const shadow=(x,z,r)=>objects.push(obj('disk',x,.022,z,r,1,r,'#102f2a',0,.15));
         // The next unlit beacon pulses softly to say "go here"; a beacon with a creature too close blinks red instead.
@@ -393,25 +447,31 @@
         for(const seed of s.seeds)if(!seed.taken){const y=.7+Math.sin(time*2+seed.id)*.13;shadow(seed.x,seed.z,.6);objects.push(glow('sphere',seed.x,y,seed.z,.32,.48,.32,'#ffe49a'),obj('sphere',seed.x-.15,y+.22,seed.z,.28,.12,.15,'#86efac',-.4),obj('torus',seed.x,.1,seed.z,.65,.035,.65,'#d3c47c'));}
         for(const g of s.gardens){objects.push(obj('disk',g.x,.03,g.z,g.radius*2,1,g.radius*2,'#86efac',0,.13,.3));ring(objects,g.x,g.z,g.radius,g.life>3?'#b5efb5':'#fde68a',.07,.8);for(let i=0;i<9;i++){const a=i*Math.PI*2/9,x=g.x+Math.cos(a)*1.65,z=g.z+Math.sin(a)*1.65;objects.push(obj('sphere',x,.13,z,.44,.17,.35,'#659b67'),glow('sphere',x,.34+Math.sin(time*2+i)*.05,z,.15,.16,.15,'#e9f5b4'));}}
         for(const h of s.hazards){const warning=h.delay>0;objects.push(obj('disk',h.x,.055,h.z,h.radius*2,1,h.radius*2,warning?'#fbbf24':'#f43f5e',0,warning?.12:.4,.5));ring(objects,h.x,h.z,h.radius,warning?'#fbbf24':'#fb7185',.08);if(warning)ring(objects,h.x,h.z,h.radius*clamp(1-h.delay/1.2,.1,1),'#fde68a',.085,.6);}
-        for(const burst of s.bursts){const age=1-burst.life/.6,size=.04+.2*(1-age);for(let i=0;i<8;i++){const a=i*Math.PI/4,r=.3+age*1.3;objects.push(glow('sphere',burst.x+Math.cos(a)*r,.6+age*.5,burst.z+Math.sin(a)*r,size,size,size,'#e9f5b4',0,1-age));}}
+        for(const o of s.orbs)objects.push(glow('sphere',o.x,.45+Math.sin(time*4+o.x)*.08,o.z,juice.orb.size,juice.orb.size,juice.orb.size,juice.orb.color));
+        if(s===state)for(const q of POOL)if(q.life>0){const k=q.life/q.max,d=q.desc;d.x=q.x;d.y=q.y;d.z=q.z;d.sx=d.sy=d.sz=q.size*(.4+.6*k);d.opacity=k;objects.push(d);}
         for(const shot of s.shots){objects.push(glow('sphere',shot.x,.7,shot.z,.3,.3,.3,'#fff3b0'));objects.push(glow('sphere',shot.x-shot.vx*.03,.7,shot.z-shot.vz*.03,.2,.2,.2,'#d8f5cf',0,.6));}
         for(const bolt of s.projectiles){objects.push(glow('sphere',bolt.x,.64,bolt.z,.28,.28,.28,'#e9bcff'));objects.push(glow('sphere',bolt.x-bolt.vx*.035,.64,bolt.z-bolt.vz*.035,.18,.18,.18,'#c4b5fd',0,.6));}
-        for(const e of s.enemies){
-            if(!e.alive)continue;const type=e.type||'stalker',scale=e.boss?1.65:type==='brute'?1.25:1,angle=Math.atan2(p.x-e.x,p.z-e.z),bob=Math.sin(time*3+e.id)*.05,col=e.flash>0?'#fff7df':e.phase==='warn'?'#d9a345':type==='caster'?'#697ea6':type==='brute'?'#796b88':'#81957b';
+        // k < 1 draws a defeated creature shrinking away over juice.defeat.shrink seconds.
+        const drawEnemy=(e,k=1)=>{
+            const type=e.type||'stalker',scale=(e.boss?1.65:type==='brute'?1.25:1)*k,angle=Math.atan2(p.x-e.x,p.z-e.z),bob=Math.sin(time*3+e.id)*.05*k,col=e.flash>0?'#ffffff':e.phase==='warn'?'#d9a345':type==='caster'?'#697ea6':type==='brute'?'#796b88':'#81957b';
             shadow(e.x,e.z,scale*1.35);
             if(type==='caster'){
-                objects.push(obj('sphere',e.x,.85+bob,e.z,.73,.83,.73,col),obj('torus',e.x,.67+bob,e.z,1.1,.16,1.1,'#b9a6d7',time),glow('sphere',e.x,.96+bob,e.z+.36,.24,.16,.12,'#eed5ff'));
-                for(let i=0;i<3;i++){const a=time+i*Math.PI*2/3;objects.push(obj('octa',e.x+Math.cos(a)*.6,1.1+bob,e.z+Math.sin(a)*.6,.18,.35,.18,'#bcaee7',a));}
+                objects.push(obj('sphere',e.x,.85*k+bob,e.z,.73*k,.83*k,.73*k,col),obj('torus',e.x,.67*k+bob,e.z,1.1*k,.16*k,1.1*k,'#b9a6d7',time),glow('sphere',e.x,.96*k+bob,e.z+.36*k,.24*k,.16*k,.12*k,'#eed5ff'));
+                for(let i=0;i<3;i++){const a=time+i*Math.PI*2/3;objects.push(obj('octa',e.x+Math.cos(a)*.6*k,1.1*k+bob,e.z+Math.sin(a)*.6*k,.18*k,.35*k,.18*k,'#bcaee7',a));}
             }else{
                 objects.push(obj('bevelbox',e.x,.63*scale,e.z,.83*scale,.94*scale,.73*scale,col,angle),obj('sphere',e.x,1.12*scale+bob,e.z,.67*scale,.57*scale,.61*scale,col,angle));
                 for(const side of[-1,1]){const lx=Math.cos(angle)*side*.46*scale,lz=-Math.sin(angle)*side*.46*scale;objects.push(obj('sphere',e.x+lx,.56*scale,e.z+lz,.37*scale,.7*scale,.4*scale,col),obj('bevelbox',e.x+lx*.55,.16,e.z+lz*.55,.28*scale,.25,.42*scale,'#3d4a47',angle));objects.push(obj('octa',e.x+lx*.65,1.5*scale,e.z+lz*.65,.24*scale,.58*scale,.23*scale,e.rage?'#fb7185':'#b9c2a9',angle));}
                 objects.push(glow('bevelbox',e.x+Math.sin(angle)*.35*scale,1.13*scale,e.z+Math.cos(angle)*.35*scale,.35*scale,.09,.07,e.rage?'#fb7185':'#e3f4bd',angle));
             }
+            if(k<1)return;
             if(e.hp<e.maxHP||e.boss){const width=1.2*scale,y=1.88*scale;objects.push(obj('bevelbox',e.x,y,e.z,width,.075,.1,'#263c36'),obj('bevelbox',e.x-(1-e.hp/e.maxHP)*width/2,y+.005,e.z,width*e.hp/e.maxHP,.08,.12,e.rage?'#fb7185':'#e9bd92'));}
             if(e.phase==='warn'&&e.attackType!=='slam'){ring(objects,e.x,e.z,scale*.9,'#fbbf24',.065);for(let i=1;i<5;i++)objects.push(glow('bevelbox',e.x+e.aimX*i*.55,.08,e.z+e.aimZ*i*.55,.14,.04,.25,'#fde68a',Math.atan2(e.aimX,e.aimZ)));}
-        }
-        const angle=Math.atan2(p.facingX,p.facingZ),walk=s.moving?Math.sin(time*13)*.11:0,bob=s.moving?Math.abs(walk)*.4:Math.sin(time*2)*.018,skin=p.invuln>0&&Math.floor(time*16)%2===0?'#fff2cd':'#e8c797';shadow(p.x,p.z,1.15);
-        const part=(shape,lx,y,lz,sx,sy,sz,color,emissive=0)=>{objects.push(obj(shape,p.x+Math.cos(angle)*lx+Math.sin(angle)*lz,y+bob,p.z-Math.sin(angle)*lx+Math.cos(angle)*lz,sx,sy,sz,color,angle,1,emissive));};
+        };
+        for(const e of s.enemies)if(e.alive)drawEnemy(e);
+        if(s===state)for(const d of dying)drawEnemy(d.e,Math.max(.02,1-d.age/juice.defeat.shrink));
+        // While invulnerable after a hit the guardian blinks (skipped with reduced motion, where time is 0).
+        const angle=Math.atan2(p.facingX,p.facingZ),walk=s.moving?Math.sin(time*13)*.11:0,bob=s.moving?Math.abs(walk)*.4:Math.sin(time*2)*.018,skin='#e8c797',blinkOff=p.invuln>0&&time>0&&Math.floor(time*juice.hurt.blink)%2===0;shadow(p.x,p.z,1.15);
+        const part=(shape,lx,y,lz,sx,sy,sz,color,emissive=0)=>{if(blinkOff)return;objects.push(obj(shape,p.x+Math.cos(angle)*lx+Math.sin(angle)*lz,y+bob,p.z-Math.sin(angle)*lx+Math.cos(angle)*lz,sx,sy,sz,color,angle,1,emissive));};
         part('bevelbox',-.18,.16+walk,.02,.25,.3,.42,'#624f3e');part('bevelbox',.18,.16-walk,.02,.25,.3,.42,'#624f3e');
         part('sphere',0,.65,0,.72,.83,.62,'#27785b');part('bevelbox',0,.7,-.34,.47,.56,.28,'#9c7747');part('bevelbox',0,.62,.03,.74,.14,.6,'#ac8950');
         part('sphere',0,1.2,.03,.68,.65,.65,skin);part('sphere',0,1.39,-.1,.79,.58,.77,'#37734e');part('bevelbox',0,1.54,.11,.85,.11,.75,'#4d8755');
@@ -426,11 +486,24 @@
     function loop(now){frame=requestAnimationFrame(loop);const dt=last?Math.min((now-last)/1000,.05):0;last=now;
         if(state&&state.phase==='playing'){
             const west=keys.has('a')||keys.has('arrowleft')||held.has('west'),east=keys.has('d')||keys.has('arrowright')||held.has('east'),north=keys.has('w')||keys.has('arrowup')||held.has('north'),south=keys.has('s')||keys.has('arrowdown')||held.has('south');
-            tick(state,{x:Number(east)-Number(west),z:Number(south)-Number(north)},dt);
-            if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',beacon:'beaconLit',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',bloom:'bloomEvent',rage:'rage',shrineLocked:'shrineLocked',blessing:'blessing'}[state.event];if(eventKey&&state.time>=(ZONES[state.zone].quiet||0))$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='beacon')sfx('clear');else if(state.event==='defeat')sfx('combo');else if(state.event==='hurt')sfx('wrong');else if(state.event==='pulse'||state.event==='charged')sfx('tap');else if(state.event==='garden')sfx('hint');else if(state.event==='bloom')sfx('combo');}
+            tick(state,{x:Number(east)-Number(west),z:Number(south)-Number(north)},dt);playFx(state.fx.splice(0));
+            // Pulse hits and lit beacons have their own synthesized sounds (playFx), so they are not repeated here.
+            if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',beacon:'beaconLit',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',bloom:'bloomEvent',rage:'rage',shrineLocked:'shrineLocked',blessing:'blessing'}[state.event];if(eventKey&&state.time>=(ZONES[state.zone].quiet||0))$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='defeat')sfx('combo');else if(state.event==='hurt')sfx('wrong');else if(state.event==='garden')sfx('hint');else if(state.event==='bloom')sfx('combo');}
         }
-        if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='shrine'){sfx('hint');showOverlay('shrine');}else if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(['won','lost'].includes(state.phase))finish();}
-        if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const target=[p.x*.78,0,p.z*.78];camera[0]+=(target[0]-camera[0])*smoothing;camera[1]=11.8;camera[2]+=(target[2]+12.5-camera[2])*smoothing;renderer.render(scene(active,reduced?0:now/1000),{eye:camera,target:[camera[0],.25,camera[2]-13.5],fov:49});}
+        if(state&&(state.phase==='playing'||state.phase==='won'))stepJuice(dt);
+        // A win holds on a slow zoom-out for juice.victory.time before the result screen.
+        if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='shrine'){sfx('hint');showOverlay('shrine');}else if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(state.phase==='won')victoryAt=now;else if(state.phase==='lost')finish();}
+        if(state&&state.phase==='won'&&victoryAt&&now-victoryAt>=juice.victory.time*1000)finish();
+        if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const target=[p.x*.78,0,p.z*.78];camera[0]+=(target[0]-camera[0])*smoothing;camera[1]=11.8;camera[2]+=(target[2]+12.5-camera[2])*smoothing;
+            // Scene light follows the number of lit beacons (juice.light.min at 0/3, max at 3/3).
+            const lightTarget=juice.light.min+(juice.light.max-juice.light.min)*active.beacons.filter(b=>b.lit).length/active.beacons.length;
+            lightNow=lightNow<0||reduced?lightTarget:lightNow+(lightTarget-lightNow)*Math.min(1,dt*3/juice.light.ease);
+            if(Math.abs(lightNow-renderer.lightScale)>.003)renderer.setEnvironment({lightScale:+lightNow.toFixed(3)});
+            let eye=camera,look=[camera[0],.25,camera[2]-13.5];
+            if(state&&state.phase==='won'&&victoryAt){const k=clamp((now-victoryAt)/1000/juice.victory.time,0,1),ease=k*k*(3-2*k),wide=[0,juice.victory.height,juice.victory.distance];eye=eye.map((v,i)=>v+(wide[i]-v)*ease);look=look.map(v=>v*(1-ease));}
+            if(shake>0&&!reduced){const a=juice.shake.amplitude*shake/juice.shake.time,ox=(Math.random()*2-1)*a,oy=(Math.random()*2-1)*a;eye=[eye[0]+ox,eye[1]+oy,eye[2]];look=[look[0]+ox,look[1]+oy,look[2]];}
+            shake=Math.max(0,shake-dt);
+            renderer.render(scene(active,reduced?0:now/1000),{eye,target:look,fov:49});}
         updateHUD();
     }
     function boot(){

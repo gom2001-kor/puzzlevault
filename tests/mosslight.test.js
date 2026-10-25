@@ -73,7 +73,7 @@ test('only movement is an input: abilities are off by default and the combo stat
     assert.equal(s.beacons[0].lit,false);assert.equal(s.energy,100);assert.ok(!('combo' in s)&&!('comboTimer' in s));
 });
 test('the lantern fires every 0.8 seconds at the nearest creature in range and never without one',()=>{
-    const s=C.makeRun();s.player.x=0;s.player.z=4;const near=dummy(0,3,4),far=dummy(1,-4.5,4);s.enemies=[far,near];
+    const s=C.makeRun();s.player.x=0;s.player.z=4;const near=dummy(0,1.5,4),far=dummy(1,-5.8,4);s.enemies=[far,near];
     C.tick(s,{},.05);assert.equal(s.shots.length,1);assert.ok(s.shots[0].vx>0&&Math.abs(s.shots[0].vz)<1e-9);
     let fired=1,previous=s.attackCD;for(let i=1;i<78;i++){C.tick(s,{},.05);if(s.attackCD>previous)fired++;previous=s.attackCD;}
     assert.equal(fired,5);assert.ok(near.hp<20);assert.equal(far.hp,20);
@@ -189,4 +189,24 @@ test('a hunting creature closes in from beyond 10 units, and standing still at a
     const t=C.makeRun({seed:9}),b=t.beacons[0];
     while(t.phase==='playing'&&t.time<120)C.tick(t,C.distance(t.player,b)>.3?{x:b.x-t.player.x,z:b.z-t.player.z}:{},1/60);
     assert.equal(t.beacons[0].lit,true);assert.equal(t.phase,'lost');
+});
+
+// Feedback ("juice") events and the gameplay parts of them (knockback, orbs, invulnerability); see config.juice.
+test('a pulse hit pushes the creature back along the shot, flashes it white and reports the hit',()=>{
+    const s=C.makeRun({zone:1});s.player.x=0;s.player.z=4;const e=dummy(0,2,4,10);s.enemies=[e];
+    while(e.hp===10&&s.time<2)C.tick(s,{},.01);
+    assert.equal(e.hp,9);assert.ok(Math.abs(e.x-(2+C.config.juice.knockback.distance))<.02,`x ${e.x}`);assert.ok(e.flash>0&&e.flash<=C.config.juice.knockback.flash);
+    const hit=s.fx.find(f=>f.type==='hit');assert.ok(hit&&Math.abs(hit.dx-1)<1e-9&&Math.abs(hit.dz)<1e-9);
+});
+test('a defeated creature drops an orb that flies to a player within 2 and is counted, not shown',()=>{
+    const s=C.makeRun({zone:1});s.player.x=0;s.player.z=4;const e=dummy(0,4,4,1);s.enemies=[e];
+    while(e.alive&&s.time<2)C.tick(s,{},.01);
+    assert.ok(s.fx.some(f=>f.type==='defeat'&&f.enemy.id===0));assert.equal(s.orbs.length,1);
+    advance(s,1);assert.equal(s.orbs.length,1);assert.equal(s.xp,0);
+    s.player.x=s.orbs[0].x-1.8;advance(s,.5);assert.equal(s.orbs.length,0);assert.equal(s.xp,1);assert.ok(s.fx.some(f=>f.type==='orb'));
+});
+test('taking a hit grants 0.5 s of invulnerability and reports it; a lit beacon reports itself',()=>{
+    const s=C.makeRun({zone:1});s.enemies=[];s.hazards=[{x:s.player.x,z:s.player.z,radius:2,delay:0,life:.05,hit:false}];C.tick(s,{},.05);
+    assert.equal(s.player.hp,4.5);assert.ok(Math.abs(s.player.invuln-C.config.juice.hurt.invuln)<1e-9);assert.ok(s.fx.some(f=>f.type==='hurt'));
+    const b=s.beacons[0];s.player.x=b.x;s.player.z=b.z;advance(s,2.05);assert.equal(b.lit,true);assert.ok(s.fx.some(f=>f.type==='beacon'&&f.x===b.x&&f.z===b.z));
 });
