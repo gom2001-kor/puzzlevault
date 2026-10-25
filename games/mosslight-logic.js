@@ -39,7 +39,8 @@
     };
     // Follow camera. pitch is the downward angle in degrees (the original rig was ~40.6); the distance is chosen
     // so the ground visible at the bottom edge of the screen stays the same as the original rig.
-    config.camera = { pitch: 48, fov: 49 };
+    // portrait: on a canvas taller than wide the camera centres the player and backs off by (aspect / canvas aspect)^pull.
+    config.camera = { pitch: 48, fov: 49, portrait: { aspect: 1.36, pull: .5 } };
     // Keeping the fight readable behind trees, rocks and mist. Each feature can be switched off on its own.
     config.visibility = {
         steepCamera: true,                                 // use config.camera.pitch instead of the original angle
@@ -53,7 +54,7 @@
     config.balance = {
         zoneScale: [1, 1.3, 1.6],                                  // guard and boss health on islands 1, 2, 3
         xp: { first: 4, growth: 1.3, orb: { stalker: 3, caster: 2, brute: 3, boss: 0 } }, // level 1->2 needs `first`, then x growth
-        waves: { interval: 45, cap: 4, capStep: 2, spawnEvery: 4, spawnFactor: .85, speedStep: .06, casterFrom: 2, bruteFrom: 3, hp: { stalker: 3, caster: 3, brute: 5 } },
+        waves: { interval: 45, cap: 4, capStep: 1, spawnEvery: 4, spawnFactor: .85, speedStep: .06, casterFrom: 3, bruteFrom: 4, hp: { stalker: 3, caster: 3, brute: 5 } },
         // earliest: the guardian never wakes sooner than this many seconds after the first ignition.
         boss: { hp: 100, earliest: 150, warn: 2, speed: .7, rushEvery: 2.5, rushTelegraph: 1, rushSpeed: 6, rushTime: .6, rushDamage: 1.5, slamBelow: .5, slamEvery: 4, slamTelegraph: 1, slamRadius: 3.4, slamDamage: 1.5 },
         // Per-level values (level 1, 2, 3). Card text fills {n} from the level being taken.
@@ -72,16 +73,18 @@
             bloom: [10, 8, 6]            // defeats per all-round pulse (3 damage within 6.5)
         }
     };
+    // Floating joystick on touch devices, in CSS pixels.
+    config.touch = { radius: 60, deadZone: 8 };
     const UPGRADES = Object.keys(config.balance.upgrades);
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     // Camera eye and look-at point for a player at (px, pz); see config.camera.
     const LEGACY_CAMERA = { height: 11.55, back: 13.5 };
-    function cameraPose(px, pz, steep = config.visibility.steepCamera) {
-        const look = [px * .78, .25, pz * .78 - 1], legacyPitch = Math.atan2(LEGACY_CAMERA.height, LEGACY_CAMERA.back), half = config.camera.fov * Math.PI / 360;
+    function cameraPose(px, pz, steep = config.visibility.steepCamera, aspect = 0) {
+        const tall = aspect > 0 && aspect < 1, look = tall ? [px, .25, pz - 1] : [px * .78, .25, pz * .78 - 1], legacyPitch = Math.atan2(LEGACY_CAMERA.height, LEGACY_CAMERA.back), half = config.camera.fov * Math.PI / 360;
         const pitch = steep ? config.camera.pitch * Math.PI / 180 : legacyPitch, legacyDistance = Math.hypot(LEGACY_CAMERA.height, LEGACY_CAMERA.back);
         // Horizontal reach from the look point to the bottom edge of the view, per unit of camera distance.
         const reach = angle => Math.cos(angle) - Math.sin(angle) / Math.tan(angle + half);
-        const distance = steep ? legacyDistance * reach(legacyPitch) / reach(pitch) : legacyDistance;
+        const distance = (steep ? legacyDistance * reach(legacyPitch) / reach(pitch) : legacyDistance) * (tall ? (config.camera.portrait.aspect / aspect) ** config.camera.portrait.pull : 1);
         return { eye: [look[0], look[1] + distance * Math.sin(pitch), look[2] + distance * Math.cos(pitch)], look, pitch, distance };
     }
     // True when the segment a-b passes through the ellipsoid {x, y, z, rx, ry, rz}.
@@ -393,11 +396,11 @@
     for(const code of Object.keys(SURVIVOR))Object.assign(TEXT[code],SURVIVOR[code]);
     // Island 1 onboarding copy. The movement hint lives only in moveHintKeys / moveHintTouch, so a later joystick swaps text here.
     const ONBOARDING={
-        en:{start:'Start',beaconsHud:'Beacons',moveHintKeys:'Move with WASD / arrow keys',moveHintTouch:'Use the arrows to move'},
-        ko:{start:'시작',beaconsHud:'봉화',moveHintKeys:'WASD / 방향키로 이동',moveHintTouch:'방향 버튼으로 이동'},
-        ja:{start:'スタート',beaconsHud:'灯台',moveHintKeys:'WASD / 矢印キーで移動',moveHintTouch:'方向ボタンで移動'},
-        zh:{start:'开始',beaconsHud:'灯塔',moveHintKeys:'WASD / 方向键移动',moveHintTouch:'用方向按钮移动'},
-        es:{start:'Empezar',beaconsHud:'Faros',moveHintKeys:'Muévete con WASD / flechas',moveHintTouch:'Usa las flechas para moverte'}
+        en:{start:'Start',beaconsHud:'Beacons',moveHintKeys:'Move with WASD / arrow keys',moveHintTouch:'Drag to move'},
+        ko:{start:'시작',beaconsHud:'봉화',moveHintKeys:'WASD / 방향키로 이동',moveHintTouch:'끌어서 이동'},
+        ja:{start:'スタート',beaconsHud:'灯台',moveHintKeys:'WASD / 矢印キーで移動',moveHintTouch:'ドラッグで移動'},
+        zh:{start:'开始',beaconsHud:'灯塔',moveHintKeys:'WASD / 方向键移动',moveHintTouch:'拖动即可移动'},
+        es:{start:'Empezar',beaconsHud:'Faros',moveHintKeys:'Muévete con WASD / flechas',moveHintTouch:'Arrastra para moverte'}
     };
     for(const code of Object.keys(ONBOARDING))Object.assign(TEXT[code],ONBOARDING[code]);
     for(const [code,label] of Object.entries({en:'Next island',ko:'다음 섬',ja:'次の島',zh:'下一座岛',es:'Siguiente isla'}))TEXT[code].nextIsland=label;
@@ -424,6 +427,7 @@
     async function shareRun(){if(!state)return;const m=Math.floor(state.time/60),ss=String(Math.floor(state.time%60)).padStart(2,'0');if(typeof shareResult==='function')await shareResult(`I survived ${m}:${ss} in Mosslight Wardens 🌲 Beat me: ${resultURL(state.mode,state.date,lang(),location.href)}`);}
     function takeCard(id){if(!state||!chooseCard(state,id))return;sfx('clear');if(state.phase==='levelup')renderOverlay();else{hideOverlay();$('ml-canvas').focus({preventScroll:true});}updateHUD(true);}
     let state=null,renderer=null,last=0,frame=0,selectedIsland=0,hintTimer=0,seenEvent=0,seenPhase='',overlayKind='start',soundEnabled=true,camera=[0,11.8,17],lastHud=0,adPending=false,contextLost=false,lastEnvironment=-1;
+    const stick={id:null,ox:0,oy:0,x:0,z:0};
     const keys=new Set(),held=new Set(),$=id=>document.getElementById(id),lang=()=>typeof I18n!=='undefined'&&TEXT[I18n.currentLang]?I18n.currentLang:'en',t=key=>TEXT[lang()][key]||TEXT.en[key]||key;
     const storage={get(k,fallback=null){try{const v=localStorage.getItem('pv_mosslight_'+k);return v===null?fallback:JSON.parse(v);}catch(_){return fallback;}},set(k,v){try{localStorage.setItem('pv_mosslight_'+k,JSON.stringify(v));}catch(_){}},remove(k){try{localStorage.removeItem('pv_mosslight_'+k);}catch(_){}}};
     const clock=n=>`${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`;
@@ -438,7 +442,7 @@
         const date=mode==='daily'&&validDailyDate(courseDate)?courseDate:new Date().toISOString().slice(0,10);
         const seed=mode==='daily'?dailySeedForDate(date):(Date.now()>>>0)||1,island=mode==='daily'||zone>=unlockedIslands()?0:zone;
         state=makeRun({seed,mode,date,zone:island,roundId:makeId()});if(mode==='story')storage.set('lastIsland',island);
-        seenEvent=0;seenPhase='';resetJuice();clearInput();camera=cameraPose(state.player.x,state.player.z).eye.slice();hideOverlay();$('ml-canvas').focus({preventScroll:true});updateHUD(true);sfx('tap');showMoveHint();if(matchMedia('(max-width:600px)').matches)requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
+        seenEvent=0;seenPhase='';resetJuice();clearInput();camera=cameraPose(state.player.x,state.player.z,undefined,canvasAspect()).eye.slice();hideOverlay();syncImmersive();$('ml-canvas').focus({preventScroll:true});updateHUD(true);sfx('tap');showMoveHint();if(matchMedia('(max-width:600px)').matches&&!coarse())requestAnimationFrame(()=>document.querySelector('.ml-game').scrollIntoView({behavior:'auto',block:'start'}));
     }
     // The only text in the first 30 seconds of island 1: a 2-second movement hint that fades in and out.
     function showMoveHint(){
@@ -446,10 +450,14 @@
         if(!ZONES[state.zone].hint)return;
         hint.textContent=t(matchMedia('(pointer: coarse)').matches?'moveHintTouch':'moveHintKeys');void hint.offsetWidth;hint.hidden=false;hintTimer=setTimeout(()=>{hint.hidden=true;},2000);
     }
-    function clearInput(){keys.clear();held.clear();document.querySelectorAll('[data-dir]').forEach(b=>b.classList.remove('pressed'));}
+    function clearInput(){keys.clear();held.clear();document.querySelectorAll('[data-dir]').forEach(b=>b.classList.remove('pressed'));releaseStick();}
+    // Touch devices: a floating joystick wherever a finger lands (config.touch), and the game fills the screen while a run is on.
+    const coarse=()=>matchMedia('(pointer: coarse)').matches,canvasAspect=()=>{const c=$('ml-canvas');return c.clientHeight?c.clientWidth/c.clientHeight:0;};
+    function releaseStick(){stick.id=null;stick.x=stick.z=0;const el=$('ml-stick');if(el)el.hidden=true;}
+    function syncImmersive(){const on=coarse()&&!!state&&!['start','result'].includes(overlayKind),game=document.querySelector('.ml-game');if(game.classList.contains('ml-immersive')===on)return;game.classList.toggle('ml-immersive',on);document.documentElement.classList.toggle('ml-immersive-page',on);if(!on)releaseStick();}
     function pause(){if(!state||!['playing','paused'].includes(state.phase)||(state.phase==='paused'&&contextLost))return;clearInput();state.phase=state.phase==='playing'?'paused':'playing';if(state.phase==='paused')showOverlay('pause');else hideOverlay();updateHUD(true);}
     function hideOverlay(){$('ml-overlay').hidden=true;overlayKind='';}
-    function showOverlay(kind){overlayKind=kind;if(kind==='start')selectedIsland=lastIsland();clearInput();$('ml-overlay').hidden=false;renderOverlay();}
+    function showOverlay(kind){overlayKind=kind;if(kind==='start')selectedIsland=lastIsland();clearInput();$('ml-overlay').hidden=false;renderOverlay();syncImmersive();}
     function button(label,fn,className=''){const b=document.createElement('button');b.type='button';b.textContent=label;b.className='ml-button '+className;b.addEventListener('click',fn);return b;}
     function renderOverlay(){
         const box=$('ml-overlay-content');box.replaceChildren();
@@ -471,7 +479,7 @@
             title.textContent=t('shrine');p.textContent=t('shrineText');
             for(const id of ['renewal','flare']){const b=button('',()=>{if(chooseBoon(state,id)){hideOverlay();updateHUD(true);sfx('clear');}});const strong=document.createElement('strong'),small=document.createElement('span');strong.textContent=t(id);small.textContent=t(id+'Desc');b.append(strong,small);actions.append(b);}
         }else if(overlayKind==='levelup'){
-            title.textContent=t('levelUp').replace('{n}',state.level);p.textContent=t('levelUpText');
+            title.textContent=t('levelUp').replace('{n}',state.level);p.textContent=t('levelUpText');actions.classList.add('ml-cards');
             state.cards.forEach((id,i)=>{const lv=(state.levels[id]||0)+1,[name,effect]=upgradeText(id),b=button('',()=>takeCard(id),'ml-card'),strong=document.createElement('strong'),small=document.createElement('span');
                 strong.textContent=`${i+1}. ${name} ${['I','II','III'][lv-1]}`;small.textContent=effect.replace('{n}',upgradeNumber(id,lv));b.append(strong,small);actions.append(b);});
         }else if(overlayKind==='upgrade'){
@@ -688,10 +696,10 @@
         return objects;
     }
     const preview=makeRun({seed:812});
-    function loop(now){frame=requestAnimationFrame(loop);const dt=last?Math.min((now-last)/1000,.05):0;last=now;
+    function loop(now){frame=requestAnimationFrame(loop);const dt=last?Math.min((now-last)/1000,.05):0;last=now;syncImmersive();
         if(state&&state.phase==='playing'){
             const west=keys.has('a')||keys.has('arrowleft')||held.has('west'),east=keys.has('d')||keys.has('arrowright')||held.has('east'),north=keys.has('w')||keys.has('arrowup')||held.has('north'),south=keys.has('s')||keys.has('arrowdown')||held.has('south');
-            tick(state,{x:Number(east)-Number(west),z:Number(south)-Number(north)},dt);playFx(state.fx.splice(0));
+            tick(state,stick.id!==null&&(stick.x||stick.z)?{x:stick.x,z:stick.z}:{x:Number(east)-Number(west),z:Number(south)-Number(north)},dt);playFx(state.fx.splice(0));
             // Pulse hits and lit beacons have their own synthesized sounds (playFx), so they are not repeated here.
             if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',bossWarn:'bossWarn',beacon:'beaconLit',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',bloom:'bloomEvent',rage:'rage',shrineLocked:'shrineLocked',blessing:'blessing'}[state.event];if(eventKey&&state.time>=(ZONES[state.zone].quiet||0))$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='defeat')sfx('combo');else if(state.event==='hurt')sfx('wrong');else if(state.event==='garden')sfx('hint');else if(state.event==='bloom')sfx('combo');}
         }
@@ -699,7 +707,7 @@
         // A win holds on a slow zoom-out for juice.victory.time before the result screen.
         if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='shrine'){sfx('hint');showOverlay('shrine');}else if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(state.phase==='won')victoryAt=now;else if(state.phase==='lost')finish();else if(state.phase==='levelup'){sfx('combo');showOverlay('levelup');}}
         if(state&&state.phase==='won'&&victoryAt&&now-victoryAt>=juice.victory.time*1000)finish();
-        if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const pose=cameraPose(p.x,p.z);for(let i=0;i<3;i++)camera[i]+=(pose.eye[i]-camera[i])*smoothing;
+        if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const pose=cameraPose(p.x,p.z,undefined,canvasAspect());for(let i=0;i<3;i++)camera[i]+=(pose.eye[i]-camera[i])*smoothing;
             // Scene light follows the number of lit beacons (juice.light.min at 0/3, max at 3/3).
             const lightTarget=juice.light.min+(juice.light.max-juice.light.min)*active.beacons.filter(b=>b.lit).length/active.beacons.length;
             lightNow=lightNow<0||reduced?lightTarget:lightNow+(lightTarget-lightNow)*Math.min(1,dt*3/juice.light.ease);
@@ -719,6 +727,16 @@
         $('ml-canvas').addEventListener('webglcontextlost',e=>{e.preventDefault();contextLost=true;clearInput();if(state&&state.phase==='playing')pause();else if(overlayKind)renderOverlay();});$('ml-canvas').addEventListener('webglcontextrestored',()=>{contextLost=false;last=0;if(overlayKind)renderOverlay();});
         try{soundEnabled=localStorage.getItem('pv_sound')!=='off';}catch(_){};
         $('ml-pause').addEventListener('click',pause);$('ml-sound').addEventListener('click',()=>{soundEnabled=!soundEnabled;try{localStorage.setItem('pv_sound',soundEnabled?'on':'off');}catch(_){}if(typeof SFX!=='undefined')SFX.enabled=soundEnabled;updateHUD(true);});
+        // Floating joystick: the touch point becomes the centre; dragging past the dead zone moves that way (screen up = north).
+        const game=document.querySelector('.ml-game'),stickEl=$('ml-stick'),knob=stickEl.firstElementChild,T=config.touch;
+        const touchPointer=e=>e.pointerType!=='mouse'||coarse(),inMenu=e=>!$('ml-overlay').hidden&&$('ml-overlay').contains(e.target);
+        game.addEventListener('pointerdown',e=>{if(!state||state.phase!=='playing'||stick.id!==null||!touchPointer(e)||inMenu(e)||e.target.closest('button,a'))return;e.preventDefault();
+            const box=$('ml-canvas').parentElement.getBoundingClientRect();stick.id=e.pointerId;stick.ox=e.clientX;stick.oy=e.clientY;stick.x=stick.z=0;
+            stickEl.style.left=(e.clientX-box.left)+'px';stickEl.style.top=(e.clientY-box.top)+'px';knob.style.transform='translate(-50%,-50%)';stickEl.hidden=false;try{game.setPointerCapture(e.pointerId);}catch(_){}});
+        game.addEventListener('pointermove',e=>{if(e.pointerId!==stick.id)return;e.preventDefault();const dx=e.clientX-stick.ox,dy=e.clientY-stick.oy,d=Math.hypot(dx,dy),k=d>T.radius?T.radius/d:1;
+            knob.style.transform=`translate(calc(-50% + ${dx*k}px),calc(-50% + ${dy*k}px))`;if(d<=T.deadZone){stick.x=stick.z=0;return;}stick.x=dx/d;stick.z=dy/d;});
+        for(const ev of ['pointerup','pointercancel','lostpointercapture'])game.addEventListener(ev,e=>{if(e.pointerId===stick.id)releaseStick();});
+        for(const ev of ['touchstart','touchmove'])game.addEventListener(ev,e=>{if(state&&state.phase==='playing'&&!inMenu(e))e.preventDefault();},{passive:false});
         for(const b of document.querySelectorAll('[data-dir]')){const dir=b.dataset.dir;b.addEventListener('pointerdown',e=>{if(!state||state.phase!=='playing')return;e.preventDefault();held.add(dir);b.classList.add('pressed');b.setPointerCapture(e.pointerId);});for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>{held.delete(dir);b.classList.remove('pressed');});}
         document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;const k=e.key.toLowerCase();if(state&&state.phase==='levelup'&&['1','2','3'].includes(k)){e.preventDefault();const id=state.cards[Number(k)-1];if(id&&!e.repeat)takeCard(id);return;}if(['p','escape'].includes(k)){if(state&&['playing','paused'].includes(state.phase)){e.preventDefault();if(!e.repeat)pause();}return;}if(!state||state.phase!=='playing')return;
             if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(k)){e.preventDefault();keys.add(k);return;}

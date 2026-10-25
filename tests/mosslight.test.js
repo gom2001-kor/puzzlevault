@@ -299,3 +299,18 @@ test('the same daily seed and the same inputs give the same run, cards and guard
         return s;};
     const a=play(),b=play();assert.equal(JSON.stringify(a),JSON.stringify(b));
 });
+test('touch devices get a floating joystick and drag hint instead of the arrow buttons; desktop rules stay as they were',()=>{
+    const fs=require('node:fs'),path=require('node:path'),read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
+    assert.deepEqual(C.config.touch,{radius:60,deadZone:8});
+    const js=read('games/mosslight-logic.js'),css=read('css/mosslight.css'),html=read('games/mosslight.html');
+    assert.match(js,/moveHintTouch:'Drag to move'/);assert.match(js,/moveHintTouch:'끌어서 이동'/);
+    assert.match(html,/id="ml-stick"/);assert.match(html,/data-dir="north"/,'desktop keeps its buttons');
+    const touch=css.slice(css.indexOf('@media(pointer:coarse){'));
+    assert.match(touch,/\.ml-controls\.game-controls\{display:none\}/);assert.match(touch,/touch-action:none/);
+    assert.match(touch,/\.ml-cards\{gap:12px\}\.ml-cards \.ml-button\.ml-card\{min-height:56px\}/);
+});
+test('a portrait canvas centres the camera on the player and backs off; landscape and desktop poses are unchanged',()=>{
+    const wide=C.cameraPose(2,3),desk=C.cameraPose(2,3,undefined,1.8),tall=C.cameraPose(2,3,undefined,.6),P=C.config.camera.portrait;
+    assert.deepEqual(desk,wide);assert.deepEqual(C.cameraPose(2,3,undefined,1),wide);
+    assert.deepEqual(tall.look,[2,.25,2]);assert.ok(Math.abs(tall.distance/wide.distance-(P.aspect/.6)**P.pull)<1e-9);
+});
