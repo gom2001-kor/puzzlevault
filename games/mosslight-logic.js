@@ -350,7 +350,7 @@
         for(const slab of a)slab.ground=true;
         // Fog islands get a 10x10 grid of thin ground tiles so a beacon's light ring recolours the floor only
         // where it has passed and never past the island edge.
-        if(spec.fog)for(let i=0;i<10;i++)for(let j=0;j<10;j++)a.push({...obj('bevelbox',-8.55+i*1.9,.006,-8.55+j*1.9,1.9,.02,1.9,'#6a9b5a'),castShadow:false});
+        if(spec.fog)for(let i=0;i<10;i++)for(let j=0;j<10;j++)a.push({...obj('plane',-8.55+i*1.9,.008,-8.55+j*1.9,1.9,1,1.9,'#6a9b5a'),castShadow:false});
         // Individually shaped rock shelves and moss pillows soften the island silhouette.
         for(let i=0;i<32;i++){const side=i%4,n=Math.floor(i/4),v=-8.4+n*2.4,x=side<2?(side===0?-9:9):v,z=side<2?v:(side===2?-9:9);a.push(obj('sphere',x,-.68-random()*.6,z,2.3+random(),1.6,2.5, i%3?'#526753':'#748866',random()*3));if(i%3===0)a.push(obj('sphere',x*.96,-.08,z*.96,1.8,.35,1.7,greens[1]));}
         for(let i=0;i<13;i++){const z=7.7-i*1.35,x=Math.sin(i*.75)*.55;a.push(obj('sphere',x,.024,z,1.4,.08,1.15,'#9d9c7c',i*.3),obj('bevelbox',x+.27,.04,z-.12,.6,.055,.48,'#b0ad8b',i*.21));}
