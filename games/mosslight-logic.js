@@ -348,6 +348,9 @@
         const a=[],spec=ZONES[zone],random=rng(812+zone*56),greens=[['#4c7651','#6f9558','#87a96b'],['#3f776f','#60938a','#80b19b'],['#49635e','#668377','#8b9d78']][zone];
         a.push(obj('bevelbox',0,-.55,0,19,1.1,19,greens[0]),obj('bevelbox',0,-1.5,0,17.8,1.2,17.8,'#354e45'),obj('bevelbox',0,-2.3,0,14.6,1.1,14.6,'#293b37'));
         for(const slab of a)slab.ground=true;
+        // Fog islands get a 10x10 grid of thin ground tiles so a beacon's light ring recolours the floor only
+        // where it has passed and never past the island edge.
+        if(spec.fog)for(let i=0;i<10;i++)for(let j=0;j<10;j++)a.push({...obj('bevelbox',-8.55+i*1.9,.006,-8.55+j*1.9,1.9,.02,1.9,'#6a9b5a'),castShadow:false});
         // Individually shaped rock shelves and moss pillows soften the island silhouette.
         for(let i=0;i<32;i++){const side=i%4,n=Math.floor(i/4),v=-8.4+n*2.4,x=side<2?(side===0?-9:9):v,z=side<2?v:(side===2?-9:9);a.push(obj('sphere',x,-.68-random()*.6,z,2.3+random(),1.6,2.5, i%3?'#526753':'#748866',random()*3));if(i%3===0)a.push(obj('sphere',x*.96,-.08,z*.96,1.8,.35,1.7,greens[1]));}
         for(let i=0;i<13;i++){const z=7.7-i*1.35,x=Math.sin(i*.75)*.55;a.push(obj('sphere',x,.024,z,1.4,.08,1.15,'#9d9c7c',i*.3),obj('bevelbox',x+.27,.04,z-.12,.6,.055,.48,'#b0ad8b',i*.21));}
@@ -425,7 +428,6 @@
             return o.mist?{...o,opacity:o.opacity*f}:{...o,color:fogColor(o.color,f),opacity:faded?.28:o.opacity};
         }).filter(o=>!o.mist||o.opacity>.01);
         for(const c of rings){
-            if(spec.fog&&c.r>0)objects.push(obj('disk',c.x,.012,c.z,c.r*2,1,c.r*2,'#86c66f',0,.42,.15));
             if(c.age<g.time)ring(objects,c.x,c.z,Math.max(.1,c.r),'#fff3c4',.25,1-c.age/g.time);
         }
         const glow=(shape,x,y,z,sx,sy,sz,color,ry=0,opacity=1)=>({...obj(shape,x,y,z,sx,sy,sz,color,ry,opacity,.7),castShadow:false});

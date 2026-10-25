@@ -51,14 +51,14 @@ const I18n = {
 
     async loadLang(langCode) {
         try {
-            const resp = await fetch('/lang/' + langCode + '.json?v=27');
+            const resp = await fetch('/lang/' + langCode + '.json?v=28');
             if (!resp.ok) throw new Error('Language file not found');
             this.translations = await resp.json();
             this.currentLang = langCode;
         } catch (e) {
             if (langCode !== 'en') {
                 try {
-                    const resp = await fetch('/lang/en.json?v=27');
+                    const resp = await fetch('/lang/en.json?v=28');
                     if (resp.ok) {
                         this.translations = await resp.json();
                         this.currentLang = 'en';
