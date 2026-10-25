@@ -36,9 +36,9 @@ test('Mosslight seeded islands reproduce encounters without carrying daily upgra
     assert.notEqual(C.makeRun({seed:4243,zone:1}).enemies[0].timer,C.makeRun({seed:4242,zone:1}).enemies[0].timer);
 });
 test('movement normalizes diagonals and cannot pass through trees or the island edge',()=>{
-    const a=C.makeRun(),b=C.makeRun();a.enemies=[];b.enemies=[];
+    const a=C.makeRun(),b=C.makeRun();a.enemies=[];b.enemies=[];const [startX,startZ]=[a.player.x,a.player.z];
     C.tick(a,{x:1,z:0},.05);C.tick(b,{x:1,z:-1},.05);
-    assert.ok(Math.abs(Math.hypot(b.player.x,b.player.z-7.4)-a.player.x)<1e-9);
+    assert.ok(Math.abs(Math.hypot(b.player.x-startX,b.player.z-startZ)-(a.player.x-startX))<1e-9);
     advance(a,12,{x:1});assert.ok(a.player.x<=8.8);
     a.player.x=-5.8;a.player.z=3;advance(a,2,{x:1});assert.ok(a.player.x<-5.4);
 });
@@ -147,24 +147,55 @@ test('a creature within 3 of a beacon pauses its charge without resetting it, on
     advance(s,.55);assert.equal(b.lit,true);
     const t=C.makeRun({zone:1});t.enemies=[];const c=t.beacons[1];t.player.x=c.x;t.player.z=c.z;advance(t,1.5);t.player.x+=2;C.tick(t,{},.05);assert.equal(c.charge,0);
 });
-test('island 1 starts 4 from the first beacon on a clear path, with a slow two-shot creature next to it',()=>{
-    const s=C.makeRun({seed:9}),first=s.beacons[0];
+test('island 1 starts 4 from the first beacon on a clear path, with guards waiting at beacons 2 and 3',()=>{
+    const s=C.makeRun({seed:9}),[first,second,third]=s.beacons;
     assert.ok(Math.abs(C.distance(s.player,first)-4)<1e-9);
     for(let i=0;i<=40;i++){const x=s.player.x+(first.x-s.player.x)*i/40,z=s.player.z+(first.z-s.player.z)*i/40;assert.ok(C.canStand(s,x,z),`blocked at ${x},${z}`);}
-    assert.equal(s.enemies.length,1);const weak=s.enemies[0];assert.ok(C.distance(weak,first)<2);assert.equal(weak.hp,2);assert.ok(weak.speed<1);
-    assert.deepEqual(s.spawns.map(e=>e.spawn),[20,20,40,40]);
+    const near=b=>s.enemies.filter(e=>C.distance(e,b)<C.config.beaconClearRadius);
+    assert.equal(near(first).length,1);assert.equal(near(first)[0].hp,2);assert.ok(C.distance(near(first)[0],first)<2);
+    assert.equal(near(second).length,3);assert.equal(near(third).length,3);
+    assert.ok(Math.max(...near(second).map(e=>e.hp))<Math.min(...near(third).map(e=>e.hp)),'beacon 3 guards are sturdier');
+    // Each leg between beacons is 4-6 s of walking at the player's 3.8 units per second.
+    for(const [a,b] of [[first,second],[second,third]]){const seconds=C.distance(a,b)/3.8;assert.ok(seconds>=4&&seconds<=6,`${seconds.toFixed(2)} s`);}
+    assert.deepEqual(s.spawns.map(e=>e.spawn),[8,16,28,40]);
 });
-test('walking straight to the first beacon lights it 2 s after the pulse clears the creature, with no damage before',()=>{
+test('walking straight to the first beacon lights it 2 s after the pulse clears its creature, with no damage before',()=>{
     const s=C.makeRun({seed:9}),first=s.beacons[0],weak=s.enemies[0];s.hazards=[{x:first.x,z:first.z,radius:2,delay:0,life:60,hit:false}];
-    let shots=0,previous=s.attackCD,died=-1,arrived=-1;
+    let died=-1,arrived=-1;
     while(!first.lit&&s.time<15){
-        const input=C.distance(s.player,first)>.3?{z:-1}:{};C.tick(s,input,.05);
-        if(s.attackCD>previous&&weak.alive)shots++;if(s.attackCD>previous&&died<0&&!weak.alive)shots++;previous=s.attackCD;
+        C.tick(s,C.distance(s.player,first)>.3?{z:-1}:{},.05);
         if(died<0&&!weak.alive)died=s.time;if(arrived<0&&C.distance(s.player,first)<=C.config.beaconRadius)arrived=s.time;
         if(!first.lit)assert.equal(s.player.hp,6);
     }
-    assert.ok(died>0&&shots<=2,`died ${died}, ${shots} shots`);assert.equal(first.lit,true);
+    assert.ok(died>0);assert.equal(first.lit,true);
     assert.ok(Math.abs(first.litAt-(Math.max(died,arrived)+2))<.11,`lit ${first.litAt}, died ${died}, arrived ${arrived}`);
     C.tick(s,{},.05);assert.equal(s.player.hp,4.5);
-    advance(s,19.9-s.time);assert.equal(s.enemies.length,1);advance(s,.15);assert.equal(s.enemies.filter(e=>e.alive).length,2);
+});
+test('guards that hold their ground keep beacons 2 and 3 dark until every one of them is defeated',()=>{
+    const s=C.makeRun({seed:9});s.spawns=[];s.beacons[0].lit=true;const second=s.beacons[1];s.player.x=second.x;s.player.z=second.z;
+    const guards=s.enemies.filter(e=>C.distance(e,second)<C.config.beaconClearRadius);
+    advance(s,5);assert.equal(second.lit,false);assert.ok(guards.every(e=>C.distance(e,second)<C.config.beaconClearRadius));
+    while(!second.lit&&s.time<40)C.tick(s,{},.05);
+    assert.equal(second.lit,true);assert.ok(guards.every(e=>!e.alive));
+});
+
+// Pace of island 1 with scripted players (60 fps): the route is beacon 1, beacon 2, then around a tree to beacon 3.
+const ROUTE=[[[6,3.6]],[[-7.6,-6]],[[-3,-3],[8,-2]]];
+function play(seed,{noSpawns=false,dodge=false}={}){
+    const s=C.makeRun({seed});if(noSpawns)s.spawns=[];let wp=0,target=s.beacons[0];
+    while(s.phase==='playing'&&s.time<150){
+        const next=s.beacons.find(b=>!b.lit);if(next!==target){target=next;wp=0;}
+        const leg=ROUTE[s.beacons.indexOf(target)];while(wp<leg.length-1&&Math.hypot(s.player.x-leg[wp][0],s.player.z-leg[wp][1])<.3)wp++;
+        const close=dodge?s.enemies.filter(e=>e.alive&&e.timer<90&&C.distance(e,s.player)<2.5):[];
+        let input;if(close.length)input={x:close.reduce((a,e)=>a+s.player.x-e.x,0)||1,z:close.reduce((a,e)=>a+s.player.z-e.z,0)};
+        else{const [x,z]=leg[Math.min(wp,leg.length-1)],dx=x-s.player.x,dz=z-s.player.z;input=Math.hypot(dx,dz)<.3?{}:{x:dx,z:dz};}
+        C.tick(s,input,1/60);
+    }
+    return s;
+}
+test('island 1 cannot be finished in under 60 s, even on the shortest route with no extra creatures',()=>{
+    for(const seed of [1,2,3]){const s=play(seed,{noSpawns:true});assert.equal(s.phase,'won');assert.ok(s.time>=60,`${s.time.toFixed(1)} s`);assert.ok(s.kills>=6);}
+});
+test('a straight run that sidesteps attackers finishes island 1 in 60-90 s after defeating at least 6 creatures',()=>{
+    for(const seed of [1,2,3,4,5]){const s=play(seed,{dodge:true});assert.equal(s.phase,'won',`seed ${seed}`);assert.ok(s.time>=60&&s.time<=90,`${s.time.toFixed(1)} s`);assert.ok(s.kills>=6,`${s.kills} kills`);}
 });

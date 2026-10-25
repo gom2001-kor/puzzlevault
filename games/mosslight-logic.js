@@ -2,14 +2,20 @@
 (function (root) {
     'use strict';
     const ZONES = [
-        // Island 1 onboarding: the player starts 4 from the first beacon; a slow two-shot creature already stands
-        // inside that beacon's clear radius and walks toward the player, so the beacon only charges once the
-        // automatic pulse has removed it. Two regular creatures arrive at 20 s and two more at 40 s (seconds from
-        // the start of the run). Until the first beacon burns the player takes no damage, status messages stay
-        // quiet for 30 s, and fog covers the island except around lit beacons.
-        { name: 'glade', ground: '#224d45', accent: '#86efac', obstacles: [[-4, 3, 1.1], [4, 0, 1.2], [-3, -5, 1], [6, -6, 1]], seeds: [[-6, 5], [6, 4], [-6, -2], [5, -4], [0, -7]],
-            start: [0, 7.4], beacons: [[0, 3.4], [-7.2, .5], [2, -6]], fog: true, grace: true, quiet: 30, hint: true,
-            enemies: [[0, 1.6, { type: 'stalker', hp: 2, speed: .5, timer: 99 }], [-5, -4, { spawn: 20, type: 'stalker' }], [5, -3, { spawn: 20, type: 'caster' }], [-6, 3, { spawn: 40, type: 'brute' }], [4, -6, { spawn: 40, type: 'stalker' }]] },
+        // Island 1 onboarding: the player starts 4 from the first beacon, where a slow two-shot creature already
+        // stands inside the beacon's clear radius. Beacons 2 and 3 sit at opposite ends of the island (4-6 s of
+        // walking each) and are guarded from the start by creatures that hold their ground (speed .05, no attack):
+        // weaker ones at beacon 2, sturdier ones at beacon 3. Their health sets the pace: even with no other
+        // creatures the island takes at least ~60 s, and a straight run that sidesteps attackers takes ~65-70 s.
+        // Regular creatures arrive along the route at 8, 16, 28 and 40 s (seconds from the start of the run).
+        // Until the first beacon burns the player takes no damage, status messages stay quiet for 30 s, and fog
+        // covers the island except around lit beacons.
+        { name: 'glade', ground: '#224d45', accent: '#86efac', obstacles: [[-4, 3, 1.1], [4, 0, 1.2], [-3, -5, 1], [6, -6, 1]], seeds: [[-6, 5], [2, 6], [-6, -2], [5, -4], [0, -7]],
+            start: [6, 7.6], beacons: [[6, 3.6], [-7.6, -6], [8, -2]], fog: true, grace: true, quiet: 30, hint: true,
+            enemies: [[6, 1.8, { type: 'stalker', hp: 2, speed: .5, timer: 99 }],
+                [-6, -4.4, { type: 'stalker', hp: 4, speed: .05, timer: 99 }], [-5.4, -7.2, { type: 'stalker', hp: 4, speed: .05, timer: 99 }], [-7.8, -3.4, { type: 'stalker', hp: 4, speed: .05, timer: 99 }],
+                [6.4, -.6, { type: 'brute', hp: 20, speed: .05, timer: 99 }], [7.2, -4.4, { type: 'stalker', hp: 19, speed: .05, timer: 99 }], [6, -2.6, { type: 'stalker', hp: 18, speed: .05, timer: 99 }],
+                [-1, -1, { spawn: 8, type: 'stalker' }], [-4.5, -1.5, { spawn: 16, type: 'caster' }], [1, -3, { spawn: 28, type: 'brute' }], [3.5, -1.8, { spawn: 40, type: 'stalker' }]] },
         { name: 'terrace', ground: '#253c59', accent: '#93c5fd', obstacles: [[-3, 4, 1.3], [3, 0, 1.1], [-4, -3, 1.1], [5, -6, 1.2]], seeds: [[-6, 6], [6, 5], [-6, -5], [6, -2], [0, -7]], enemies: [[-6, 2], [5, 3], [-6, -2], [5, -4], [-2, -7], [2, -7]] },
         { name: 'heart', ground: '#433953', accent: '#c4b5fd', obstacles: [[-4, 4, 1.2], [4, 4, 1.2], [-6, -3, 1.1], [6, -3, 1.1]], seeds: [[-6, 6], [6, 6], [-7, -1], [7, -1], [0, -7]], enemies: [[-5, 1], [5, 1], [-4, -6], [4, -6], [0, -5, true]] }
     ];
