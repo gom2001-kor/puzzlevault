@@ -2,19 +2,20 @@
 (function (root) {
     'use strict';
     const ZONES = [
-        // Island 1 onboarding timeline, in seconds from the start of the run: no creatures until 5 s, a slow two-shot
-        // creature on the path at 5 s, the first beacon wakes at 8 s (so it lights at 10 s at the earliest), two
-        // regular creatures at 20 s and two more at 40 s. Until the first beacon burns the player takes no damage,
-        // status messages stay quiet for 30 s, and fog covers the island except around lit beacons.
+        // Island 1 onboarding: the player starts 4 from the first beacon; a slow two-shot creature already stands
+        // inside that beacon's clear radius and walks toward the player, so the beacon only charges once the
+        // automatic pulse has removed it. Two regular creatures arrive at 20 s and two more at 40 s (seconds from
+        // the start of the run). Until the first beacon burns the player takes no damage, status messages stay
+        // quiet for 30 s, and fog covers the island except around lit beacons.
         { name: 'glade', ground: '#224d45', accent: '#86efac', obstacles: [[-4, 3, 1.1], [4, 0, 1.2], [-3, -5, 1], [6, -6, 1]], seeds: [[-6, 5], [6, 4], [-6, -2], [5, -4], [0, -7]],
-            start: [0, 7.4], beacons: [[0, 3.4], [-7.2, .5], [2, -6]], wake: [8, 0, 0], fog: true, grace: true, quiet: 30, hint: true,
-            enemies: [[0, -2.6, { spawn: 5, type: 'stalker', hp: 2, speed: .5, timer: 99 }], [-5, -4, { spawn: 20, type: 'stalker' }], [5, -3, { spawn: 20, type: 'caster' }], [-6, 3, { spawn: 40, type: 'brute' }], [4, -6, { spawn: 40, type: 'stalker' }]] },
+            start: [0, 7.4], beacons: [[0, 3.4], [-7.2, .5], [2, -6]], fog: true, grace: true, quiet: 30, hint: true,
+            enemies: [[0, 1.6, { type: 'stalker', hp: 2, speed: .5, timer: 99 }], [-5, -4, { spawn: 20, type: 'stalker' }], [5, -3, { spawn: 20, type: 'caster' }], [-6, 3, { spawn: 40, type: 'brute' }], [4, -6, { spawn: 40, type: 'stalker' }]] },
         { name: 'terrace', ground: '#253c59', accent: '#93c5fd', obstacles: [[-3, 4, 1.3], [3, 0, 1.1], [-4, -3, 1.1], [5, -6, 1.2]], seeds: [[-6, 6], [6, 5], [-6, -5], [6, -2], [0, -7]], enemies: [[-6, 2], [5, 3], [-6, -2], [5, -4], [-2, -7], [2, -7]] },
         { name: 'heart', ground: '#433953', accent: '#c4b5fd', obstacles: [[-4, 4, 1.2], [4, 4, 1.2], [-6, -3, 1.1], [6, -3, 1.1]], seeds: [[-6, 6], [6, 6], [-7, -1], [7, -1], [0, -7]], enemies: [[-5, 1], [5, 1], [-4, -6], [4, -6], [0, -5, true]] }
     ];
     const BEACONS = [[0, -1], [-6.5, 1], [6.5, 1.5]];
     // Survivor rules: movement is the only input. Disabled abilities keep their code and can be switched back on here.
-    const config = { features: { dash: false, garden: false, attune: false, bloom: false }, pulseInterval: .8, pulseRange: 6, shotSpeed: 9, beaconRadius: 1.5, beaconTime: 2 };
+    const config = { features: { dash: false, garden: false, attune: false, bloom: false }, pulseInterval: .8, pulseRange: 6, shotSpeed: 9, beaconRadius: 1.5, beaconTime: 2, beaconClearRadius: 3 };
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const distance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
     function rng(seed) { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -48,7 +49,7 @@
         s.maxHP = 6 + s.upgrades.filter(x => x === 'root').length * 2;
         const [startX, startZ] = spec.start || [0, 7.4];
         s.time = 0; s.player = { x: startX, z: startZ, hp: s.maxHP, facingX: 0, facingZ: -1, invuln: 0, dash: 0 };
-        s.attackCD = 0; s.dashCD = 0; s.gardenCD = 0; s.gardenCharges = 2; s.gardenRegen = 0; s.gardens = []; s.collected = 0; s.restored = 0; s.beacons = (spec.beacons || BEACONS).map(([x,z], i) => ({ x, z, id: i, lit: false, charge: 0, wake: (spec.wake || [])[i] || 0, litAt: -1 })); s.seeds = spec.seeds.map(([x,z], i) => ({ x, z, id: i, taken: false }));
+        s.attackCD = 0; s.dashCD = 0; s.gardenCD = 0; s.gardenCharges = 2; s.gardenRegen = 0; s.gardens = []; s.collected = 0; s.restored = 0; s.beacons = (spec.beacons || BEACONS).map(([x,z], i) => ({ x, z, id: i, lit: false, charge: 0, blocked: false, litAt: -1 })); s.seeds = spec.seeds.map(([x,z], i) => ({ x, z, id: i, taken: false }));
         s.energy=25; s.bloom=0; s.shots=[]; s.bursts=[]; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
         s.shrine={x:-7,z:-6,used:false};
         // An enemy entry is [x, z, boss] or [x, z, { spawn, type, hp, speed, timer }]; spawn > 0 holds it back until that second.
@@ -138,7 +139,9 @@
         if(s.player.dash>0){s.player.dash=Math.max(0,s.player.dash-dt);move(s,s.player,s.player.facingX*11*dt,s.player.facingZ*11*dt);}
         else move(s,s.player,x*3.8*dt,z*3.8*dt);
         for(const seed of s.seeds)if(!seed.taken&&distance(seed,s.player)<.85){seed.taken=true;s.collected++;s.score+=45;s.energy=clamp(s.energy+8,0,100);event(s,'seed');}
-        for(const b of s.beacons){if(b.lit)continue;b.charge=s.time>b.wake&&distance(b,s.player)<=config.beaconRadius?b.charge+Math.min(dt,s.time-b.wake):0;if(b.charge>=config.beaconTime-1e-9)lightBeacon(s,b);}
+        // Standing in the ring charges a beacon; a living creature within beaconClearRadius pauses the charge
+        // (it is kept), and stepping out of the ring resets it.
+        for(const b of s.beacons){if(b.lit)continue;b.blocked=s.enemies.some(e=>e.alive&&distance(e,b)<config.beaconClearRadius);if(distance(b,s.player)>config.beaconRadius)b.charge=0;else if(!b.blocked)b.charge+=dt;if(b.charge>=config.beaconTime-1e-9)lightBeacon(s,b);}
         if(s.phase!=='playing')return;
         attack(s);
         s.shots=s.shots.filter(shot=>{shot.life-=dt;shot.x+=shot.vx*dt;shot.z+=shot.vz*dt;const e=s.enemies.find(e=>e.alive&&distance(e,shot)<(e.boss?.95:.6));if(e){strike(s,e,shot.power);s.energy=clamp(s.energy+10,0,100);return false;}return shot.life>0;});
@@ -276,8 +279,10 @@
         }else{
             const won=state&&state.phase==='won';title.textContent=t(won?'won':'lost');p.textContent=t(won?'wonText':'lostText')+(won&&state.zone===0?' '+t('unlocked'):'');
             const stat=document.createElement('p');stat.className='ml-result-stats';stat.textContent=`${t('score')} ${state.score} · ${t('restored')} ${state.restored}/3 · ${t('time')} ${clock(state.elapsed)}`;actions.append(stat);
+            // Personal records moved here from below the game; they are only read at the end of a run.
+            const records=document.createElement('small');records.textContent=`${t('best')}: ${Number(storage.get('best',0))||0} · ${t('wins')}: ${Number(storage.get('wins',0))||0} · ${t('saved')}`;
             // A single retry resets the same island immediately; the renderer and terrain cache are reused.
-            actions.append(button(t('retry'),()=>start(state.mode,false,state.date,state.zone),'ml-primary'));
+            actions.append(button(t('retry'),()=>start(state.mode,false,state.date,state.zone),'ml-primary'),records);
             const related=document.createElement('nav');related.className='ml-result-links';related.setAttribute('aria-label','More games');for(const [id,name] of [['cloudweft','Cloudweft Passage'],['colorflow','ColorFlow'],['numvault','NumVault']]){const a=document.createElement('a');a.href='/games/'+id+'.html';a.textContent=name;related.append(a);}actions.append(related);
         }
         box.append(title,p,actions);$('ml-overlay').setAttribute('aria-busy',String(adPending));if(!renderer||adPending||contextLost)actions.querySelectorAll('button').forEach(b=>b.disabled=true);
@@ -286,12 +291,10 @@
     function updateHUD(force=false){
         const now=performance.now();if(!force&&now-lastHud<100)return;lastHud=now;
         $('ml-sound').textContent=`${t('sound')}: ${t(soundEnabled?'on':'off')}`;
-        $('ml-best').textContent=`${t('best')}: ${Number(storage.get('best',0))||0} · ${t('wins')}: ${Number(storage.get('wins',0))||0}`;
-        $('ml-objective').textContent=t('objective');
-        if(!state){$('ml-zone').textContent=`${t('zone')} 1 / 3 · ${t('glade')}`;$('ml-vitality').textContent='6 / 6';$('ml-healthbar').style.width='100%';$('ml-beacons').textContent='0 / 3';$('ml-foes').textContent='5';$('ml-score').textContent='0';$('ml-build').textContent=t('none');}
+        if(!state){$('ml-zone').textContent=`${t('zone')} 1 / 3 · ${t('glade')}`;$('ml-vitality').textContent='6 / 6';$('ml-healthbar').style.width='100%';$('ml-beacons').textContent='0 / 3';$('ml-foes').textContent='0';$('ml-score').textContent='0';}
         else{
             $('ml-zone').textContent=`${t('zone')} ${state.zone+1} / 3 · ${t(ZONES[state.zone].name)}${state.mode==='daily'?' · '+state.date+' UTC':''}`;
-            $('ml-vitality').textContent=`${Math.ceil(state.player.hp*10)/10} / ${state.maxHP}`;$('ml-healthbar').style.width=(state.player.hp/state.maxHP*100)+'%';$('ml-beacons').textContent=state.beacons.filter(b=>b.lit).length+' / 3';$('ml-foes').textContent=state.enemies.filter(e=>e.alive).length;$('ml-score').textContent=state.score;$('ml-build').textContent=state.upgrades.length?state.upgrades.map(x=>t(x==='pulse'?'pulseUpgrade':x)).join(' + '):t('none');
+            $('ml-vitality').textContent=`${Math.ceil(state.player.hp*10)/10} / ${state.maxHP}`;$('ml-healthbar').style.width=(state.player.hp/state.maxHP*100)+'%';$('ml-beacons').textContent=state.beacons.filter(b=>b.lit).length+' / 3';$('ml-foes').textContent=state.enemies.filter(e=>e.alive).length;$('ml-score').textContent=state.score;
         }
         $('ml-sidequest').hidden=!config.features.attune;if(config.features.attune)$('ml-sidequest').textContent=state&&state.shrine.used?t('shrineDone')+' · '+t(state.boon):t('sidequest')+(state?' ('+Math.min(3,state.zoneKills)+'/3)':'');
         $('ml-pause').disabled=!state||!['playing','paused'].includes(state.phase);$('ml-pause').textContent=t(state&&state.phase==='paused'?'resumePlay':'pause');
@@ -352,14 +355,15 @@
         for(const c of clearings)objects.push(obj('disk',c.x,.012,c.z,16,1,16,'#86c66f',0,.42*c.t,.15));
         const glow=(shape,x,y,z,sx,sy,sz,color,ry=0,opacity=1)=>({...obj(shape,x,y,z,sx,sy,sz,color,ry,opacity,.7),castShadow:false});
         const shadow=(x,z,r)=>objects.push(obj('disk',x,.022,z,r,1,r,'#102f2a',0,.15));
-        // The next unlit beacon pulses softly to say "go here"; beacons still under fog are dimmed.
+        // The next unlit beacon pulses softly to say "go here"; a beacon with a creature too close blinks red instead.
+        // Beacons still under fog are dimmed.
         const target=s.beacons.find(b=>!b.lit);
         for(const b of s.beacons){
-            const f=b.lit?0:fogAt(b.x,b.z),c=color=>fogColor(color,f),guide=b===target,blink=guide?.5+.5*Math.sin(time*3.2):0,size=1+blink*.22;
+            const f=b.lit?0:fogAt(b.x,b.z),c=color=>fogColor(color,f),blocked=!b.lit&&b.blocked,guide=b===target||blocked,blink=guide?.5+.5*Math.sin(time*(blocked?7:3.2)):0,size=1+blink*.22;
             shadow(b.x,b.z,2.5);objects.push(obj('cylinder',b.x,.12,b.z,2.3,.23,2.3,c('#9a9d7b')),obj('cylinder',b.x,.33,b.z,1.6,.23,1.6,c('#657c67')),obj('bevelbox',b.x,.82,b.z,.62,.96,.62,c('#dbcb96'),Math.PI/4));
             for(let i=0;i<4;i++){const a=i*Math.PI/2;objects.push(obj('bevelbox',b.x+Math.cos(a)*.56,.8,b.z+Math.sin(a)*.56,.2,1,.2,c('#8c9c77'),a));}
-            objects.push(glow('sphere',b.x,1.68+Math.sin(time)*.05,b.z,.53*size,.75*size,.53*size,b.lit?'#fff1af':guide?spec.accent:c(spec.accent),0,b.lit?1:guide?.55+.45*blink:.6),obj('torus',b.x,1.68,b.z,1.1,.12,1.1,c('#d8b45b'),time*.3));
-            ring(objects,b.x,b.z,config.beaconRadius,b.lit?'#fde68a':guide&&s.time>=b.wake?'#d9f99d':c('#86a186'),.035,.8);
+            objects.push(glow('sphere',b.x,1.68+Math.sin(time)*.05,b.z,.53*size,.75*size,.53*size,b.lit?'#fff1af':blocked?'#f87171':guide?spec.accent:c(spec.accent),0,b.lit?1:guide?.55+.45*blink:.6),obj('torus',b.x,1.68,b.z,1.1,.12,1.1,c('#d8b45b'),time*.3));
+            ring(objects,b.x,b.z,config.beaconRadius,b.lit?'#fde68a':blocked?'#f87171':guide?'#d9f99d':c('#86a186'),.035,blocked?.35+.6*blink:.8);
             if(!b.lit&&b.charge>0)ring(objects,b.x,b.z,config.beaconRadius*b.charge/config.beaconTime,'#fde68a',.06,.9);
         }
         const shrine=s.shrine;if(config.features.attune){shadow(shrine.x,shrine.z,1.8);objects.push(obj('cylinder',shrine.x,.19,shrine.z,1.4,.4,1.4,'#767966'),obj('torus',shrine.x,.44,shrine.z,1.2,.12,1.2,'#b59b60'));

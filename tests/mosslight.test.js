@@ -135,25 +135,36 @@ test('Wildflare improves Bloom damage and the final guardian changes attack belo
     advance(s,1.75);C.tick(s,{},.05);assert.equal(boss.attackType,'slam');assert.equal(s.hazards.length,2);advance(s,1.1);assert.equal(s.projectiles.length,5);
 }));
 
-// Island 1 onboarding timeline (see the ZONES[0] comment in mosslight-logic.js).
-test('island 1 starts 4 units from the first beacon on a clear path, with no creatures for 5 seconds',()=>{
+// Beacon charging rule (all islands) and the island 1 opening (see ZONES[0] in mosslight-logic.js).
+test('a creature within 3 of a beacon pauses its charge without resetting it, on every island',()=>{
+    const s=C.makeRun({zone:1});s.enemies=[];const b=s.beacons[0];s.player.x=b.x;s.player.z=b.z;
+    advance(s,1);assert.ok(Math.abs(b.charge-1)<1e-6);
+    // Three tough creatures stand near the beacon; the automatic pulse hits them but cannot clear them.
+    s.enemies=[dummy(0,b.x+1,b.z,99),dummy(1,b.x-2,b.z,99),dummy(2,b.x,b.z+2.5,99)];
+    advance(s,3);assert.equal(b.blocked,true);assert.ok(Math.abs(b.charge-1)<1e-6);assert.equal(b.lit,false);
+    for(const e of s.enemies)e.x=b.x+3.5+e.id;
+    advance(s,.5);assert.equal(b.blocked,false);assert.ok(Math.abs(b.charge-1.5)<1e-6);
+    advance(s,.55);assert.equal(b.lit,true);
+    const t=C.makeRun({zone:1});t.enemies=[];const c=t.beacons[1];t.player.x=c.x;t.player.z=c.z;advance(t,1.5);t.player.x+=2;C.tick(t,{},.05);assert.equal(c.charge,0);
+});
+test('island 1 starts 4 from the first beacon on a clear path, with a slow two-shot creature next to it',()=>{
     const s=C.makeRun({seed:9}),first=s.beacons[0];
     assert.ok(Math.abs(C.distance(s.player,first)-4)<1e-9);
     for(let i=0;i<=40;i++){const x=s.player.x+(first.x-s.player.x)*i/40,z=s.player.z+(first.z-s.player.z)*i/40;assert.ok(C.canStand(s,x,z),`blocked at ${x},${z}`);}
-    assert.equal(s.enemies.length,0);advance(s,4.95);assert.equal(s.enemies.length,0);
+    assert.equal(s.enemies.length,1);const weak=s.enemies[0];assert.ok(C.distance(weak,first)<2);assert.equal(weak.hp,2);assert.ok(weak.speed<1);
+    assert.deepEqual(s.spawns.map(e=>e.spawn),[20,20,40,40]);
 });
-test('island 1 sends one slow two-shot creature at 5 s, then two regular creatures at 20 s',()=>{
-    const s=C.makeRun({seed:9});s.player.x=0;s.player.z=3.4;
-    advance(s,5.05);assert.equal(s.enemies.length,1);const weak=s.enemies[0];assert.equal(weak.hp,2);assert.ok(weak.speed<1);
-    let shots=0,previous=s.attackCD;if(s.attackCD>0)shots++;
-    while(weak.alive&&s.time<12){C.tick(s,{},.05);if(s.attackCD>previous)shots++;previous=s.attackCD;}
-    assert.equal(weak.alive,false);assert.ok(shots>=1&&shots<=2,`${shots} shots`);assert.ok(s.time<8);assert.equal(s.bursts.length,1);assert.equal(s.event,'defeat');
-    advance(s,19.9-s.time);assert.equal(s.enemies.length,1);advance(s,.15);assert.equal(s.enemies.filter(e=>e.alive).length,2);
-    assert.ok(s.enemies.slice(1).every(e=>e.hp===3&&!e.speed));
-});
-test('the first beacon lights at 10 s at the earliest, and no damage lands before it burns',()=>{
-    const s=C.makeRun({seed:9});s.player.x=0;s.player.z=3.4;s.hazards=[{x:0,z:3.4,radius:3,delay:0,life:20,hit:false}];
-    advance(s,9.9);assert.equal(s.beacons[0].lit,false);assert.equal(s.player.hp,6);assert.equal(s.phase,'playing');
-    advance(s,.15);assert.equal(s.beacons[0].lit,true);assert.ok(s.beacons[0].litAt>=10-1e-9&&s.beacons[0].litAt<10.1);assert.equal(s.restored,1);
+test('walking straight to the first beacon lights it 2 s after the pulse clears the creature, with no damage before',()=>{
+    const s=C.makeRun({seed:9}),first=s.beacons[0],weak=s.enemies[0];s.hazards=[{x:first.x,z:first.z,radius:2,delay:0,life:60,hit:false}];
+    let shots=0,previous=s.attackCD,died=-1,arrived=-1;
+    while(!first.lit&&s.time<15){
+        const input=C.distance(s.player,first)>.3?{z:-1}:{};C.tick(s,input,.05);
+        if(s.attackCD>previous&&weak.alive)shots++;if(s.attackCD>previous&&died<0&&!weak.alive)shots++;previous=s.attackCD;
+        if(died<0&&!weak.alive)died=s.time;if(arrived<0&&C.distance(s.player,first)<=C.config.beaconRadius)arrived=s.time;
+        if(!first.lit)assert.equal(s.player.hp,6);
+    }
+    assert.ok(died>0&&shots<=2,`died ${died}, ${shots} shots`);assert.equal(first.lit,true);
+    assert.ok(Math.abs(first.litAt-(Math.max(died,arrived)+2))<.11,`lit ${first.litAt}, died ${died}, arrived ${arrived}`);
     C.tick(s,{},.05);assert.equal(s.player.hp,4.5);
+    advance(s,19.9-s.time);assert.equal(s.enemies.length,1);advance(s,.15);assert.equal(s.enemies.filter(e=>e.alive).length,2);
 });
