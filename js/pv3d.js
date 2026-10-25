@@ -324,10 +324,12 @@
                 gl.enable(gl.BLEND);gl.depthMask(false);gl.depthFunc(gl.LEQUAL);
                 for(const obj of transparent){const mesh=this.meshes[obj.shape||'box'];this.drawObject(obj,mesh);this.stats.instances++;this.stats.triangles+=mesh.count/3;}gl.depthFunc(gl.LESS);gl.depthMask(true);gl.disable(gl.BLEND);}
             if(xray.length){
+                // Both passes are instanced per shape, the same path the opaque pass used, so depths match exactly.
+                const byShape={};for(const obj of xray)(byShape[obj.shape||'box']||(byShape[obj.shape||'box']=[])).push(obj);
                 gl.enable(gl.BLEND);gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.uniform1f(this.u.Flat,1);
-                for(const obj of xray)this.drawObject({...obj,color:obj.xray,opacity:finite(obj.xrayOpacity,.45)},this.meshes[obj.shape||'box']);
+                for(const shape in byShape)this.batch(shape,byShape[shape].map(obj=>({...obj,color:obj.xray,opacity:finite(obj.xrayOpacity,.45)})),true);
                 gl.uniform1f(this.u.Flat,0);gl.disable(gl.BLEND);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-2);
-                for(const obj of xray)this.drawObject(obj,this.meshes[obj.shape||'box']);
+                for(const shape in byShape)this.batch(shape,byShape[shape],true);
                 gl.disable(gl.POLYGON_OFFSET_FILL);gl.depthFunc(gl.LESS);gl.depthMask(true);
             }
             if(this.sceneTarget){gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,width,height);gl.useProgram(this.programPost);gl.bindTexture(gl.TEXTURE_2D,this.sceneTarget.texture);gl.uniform1i(this.post.Scene,0);gl.uniform2f(this.post.Texel,1/width,1/height);gl.uniform1f(this.post.Bloom,this.bloom);this.fullScreen(this.programPost);}

@@ -41,8 +41,9 @@
     config.visibility = {
         steepCamera: true,                                 // use config.camera.pitch instead of the original angle
         fade: true, fadeAlpha: .25, fadeTime: .2,          // occluders on a camera ray fade to fadeAlpha over fadeTime s
+        fadeDepthWrite: false,                             // true: faded occluders keep depth (no back faces, but they hide characters' own colours)
         maxRays: 8, enemyRange: 6,                         // rays: the player plus the nearest creatures within enemyRange
-        silhouette: true, silhouetteAlpha: .45, playerColor: '#9be36a', enemyColor: '#b48cf2'
+        silhouette: true, silhouetteAlpha: .45, playerColor: '#9be36a', enemyColor: '#b48cf2' // drawn wherever a character is hidden by something still writing depth
     };
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     // Camera eye and look-at point for a player at (px, pz); see config.camera.
@@ -427,22 +428,23 @@
             q.life=q.max=life;q.x=x;q.y=y;q.z=z;q.vx=Math.cos(a)*v;q.vz=Math.sin(a)*v;q.vy=1+Math.random()*1.5;q.size=size;q.desc.color=color;}
     }
     // ---- Visibility: up to config.visibility.maxRays camera rays (player + nearest creatures within enemyRange) are
-    // tested against the occluder ellipsoids every frame. Hit occluders fade to fadeAlpha over fadeTime and back;
-    // characters behind a solid occluder get an x-ray silhouette.
-    const occAlpha=new Map(),xrayIds=new Set();let xrayPlayer=false;
+    // tested against the occluder ellipsoids every frame; hit occluders fade to fadeAlpha over fadeTime and back.
+    // Silhouettes need no rays: every character is marked and the renderer keeps the tint only on hidden pixels,
+    // so a faded occluder (which writes no depth) shows the character in its own colours.
+    const occAlpha=new Map();
     function updateVisibility(s,eye,dt){
-        const vis=config.visibility,hit=new Set();xrayIds.clear();xrayPlayer=false;
-        if(vis.fade||vis.silhouette){
+        const vis=config.visibility,hit=new Set();
+        if(vis.fade){
             const occluders=terrain(s.zone).occluders,targets=[{point:[s.player.x,.9,s.player.z]}];
             for(const e of s.enemies.filter(e=>e.alive&&distance(e,s.player)<=vis.enemyRange).sort((a,b)=>distance(a,s.player)-distance(b,s.player)).slice(0,vis.maxRays-1))
                 targets.push({enemy:e,point:[e.x,.8*(e.boss?1.65:e.type==='brute'?1.25:1),e.z]});
-            for(const t of targets){let solid=false;for(const o of occluders)if(segmentHitsEllipsoid(eye,t.point,o)){hit.add(o.id);if(!o.soft)solid=true;}if(solid){if(t.enemy)xrayIds.add(t.enemy.id);else xrayPlayer=true;}}
+            for(const t of targets)for(const o of occluders)if(segmentHitsEllipsoid(eye,t.point,o))hit.add(o.id);
         }
         const step=dt*(1-vis.fadeAlpha)/Math.max(.001,vis.fadeTime);
-        if(vis.fade)for(const id of hit)if(!occAlpha.has(id))occAlpha.set(id,1);
+        for(const id of hit)if(!occAlpha.has(id))occAlpha.set(id,1);
         for(const [id,a] of occAlpha){const target=vis.fade&&hit.has(id)?vis.fadeAlpha:1,next=a<target?Math.min(target,a+step):Math.max(target,a-step);if(next>=1)occAlpha.delete(id);else occAlpha.set(id,next);}
     }
-    function resetJuice(){occAlpha.clear();xrayIds.clear();xrayPlayer=false;for(const q of POOL)q.life=0;dying.length=0;shake=0;hitChain=0;lastHitAt=-9;victoryAt=0;fxTime=0;ringStart={};}
+    function resetJuice(){occAlpha.clear();for(const q of POOL)q.life=0;dying.length=0;shake=0;hitChain=0;lastHitAt=-9;victoryAt=0;fxTime=0;ringStart={};}
     // Synthesized tones on the shared Web Audio context, so no audio files ship with the game.
     function tone(freq,length,volume,{type='triangle',attack=.005,harmonic=0}={}){
         if(!soundEnabled||typeof SFX==='undefined')return;
@@ -472,13 +474,13 @@
         // has passed returns to full colour (soft 1-unit edge) and stays that way.
         const g=juice.ignite,rings=s.beacons.filter(b=>b.lit).map(b=>{const age=s===state&&ringStart[b.id]!==undefined?fxTime-ringStart[b.id]:g.time;return {x:b.x,z:b.z,age,r:g.radius*clamp(age/g.time,0,1)};});
         const fogAt=(x,z)=>{if(!spec.fog)return 0;let f=1;for(const c of rings)f=Math.min(f,clamp(Math.hypot(x-c.x,z-c.z)-(c.r-1),0,1));return f;};
-        // Occluders on a camera ray carry their fade alpha (see updateVisibility); solid ones also write depth first
-        // so a faded tree shows only its front surface.
+        // Occluders on a camera ray carry their fade alpha (see updateVisibility). By default they write no depth, so
+        // the characters behind them keep their own colours; fadeDepthWrite trades that for front-surface-only fading.
         const objects=terrain(s.zone).map(o=>{
             const alpha=s===state&&o.occ!==undefined?occAlpha.get(o.occ):undefined;
             let r=o;
             if(spec.fog){const f=o.ground?1:fogAt(o.x,o.z);r=o.mist?{...o,opacity:o.opacity*f}:{...o,color:fogColor(o.color,f)};}
-            if(alpha!==undefined){if(r===o)r={...o};r.opacity*=alpha;if(o.opacity>=.995)r.depthWrite=true;}
+            if(alpha!==undefined){if(r===o)r={...o};r.opacity*=alpha;if(o.opacity>=.995&&config.visibility.fadeDepthWrite)r.depthWrite=true;}
             return r;
         }).filter(o=>!o.mist||o.opacity>.01);
         for(const c of rings){
@@ -508,7 +510,7 @@
         for(const shot of s.shots){objects.push(glow('sphere',shot.x,.7,shot.z,.3,.3,.3,'#fff3b0'));objects.push(glow('sphere',shot.x-shot.vx*.03,.7,shot.z-shot.vz*.03,.2,.2,.2,'#d8f5cf',0,.6));}
         for(const bolt of s.projectiles){objects.push(glow('sphere',bolt.x,.64,bolt.z,.28,.28,.28,'#e9bcff'));objects.push(glow('sphere',bolt.x-bolt.vx*.035,.64,bolt.z-bolt.vz*.035,.18,.18,.18,'#c4b5fd',0,.6));}
         // k < 1 draws a defeated creature shrinking away over juice.defeat.shrink seconds.
-        const xraySilhouette=e=>s===state&&config.visibility.silhouette&&xrayIds.has(e.id);
+        const xraySilhouette=()=>s===state&&config.visibility.silhouette;
         const drawEnemy=(e,k=1)=>{
             const type=e.type||'stalker',scale=(e.boss?1.65:type==='brute'?1.25:1)*k,angle=Math.atan2(p.x-e.x,p.z-e.z),bob=Math.sin(time*3+e.id)*.05*k,col=e.flash>0?'#ffffff':e.phase==='warn'?'#d9a345':type==='caster'?'#697ea6':type==='brute'?'#796b88':'#81957b';
             shadow(e.x,e.z,scale*1.35);const body=objects.length;
@@ -521,7 +523,7 @@
                 objects.push(glow('bevelbox',e.x+Math.sin(angle)*.35*scale,1.13*scale,e.z+Math.cos(angle)*.35*scale,.35*scale,.09,.07,e.rage?'#fb7185':'#e3f4bd',angle));
             }
             if(k<1)return;
-            if(xraySilhouette(e))for(let i=body;i<objects.length;i++)if(objects[i].castShadow!==false&&objects[i].opacity>=.995){objects[i].xray=config.visibility.enemyColor;objects[i].xrayOpacity=config.visibility.silhouetteAlpha;}
+            if(xraySilhouette())for(let i=body;i<objects.length;i++)if(objects[i].castShadow!==false&&objects[i].opacity>=.995){objects[i].xray=config.visibility.enemyColor;objects[i].xrayOpacity=config.visibility.silhouetteAlpha;}
             if(e.hp<e.maxHP||e.boss){const width=1.2*scale,y=1.88*scale;objects.push(obj('bevelbox',e.x,y,e.z,width,.075,.1,'#263c36'),obj('bevelbox',e.x-(1-e.hp/e.maxHP)*width/2,y+.005,e.z,width*e.hp/e.maxHP,.08,.12,e.rage?'#fb7185':'#e9bd92'));}
             if(e.phase==='warn'&&e.attackType!=='slam'){ring(objects,e.x,e.z,scale*.9,'#fbbf24',.065);for(let i=1;i<5;i++)objects.push(glow('bevelbox',e.x+e.aimX*i*.55,.08,e.z+e.aimZ*i*.55,.14,.04,.25,'#fde68a',Math.atan2(e.aimX,e.aimZ)));}
         };
@@ -529,7 +531,7 @@
         if(s===state)for(const d of dying)drawEnemy(d.e,Math.max(.02,1-d.age/juice.defeat.shrink));
         // While invulnerable after a hit the guardian blinks (skipped with reduced motion, where time is 0).
         const angle=Math.atan2(p.facingX,p.facingZ),walk=s.moving?Math.sin(time*13)*.11:0,bob=s.moving?Math.abs(walk)*.4:Math.sin(time*2)*.018,skin='#e8c797',blinkOff=p.invuln>0&&time>0&&Math.floor(time*juice.hurt.blink)%2===0;shadow(p.x,p.z,1.15);
-        const playerXray=s===state&&config.visibility.silhouette&&xrayPlayer;
+        const playerXray=s===state&&config.visibility.silhouette;
         const part=(shape,lx,y,lz,sx,sy,sz,color,emissive=0)=>{if(blinkOff)return;const o=obj(shape,p.x+Math.cos(angle)*lx+Math.sin(angle)*lz,y+bob,p.z-Math.sin(angle)*lx+Math.cos(angle)*lz,sx,sy,sz,color,angle,1,emissive);if(playerXray){o.xray=config.visibility.playerColor;o.xrayOpacity=config.visibility.silhouetteAlpha;}objects.push(o);};
         part('bevelbox',-.18,.16+walk,.02,.25,.3,.42,'#624f3e');part('bevelbox',.18,.16-walk,.02,.25,.3,.42,'#624f3e');
         part('sphere',0,.65,0,.72,.83,.62,'#27785b');part('bevelbox',0,.7,-.34,.47,.56,.28,'#9c7747');part('bevelbox',0,.62,.03,.74,.14,.6,'#ac8950');
