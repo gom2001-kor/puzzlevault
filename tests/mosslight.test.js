@@ -33,7 +33,7 @@ test('explicit daily seed exactly matches the shared UTC seed algorithm',()=>{
 test('Mosslight seeded islands reproduce encounters without carrying daily upgrades',()=>{
     const a=C.makeRun({seed:4242,mode:'daily'}),b=C.makeRun({seed:4242,mode:'daily'});
     assert.deepEqual(a.enemies,b.enemies);assert.deepEqual(a.spawns,b.spawns);assert.equal(a.zone,0);assert.deepEqual(a.upgrades,[]);assert.equal(a.player.hp,6);
-    assert.notEqual(C.makeRun({seed:4243,zone:1}).enemies[0].timer,C.makeRun({seed:4242,zone:1}).enemies[0].timer);
+    assert.notEqual(C.makeRun({seed:4243,zone:1}).enemies[1].timer,C.makeRun({seed:4242,zone:1}).enemies[1].timer);
 });
 test('movement normalizes diagonals and cannot pass through trees or the island edge',()=>{
     const a=C.makeRun(),b=C.makeRun();a.enemies=[];b.enemies=[];const [startX,startZ]=[a.player.x,a.player.z];
@@ -80,13 +80,13 @@ test('the lantern fires every 0.8 seconds at the nearest creature in range and n
     const idle=C.makeRun();idle.player.x=0;idle.player.z=4;idle.enemies=[dummy(0,0,-3)];advance(idle,3);
     assert.equal(idle.shots.length,0);assert.equal(idle.enemies[0].hp,20);assert.equal(idle.attackCD,0);
 });
-test('beacons light after 2 seconds inside their ring, leaving resets the timer, and three beacons win',()=>{
+test('beacons light after 2 seconds inside their ring, leaving resets the timer, and the third summons the guardian',()=>{
     const s=C.makeRun({zone:1});s.enemies=[];const [a,b,c]=s.beacons;assert.equal(s.beacons.length,3);
     s.player.x=a.x+1.4;s.player.z=a.z;advance(s,1.5);assert.equal(a.lit,false);
     s.player.x=a.x+1.6;C.tick(s,{},.05);assert.equal(a.charge,0);
     s.player.x=a.x;advance(s,1.9);assert.equal(a.lit,false);advance(s,.15);assert.equal(a.lit,true);assert.equal(s.restored,1);assert.equal(s.phase,'playing');assert.equal(s.event,'beacon');
     for(const beacon of [b,c]){s.player.x=beacon.x;s.player.z=beacon.z;advance(s,2.05);}
-    assert.equal(s.phase,'won');assert.equal(s.restored,3);assert.ok(s.score>=1500);assert.equal(C.markRecorded(s),true);
+    assert.equal(s.phase,'playing');assert.equal(s.restored,3);assert.ok(s.score>=1500);assert.equal(s.event,'bossWarn');assert.equal(C.markRecorded(s),false);
 });
 test('losing all vitality ends the run and a retry rebuilds the same island from scratch',()=>{
     const s=C.makeRun({zone:1,seed:7});s.player.hp=1;s.hazards=[{x:s.player.x,z:s.player.z,radius:2,delay:0,life:.5,hit:false}];C.tick(s,{},.05);
@@ -128,11 +128,9 @@ test('optional shrine (switched on) needs three victories, offers one blessing a
     s.player.hp=2;assert.equal(C.chooseBoon(s,'renewal'),true);assert.equal(s.player.hp,4);assert.equal(s.gardenCharges,3);assert.equal(s.energy,60);assert.equal(C.chooseBoon(s,'flare'),false);
     s.gardenCharges=0;s.enemies=[];advance(s,12.1);assert.equal(s.gardenCharges,1);s.phase='upgrade';C.chooseUpgrade(s,'pulse');assert.equal(s.boon,'');assert.equal(s.shrine.used,false);assert.equal(s.zoneKills,0);
 }));
-test('Wildflare improves Bloom damage and the final guardian changes attack below half health',()=>withFeatures(['attune','bloom'],()=>{
+test('Wildflare (switched on) improves Bloom damage',()=>withFeatures(['attune','bloom'],()=>{
     const s=C.makeRun({zone:2,upgrades:['root','pulse']});s.phase='shrine';assert.equal(C.chooseBoon(s,'flare'),true);s.energy=100;
-    const boss=s.enemies.find(e=>e.boss);s.enemies=[boss];s.player.x=boss.x;s.player.z=boss.z+2;const hp=boss.hp;C.bloom(s);assert.equal(boss.hp,hp-6);
-    boss.hp=boss.maxHP/2;boss.phase='stalk';C.tick(s,{},.05);assert.equal(boss.rage,true);assert.equal(boss.phase,'rest');assert.equal(s.event,'rage');
-    advance(s,1.75);C.tick(s,{},.05);assert.equal(boss.attackType,'slam');assert.equal(s.hazards.length,2);advance(s,1.1);assert.equal(s.projectiles.length,5);
+    const target=dummy(0,s.player.x,s.player.z+2,20);s.enemies=[target];C.bloom(s);assert.equal(target.hp,14);
 }));
 
 // Beacon charging rule (all islands) and the island 1 opening (see ZONES[0] in mosslight-logic.js).
@@ -173,25 +171,6 @@ test('walking straight to the first beacon lights it 2 s after the pulse clears 
     assert.ok(Math.abs(first.litAt-(Math.max(died,arrived)+2))<.11,`lit ${first.litAt}, died ${died}, arrived ${arrived}`);
     C.tick(s,{},.05);assert.equal(s.player.hp,4.5);
 });
-test('after the first beacon a creature enters every 7 s from the edge farthest from the player, two at a time from 30 s',()=>{
-    const s=C.makeRun({seed:9});s.enemies=[];s.player.hp=999;
-    advance(s,10);assert.equal(s.enemies.length,0,'nothing streams before the first beacon');
-    const first=s.beacons[0];s.player.x=first.x;s.player.z=first.z;while(!first.lit)C.tick(s,{},.05);
-    const waves=[];let seen=0;
-    while(s.time<first.litAt+36){C.tick(s,{},.05);if(s.enemies.length>seen){waves.push({at:+(s.time-first.litAt).toFixed(2),time:s.time,added:s.enemies.slice(seen).map(e=>({x:e.x,z:e.z,hunt:e.hunt}))});seen=s.enemies.length;}}
-    assert.deepEqual(waves.map(w=>Math.round(w.at)),[7,14,21,28,35]);
-    for(const w of waves)assert.equal(w.added.length,w.time>=30?2:1,`wave at ${w.time.toFixed(1)} s`);
-    const firstIn=waves[0].added[0];assert.ok(Math.hypot(firstIn.x+8.2,firstIn.z+8.2)<.2,'enters at the far corner (-8.2, -8.2)');assert.equal(firstIn.hunt,true);
-});
-test('a hunting creature closes in from beyond 10 units, and standing still at a beacon ends in defeat',()=>{
-    const s=C.makeRun({seed:9});s.enemies=[];s.beacons[0].lit=true;s.streamAt=s.time+.05;C.tick(s,{},.05);
-    const hunter=s.enemies[0],before=C.distance(hunter,s.player);assert.ok(before>10);advance(s,2);assert.ok(C.distance(hunter,s.player)<before-1);
-    const t=C.makeRun({seed:9}),b=t.beacons[0];
-    while(t.phase==='playing'&&t.time<120)C.tick(t,C.distance(t.player,b)>.3?{x:b.x-t.player.x,z:b.z-t.player.z}:{},1/60);
-    assert.equal(t.beacons[0].lit,true);assert.equal(t.phase,'lost');
-});
-
-// Feedback ("juice") events and the gameplay parts of them (knockback, orbs, invulnerability); see config.juice.
 test('a pulse hit pushes the creature back along the shot, flashes it white and reports the hit',()=>{
     const s=C.makeRun({zone:1});s.player.x=0;s.player.z=4;const e=dummy(0,2,4,10);s.enemies=[e];
     while(e.hp===10&&s.time<2)C.tick(s,{},.01);
@@ -226,4 +205,82 @@ test('camera rays detect ellipsoid occluders between the eye and a target only',
     assert.equal(C.segmentHitsEllipsoid(eye,player,tree),true);
     assert.equal(C.segmentHitsEllipsoid(eye,player,{...tree,x:5}),false,'off to the side');
     assert.equal(C.segmentHitsEllipsoid(eye,player,{...tree,z:-4,y:1}),false,'behind the target');
+});
+
+// Waves, the last guardian, experience and upgrades (config.balance).
+const B=C.config.balance;
+// Ticks like the game loop, taking the first card whenever a level-up pauses play.
+const play=(s,input,dt)=>{C.tick(s,input,dt);if(s.phase==='levelup')C.chooseCard(s,s.cards[0]);};
+const lightAll=s=>{for(const b of s.beacons){s.player.x=b.x;s.player.z=b.z;while(!b.lit&&s.time<60)play(s,{},.05);}};
+test('waves start at the first beacon, rise every interval and add casters then brutes from the far edge',()=>{
+    const s=C.makeRun({seed:9});s.enemies=[];s.player.hp=999;advance(s,10);assert.equal(s.wave,0);
+    const first=s.beacons[0];s.player.x=first.x;s.player.z=first.z;while(!first.lit)play(s,{},.05);assert.equal(s.wave,1);
+    const lit=first.litAt;let firstSpawn=null,types=new Set();
+    while(s.time<lit+B.waves.interval*3+1){play(s,{},.05);for(const e of s.enemies)if(e.hunt){if(!firstSpawn)firstSpawn={x:e.x,z:e.z,t:s.time-lit};types.add(s.wave+':'+e.type);}for(const e of s.enemies)if(e.hunt&&e.alive&&s.wave<3)e.hp=e.maxHP;}
+    assert.equal(s.wave,4);assert.ok(Math.abs(firstSpawn.t-B.waves.spawnEvery)<.06,`first spawn at ${firstSpawn.t}`);assert.ok(Math.hypot(firstSpawn.x+8.2,firstSpawn.z+8.2)<.3);
+    assert.ok(![...types].some(t=>t==='1:caster'||t==='1:brute'||t==='2:brute'),[...types].join());
+    const alive=s.enemies.filter(e=>e.alive&&e.hunt).length;assert.ok(alive<=B.waves.cap+B.waves.capStep*(s.wave-1));
+});
+test('standing still at a beacon ends in defeat once waves start; a hunter closes in from beyond 10',()=>{
+    const s=C.makeRun({seed:9});s.enemies=[];s.beacons[0].lit=true;s.wave=1;s.waveAt=99;s.spawnAt=s.time+.05;C.tick(s,{},.05);
+    const hunter=s.enemies[0],before=C.distance(hunter,s.player);assert.ok(before>10);advance(s,2);assert.ok(C.distance(hunter,s.player)<before-1);
+    const t=C.makeRun({seed:9}),b=t.beacons[0];
+    while(t.phase!=='lost'&&t.time<240){C.tick(t,C.distance(t.player,b)>.3?{x:b.x-t.player.x,z:b.z-t.player.z}:{},1/60);if(t.phase==='levelup')C.chooseCard(t,t.cards[0]);}
+    assert.equal(t.beacons[0].lit,true);assert.equal(t.phase,'lost');
+});
+test('the third beacon warns, then the last guardian appears at the centre; only defeating it wins',()=>{
+    const s=C.makeRun({seed:9,zone:1});s.enemies=[];s.player.hp=999;lightAll(s);
+    assert.equal(s.phase,'playing');assert.ok(s.bossAt>0);assert.ok(Math.abs(s.bossAt-s.time-B.boss.warn)<.06);assert.ok(!s.enemies.some(e=>e.warden));
+    for(let i=0;i<Math.ceil((B.boss.warn+.05)/.05);i++)play(s,{},.05);const boss=s.enemies.find(e=>e.warden);assert.ok(boss);assert.equal(boss.maxHP,Math.round(B.boss.hp*B.zoneScale[1]));assert.ok(Math.hypot(boss.x,boss.z)<2);
+    assert.ok(s.wave>=1,'waves keep running during the guardian');
+    boss.hp=1;s.enemies=[boss];s.player.x=boss.x+2;s.player.z=boss.z;s.attackCD=0;while(!['won','lost'].includes(s.phase)&&s.time<200)play(s,{},.05);assert.equal(s.phase,'won');
+});
+test('the guardian telegraphs its rush for 1 s and, below half health, slams a marked circle every 4 s',()=>{
+    const s=C.makeRun({seed:9});s.enemies=[];s.player.hp=999;lightAll(s);for(let i=0;i<Math.ceil((B.boss.warn+.05)/.05);i++)play(s,{},.05);
+    const boss=s.enemies.find(e=>e.warden);s.enemies=[boss];s.spawnAt=1e9;s.player.x=boss.x+4;s.player.z=boss.z;boss.hp=boss.maxHP;
+    let warnAt=null,rushAt=null;for(let i=0;i<200&&rushAt===null;i++){s.attackCD=1;C.tick(s,{},.02);if(boss.phase==='warn'&&warnAt===null)warnAt=s.time;if(boss.phase==='rush')rushAt=s.time;}
+    assert.ok(Math.abs(rushAt-warnAt-B.boss.rushTelegraph)<.05,`telegraph ${rushAt-warnAt}`);
+    boss.hp=boss.maxHP*B.boss.slamBelow;boss.phase='stalk';boss.slamCD=0;s.hazards=[];s.attackCD=1;C.tick(s,{},.02);
+    assert.equal(boss.attackType,'slam');assert.equal(s.hazards.length,1);assert.ok(B.boss.slamTelegraph-s.hazards[0].delay<=.02+1e-9,'marked for slamTelegraph s');assert.equal(s.hazards[0].radius,B.boss.slamRadius);
+    assert.ok(Math.abs(boss.slamCD-B.boss.slamEvery)<.03);
+});
+test('experience levels the run up with 3 distinct seeded cards; play pauses until one is taken',()=>{
+    assert.deepEqual([1,2,3,4].map(C.xpNeeded),[5,7,8,11]);
+    const s=C.makeRun({seed:9,zone:1}),t=C.makeRun({seed:9,zone:1});s.enemies=[];t.enemies=[];
+    for(const r of [s,t]){r.xp=5;C.tick(r,{},.05);}
+    assert.equal(s.phase,'levelup');assert.equal(s.level,2);assert.equal(new Set(s.cards).size,3);assert.deepEqual(s.cards,t.cards,'same seed, same cards');
+    const before=JSON.stringify(s);advance(s,2);assert.equal(JSON.stringify(s),before,'paused while choosing');
+    assert.equal(C.chooseCard(s,'nope'),false);assert.equal(C.chooseCard(s,s.cards[0]),true);assert.equal(s.phase,'playing');assert.equal(s.levels[t.cards[0]],1);
+    s.xp=200;C.tick(s,{},.05);let taken=0;while(s.phase==='levelup'&&taken<40){const pick=s.cards[0];assert.ok((s.levels[pick]||0)<3);C.chooseCard(s,pick);taken++;}
+    assert.ok(Object.values(s.levels).every(v=>v<=3));
+});
+test('upgrades change the pulse, movement, survival and forest effects as configured',()=>{
+    const with_=(levels,setup)=>{const s=C.makeRun({seed:9,zone:1});s.enemies=[];s.levels={...levels};setup&&setup(s);return s;};
+    let s=with_({rate:2,fork:2,pierce:1,range:1});s.enemies=[dummy(0,s.player.x+3,s.player.z,20),dummy(1,s.player.x+5,s.player.z,20)];C.tick(s,{},.05);
+    assert.equal(s.shots.length,B.upgrades.fork[1]);assert.ok(Math.abs(s.attackCD-(C.config.pulseInterval/B.upgrades.rate[1]-.0))<.06);assert.equal(s.shots[0].pierce,B.upgrades.pierce[0]);
+    s=with_({swift:1});const x0=s.player.x;C.tick(s,{x:-1},.05);assert.ok(Math.abs((x0-s.player.x)-3.8*B.upgrades.swift[0]*.05)<1e-9);
+    s=with_({mend:2});s.beacons[0].lit=true;s.player.x=s.beacons[0].x;s.player.z=s.beacons[0].z;s.player.hp=2;advance(s,1);assert.ok(Math.abs(s.player.hp-2-B.upgrades.mend[1])<.06);
+    s=with_({guard:1});s.beacons[0].lit=true;s.hazards=[{x:s.player.x,z:s.player.z,radius:2,delay:0,life:.05,hit:false}];C.tick(s,{},.05);assert.ok(Math.abs(s.player.invuln-C.config.juice.hurt.invuln*B.upgrades.guard[0])<1e-9);
+    s=with_({attune:1});s.orbs=[{x:s.player.x+B.upgrades.attune[0]-.2,z:s.player.z,pulled:false,value:2}];advance(s,1);assert.equal(s.xp,2);
+    s=with_({dash:1});s.enemies=[dummy(0,s.player.x-3,s.player.z,20)];s.attackCD=99;advance(s,B.upgrades.dash[0]+.5);assert.ok(s.enemies[0].hp<20,'auto dash hit');
+    s=with_({garden:1});s.beacons[0].lit=true;C.chooseCard({...s,phase:'x'},'garden');s.levels.garden=1;s.gardens=[{x:0,z:0,life:Infinity,radius:3,beacon:0}];
+    const slowEnemy=dummy(0,0,0,20);slowEnemy.phase='stalk';slowEnemy.hunt=true;slowEnemy.timer=99;s.enemies=[slowEnemy];s.player.x=6;s.player.z=0;s.attackCD=99;const ex=slowEnemy.x;C.tick(s,{},.05);
+    assert.ok(Math.abs((slowEnemy.x-ex)-1.35*(1-B.upgrades.garden[0])*.05)<1e-6);
+    s=with_({bloom:1});s.player.hp=999;s.bloomKills=B.upgrades.bloom[0]-1;const target=dummy(0,s.player.x+1,s.player.z,1),behind=dummy(1,s.player.x-2,s.player.z,10);s.enemies=[target,behind];
+    while(target.alive&&s.time<2)C.tick(s,{},.02);assert.equal(target.alive,false);assert.equal(behind.hp,7,'the all-round pulse hits for 3');assert.equal(s.bloomKills,0);
+});
+test('vitality heals at once, and upgrades reset with every new run',()=>{
+    const s=C.makeRun({seed:9});s.enemies=[];s.player.hp=3;s.xp=5;C.tick(s,{},.05);
+    const id='vitality';s.cards=[id,...s.cards.slice(1)];C.chooseCard(s,id);assert.equal(s.maxHP,7);assert.equal(s.player.hp,4);
+    const next=C.makeRun({seed:9,zone:1});assert.deepEqual(next.levels,{});assert.equal(next.level,1);assert.equal(next.xp,0);
+});
+test('islands 2 and 3 scale guard and guardian health by 1.3 and 1.6',()=>{
+    const hp=z=>C.makeRun({seed:9,zone:z}).enemies.map(e=>e.maxHP);
+    assert.deepEqual(hp(0),[2,3,4,4,8,4,4]);assert.deepEqual(hp(1),[2,3,4,4,8,4,4].map(v=>Math.round(v*1.3)));assert.deepEqual(hp(2),[2,3,4,4,8,4,4].map(v=>Math.round(v*1.6)));
+});
+test('the same daily seed and the same inputs give the same run, cards and guardian included',()=>{
+    const play=()=>{const s=C.makeRun({seed:C.dailySeedForDate('2026-10-25'),mode:'daily',date:'2026-10-25'});let k=0;
+        while(s.phase!=='won'&&s.phase!=='lost'&&s.time<150){const b=s.beacons.find(b=>!b.lit)||{x:0,z:3};C.tick(s,{x:Math.sin(k*.01)+(b.x-s.player.x)*.1,z:Math.cos(k*.013)+(b.z-s.player.z)*.1},1/60);k++;if(s.phase==='levelup')C.chooseCard(s,s.cards[k%s.cards.length]);}
+        return s;};
+    const a=play(),b=play();assert.equal(JSON.stringify(a),JSON.stringify(b));
 });

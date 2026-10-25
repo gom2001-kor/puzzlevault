@@ -4,21 +4,24 @@
     const ZONES = [
         // Island 1 onboarding: the player starts 4 from the first beacon, where a slow two-shot creature already
         // stands inside the beacon's clear radius. Beacons 2 and 3 sit at opposite ends of the island (4-6 s of
-        // walking each), each guarded from the start by regular creatures. The run's length comes from pressure:
-        // once the first beacon is lit, a creature enters from the island edge farthest from the player every 7 s,
-        // two at a time from 30 s on (see `stream`). Until the first beacon burns the player takes no damage,
-        // status messages stay quiet for 30 s, and fog covers the island except around lit beacons.
+        // walking each), each guarded from the start by regular creatures (GUARDS). Waves start with the first
+        // beacon (config.balance.waves) and the third beacon summons the last guardian (config.balance.boss).
+        // Until the first beacon burns the player takes no damage, status messages stay quiet for 30 s, and fog
+        // covers the island except around lit beacons.
         { name: 'glade', ground: '#224d45', accent: '#86efac', obstacles: [[-4, 3, 1.1], [4, 0, 1.2], [-3, -5, 1], [6, -6, 1]], seeds: [[-6, 5], [2, 6], [-6, -2], [5, -4], [0, -7]],
             // Guards notice the player within 10, so beacon 3 sits more than 10 from beacon 1 and from the first leg.
-            start: [6, 7.6], beacons: [[6, 3.6], [-7.6, -8], [-8, 8]], fog: true, grace: true, quiet: 30, hint: true,
-            stream: { every: 7, doubleAfter: 30, types: ['stalker', 'caster', 'stalker', 'brute'] },
-            enemies: [[6, 1.8, { type: 'stalker', hp: 2, speed: .5, timer: 99 }],
-                [-6, -6.4, { type: 'stalker', hp: 3 }], [-5.4, -8.3, { type: 'stalker', hp: 4 }], [-7.9, -5.4, { type: 'stalker', hp: 4 }],
-                [-6.3, 6.6, { type: 'brute', hp: 8 }], [-7.4, 5.6, { type: 'stalker', hp: 4 }], [-5.8, 8.2, { type: 'stalker', hp: 4 }]] },
-        { name: 'terrace', ground: '#253c59', accent: '#93c5fd', obstacles: [[-3, 4, 1.3], [3, 0, 1.1], [-4, -3, 1.1], [5, -6, 1.2]], seeds: [[-6, 6], [6, 5], [-6, -5], [6, -2], [0, -7]], enemies: [[-6, 2], [5, 3], [-6, -2], [5, -4], [-2, -7], [2, -7]] },
-        { name: 'heart', ground: '#433953', accent: '#c4b5fd', obstacles: [[-4, 4, 1.2], [4, 4, 1.2], [-6, -3, 1.1], [6, -3, 1.1]], seeds: [[-6, 6], [6, 6], [-7, -1], [7, -1], [0, -7]], enemies: [[-5, 1], [5, 1], [-4, -6], [4, -6], [0, -5, true]] }
+            start: [6, 7.6], beacons: [[6, 3.6], [-7.6, -8], [-8, 8]], fog: true, grace: true, quiet: 30, hint: true },
+        { name: 'terrace', ground: '#253c59', accent: '#93c5fd', obstacles: [[-3, 4, 1.3], [3, 0, 1.1], [-4, -3, 1.1], [5, -6, 1.2]], seeds: [[-6, 6], [6, 5], [-6, -5], [6, -2], [0, -7]] },
+        { name: 'heart', ground: '#433953', accent: '#c4b5fd', obstacles: [[-4, 4, 1.2], [4, 4, 1.2], [-6, -3, 1.1], [6, -3, 1.1]], seeds: [[-6, 6], [6, 6], [-7, -1], [7, -1], [0, -7]] }
     ];
     const BEACONS = [[0, -1], [-6.5, 1], [6.5, 1.5]];
+    // Guards placed around each island's beacons (offsets from the beacon). Health is for island 1; islands 2 and 3
+    // scale it by config.balance.zoneScale.
+    const GUARDS = [
+        [0, 0, -1.8, { type: 'stalker', hp: 2, speed: .5, timer: 99 }],
+        [1, 1.6, 1.6, { type: 'stalker', hp: 3 }], [1, 2.2, -.3, { type: 'stalker', hp: 4 }], [1, -.3, 2.6, { type: 'stalker', hp: 4 }],
+        [2, 1.7, -1.4, { type: 'brute', hp: 8 }], [2, .6, -2.4, { type: 'stalker', hp: 4 }], [2, 2.2, .2, { type: 'stalker', hp: 4 }]
+    ];
     // Survivor rules: movement is the only input. Disabled abilities keep their code and can be switched back on here.
     const config = { features: { dash: false, garden: false, attune: false, bloom: false }, pulseInterval: .8, pulseRange: 6, shotSpeed: 9, beaconRadius: 1.5, beaconTime: 2, beaconClearRadius: 3 };
     // Feedback ("juice") tuning in one place. Seconds, world units, Hz and 0-1 volumes.
@@ -46,6 +49,29 @@
         maxRays: 8, enemyRange: 6,                         // rays: the player plus the nearest creatures within enemyRange
         silhouette: true, silhouetteAlpha: .45, playerColor: '#9be36a', enemyColor: '#b48cf2' // drawn wherever a character is hidden by something still writing depth
     };
+    // Run structure and progression in one place: waves, the last guardian, experience and the 12 upgrades.
+    config.balance = {
+        zoneScale: [1, 1.3, 1.6],                                  // guard and boss health on islands 1, 2, 3
+        xp: { first: 5, growth: 1.3, orb: { stalker: 2, caster: 2, brute: 3, boss: 0 } }, // level 1->2 needs `first`, then x growth
+        waves: { interval: 45, cap: 4, capStep: 2, spawnEvery: 4, spawnFactor: .85, speedStep: .06, casterFrom: 2, bruteFrom: 3, hp: { stalker: 3, caster: 3, brute: 5 } },
+        boss: { hp: 60, warn: 2, speed: .7, rushEvery: 2.5, rushTelegraph: 1, rushSpeed: 6, rushTime: .6, rushDamage: 1.5, slamBelow: .5, slamEvery: 4, slamTelegraph: 1, slamRadius: 3.4, slamDamage: 1.5 },
+        // Per-level values (level 1, 2, 3). Card text fills {n} from the level being taken.
+        upgrades: {
+            rate: [1.2, 1.4, 1.6],       // pulse fire rate multiplier
+            range: [1.25, 1.5, 1.75],    // pulse range multiplier
+            fork: [2, 3, 4],             // pulses per volley
+            pierce: [1, 2, 3],           // extra creatures a pulse passes through
+            vitality: [1, 2, 3],         // extra maximum vitality (each level also heals 1)
+            guard: [1.5, 2, 2.5],        // invulnerability-after-hit multiplier
+            mend: [.5, 1, 1.5],          // vitality per second within 3 of a lit beacon
+            swift: [1.12, 1.24, 1.36],   // movement speed multiplier
+            dash: [5, 4, 3],             // seconds between automatic dashes (2 damage to creatures passed)
+            garden: [.3, .45, .6],       // slow for creatures within 3 of a lit beacon
+            attune: [4, 5, 6],           // orb pickup radius
+            bloom: [10, 8, 6]            // defeats per all-round pulse (3 damage within 6.5)
+        }
+    };
+    const UPGRADES = Object.keys(config.balance.upgrades);
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     // Camera eye and look-at point for a player at (px, pz); see config.camera.
     const LEGACY_CAMERA = { height: 11.55, back: 13.5 };
@@ -89,6 +115,10 @@
         const zone = Number.isInteger(options.zone) ? clamp(options.zone, 0, 2) : 0;
         const upgrades = Array.isArray(options.upgrades) ? options.upgrades.filter(x => ['root', 'pulse', 'wind'].includes(x)).slice(0, zone) : [];
         const state = { phase: 'playing', zone, seed: (options.seed >>> 0) || 1, mode: options.mode === 'daily' ? 'daily' : 'story', date: options.date || '', roundId: options.roundId || '', recorded: false, upgrades, score: Math.max(0, Math.floor(options.score || 0)), elapsed: Math.max(0, options.elapsed || 0), kills: Math.max(0, Math.floor(options.kills || 0)), restored: 0, event: '', eventId: 0 };
+        // Run progression (one run = one island): level, experience target, upgrade levels and the offered cards.
+        // Separate seeded streams for cards, spawns and the guardian keep a seed's run identical for everyone.
+        state.xp = 0; state.level = 1; state.xpNext = config.balance.xp.first; state.levels = {}; state.cards = null; state.levelUps = 0;
+        state.rand = { card: (state.seed ^ 0x9e3779b9) >>> 0 || 1, spawn: (state.seed ^ 0x85ebca6b) >>> 0 || 1, boss: (state.seed ^ 0xc2b2ae35) >>> 0 || 1 };
         loadZone(state); return state;
     }
     function loadZone(s) {
@@ -97,15 +127,40 @@
         const [startX, startZ] = spec.start || [0, 7.4];
         s.time = 0; s.player = { x: startX, z: startZ, hp: s.maxHP, facingX: 0, facingZ: -1, invuln: 0, dash: 0 };
         s.attackCD = 0; s.dashCD = 0; s.gardenCD = 0; s.gardenCharges = 2; s.gardenRegen = 0; s.gardens = []; s.collected = 0; s.restored = 0; s.beacons = (spec.beacons || BEACONS).map(([x,z], i) => ({ x, z, id: i, lit: false, charge: 0, blocked: false, litAt: -1 })); s.seeds = spec.seeds.map(([x,z], i) => ({ x, z, id: i, taken: false }));
-        s.energy=25; s.bloom=0; s.shots=[]; s.fx=[]; s.orbs=[]; s.xp=s.xp||0; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
+        s.energy=25; s.bloom=0; s.shots=[]; s.fx=[]; s.orbs=[]; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
+        s.wave=0; s.waveAt=0; s.spawnAt=0; s.bossAt=0; s.bossId=-1; s.dashTimer=0; s.dashHits=[]; s.bloomKills=0;
         s.shrine={x:-7,z:-6,used:false};
-        // An enemy entry is [x, z, boss] or [x, z, { spawn, type, hp, speed, timer }]; spawn > 0 holds it back until that second.
-        const all = spec.enemies.map(([x,z,extra],i) => {const o=extra&&typeof extra==='object'?extra:{boss:!!extra},type=o.boss?'boss':o.type||['stalker','caster','brute'][i%3],hp=o.hp||(o.boss?26:type==='brute'?5+s.zone:3+s.zone);return {id:i,x,z,type,boss:!!o.boss,hp,maxHP:hp,phase:'stalk',timer:o.timer??1+random(),speed:o.speed||0,spawn:o.spawn||0,aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0};});
-        s.enemies = all.filter(e => !e.spawn); s.spawns = all.filter(e => e.spawn).sort((a,b) => a.spawn-b.spawn);
-        s.nextId = all.length; s.streamAt = 0; s.streamCount = 0;
+        // Guards stand around this island's beacons from the start; their health scales with the island.
+        const scale = config.balance.zoneScale[s.zone] || 1;
+        s.enemies = GUARDS.map(([b,dx,dz,o],i) => {const x=s.beacons[b].x+dx,z=s.beacons[b].z+dz,hp=Math.round(o.hp*scale);return {id:i,x,z,type:o.type,boss:false,hp,maxHP:hp,phase:'stalk',timer:o.timer??1+random(),speed:o.speed||0,spawn:0,aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0};});
+        s.spawns = []; s.nextId = s.enemies.length;
         s.phase = 'playing'; event(s, 'enter');
     }
     function event(s, name) { s.event = name; s.eventId++; }
+    // Seeded random streams kept inside the state (plain JSON), one per purpose: 'card', 'spawn', 'boss'.
+    function nextRandom(s,key){s.rand[key]=(Math.imul(s.rand[key],1664525)+1013904223)>>>0;return s.rand[key]/4294967296;}
+    const level=(s,id)=>s.levels[id]||0;
+    const upgradeValue=(s,id)=>{const l=level(s,id);return l?config.balance.upgrades[id][l-1]:0;};
+    // Experience needed to go from `lv` to lv+1: `first` for level 1, then x `growth` per level.
+    function xpNeeded(lv){return Math.round(config.balance.xp.first*config.balance.xp.growth**(lv-1));}
+    function offerCards(s){const pool=UPGRADES.filter(id=>level(s,id)<3),cards=[];while(cards.length<3&&pool.length)cards.push(pool.splice(Math.floor(nextRandom(s,'card')*pool.length),1)[0]);return cards;}
+    function checkLevelUp(s){
+        if(s.phase!=='playing'||s.xp<s.xpNext)return false;
+        s.level++;s.levelUps++;s.xpNext+=xpNeeded(s.level);const cards=offerCards(s);
+        if(!cards.length)return checkLevelUp(s);
+        s.cards=cards;s.phase='levelup';event(s,'levelup');return true;
+    }
+    // Takes one offered card; play resumes at once (or the next pending level-up opens).
+    function chooseCard(s,id){
+        if(s.phase!=='levelup'||!s.cards||!s.cards.includes(id))return false;
+        s.levels[id]=level(s,id)+1;s.cards=null;s.phase='playing';
+        if(id==='vitality'){s.maxHP+=1;s.player.hp=Math.min(s.maxHP,s.player.hp+1);}
+        if(id==='garden')syncGardens(s);
+        checkLevelUp(s);return true;
+    }
+    // The garden upgrade reuses the garden objects: a permanent radius-3 garden at every lit beacon slows creatures.
+    function syncGardens(s){if(!level(s,'garden'))return;for(const b of s.beacons)if(b.lit&&!s.gardens.some(g=>g.beacon===b.id))s.gardens.push({x:b.x,z:b.z,life:Infinity,radius:3,beacon:b.id});}
+    function gardenSlow(s,e){return level(s,'garden')&&s.gardens.some(g=>g.beacon!==undefined&&distance(e,g)<g.radius)?1-upgradeValue(s,'garden'):1;}
     function canStand(s, x, z, radius = 0.34) {
         if (Math.abs(x) > 8.8 || Math.abs(z) > 8.8) return false;
         return !ZONES[s.zone].obstacles.some(([ox,oz,r]) => Math.hypot(x-ox,z-oz) < r + radius);
@@ -114,29 +169,39 @@
         if (canStand(s, actor.x+dx, actor.z)) actor.x += dx;
         if (canStand(s, actor.x, actor.z+dz)) actor.z += dz;
     }
-    function inGarden(s) { return s.gardens.some(g => g.life > 0 && distance(g,s.player) < g.radius); }
+    function inGarden(s) { return s.gardens.some(g => g.beacon === undefined && g.life > 0 && distance(g,s.player) < g.radius); }
     // Presentation events for the interface (several can happen in one tick); the UI drains s.fx every frame.
     function fx(s,item){if(s.fx.length<256)s.fx.push(item);}
     function strike(s,e,power,dirX=0,dirZ=0) {
         const juice=config.juice;e.hp=Math.max(0,e.hp-power);e.flash=juice.knockback.flash;
-        if(dirX||dirZ){fx(s,{type:'hit',x:e.x,z:e.z,dx:dirX,dz:dirZ});if(e.hp>0)move(s,e,dirX*juice.knockback.distance,dirZ*juice.knockback.distance);}
-        if(e.hp===0&&e.alive){e.alive=false;fx(s,{type:'defeat',x:e.x,z:e.z,enemy:{...e}});s.orbs.push({x:e.x,z:e.z,pulled:false});event(s,'defeat');s.kills++;s.zoneKills++;s.score+=e.boss?600:90+s.zone*30;s.energy=clamp(s.energy+12,0,100);}
+        if(dirX||dirZ){fx(s,{type:'hit',x:e.x,z:e.z,dx:dirX,dz:dirZ});if(e.hp>0&&!e.boss)move(s,e,dirX*juice.knockback.distance,dirZ*juice.knockback.distance);}
+        if(e.hp===0&&e.alive){
+            e.alive=false;fx(s,{type:'defeat',x:e.x,z:e.z,enemy:{...e}});event(s,'defeat');s.kills++;s.zoneKills++;s.score+=e.boss?600:90+s.zone*30;s.energy=clamp(s.energy+12,0,100);
+            const value=config.balance.xp.orb[e.type]??1;if(value>0)s.orbs.push({x:e.x,z:e.z,pulled:false,value});
+            if(e.warden){s.phase='won';event(s,'won');return;}
+            // Bloom upgrade: an all-round pulse every few defeats.
+            if(level(s,'bloom')&&++s.bloomKills>=upgradeValue(s,'bloom')){s.bloomKills=0;s.bloom=.9;fx(s,{type:'bloom'});bloomStrike(s,3,6.5,false);}
+        }
     }
-    // Fires automatically from tick(): one light shot at the nearest creature in range.
+    // Damages every creature within `radius` of the player (shared by Bloom and the bloom upgrade).
+    function bloomStrike(s,power,radius,stagger){for(const e of s.enemies)if(e.alive&&distance(e,s.player)<radius){strike(s,e,power);if(stagger){e.phase='rest';e.timer=2;}}}
+    // Fires automatically from tick(): light shots at the nearest creatures in range (more with the fork upgrade;
+    // spare shots fan out beside the first). Rate, range, fork and pierce come from the run's upgrades.
     function attack(s) {
         if (s.phase !== 'playing' || s.attackCD > 0) return false;
-        let target=null,nearest=config.pulseRange;
-        for(const e of s.enemies){const d=distance(e,s.player);if(e.alive&&d<=nearest){target=e;nearest=d;}}
-        if(!target)return false;
+        const range=config.pulseRange*(upgradeValue(s,'range')||1),forks=upgradeValue(s,'fork')||1;
+        const targets=s.enemies.filter(e=>e.alive&&distance(e,s.player)<=range).sort((a,b)=>distance(a,s.player)-distance(b,s.player));
+        if(!targets.length)return false;
         const charged=config.features.garden&&inGarden(s),power=1+(charged?1:0)+s.upgrades.filter(x=>x==='pulse').length;
-        const dx=(target.x-s.player.x)/(nearest||1),dz=(target.z-s.player.z)/(nearest||1);
-        s.shots.push({x:s.player.x,z:s.player.z,vx:dx*config.shotSpeed,vz:dz*config.shotSpeed,life:config.pulseRange/config.shotSpeed+.15,power});
-        s.attackCD=config.pulseInterval;event(s,charged?'charged':'pulse');return true;
+        const aim=e=>Math.atan2(e.z-s.player.z,e.x-s.player.x),first=aim(targets[0]);
+        for(let i=0;i<forks;i++){const a=targets[i]?aim(targets[i]):first+(i%2?1:-1)*Math.ceil(i/2)*.26;
+            s.shots.push({x:s.player.x,z:s.player.z,vx:Math.cos(a)*config.shotSpeed,vz:Math.sin(a)*config.shotSpeed,life:range/config.shotSpeed+.15,power,pierce:upgradeValue(s,'pierce'),hits:[]});}
+        s.attackCD=config.pulseInterval/(upgradeValue(s,'rate')||1);event(s,charged?'charged':'pulse');return true;
     }
     function bloom(s){
         if(!config.features.bloom||s.phase!=='playing'||s.energy<100)return false;
         s.energy=0;s.bloom=.9;s.player.invuln=Math.max(s.player.invuln,1);s.projectiles=[];
-        for(const e of s.enemies)if(e.alive&&distance(e,s.player)<6.5){strike(s,e,s.boon==='flare'?6:4);e.phase='rest';e.timer=2;}
+        bloomStrike(s,s.boon==='flare'?6:4,6.5,true);
         s.player.hp=Math.min(s.maxHP,s.player.hp+1);event(s,'bloom');return true;
     }
     function chooseBoon(s,boon){
@@ -145,9 +210,11 @@
         if(boon==='renewal'){s.player.hp=Math.min(s.maxHP,s.player.hp+2);s.gardenCharges=Math.min(3,s.gardenCharges+1);}
         event(s,'blessing');return true;
     }
-    function dash(s) {
-        if (!config.features.dash || s.phase !== 'playing' || s.dashCD > 0) return false;
-        s.player.dash=.2; s.player.invuln=Math.max(s.player.invuln,.35); s.dashCD=s.upgrades.includes('wind') ? 1.4 : 2.3; event(s,'dash'); return true;
+    // Manual dash (feature flag) or the automatic dash of the dash upgrade (auto = true, no flag or cooldown).
+    function dash(s, auto = false) {
+        if ((!config.features.dash && !auto) || s.phase !== 'playing' || (!auto && s.dashCD > 0)) return false;
+        s.player.dash=.2; s.player.dashX=s.player.facingX; s.player.dashZ=s.player.facingZ; s.player.invuln=Math.max(s.player.invuln,.35); s.dashHits=[];
+        if(!auto)s.dashCD=s.upgrades.includes('wind') ? 1.4 : 2.3; event(s,'dash'); return true;
     }
     function plant(s) {
         if (!config.features.garden || s.phase !== 'playing' || s.gardenCharges <= 0 || s.gardenCD > 0) return false;
@@ -157,17 +224,39 @@
     function lightBeacon(s,b) {
         if(b.lit)return false;
         b.lit=true;b.charge=config.beaconTime;b.litAt=s.time;s.restored++;s.score+=500;fx(s,{type:'beacon',x:b.x,z:b.z});
-        const stream=ZONES[s.zone].stream;if(stream&&!s.streamAt)s.streamAt=s.time+stream.every;
-        if(s.beacons.every(x=>x.lit)){s.phase='won';event(s,'won');}else event(s,'beacon');
+        const W=config.balance.waves;if(!s.wave){s.wave=1;s.waveAt=s.time+W.interval;s.spawnAt=s.time+W.spawnEvery;}
+        syncGardens(s);
+        // The third beacon does not win: it wakes the last guardian after a short warning.
+        if(s.beacons.every(x=>x.lit)){s.bossAt=s.time+config.balance.boss.warn;fx(s,{type:'bossWarn'});event(s,'bossWarn');}else event(s,'beacon');
         return true;
     }
-    // Streamed creatures enter at the island edge point farthest from the player and hunt from any distance.
+    // Wave creatures enter at the island edge point farthest from the player and hunt from any distance.
     const EDGE=[-8.2,-4.1,0,4.1,8.2].flatMap(v=>[[v,-8.2],[v,8.2],[-8.2,v],[8.2,v]]);
-    function streamEnemy(s,stream){
+    function streamEnemy(s,type){
         const alive=s.enemies.filter(e=>e.alive),far=([x,z])=>Math.hypot(x-s.player.x,z-s.player.z);
         const [x,z]=EDGE.filter(([x,z])=>canStand(s,x,z)&&!alive.some(e=>Math.hypot(e.x-x,e.z-z)<1.5)).sort((a,b)=>far(b)-far(a))[0]||[0,-8.2];
-        const type=stream.types[s.streamCount++%stream.types.length],hp=type==='brute'?5+s.zone:3+s.zone;
+        const hp=config.balance.waves.hp[type];
         s.enemies.push({id:s.nextId++,x,z,type,boss:false,hp,maxHP:hp,phase:'stalk',timer:1,speed:0,spawn:0,hunt:true,aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0});
+    }
+    function waveType(s){const W=config.balance.waves,pool=['stalker'];if(s.wave>=W.casterFrom)pool.push('caster');if(s.wave>=W.bruteFrom)pool.push('brute');return pool[Math.floor(nextRandom(s,'spawn')*pool.length)];}
+    // The last guardian appears at the island centre (or the nearest free spot). Its first attacks are seeded.
+    function summonBoss(s){
+        const B=config.balance.boss,hp=Math.round(B.hp*(config.balance.zoneScale[s.zone]||1));let x=0,z=0;
+        for(let r=0;r<6&&!canStand(s,x,z,.9);r+=.5)for(let a=0;a<8&&!canStand(s,x,z,.9);a++){x=Math.cos(a*Math.PI/4)*r;z=Math.sin(a*Math.PI/4)*r;}
+        const boss={id:s.nextId++,x,z,type:'boss',boss:true,warden:true,hp,maxHP:hp,phase:'stalk',timer:0,speed:B.speed,spawn:0,hunt:true,aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0,
+            rushCD:B.rushEvery*(.4+.6*nextRandom(s,'boss')),slamCD:B.slamEvery*(.4+.6*nextRandom(s,'boss'))};
+        s.enemies.push(boss);s.bossId=boss.id;fx(s,{type:'bossArrive',x,z});event(s,'bossArrive');
+    }
+    // The last guardian: rushes at the player every rushEvery s after a rushTelegraph-long amber line, and below
+    // slamBelow health also strikes the ground around itself every slamEvery s after a slamTelegraph-long circle.
+    function bossStep(s,e,d,dx,dz,dt,pace){
+        const B=config.balance.boss;e.rushCD-=dt;e.slamCD-=dt;
+        if(e.phase==='stalk'){
+            if(d>1.8)move(s,e,dx*dt*B.speed*pace,dz*dt*B.speed*pace);
+            if(e.hp<=e.maxHP*B.slamBelow&&e.slamCD<=0){e.phase='warn';e.attackType='slam';e.timer=B.slamTelegraph;e.slamCD=B.slamEvery;s.hazards.push({x:e.x,z:e.z,radius:B.slamRadius,delay:B.slamTelegraph,life:.55,hit:false,damage:B.slamDamage});}
+            else if(e.rushCD<=0){e.phase='warn';e.attackType='rush';e.timer=B.rushTelegraph;e.rushCD=B.rushEvery;e.aimX=dx;e.aimZ=dz;e.hit=false;}
+        }else if(e.phase==='warn'&&e.timer<=0){if(e.attackType==='rush'){e.phase='rush';e.timer=B.rushTime;}else e.phase='stalk';}
+        else if(e.phase==='rush'){move(s,e,e.aimX*B.rushSpeed*dt*pace,e.aimZ*B.rushSpeed*dt*pace);if(!e.hit&&distance(e,s.player)<1.45&&hurt(s,B.rushDamage))e.hit=true;if(e.timer<=0)e.phase='stalk';}
     }
     function interact(s) {
         if(!config.features.attune||s.phase!=='playing')return false;
@@ -179,7 +268,7 @@
         if (s.phase !== 'upgrade' || !['root','pulse','wind'].includes(upgrade) || (upgrade === 'wind' && s.upgrades.includes('wind'))) return false;
         s.upgrades.push(upgrade); s.zone++; loadZone(s); return true;
     }
-    function hurt(s,amount){if(s.player.invuln>0||(ZONES[s.zone].grace&&!s.beacons.some(b=>b.lit)))return false;s.player.hp-=amount;s.player.invuln=config.juice.hurt.invuln;fx(s,{type:'hurt'});event(s,'hurt');return true;}
+    function hurt(s,amount){if(s.player.invuln>0||(ZONES[s.zone].grace&&!s.beacons.some(b=>b.lit)))return false;s.player.hp-=amount;s.player.invuln=config.juice.hurt.invuln*(upgradeValue(s,'guard')||1);fx(s,{type:'hurt'});event(s,'hurt');return true;}
     function volley(s,e,count=1){
         const base=Math.atan2(e.aimZ,e.aimX);
         for(let i=0;i<count;i++){const a=base+(i-(count-1)/2)*.23;s.projectiles.push({x:e.x,z:e.z,vx:Math.cos(a)*4.8,vz:Math.sin(a)*4.8,life:4.2,boss:e.boss});}
@@ -188,34 +277,52 @@
         if(s.phase!=='playing'||!Number.isFinite(dt)||dt<=0)return;
         dt=Math.min(dt,.05);s.elapsed+=dt;s.time+=dt;
         while(s.spawns.length&&s.spawns[0].spawn<=s.time+1e-9)s.enemies.push(s.spawns.shift());
-        const stream=ZONES[s.zone].stream;
-        while(stream&&s.streamAt&&s.time>=s.streamAt-1e-9){for(let n=s.time>=stream.doubleAfter?2:1;n>0;n--)streamEnemy(s,stream);s.streamAt+=stream.every;}
-        // Experience orbs: once the player is within pickup range they fly in and are counted (s.xp).
-        const orb=config.juice.orb;
-        s.orbs=s.orbs.filter(o=>{const d=distance(o,s.player);if(d<=orb.pickup)o.pulled=true;if(!o.pulled)return true;const step=Math.min(d,orb.pull*dt);o.x+=(s.player.x-o.x)/(d||1)*step;o.z+=(s.player.z-o.z)/(d||1)*step;if(d-step>.35)return true;s.xp++;fx(s,{type:'orb'});return false;});
+        // Waves (from the first beacon): every `interval` s the wave number rises; one creature enters every
+        // spawnEvery x spawnFactor^(wave-1) s while fewer than cap + capStep x (wave-1) wave creatures are alive.
+        const W=config.balance.waves;
+        if(s.wave){
+            while(s.time>=s.waveAt-1e-9){s.wave++;s.waveAt+=W.interval;fx(s,{type:'wave',wave:s.wave});}
+            if(s.time>=s.spawnAt-1e-9){if(s.enemies.filter(e=>e.alive&&e.hunt&&!e.boss).length<W.cap+W.capStep*(s.wave-1))streamEnemy(s,waveType(s));s.spawnAt=s.time+W.spawnEvery*W.spawnFactor**(s.wave-1);}
+        }
+        if(s.bossAt&&s.time>=s.bossAt-1e-9){s.bossAt=0;summonBoss(s);}
+        // Experience orbs: once the player is within pickup range (attune upgrade widens it) they fly in and count.
+        const orb=config.juice.orb,pickup=upgradeValue(s,'attune')||orb.pickup;
+        s.orbs=s.orbs.filter(o=>{const d=distance(o,s.player);if(d<=pickup)o.pulled=true;if(!o.pulled)return true;const step=Math.min(d,orb.pull*dt);o.x+=(s.player.x-o.x)/(d||1)*step;o.z+=(s.player.z-o.z)/(d||1)*step;if(d-step>.35)return true;s.xp+=o.value||1;fx(s,{type:'orb'});return false;});
         for(const key of ['attackCD','dashCD','gardenCD','bloom'])s[key]=Math.max(0,s[key]-dt);
         s.player.invuln=Math.max(0,s.player.invuln-dt);
         if(config.features.garden){const regen=s.boon==='renewal'?12:18;s.gardenRegen+=dt;if(s.gardenRegen>=regen){s.gardenRegen-=regen;s.gardenCharges=Math.min(3,s.gardenCharges+1);}}
         s.gardens=s.gardens.filter(g=>{g.life-=dt;return g.life>0;});
         if(inGarden(s))s.player.hp=Math.min(s.maxHP,s.player.hp+dt*.48);
+        if(level(s,'mend')&&s.beacons.some(b=>b.lit&&distance(b,s.player)<3))s.player.hp=Math.min(s.maxHP,s.player.hp+upgradeValue(s,'mend')*dt);
+        // Dash upgrade: every few seconds an automatic dash toward the nearest creature, damaging what it passes.
+        if(level(s,'dash')){s.dashTimer+=dt;const near=s.enemies.filter(e=>e.alive).sort((a,b)=>distance(a,s.player)-distance(b,s.player))[0];
+            if(s.dashTimer>=upgradeValue(s,'dash')&&near){const d=distance(near,s.player)||1;s.player.facingX=(near.x-s.player.x)/d;s.player.facingZ=(near.z-s.player.z)/d;s.dashTimer=0;dash(s,true);}}
         let x=Number(input.x)||0,z=Number(input.z)||0,n=Math.hypot(x,z);s.moving=n>0;
         if(n>0){x/=n;z/=n;s.player.facingX=x;s.player.facingZ=z;}
-        if(s.player.dash>0){s.player.dash=Math.max(0,s.player.dash-dt);move(s,s.player,s.player.facingX*11*dt,s.player.facingZ*11*dt);}
-        else move(s,s.player,x*3.8*dt,z*3.8*dt);
+        if(s.player.dash>0){
+            s.player.dash=Math.max(0,s.player.dash-dt);move(s,s.player,(s.player.dashX??s.player.facingX)*11*dt,(s.player.dashZ??s.player.facingZ)*11*dt);
+            if(level(s,'dash'))for(const e of s.enemies)if(e.alive&&!s.dashHits.includes(e.id)&&distance(e,s.player)<.9){s.dashHits.push(e.id);strike(s,e,2,s.player.dashX,s.player.dashZ);if(s.phase!=='playing')return;}
+        }
+        else{const speed=3.8*(upgradeValue(s,'swift')||1);move(s,s.player,x*speed*dt,z*speed*dt);}
         for(const seed of s.seeds)if(!seed.taken&&distance(seed,s.player)<.85){seed.taken=true;s.collected++;s.score+=45;s.energy=clamp(s.energy+8,0,100);event(s,'seed');}
         // Standing in the ring charges a beacon; a living creature within beaconClearRadius pauses the charge
         // (it is kept), and stepping out of the ring resets it.
         for(const b of s.beacons){if(b.lit)continue;b.blocked=s.enemies.some(e=>e.alive&&distance(e,b)<config.beaconClearRadius);if(distance(b,s.player)>config.beaconRadius)b.charge=0;else if(!b.blocked)b.charge+=dt;if(b.charge>=config.beaconTime-1e-9)lightBeacon(s,b);}
         if(s.phase!=='playing')return;
         attack(s);
-        s.shots=s.shots.filter(shot=>{shot.life-=dt;shot.x+=shot.vx*dt;shot.z+=shot.vz*dt;const e=s.enemies.find(e=>e.alive&&distance(e,shot)<(e.boss?.95:.6));if(e){const speed=Math.hypot(shot.vx,shot.vz)||1;strike(s,e,shot.power,shot.vx/speed,shot.vz/speed);s.energy=clamp(s.energy+10,0,100);return false;}return shot.life>0;});
+        s.shots=s.shots.filter(shot=>{shot.life-=dt;shot.x+=shot.vx*dt;shot.z+=shot.vz*dt;const hits=shot.hits||[];const e=s.enemies.find(e=>e.alive&&!hits.includes(e.id)&&distance(e,shot)<(e.boss?.95:.6));
+            if(!e)return shot.life>0;const speed=Math.hypot(shot.vx,shot.vz)||1;strike(s,e,shot.power,shot.vx/speed,shot.vz/speed);s.energy=clamp(s.energy+10,0,100);
+            if(shot.pierce>0){shot.pierce--;hits.push(e.id);shot.hits=hits;return shot.life>0;}return false;});
+        if(s.phase!=='playing')return;
+        const wavePace=1+W.speedStep*Math.max(0,s.wave-1);
         for(const e of s.enemies){
             if(!e.alive)continue;e.flash=Math.max(0,e.flash-dt);e.timer-=dt;
-            const d=distance(e,s.player),dx=(s.player.x-e.x)/(d||1),dz=(s.player.z-e.z)/(d||1),type=e.type||'stalker';
+            const d=distance(e,s.player),dx=(s.player.x-e.x)/(d||1),dz=(s.player.z-e.z)/(d||1),type=e.type||'stalker',slow=gardenSlow(s,e);
+            if(e.warden){bossStep(s,e,d,dx,dz,dt,slow);continue;}
             if(e.boss&&!e.rage&&e.hp<=e.maxHP/2){e.rage=true;e.phase='rest';e.timer=1.4;event(s,'rage');}
             if(e.phase==='stalk'){
                 const reach=type==='caster'?6.7:type==='brute'?3.6:4.3;
-                const pace=e.speed||(e.boss?.95:type==='brute'?.85:1.35);
+                const pace=(e.speed||(e.boss?.95:type==='brute'?.85:1.35))*wavePace*slow;
                 if((d<10||e.hunt)&&d>(type==='caster'?5:1.65))move(s,e,dx*dt*pace,dz*dt*pace);
                 if(type==='caster'&&d<3.2)move(s,e,-dx*dt*1.1,-dz*dt*1.1);
                 if(e.timer<=0&&d<reach){
@@ -231,14 +338,15 @@
                 else if(e.attackType==='slam'){e.phase='rest';e.timer=e.boss?1.5:2;if(e.boss&&e.rage)volley(s,e,5);e.cycle=(e.cycle||0)+1;}
                 else{e.phase='rush';e.timer=e.boss?.65:.42;}
             }else if(e.phase==='rush'){
-                move(s,e,e.aimX*(e.boss?5:6)*dt,e.aimZ*(e.boss?5:6)*dt);
+                move(s,e,e.aimX*(e.boss?5:6)*dt*slow,e.aimZ*(e.boss?5:6)*dt*slow);
                 if(!e.hit&&distance(e,s.player)<(e.boss?1.45:.92)&&hurt(s,e.boss?1.5:1))e.hit=true;
                 if(e.timer<=0){e.phase='rest';e.timer=e.boss?1.5:1.4;e.cycle=(e.cycle||0)+1;}
             }else if(e.phase==='rest'&&e.timer<=0){e.phase='stalk';e.timer=.2;}
         }
         s.projectiles=s.projectiles.filter(p=>{p.life-=dt;p.x+=p.vx*dt;p.z+=p.vz*dt;if(distance(p,s.player)<.5){hurt(s,p.boss?1.5:1);return false;}return p.life>0&&Math.abs(p.x)<10&&Math.abs(p.z)<10;});
-        s.hazards=s.hazards.filter(h=>{if(h.delay>0){h.delay-=dt;return true;}h.life-=dt;if(!h.hit&&distance(h,s.player)<h.radius&&hurt(s,1.5))h.hit=true;return h.life>0;});
+        s.hazards=s.hazards.filter(h=>{if(h.delay>0){h.delay-=dt;return true;}h.life-=dt;if(!h.hit&&distance(h,s.player)<h.radius&&hurt(s,h.damage||1.5))h.hit=true;return h.life>0;});
         if(s.player.hp<=0){s.player.hp=0;s.phase='lost';event(s,'lost');}
+        else checkLevelUp(s);
     }
     function checkpoint(s) { return { version:1,zone:s.zone,upgrades:s.upgrades.slice(),seed:s.seed,score:s.score,kills:s.kills,elapsed:s.elapsed,mode:s.mode }; }
     function validCheckpoint(value) {
@@ -248,7 +356,7 @@
         return { ...value,upgrades:value.upgrades.slice() };
     }
     function markRecorded(s){if(!['won','lost'].includes(s.phase)||s.recorded)return false;s.recorded=true;return true;}
-    const Core={ZONES,BEACONS,config,cameraPose,segmentHitsEllipsoid,lightBeacon,makeRun,loadZone,canStand,move,inGarden,attack,dash,plant,bloom,chooseBoon,interact,chooseUpgrade,tick,checkpoint,validCheckpoint,markRecorded,distance,validDailyDate,dailySeedForDate,dailyRequest,resultURL};
+    const Core={ZONES,BEACONS,GUARDS,UPGRADES,config,chooseCard,xpNeeded,cameraPose,segmentHitsEllipsoid,lightBeacon,makeRun,loadZone,canStand,move,inGarden,attack,dash,plant,bloom,chooseBoon,interact,chooseUpgrade,tick,checkpoint,validCheckpoint,markRecorded,distance,validDailyDate,dailySeedForDate,dailyRequest,resultURL};
     if(typeof module!=='undefined'&&module.exports)module.exports=Core;
     root.MosslightCore=Core;
     if(typeof document==='undefined')return;
@@ -289,6 +397,28 @@
     };
     for(const code of Object.keys(ONBOARDING))Object.assign(TEXT[code],ONBOARDING[code]);
     for(const [code,label] of Object.entries({en:'Next island',ko:'다음 섬',ja:'次の島',zh:'下一座岛',es:'Siguiente isla'}))TEXT[code].nextIsland=label;
+    // Upgrade cards: [name, one-line effect]; {n} is filled from config.balance.upgrades for the level being taken.
+    const UPGRADE_TEXT={
+        en:{rate:['Quick pulse','Pulse fire rate +20%'],range:['Long pulse','Pulse range +25%'],fork:['Forked pulse','One more pulse per volley'],pierce:['Piercing pulse','Pulses pass through 1 more creature'],vitality:['Deep roots','+1 maximum vitality, healed now'],guard:['Second wind','+50% invulnerability after a hit'],mend:['Beacon warmth','Recover 0.5 per second near a lit beacon'],swift:['Windstep','Move speed +12%'],dash:['Dash','Auto-dash at the nearest creature every {n} s'],garden:['Garden','Creatures near lit beacons {n}% slower'],attune:['Attune','Orb pickup radius {n}'],bloom:['Bloom','All-round pulse every {n} defeats']},
+        ko:{rate:['빠른 파동','파동 발사 속도 +20%'],range:['긴 파동','파동 사거리 +25%'],fork:['갈래 파동','한 번에 파동 한 갈래 더'],pierce:['관통 파동','파동이 적 1마리를 더 통과'],vitality:['단단한 뿌리','최대 생명력 +1, 바로 회복'],guard:['숨 고르기','피격 후 무적 시간 +50%'],mend:['봉화의 온기','켜진 봉화 근처에서 초당 0.5 회복'],swift:['바람걸음','이동 속도 +12%'],dash:['돌진','{n}초마다 가장 가까운 적에게 자동 돌진'],garden:['정원','켜진 봉화 주변 적 {n}% 둔화'],attune:['조율','구슬 흡수 반경 {n}'],bloom:['개화','처치 {n}마리마다 전방위 파동']},
+        ja:{rate:['速い波動','波動の発射速度 +20%'],range:['長い波動','波動の射程 +25%'],fork:['分かれ波動','一度に波動をもう1本'],pierce:['貫通波動','波動が敵をもう1体貫通'],vitality:['深い根','最大生命力 +1、すぐ回復'],guard:['ひと呼吸','被弾後の無敵時間 +50%'],mend:['灯台のぬくもり','灯した灯台の近くで毎秒0.5回復'],swift:['風の歩み','移動速度 +12%'],dash:['ダッシュ','{n}秒ごとに最も近い敵へ自動ダッシュ'],garden:['庭','灯した灯台の周りの敵を{n}%減速'],attune:['調律','光の玉の吸収半径 {n}'],bloom:['開花','{n}体倒すごとに全方位の波動']},
+        zh:{rate:['快速脉冲','脉冲发射速度 +20%'],range:['远程脉冲','脉冲射程 +25%'],fork:['分叉脉冲','每次多发射一道脉冲'],pierce:['穿透脉冲','脉冲可多穿透1个敌人'],vitality:['深根','最大生命 +1，立即回复'],guard:['喘息','受伤后无敌时间 +50%'],mend:['灯塔之暖','在点亮的灯塔附近每秒回复0.5'],swift:['踏风','移动速度 +12%'],dash:['冲刺','每{n}秒自动冲向最近的敌人'],garden:['花园','点亮灯塔周围的敌人减速{n}%'],attune:['调律','光球吸收半径 {n}'],bloom:['绽放','每击败{n}个敌人释放全方位脉冲']},
+        es:{rate:['Pulso rápido','Cadencia del pulso +20%'],range:['Pulso largo','Alcance del pulso +25%'],fork:['Pulso doble','Un pulso más por ráfaga'],pierce:['Pulso perforante','El pulso atraviesa 1 criatura más'],vitality:['Raíces profundas','Vitalidad máxima +1 y curación'],guard:['Respiro','Invulnerabilidad tras un golpe +50%'],mend:['Calor del faro','Recupera 0,5 por segundo cerca de un faro encendido'],swift:['Paso de viento','Velocidad +12%'],dash:['Embestida','Embestida automática cada {n} s hacia la criatura más cercana'],garden:['Jardín','Criaturas junto a faros encendidos {n}% más lentas'],attune:['Sintonía','Radio de recogida de orbes {n}'],bloom:['Floración','Pulso en todas direcciones cada {n} derrotas']}
+    };
+    const RUN_TEXT={
+        en:{levelUp:'Level {n}',levelUpText:'Choose one (1, 2, 3).',waveLabel:'Wave {n}',bossWarn:'The last guardian is waking!',survived:'{prefix}Survived {m}:{ss} · Level {lv} · Defeated {k}',todayPrefix:'Today: ',wonText:'The last guardian has fallen and all three beacons burn.'},
+        ko:{levelUp:'레벨 {n}',levelUpText:'하나를 고르세요 (1·2·3)',waveLabel:'웨이브 {n}',bossWarn:'마지막 수호자가 깨어나요!',survived:'{prefix}{m}분 {s}초 생존 · 레벨 {lv} · 처치 {k}',todayPrefix:'오늘 ',wonText:'마지막 수호자가 쓰러지고 봉화 세 개가 모두 빛나요.'},
+        ja:{levelUp:'レベル {n}',levelUpText:'1つ選んでください（1・2・3）',waveLabel:'ウェーブ {n}',bossWarn:'最後の守護者が目覚める！',survived:'{prefix}{m}分{s}秒 生存 · レベル {lv} · 撃破 {k}',todayPrefix:'今日 ',wonText:'最後の守護者が倒れ、3つの灯台がすべて輝いています。'},
+        zh:{levelUp:'等级 {n}',levelUpText:'选择一项（1、2、3）',waveLabel:'第{n}波',bossWarn:'最后的守护者苏醒了！',survived:'{prefix}生存 {m}分{s}秒 · 等级 {lv} · 击败 {k}',todayPrefix:'今天 ',wonText:'最后的守护者倒下了，三座灯塔全部点亮。'},
+        es:{levelUp:'Nivel {n}',levelUpText:'Elige una (1, 2, 3).',waveLabel:'Oleada {n}',bossWarn:'¡Despierta el último guardián!',survived:'{prefix}Sobreviviste {m}:{ss} · Nivel {lv} · Derrotas {k}',todayPrefix:'Hoy: ',wonText:'El último guardián ha caído y los tres faros brillan.'}
+    };
+    for(const code of Object.keys(RUN_TEXT))Object.assign(TEXT[code],RUN_TEXT[code]);
+    const upgradeText=id=>(UPGRADE_TEXT[lang()]||UPGRADE_TEXT.en)[id];
+    // Card numbers: seconds, percent, radius or defeats for the level being taken.
+    function upgradeNumber(id,lv){const v=config.balance.upgrades[id][lv-1];return id==='garden'?Math.round(v*100):v;}
+    function runStats(){const m=Math.floor(state.time/60),sec=Math.floor(state.time%60);return t('survived').replace('{prefix}',state.mode==='daily'?t('todayPrefix'):'').replace('{m}',m).replace('{s}',sec).replace('{ss}',String(sec).padStart(2,'0')).replace('{lv}',state.level).replace('{k}',state.kills);}
+    async function shareRun(){if(!state)return;const m=Math.floor(state.time/60),ss=String(Math.floor(state.time%60)).padStart(2,'0');if(typeof shareResult==='function')await shareResult(`I survived ${m}:${ss} in Mosslight Wardens 🌲 Beat me: ${resultURL(state.mode,state.date,lang(),location.href)}`);}
+    function takeCard(id){if(!state||!chooseCard(state,id))return;sfx('clear');if(state.phase==='levelup')renderOverlay();else{hideOverlay();$('ml-canvas').focus({preventScroll:true});}updateHUD(true);}
     let state=null,renderer=null,last=0,frame=0,selectedIsland=0,hintTimer=0,seenEvent=0,seenPhase='',overlayKind='start',soundEnabled=true,camera=[0,11.8,17],lastHud=0,adPending=false,contextLost=false,lastEnvironment=-1;
     const keys=new Set(),held=new Set(),$=id=>document.getElementById(id),lang=()=>typeof I18n!=='undefined'&&TEXT[I18n.currentLang]?I18n.currentLang:'en',t=key=>TEXT[lang()][key]||TEXT.en[key]||key;
     const storage={get(k,fallback=null){try{const v=localStorage.getItem('pv_mosslight_'+k);return v===null?fallback:JSON.parse(v);}catch(_){return fallback;}},set(k,v){try{localStorage.setItem('pv_mosslight_'+k,JSON.stringify(v));}catch(_){}},remove(k){try{localStorage.removeItem('pv_mosslight_'+k);}catch(_){}}};
@@ -336,6 +466,10 @@
         }else if(overlayKind==='shrine'){
             title.textContent=t('shrine');p.textContent=t('shrineText');
             for(const id of ['renewal','flare']){const b=button('',()=>{if(chooseBoon(state,id)){hideOverlay();updateHUD(true);sfx('clear');}});const strong=document.createElement('strong'),small=document.createElement('span');strong.textContent=t(id);small.textContent=t(id+'Desc');b.append(strong,small);actions.append(b);}
+        }else if(overlayKind==='levelup'){
+            title.textContent=t('levelUp').replace('{n}',state.level);p.textContent=t('levelUpText');
+            state.cards.forEach((id,i)=>{const lv=(state.levels[id]||0)+1,[name,effect]=upgradeText(id),b=button('',()=>takeCard(id),'ml-card'),strong=document.createElement('strong'),small=document.createElement('span');
+                strong.textContent=`${i+1}. ${name} ${['I','II','III'][lv-1]}`;small.textContent=effect.replace('{n}',upgradeNumber(id,lv));b.append(strong,small);actions.append(b);});
         }else if(overlayKind==='upgrade'){
             title.textContent=t('upgrade');p.textContent=t('upgradeText');
             for(const [id,label,desc] of [['root','root','rootDesc'],['pulse','pulseUpgrade','pulseDesc'],['wind','wind','windDesc']]){
@@ -343,13 +477,14 @@
             }
         }else{
             const won=state&&state.phase==='won';title.textContent=t(won?'won':'lost');p.textContent=t(won?'wonText':'lostText')+(won&&state.zone===0?' '+t('unlocked'):'');
-            const stat=document.createElement('p');stat.className='ml-result-stats';stat.textContent=`${t('score')} ${state.score} · ${t('restored')} ${state.restored}/3 · ${t('time')} ${clock(state.elapsed)}`;actions.append(stat);
+            const stat=document.createElement('p');stat.className='ml-result-stats';stat.textContent=`${runStats()} · ${t('score')} ${state.score}`;actions.append(stat);
             // Personal records moved here from below the game; they are only read at the end of a run.
             const records=document.createElement('small');records.textContent=`${t('best')}: ${Number(storage.get('best',0))||0} · ${t('wins')}: ${Number(storage.get('wins',0))||0} · ${t('saved')}`;
             // A single retry resets the same island immediately; the renderer and terrain cache are reused.
             // "Next island" sits beside retry after a win, once that island is unlocked.
             const row=document.createElement('div');row.className='ml-result-buttons';row.append(button(t('retry'),()=>start(state.mode,false,state.date,state.zone),'ml-primary'));
             if(won&&state.zone<2&&unlockedIslands()>state.zone+1){const zone=state.zone+1;row.append(button(t('nextIsland'),()=>start('story',false,null,zone)));}
+            if(state.mode==='daily')row.append(button(t('share'),shareRun));
             actions.append(row,records);
             const related=document.createElement('nav');related.className='ml-result-links';related.setAttribute('aria-label','More games');for(const [id,name] of [['cloudweft','Cloudweft Passage'],['colorflow','ColorFlow'],['numvault','NumVault']]){const a=document.createElement('a');a.href='/games/'+id+'.html';a.textContent=name;related.append(a);}actions.append(related);
         }
@@ -359,6 +494,7 @@
     function updateHUD(force=false){
         const now=performance.now();if(!force&&now-lastHud<100)return;lastHud=now;
         $('ml-sound').textContent=`${t('sound')}: ${t(soundEnabled?'on':'off')}`;
+        $('ml-meta').textContent=state?clock(state.time)+(state.wave?' · '+t('waveLabel').replace('{n}',state.wave):''):'0:00';
         if(!state){$('ml-zone').textContent=`${t('zone')} 1 / 3 · ${t('glade')}`;$('ml-vitality').textContent='6 / 6';$('ml-healthbar').style.width='100%';$('ml-beacons').textContent='0 / 3';$('ml-foes').textContent='0';$('ml-score').textContent='0';}
         else{
             $('ml-zone').textContent=`${t('zone')} ${state.zone+1} / 3 · ${t(ZONES[state.zone].name)}${state.mode==='daily'?' · '+state.date+' UTC':''}`;
@@ -423,7 +559,7 @@
     // ---- Feedback ("juice") runtime. Particles come from a fixed pool whose render descriptors are reused every
     // frame; fxTime is a presentation clock that keeps running through the victory zoom but stops while paused.
     const juice=config.juice,POOL=Array.from({length:160},()=>({life:0,max:1,x:0,y:0,z:0,vx:0,vy:0,vz:0,size:.1,desc:{...obj('sphere',0,0,0,.1,.1,.1,'#ffffff',0,1,.7),castShadow:false}}));
-    let poolCursor=0,shake=0,hitChain=0,lastHitAt=-9,victoryAt=0,lightNow=-1,fxTime=0,ringStart={};const dying=[];
+    let poolCursor=0,lightFlash=0,shake=0,hitChain=0,lastHitAt=-9,victoryAt=0,lightNow=-1,fxTime=0,ringStart={};const dying=[];
     function emit(x,z,count,{life,speed,size,color},y=.6){
         for(let i=0;i<count;i++){const q=POOL[poolCursor];poolCursor=(poolCursor+1)%POOL.length;const a=Math.random()*Math.PI*2,v=speed*(.5+Math.random()*.7);
             q.life=q.max=life;q.x=x;q.y=y;q.z=z;q.vx=Math.cos(a)*v;q.vz=Math.sin(a)*v;q.vy=1+Math.random()*1.5;q.size=size;q.desc.color=color;}
@@ -462,6 +598,9 @@
                 const h=juice.hitSound;hitChain=fxTime-lastHitAt<=h.chain?Math.min(hitChain+1,h.steps-1):0;lastHitAt=fxTime;tone(h.base*h.step**hitChain,h.length,h.volume);
             }else if(f.type==='defeat'){dying.push({e:f.enemy,age:0});emit(f.x,f.z,juice.defeat.particles,juice.defeat,.8);}
             else if(f.type==='hurt'){const v=$('ml-vignette');v.style.animationDuration=juice.hurt.vignette+'s';v.classList.remove('on');void v.offsetWidth;v.classList.add('on');}
+            else if(f.type==='bossWarn'){lightFlash=1;tone(70,.45,.5,{type:'sine'});setTimeout(()=>tone(62,.55,.5,{type:'sine'}),260);}
+            else if(f.type==='bossArrive'){shake=juice.shake.time*4;tone(55,.7,.55,{type:'sine',attack:.01,harmonic:.3});}
+            else if(f.type==='bloom'){tone(660,.35,.16,{type:'sine',harmonic:.4});}
             else if(f.type==='beacon'){const g=juice.ignite,lit=state.beacons.find(b=>b.lit&&ringStart[b.id]===undefined);if(lit)ringStart[lit.id]=fxTime;tone(196,g.sound,g.volume,{type:'sine',attack:.08,harmonic:.5});tone(294,g.sound,g.volume*.6,{attack:.14});}
         }
     }
@@ -550,17 +689,19 @@
             const west=keys.has('a')||keys.has('arrowleft')||held.has('west'),east=keys.has('d')||keys.has('arrowright')||held.has('east'),north=keys.has('w')||keys.has('arrowup')||held.has('north'),south=keys.has('s')||keys.has('arrowdown')||held.has('south');
             tick(state,{x:Number(east)-Number(west),z:Number(south)-Number(north)},dt);playFx(state.fx.splice(0));
             // Pulse hits and lit beacons have their own synthesized sounds (playFx), so they are not repeated here.
-            if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',beacon:'beaconLit',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',bloom:'bloomEvent',rage:'rage',shrineLocked:'shrineLocked',blessing:'blessing'}[state.event];if(eventKey&&state.time>=(ZONES[state.zone].quiet||0))$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='defeat')sfx('combo');else if(state.event==='hurt')sfx('wrong');else if(state.event==='garden')sfx('hint');else if(state.event==='bloom')sfx('combo');}
+            if(state.eventId!==seenEvent){seenEvent=state.eventId;const eventKey={seed:'seedEvent',bossWarn:'bossWarn',beacon:'beaconLit',garden:'gardenEvent',charged:'charged',hurt:'hurt',enter:'enter',bloom:'bloomEvent',rage:'rage',shrineLocked:'shrineLocked',blessing:'blessing'}[state.event];if(eventKey&&state.time>=(ZONES[state.zone].quiet||0))$('ml-status').textContent=t(eventKey);if(state.event==='seed')sfx('correct');else if(state.event==='defeat')sfx('combo');else if(state.event==='hurt')sfx('wrong');else if(state.event==='garden')sfx('hint');else if(state.event==='bloom')sfx('combo');}
         }
         if(state&&(state.phase==='playing'||state.phase==='won'))stepJuice(dt);
         // A win holds on a slow zoom-out for juice.victory.time before the result screen.
-        if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='shrine'){sfx('hint');showOverlay('shrine');}else if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(state.phase==='won')victoryAt=now;else if(state.phase==='lost')finish();}
+        if(state&&state.phase!==seenPhase){seenPhase=state.phase;if(state.phase==='shrine'){sfx('hint');showOverlay('shrine');}else if(state.phase==='upgrade'){sfx('clear');showOverlay('upgrade');}else if(state.phase==='won')victoryAt=now;else if(state.phase==='lost')finish();else if(state.phase==='levelup'){sfx('combo');showOverlay('levelup');}}
         if(state&&state.phase==='won'&&victoryAt&&now-victoryAt>=juice.victory.time*1000)finish();
         if(renderer&&!contextLost){const active=state||preview,p=active.player;if(lastEnvironment!==active.zone&&renderer.setEnvironment){renderer.setEnvironment([{clear:'#203d36',skyTop:'#223b49',skyBottom:'#849c8a',lightColor:'#fff0ce'},{clear:'#25444b',skyTop:'#294654',skyBottom:'#9bb8b5',lightColor:'#e0efff'},{clear:'#343c3d',skyTop:'#363649',skyBottom:'#aaa79b',lightColor:'#ffe0b7'}][active.zone]);lastEnvironment=active.zone;}const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,smoothing=reduced?1:Math.min(1,dt*5);const pose=cameraPose(p.x,p.z);for(let i=0;i<3;i++)camera[i]+=(pose.eye[i]-camera[i])*smoothing;
             // Scene light follows the number of lit beacons (juice.light.min at 0/3, max at 3/3).
             const lightTarget=juice.light.min+(juice.light.max-juice.light.min)*active.beacons.filter(b=>b.lit).length/active.beacons.length;
             lightNow=lightNow<0||reduced?lightTarget:lightNow+(lightTarget-lightNow)*Math.min(1,dt*3/juice.light.ease);
-            if(Math.abs(lightNow-renderer.lightScale)>.003)renderer.setEnvironment({lightScale:+lightNow.toFixed(3)});
+            // The guardian's warning flashes the light once.
+            const shown=lightNow+lightFlash*.9;lightFlash=Math.max(0,lightFlash-dt*2);
+            if(Math.abs(shown-renderer.lightScale)>.003)renderer.setEnvironment({lightScale:+shown.toFixed(3)});
             let eye=camera,look=[camera[0]+pose.look[0]-pose.eye[0],pose.look[1],camera[2]+pose.look[2]-pose.eye[2]];
             if(state&&state.phase==='won'&&victoryAt){const k=clamp((now-victoryAt)/1000/juice.victory.time,0,1),ease=k*k*(3-2*k),wide=[0,juice.victory.height,juice.victory.distance];eye=eye.map((v,i)=>v+(wide[i]-v)*ease);look=look.map(v=>v*(1-ease));}
             if(shake>0&&!reduced){const a=juice.shake.amplitude*shake/juice.shake.time,ox=(Math.random()*2-1)*a,oy=(Math.random()*2-1)*a;eye=[eye[0]+ox,eye[1]+oy,eye[2]];look=[look[0]+ox,look[1]+oy,look[2]];}
@@ -575,7 +716,7 @@
         try{soundEnabled=localStorage.getItem('pv_sound')!=='off';}catch(_){};
         $('ml-pause').addEventListener('click',pause);$('ml-sound').addEventListener('click',()=>{soundEnabled=!soundEnabled;try{localStorage.setItem('pv_sound',soundEnabled?'on':'off');}catch(_){}if(typeof SFX!=='undefined')SFX.enabled=soundEnabled;updateHUD(true);});
         for(const b of document.querySelectorAll('[data-dir]')){const dir=b.dataset.dir;b.addEventListener('pointerdown',e=>{if(!state||state.phase!=='playing')return;e.preventDefault();held.add(dir);b.classList.add('pressed');b.setPointerCapture(e.pointerId);});for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>{held.delete(dir);b.classList.remove('pressed');});}
-        document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;const k=e.key.toLowerCase();if(['p','escape'].includes(k)){if(state&&['playing','paused'].includes(state.phase)){e.preventDefault();if(!e.repeat)pause();}return;}if(!state||state.phase!=='playing')return;
+        document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;const k=e.key.toLowerCase();if(state&&state.phase==='levelup'&&['1','2','3'].includes(k)){e.preventDefault();const id=state.cards[Number(k)-1];if(id&&!e.repeat)takeCard(id);return;}if(['p','escape'].includes(k)){if(state&&['playing','paused'].includes(state.phase)){e.preventDefault();if(!e.repeat)pause();}return;}if(!state||state.phase!=='playing')return;
             if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(k)){e.preventDefault();keys.add(k);return;}
             // Ability keys stay wired but only act when their config.features flag is turned on.
             const ability={shift:'dash',k:'dash',q:'garden',l:'garden',e:'restore',r:'bloom'}[k],feature={dash:'dash',garden:'garden',restore:'attune',bloom:'bloom'}[ability];
