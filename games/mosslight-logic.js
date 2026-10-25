@@ -52,9 +52,10 @@
     // Run structure and progression in one place: waves, the last guardian, experience and the 12 upgrades.
     config.balance = {
         zoneScale: [1, 1.3, 1.6],                                  // guard and boss health on islands 1, 2, 3
-        xp: { first: 5, growth: 1.3, orb: { stalker: 2, caster: 2, brute: 3, boss: 0 } }, // level 1->2 needs `first`, then x growth
+        xp: { first: 4, growth: 1.3, orb: { stalker: 3, caster: 2, brute: 3, boss: 0 } }, // level 1->2 needs `first`, then x growth
         waves: { interval: 45, cap: 4, capStep: 2, spawnEvery: 4, spawnFactor: .85, speedStep: .06, casterFrom: 2, bruteFrom: 3, hp: { stalker: 3, caster: 3, brute: 5 } },
-        boss: { hp: 60, warn: 2, speed: .7, rushEvery: 2.5, rushTelegraph: 1, rushSpeed: 6, rushTime: .6, rushDamage: 1.5, slamBelow: .5, slamEvery: 4, slamTelegraph: 1, slamRadius: 3.4, slamDamage: 1.5 },
+        // earliest: the guardian never wakes sooner than this many seconds after the first ignition.
+        boss: { hp: 100, earliest: 150, warn: 2, speed: .7, rushEvery: 2.5, rushTelegraph: 1, rushSpeed: 6, rushTime: .6, rushDamage: 1.5, slamBelow: .5, slamEvery: 4, slamTelegraph: 1, slamRadius: 3.4, slamDamage: 1.5 },
         // Per-level values (level 1, 2, 3). Card text fills {n} from the level being taken.
         upgrades: {
             rate: [1.2, 1.4, 1.6],       // pulse fire rate multiplier
@@ -128,7 +129,7 @@
         s.time = 0; s.player = { x: startX, z: startZ, hp: s.maxHP, facingX: 0, facingZ: -1, invuln: 0, dash: 0 };
         s.attackCD = 0; s.dashCD = 0; s.gardenCD = 0; s.gardenCharges = 2; s.gardenRegen = 0; s.gardens = []; s.collected = 0; s.restored = 0; s.beacons = (spec.beacons || BEACONS).map(([x,z], i) => ({ x, z, id: i, lit: false, charge: 0, blocked: false, litAt: -1 })); s.seeds = spec.seeds.map(([x,z], i) => ({ x, z, id: i, taken: false }));
         s.energy=25; s.bloom=0; s.shots=[]; s.fx=[]; s.orbs=[]; s.projectiles=[]; s.hazards=[]; s.boon=''; s.zoneKills=0;
-        s.wave=0; s.waveAt=0; s.spawnAt=0; s.bossAt=0; s.bossId=-1; s.dashTimer=0; s.dashHits=[]; s.bloomKills=0;
+        s.wave=0; s.waveAt=0; s.spawnAt=0; s.firstLitAt=0; s.wakeAt=0; s.bossAt=0; s.bossId=-1; s.dashTimer=0; s.dashHits=[]; s.bloomKills=0;
         s.shrine={x:-7,z:-6,used:false};
         // Guards stand around this island's beacons from the start; their health scales with the island.
         const scale = config.balance.zoneScale[s.zone] || 1;
@@ -221,13 +222,15 @@
         s.gardenCharges--; s.gardenCD=1; s.gardens.push({x:s.player.x,z:s.player.z,life:14,radius:2.3}); event(s,'garden'); return true;
     }
     // Beacons light themselves after config.beaconTime inside their ring; the run is won when all three burn.
+    function wakeGuardian(s){s.wakeAt=0;s.bossAt=s.time+config.balance.boss.warn;fx(s,{type:'bossWarn'});event(s,'bossWarn');}
     function lightBeacon(s,b) {
         if(b.lit)return false;
         b.lit=true;b.charge=config.beaconTime;b.litAt=s.time;s.restored++;s.score+=500;fx(s,{type:'beacon',x:b.x,z:b.z});
-        const W=config.balance.waves;if(!s.wave){s.wave=1;s.waveAt=s.time+W.interval;s.spawnAt=s.time+W.spawnEvery;}
+        const W=config.balance.waves;if(!s.wave){s.wave=1;s.waveAt=s.time+W.interval;s.spawnAt=s.time+W.spawnEvery;s.firstLitAt=s.time;}
         syncGardens(s);
-        // The third beacon does not win: it wakes the last guardian after a short warning.
-        if(s.beacons.every(x=>x.lit)){s.bossAt=s.time+config.balance.boss.warn;fx(s,{type:'bossWarn'});event(s,'bossWarn');}else event(s,'beacon');
+        // The third beacon does not win: it wakes the last guardian, but never before boss.earliest s after the
+        // first ignition. Until then s.wakeAt holds the moment the warning starts (the HUD counts down to it).
+        if(s.beacons.every(x=>x.lit)){s.wakeAt=Math.max(s.time,s.firstLitAt+config.balance.boss.earliest);if(s.wakeAt<=s.time+1e-9)wakeGuardian(s);else event(s,'beacon');}else event(s,'beacon');
         return true;
     }
     // Wave creatures enter at the island edge point farthest from the player and hunt from any distance.
@@ -284,6 +287,7 @@
             while(s.time>=s.waveAt-1e-9){s.wave++;s.waveAt+=W.interval;fx(s,{type:'wave',wave:s.wave});}
             if(s.time>=s.spawnAt-1e-9){if(s.enemies.filter(e=>e.alive&&e.hunt&&!e.boss).length<W.cap+W.capStep*(s.wave-1))streamEnemy(s,waveType(s));s.spawnAt=s.time+W.spawnEvery*W.spawnFactor**(s.wave-1);}
         }
+        if(s.wakeAt&&s.time>=s.wakeAt-1e-9)wakeGuardian(s);
         if(s.bossAt&&s.time>=s.bossAt-1e-9){s.bossAt=0;summonBoss(s);}
         // Experience orbs: once the player is within pickup range (attune upgrade widens it) they fly in and count.
         const orb=config.juice.orb,pickup=upgradeValue(s,'attune')||orb.pickup;
@@ -406,11 +410,11 @@
         es:{rate:['Pulso rápido','Cadencia del pulso +20%'],range:['Pulso largo','Alcance del pulso +25%'],fork:['Pulso doble','Un pulso más por ráfaga'],pierce:['Pulso perforante','El pulso atraviesa 1 criatura más'],vitality:['Raíces profundas','Vitalidad máxima +1 y curación'],guard:['Respiro','Invulnerabilidad tras un golpe +50%'],mend:['Calor del faro','Recupera 0,5 por segundo cerca de un faro encendido'],swift:['Paso de viento','Velocidad +12%'],dash:['Embestida','Embestida automática cada {n} s hacia la criatura más cercana'],garden:['Jardín','Criaturas junto a faros encendidos {n}% más lentas'],attune:['Sintonía','Radio de recogida de orbes {n}'],bloom:['Floración','Pulso en todas direcciones cada {n} derrotas']}
     };
     const RUN_TEXT={
-        en:{levelUp:'Level {n}',levelUpText:'Choose one (1, 2, 3).',waveLabel:'Wave {n}',bossWarn:'The last guardian is waking!',survived:'{prefix}Survived {m}:{ss} · Level {lv} · Defeated {k}',todayPrefix:'Today: ',wonText:'The last guardian has fallen and all three beacons burn.'},
-        ko:{levelUp:'레벨 {n}',levelUpText:'하나를 고르세요 (1·2·3)',waveLabel:'웨이브 {n}',bossWarn:'마지막 수호자가 깨어나요!',survived:'{prefix}{m}분 {s}초 생존 · 레벨 {lv} · 처치 {k}',todayPrefix:'오늘 ',wonText:'마지막 수호자가 쓰러지고 봉화 세 개가 모두 빛나요.'},
-        ja:{levelUp:'レベル {n}',levelUpText:'1つ選んでください（1・2・3）',waveLabel:'ウェーブ {n}',bossWarn:'最後の守護者が目覚める！',survived:'{prefix}{m}分{s}秒 生存 · レベル {lv} · 撃破 {k}',todayPrefix:'今日 ',wonText:'最後の守護者が倒れ、3つの灯台がすべて輝いています。'},
-        zh:{levelUp:'等级 {n}',levelUpText:'选择一项（1、2、3）',waveLabel:'第{n}波',bossWarn:'最后的守护者苏醒了！',survived:'{prefix}生存 {m}分{s}秒 · 等级 {lv} · 击败 {k}',todayPrefix:'今天 ',wonText:'最后的守护者倒下了，三座灯塔全部点亮。'},
-        es:{levelUp:'Nivel {n}',levelUpText:'Elige una (1, 2, 3).',waveLabel:'Oleada {n}',bossWarn:'¡Despierta el último guardián!',survived:'{prefix}Sobreviviste {m}:{ss} · Nivel {lv} · Derrotas {k}',todayPrefix:'Hoy: ',wonText:'El último guardián ha caído y los tres faros brillan.'}
+        en:{levelUp:'Level {n}',levelUpText:'Choose one (1, 2, 3).',waveLabel:'Wave {n}',guardianIn:'Guardian wakes in {t}',bossWarn:'The last guardian is waking!',survived:'{prefix}Survived {m}:{ss} · Level {lv} · Defeated {k}',todayPrefix:'Today: ',wonText:'The last guardian has fallen and all three beacons burn.'},
+        ko:{levelUp:'레벨 {n}',levelUpText:'하나를 고르세요 (1·2·3)',waveLabel:'웨이브 {n}',guardianIn:'수호자가 깨어나기까지 {t}',bossWarn:'마지막 수호자가 깨어나요!',survived:'{prefix}{m}분 {s}초 생존 · 레벨 {lv} · 처치 {k}',todayPrefix:'오늘 ',wonText:'마지막 수호자가 쓰러지고 봉화 세 개가 모두 빛나요.'},
+        ja:{levelUp:'レベル {n}',levelUpText:'1つ選んでください（1・2・3）',waveLabel:'ウェーブ {n}',guardianIn:'守護者が目覚めるまで {t}',bossWarn:'最後の守護者が目覚める！',survived:'{prefix}{m}分{s}秒 生存 · レベル {lv} · 撃破 {k}',todayPrefix:'今日 ',wonText:'最後の守護者が倒れ、3つの灯台がすべて輝いています。'},
+        zh:{levelUp:'等级 {n}',levelUpText:'选择一项（1、2、3）',waveLabel:'第{n}波',guardianIn:'守护者苏醒倒计时 {t}',bossWarn:'最后的守护者苏醒了！',survived:'{prefix}生存 {m}分{s}秒 · 等级 {lv} · 击败 {k}',todayPrefix:'今天 ',wonText:'最后的守护者倒下了，三座灯塔全部点亮。'},
+        es:{levelUp:'Nivel {n}',levelUpText:'Elige una (1, 2, 3).',waveLabel:'Oleada {n}',guardianIn:'El guardián despierta en {t}',bossWarn:'¡Despierta el último guardián!',survived:'{prefix}Sobreviviste {m}:{ss} · Nivel {lv} · Derrotas {k}',todayPrefix:'Hoy: ',wonText:'El último guardián ha caído y los tres faros brillan.'}
     };
     for(const code of Object.keys(RUN_TEXT))Object.assign(TEXT[code],RUN_TEXT[code]);
     const upgradeText=id=>(UPGRADE_TEXT[lang()]||UPGRADE_TEXT.en)[id];
@@ -494,7 +498,7 @@
     function updateHUD(force=false){
         const now=performance.now();if(!force&&now-lastHud<100)return;lastHud=now;
         $('ml-sound').textContent=`${t('sound')}: ${t(soundEnabled?'on':'off')}`;
-        $('ml-meta').textContent=state?clock(state.time)+(state.wave?' · '+t('waveLabel').replace('{n}',state.wave):''):'0:00';
+        $('ml-meta').textContent=state?clock(state.time)+(state.wave?' · '+t('waveLabel').replace('{n}',state.wave):'')+(state.wakeAt?' · '+t('guardianIn').replace('{t}',clock(Math.ceil(state.wakeAt-state.time-1e-9))):''):'0:00';
         if(!state){$('ml-zone').textContent=`${t('zone')} 1 / 3 · ${t('glade')}`;$('ml-vitality').textContent='6 / 6';$('ml-healthbar').style.width='100%';$('ml-beacons').textContent='0 / 3';$('ml-foes').textContent='0';$('ml-score').textContent='0';}
         else{
             $('ml-zone').textContent=`${t('zone')} ${state.zone+1} / 3 · ${t(ZONES[state.zone].name)}${state.mode==='daily'?' · '+state.date+' UTC':''}`;

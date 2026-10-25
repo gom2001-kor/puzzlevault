@@ -86,7 +86,7 @@ test('beacons light after 2 seconds inside their ring, leaving resets the timer,
     s.player.x=a.x+1.6;C.tick(s,{},.05);assert.equal(a.charge,0);
     s.player.x=a.x;advance(s,1.9);assert.equal(a.lit,false);advance(s,.15);assert.equal(a.lit,true);assert.equal(s.restored,1);assert.equal(s.phase,'playing');assert.equal(s.event,'beacon');
     for(const beacon of [b,c]){s.player.x=beacon.x;s.player.z=beacon.z;advance(s,2.05);}
-    assert.equal(s.phase,'playing');assert.equal(s.restored,3);assert.ok(s.score>=1500);assert.equal(s.event,'bossWarn');assert.equal(C.markRecorded(s),false);
+    assert.equal(s.phase,'playing');assert.equal(s.restored,3);assert.ok(s.score>=1500);assert.equal(s.event,'beacon');assert.ok(Math.abs(s.wakeAt-s.firstLitAt-C.config.balance.boss.earliest)<1e-9);assert.equal(s.bossAt,0);assert.equal(C.markRecorded(s),false);
 });
 test('losing all vitality ends the run and a retry rebuilds the same island from scratch',()=>{
     const s=C.makeRun({zone:1,seed:7});s.player.hp=1;s.hazards=[{x:s.player.x,z:s.player.z,radius:2,delay:0,life:.5,hit:false}];C.tick(s,{},.05);
@@ -212,6 +212,8 @@ const B=C.config.balance;
 // Ticks like the game loop, taking the first card whenever a level-up pauses play.
 const play=(s,input,dt)=>{C.tick(s,input,dt);if(s.phase==='levelup')C.chooseCard(s,s.cards[0]);};
 const lightAll=s=>{for(const b of s.beacons){s.player.x=b.x;s.player.z=b.z;while(!b.lit&&s.time<60)play(s,{},.05);}};
+// Lights every beacon, then waits out the boss.earliest countdown until the warning starts.
+const wakeAll=s=>{lightAll(s);while(!s.bossAt&&s.time<400)play(s,{},.05);};
 test('waves start at the first beacon, rise every interval and add casters then brutes from the far edge',()=>{
     const s=C.makeRun({seed:9});s.enemies=[];s.player.hp=999;advance(s,10);assert.equal(s.wave,0);
     const first=s.beacons[0];s.player.x=first.x;s.player.z=first.z;while(!first.lit)play(s,{},.05);assert.equal(s.wave,1);
@@ -229,14 +231,27 @@ test('standing still at a beacon ends in defeat once waves start; a hunter close
     assert.equal(t.beacons[0].lit,true);assert.equal(t.phase,'lost');
 });
 test('the third beacon warns, then the last guardian appears at the centre; only defeating it wins',()=>{
-    const s=C.makeRun({seed:9,zone:1});s.enemies=[];s.player.hp=999;lightAll(s);
-    assert.equal(s.phase,'playing');assert.ok(s.bossAt>0);assert.ok(Math.abs(s.bossAt-s.time-B.boss.warn)<.06);assert.ok(!s.enemies.some(e=>e.warden));
+    const s=C.makeRun({seed:9,zone:1});s.enemies=[];s.player.hp=999;wakeAll(s);
+    assert.equal(s.phase,'playing');assert.ok(s.bossAt>0);assert.equal(s.event,'bossWarn');assert.ok(Math.abs(s.bossAt-s.time-B.boss.warn)<.06);assert.ok(!s.enemies.some(e=>e.warden));
     for(let i=0;i<Math.ceil((B.boss.warn+.05)/.05);i++)play(s,{},.05);const boss=s.enemies.find(e=>e.warden);assert.ok(boss);assert.equal(boss.maxHP,Math.round(B.boss.hp*B.zoneScale[1]));assert.ok(Math.hypot(boss.x,boss.z)<2);
     assert.ok(s.wave>=1,'waves keep running during the guardian');
     boss.hp=1;s.enemies=[boss];s.player.x=boss.x+2;s.player.z=boss.z;s.attackCD=0;while(!['won','lost'].includes(s.phase)&&s.time<200)play(s,{},.05);assert.equal(s.phase,'won');
 });
+test('the guardian waits for boss.earliest s after the first ignition, counting down once 3/3 burn',()=>{
+    const s=C.makeRun({seed:9});s.enemies=[];s.player.hp=999;lightAll(s);const E=B.boss.earliest;
+    assert.ok(s.time<E,'3/3 before the countdown ends');assert.ok(s.wakeAt>s.time);assert.equal(s.bossAt,0);assert.ok(Math.abs(s.wakeAt-s.firstLitAt-E)<1e-9);
+    const wave=s.wave;while(s.time<s.wakeAt-.1)play(s,{},.05);
+    assert.equal(s.bossAt,0);assert.ok(!s.enemies.some(e=>e.warden));assert.ok(s.wave>wave,'waves keep rising during the countdown');assert.ok(s.enemies.some(e=>e.hunt),'spawns continue');
+    play(s,{},.05);play(s,{},.05);play(s,{},.05);assert.equal(s.wakeAt,0);assert.ok(Math.abs(s.bossAt-s.time-B.boss.warn)<.16);assert.equal(s.event,'bossWarn');
+    // Once earliest has passed, the third beacon warns at once.
+    const t=C.makeRun({seed:9});t.enemies=[];t.player.hp=999;const [a,b,c]=t.beacons;
+    for(const beacon of [a,b]){t.player.x=beacon.x;t.player.z=beacon.z;while(!beacon.lit)play(t,{},.05);}
+    while(t.time<t.firstLitAt+E)play(t,{},.05);assert.equal(t.bossAt,0);
+    t.player.x=c.x;t.player.z=c.z;t.enemies=[];while(!c.lit)play(t,{},.05);t.enemies=t.enemies.filter(e=>!e.hunt);
+    assert.equal(t.wakeAt,0);assert.ok(Math.abs(t.bossAt-t.time-B.boss.warn)<1e-9);assert.equal(t.event,'bossWarn');
+});
 test('the guardian telegraphs its rush for 1 s and, below half health, slams a marked circle every 4 s',()=>{
-    const s=C.makeRun({seed:9});s.enemies=[];s.player.hp=999;lightAll(s);for(let i=0;i<Math.ceil((B.boss.warn+.05)/.05);i++)play(s,{},.05);
+    const s=C.makeRun({seed:9});s.enemies=[];s.player.hp=999;wakeAll(s);for(let i=0;i<Math.ceil((B.boss.warn+.05)/.05);i++)play(s,{},.05);
     const boss=s.enemies.find(e=>e.warden);s.enemies=[boss];s.spawnAt=1e9;s.player.x=boss.x+4;s.player.z=boss.z;boss.hp=boss.maxHP;
     let warnAt=null,rushAt=null;for(let i=0;i<200&&rushAt===null;i++){s.attackCD=1;C.tick(s,{},.02);if(boss.phase==='warn'&&warnAt===null)warnAt=s.time;if(boss.phase==='rush')rushAt=s.time;}
     assert.ok(Math.abs(rushAt-warnAt-B.boss.rushTelegraph)<.05,`telegraph ${rushAt-warnAt}`);
@@ -245,7 +260,7 @@ test('the guardian telegraphs its rush for 1 s and, below half health, slams a m
     assert.ok(Math.abs(boss.slamCD-B.boss.slamEvery)<.03);
 });
 test('experience levels the run up with 3 distinct seeded cards; play pauses until one is taken',()=>{
-    assert.deepEqual([1,2,3,4].map(C.xpNeeded),[5,7,8,11]);
+    assert.deepEqual([1,2,3,4].map(C.xpNeeded),[4,5,7,9]);
     const s=C.makeRun({seed:9,zone:1}),t=C.makeRun({seed:9,zone:1});s.enemies=[];t.enemies=[];
     for(const r of [s,t]){r.xp=5;C.tick(r,{},.05);}
     assert.equal(s.phase,'levelup');assert.equal(s.level,2);assert.equal(new Set(s.cards).size,3);assert.deepEqual(s.cards,t.cards,'same seed, same cards');
