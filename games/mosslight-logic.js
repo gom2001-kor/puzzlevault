@@ -42,6 +42,7 @@
         steepCamera: true,                                 // use config.camera.pitch instead of the original angle
         fade: true, fadeAlpha: .25, fadeTime: .2,          // occluders on a camera ray fade to fadeAlpha over fadeTime s
         fadeDepthWrite: false,                             // true: faded occluders keep depth (no back faces, but they hide characters' own colours)
+        fadeAlphaNoDepth: .35,                             // used instead of fadeAlpha while fadeDepthWrite is off: back faces show through, so fade less
         maxRays: 8, enemyRange: 6,                         // rays: the player plus the nearest creatures within enemyRange
         silhouette: true, silhouetteAlpha: .45, playerColor: '#9be36a', enemyColor: '#b48cf2' // drawn wherever a character is hidden by something still writing depth
     };
@@ -440,9 +441,9 @@
                 targets.push({enemy:e,point:[e.x,.8*(e.boss?1.65:e.type==='brute'?1.25:1),e.z]});
             for(const t of targets)for(const o of occluders)if(segmentHitsEllipsoid(eye,t.point,o))hit.add(o.id);
         }
-        const step=dt*(1-vis.fadeAlpha)/Math.max(.001,vis.fadeTime);
+        const floor=vis.fadeDepthWrite?vis.fadeAlpha:vis.fadeAlphaNoDepth,step=dt*(1-floor)/Math.max(.001,vis.fadeTime);
         for(const id of hit)if(!occAlpha.has(id))occAlpha.set(id,1);
-        for(const [id,a] of occAlpha){const target=vis.fade&&hit.has(id)?vis.fadeAlpha:1,next=a<target?Math.min(target,a+step):Math.max(target,a-step);if(next>=1)occAlpha.delete(id);else occAlpha.set(id,next);}
+        for(const [id,a] of occAlpha){const target=vis.fade&&hit.has(id)?floor:1,next=a<target?Math.min(target,a+step):Math.max(target,a-step);if(next>=1)occAlpha.delete(id);else occAlpha.set(id,next);}
     }
     function resetJuice(){occAlpha.clear();for(const q of POOL)q.life=0;dying.length=0;shake=0;hitChain=0;lastHitAt=-9;victoryAt=0;fxTime=0;ringStart={};}
     // Synthesized tones on the shared Web Audio context, so no audio files ship with the game.

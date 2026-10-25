@@ -219,7 +219,7 @@ test('the steeper camera tilts by config.camera.pitch, keeps the ground at the b
     const tilt=C.config.camera.pitch-legacy.pitch*180/Math.PI;assert.ok(tilt>=5&&tilt<=10,`tilt ${tilt.toFixed(2)} deg`);
     const half=C.config.camera.fov*Math.PI/360,bottom=pose=>pose.look[2]+pose.distance*Math.cos(pose.pitch)-pose.distance*Math.sin(pose.pitch)/Math.tan(pose.pitch+half);
     assert.ok(Math.abs(bottom(steep)-bottom(legacy))<1e-9,'same ground reach at the bottom of the view');
-    assert.deepEqual(Object.keys(C.config.visibility).filter(k=>typeof C.config.visibility[k]==='boolean').sort(),['fade','fadeDepthWrite','silhouette','steepCamera']);assert.equal(C.config.visibility.fadeDepthWrite,false,'faded occluders write no depth by default');
+    assert.deepEqual(Object.keys(C.config.visibility).filter(k=>typeof C.config.visibility[k]==='boolean').sort(),['fade','fadeDepthWrite','silhouette','steepCamera']);assert.equal(C.config.visibility.fadeDepthWrite,false,'faded occluders write no depth by default');assert.equal(C.config.visibility.fadeAlphaNoDepth,.35);assert.equal(C.config.visibility.fadeAlpha,.25);
 });
 test('camera rays detect ellipsoid occluders between the eye and a target only',()=>{
     const eye=[0,14,12],player=[0,.9,0],tree={x:0,y:3,z:3,rx:2,ry:1.5,rz:2};
