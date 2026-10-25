@@ -121,9 +121,9 @@
         #else
         precision mediump float;
         #endif
-        uniform vec3 uEye; uniform vec3 uFog; uniform vec3 uLight;
+        uniform vec3 uEye; uniform vec3 uFog; uniform vec3 uLight; uniform float uAmbient;
         uniform vec2 uFogRange; uniform sampler2D uShadowMap;
-        uniform float uPass; uniform float uHasShadow; uniform float uDisk; uniform float uShadowTexel;
+        uniform float uPass; uniform float uHasShadow; uniform float uDisk; uniform float uShadowTexel; uniform float uFlat;
         varying PV_PRECISION vec3 vWorld; varying PV_PRECISION vec3 vNormal; varying PV_PRECISION vec4 vColor;
         varying PV_PRECISION vec3 vSurface; varying PV_PRECISION vec4 vShadow; varying PV_PRECISION vec2 vLocal;
         vec4 packDepth(float d){
@@ -153,13 +153,14 @@
         }
         void main(){
             if(uPass<.5){gl_FragColor=packDepth(gl_FragCoord.z);return;}
+            if(uFlat>.5){gl_FragColor=vColor;return;}
             vec3 n=normalize(vNormal),view=normalize(uEye-vWorld),key=normalize(vec3(-.55,1.0,.6));
             float visibility=shadow(n),diffuse=max(dot(n,key),0.0);
             float rough=clamp(vSurface.y,.08,1.0);
             float spec=pow(max(dot(n,normalize(key+view)),0.0),mix(80.0,9.0,rough))*(1.0-rough)*.55;
             float rim=pow(1.0-max(dot(n,view),0.0),3.0)*.13;
             vec3 base=pow(max(vColor.rgb,vec3(.0)),vec3(2.2));
-            vec3 ambient=mix(vec3(.19,.25,.28),vec3(.60,.72,.82),n.y*.5+.5)*.72;
+            vec3 ambient=mix(vec3(.19,.25,.28),vec3(.60,.72,.82),n.y*.5+.5)*.72*uAmbient;
             vec3 lit=base*(ambient+uLight*diffuse*.82*visibility)+uLight*spec*visibility+base*rim+base*vSurface.x*2.5;
             vec3 result=pow(max(lit,vec3(.0)),vec3(.454545));
             result=result/(vec3(1.0)+result*.12);
@@ -214,6 +215,8 @@
             this.skyTop=color(this.options.skyTop||this.options.clear||'#1c4a55');
             this.skyBottom=color(this.options.skyBottom||this.options.clear||'#395f64');
             this.light=color(this.options.lightColor||'#ffe1ac');
+            // lightScale dims ambient and directional light together (1 = unchanged).
+            this.lightScale=Math.max(0,finite(this.options.lightScale,1));this.sceneLight=this.light.map(v=>v*this.lightScale);
             this.fogNear=finite(this.options.fogNear,30);this.fogFar=Math.max(this.fogNear+1,finite(this.options.fogFar,100));
             this.bloom=Math.max(0,Math.min(.4,finite(this.options.bloom,.12)));
         }
@@ -236,7 +239,7 @@
             const varyingPrecision=precision&&precision.precision>0?'highp':'mediump';
             this.programMain=this.program(VS.replaceAll('PV_PRECISION',varyingPrecision),FS.replaceAll('PV_PRECISION',varyingPrecision));this.programSky=this.program(QUAD_VS,SKY_FS,['aPosition']);this.programPost=this.program(QUAD_VS,POST_FS,['aPosition']);
             const locations=(program,names)=>Object.fromEntries(names.map(n=>[n,gl.getUniformLocation(program,'u'+n)]));
-            this.u=locations(this.programMain,['VP','ShadowVP','Eye','Fog','Light','FogRange','ShadowMap','Pass','HasShadow','Disk','ShadowTexel']);
+            this.u=locations(this.programMain,['VP','ShadowVP','Eye','Fog','Light','Ambient','FogRange','ShadowMap','Pass','HasShadow','Disk','ShadowTexel','Flat']);
             this.sky=locations(this.programSky,['Top','Bottom','Light']);this.post=locations(this.programPost,['Scene','Texel','Bloom']);
             this.meshes={};this.groups={};this.shadowGroups={};
             for(const shape of SHAPES){
@@ -294,9 +297,12 @@
             const shadowEye=[target[0]-22,target[1]+40,target[2]+24];
             const shadowVP=multiply(orthographic(finite(this.options.shadowSpan,23),1,100),lookAt(shadowEye,target));
             for(const shape of SHAPES){this.groups[shape].length=0;this.shadowGroups[shape].length=0;}
-            const transparent=[];this.stats={drawCalls:0,instances:0,triangles:0,instanced:!!this.ext};
+            // depthWrite: a transparent object first writes depth so only its front surface blends (no see-through
+            // back faces). xray: after everything else the object is drawn as a flat silhouette with depth testing
+            // off, then drawn again normally with depth LEQUAL, so the silhouette survives only where it is hidden.
+            const transparent=[],prepass=[],xray=[];this.stats={drawCalls:0,instances:0,triangles:0,instanced:!!this.ext};
             for(const obj of objects||[]){if(!obj||obj.visible===false||!this.meshes[obj.shape||'box'])continue;
-                const shape=obj.shape||'box';if(finite(obj.opacity,1)<.995||shape==='disk')transparent.push(obj);else{this.groups[shape].push(obj);if(obj.castShadow!==false)this.shadowGroups[shape].push(obj);}}
+                const shape=obj.shape||'box';if(obj.xray)xray.push(obj);if(finite(obj.opacity,1)<.995||shape==='disk'){transparent.push(obj);if(obj.depthWrite)prepass.push(obj);}else{this.groups[shape].push(obj);if(obj.castShadow!==false)this.shadowGroups[shape].push(obj);}}
             gl.useProgram(this.programMain);gl.uniformMatrix4fv(this.u.ShadowVP,false,shadowVP);gl.uniform1f(this.u.Pass,0);gl.uniform1f(this.u.HasShadow,0);
             gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.disable(gl.BLEND);
             // Explicitly unbind the sampled texture before rendering into it.
@@ -309,11 +315,23 @@
             }
             gl.enable(gl.DITHER);gl.bindFramebuffer(gl.FRAMEBUFFER,this.sceneTarget?this.sceneTarget.buffer:null);gl.viewport(0,0,width,height);gl.clearColor(...this.clear,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
             gl.useProgram(this.programSky);gl.uniform3fv(this.sky.Top,this.skyTop);gl.uniform3fv(this.sky.Bottom,this.skyBottom);gl.uniform3fv(this.sky.Light,this.light);this.fullScreen(this.programSky);
-            gl.useProgram(this.programMain);gl.enable(gl.DEPTH_TEST);gl.uniform1f(this.u.Pass,1);gl.uniformMatrix4fv(this.u.VP,false,vp);gl.uniform3fv(this.u.Eye,eye);gl.uniform3fv(this.u.Fog,this.skyBottom);gl.uniform3fv(this.u.Light,this.light);gl.uniform2f(this.u.FogRange,this.fogNear,this.fogFar);
+            gl.useProgram(this.programMain);gl.enable(gl.DEPTH_TEST);gl.uniform1f(this.u.Pass,1);gl.uniformMatrix4fv(this.u.VP,false,vp);gl.uniform3fv(this.u.Eye,eye);gl.uniform3fv(this.u.Fog,this.skyBottom);gl.uniform3fv(this.u.Light,this.sceneLight);gl.uniform1f(this.u.Ambient,this.lightScale);gl.uniform2f(this.u.FogRange,this.fogNear,this.fogFar);
             gl.uniform1f(this.u.HasShadow,this.shadowTarget?1:0);gl.uniform1f(this.u.ShadowTexel,this.shadowTarget?1/this.shadowTarget.width:0);gl.uniform1i(this.u.ShadowMap,0);gl.bindTexture(gl.TEXTURE_2D,this.shadowTarget?this.shadowTarget.texture:null);
+            gl.uniform1f(this.u.Flat,0);
             for(const shape of SHAPES)this.batch(shape,this.groups[shape]);
-            if(transparent.length){const distance=o=>(finite(o.x,0)-eye[0])**2+(finite(o.y,0)-eye[1])**2+(finite(o.z,0)-eye[2])**2;transparent.sort((a,b)=>distance(b)-distance(a));gl.enable(gl.BLEND);gl.depthMask(false);
-                for(const obj of transparent){const mesh=this.meshes[obj.shape||'box'];this.drawObject(obj,mesh);this.stats.instances++;this.stats.triangles+=mesh.count/3;}gl.depthMask(true);gl.disable(gl.BLEND);}
+            if(transparent.length){const distance=o=>(finite(o.x,0)-eye[0])**2+(finite(o.y,0)-eye[1])**2+(finite(o.z,0)-eye[2])**2;transparent.sort((a,b)=>distance(b)-distance(a));
+                if(prepass.length){gl.colorMask(false,false,false,false);for(const obj of prepass)this.drawObject(obj,this.meshes[obj.shape||'box']);gl.colorMask(true,true,true,true);}
+                gl.enable(gl.BLEND);gl.depthMask(false);gl.depthFunc(gl.LEQUAL);
+                for(const obj of transparent){const mesh=this.meshes[obj.shape||'box'];this.drawObject(obj,mesh);this.stats.instances++;this.stats.triangles+=mesh.count/3;}gl.depthFunc(gl.LESS);gl.depthMask(true);gl.disable(gl.BLEND);}
+            if(xray.length){
+                // Both passes are instanced per shape, the same path the opaque pass used, so depths match exactly.
+                const byShape={};for(const obj of xray)(byShape[obj.shape||'box']||(byShape[obj.shape||'box']=[])).push(obj);
+                gl.enable(gl.BLEND);gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.uniform1f(this.u.Flat,1);
+                for(const shape in byShape)this.batch(shape,byShape[shape].map(obj=>({...obj,color:obj.xray,opacity:finite(obj.xrayOpacity,.45)})),true);
+                gl.uniform1f(this.u.Flat,0);gl.disable(gl.BLEND);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-2);
+                for(const shape in byShape)this.batch(shape,byShape[shape],true);
+                gl.disable(gl.POLYGON_OFFSET_FILL);gl.depthFunc(gl.LESS);gl.depthMask(true);
+            }
             if(this.sceneTarget){gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,width,height);gl.useProgram(this.programPost);gl.bindTexture(gl.TEXTURE_2D,this.sceneTarget.texture);gl.uniform1i(this.post.Scene,0);gl.uniform2f(this.post.Texel,1/width,1/height);gl.uniform1f(this.post.Bloom,this.bloom);this.fullScreen(this.programPost);}
         }
         dispose(){
