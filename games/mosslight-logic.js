@@ -4,18 +4,17 @@
     const ZONES = [
         // Island 1 onboarding: the player starts 4 from the first beacon, where a slow two-shot creature already
         // stands inside the beacon's clear radius. Beacons 2 and 3 sit at opposite ends of the island (4-6 s of
-        // walking each) and are guarded from the start by creatures that hold their ground (speed .001, no attack):
-        // weaker ones at beacon 2, sturdier ones at beacon 3. Their health sets the pace: even with no other
-        // creatures the island takes at least ~60 s, and a straight run that sidesteps attackers takes ~65-70 s.
-        // Regular creatures arrive along the route at 8, 16, 28 and 40 s (seconds from the start of the run).
-        // Until the first beacon burns the player takes no damage, status messages stay quiet for 30 s, and fog
-        // covers the island except around lit beacons.
+        // walking each), each guarded from the start by regular creatures. The run's length comes from pressure:
+        // once the first beacon is lit, a creature enters from the island edge farthest from the player every 7 s,
+        // two at a time from 30 s on (see `stream`). Until the first beacon burns the player takes no damage,
+        // status messages stay quiet for 30 s, and fog covers the island except around lit beacons.
         { name: 'glade', ground: '#224d45', accent: '#86efac', obstacles: [[-4, 3, 1.1], [4, 0, 1.2], [-3, -5, 1], [6, -6, 1]], seeds: [[-6, 5], [2, 6], [-6, -2], [5, -4], [0, -7]],
-            start: [6, 7.6], beacons: [[6, 3.6], [-7.6, -6], [8, -2]], fog: true, grace: true, quiet: 30, hint: true,
+            // Guards notice the player within 10, so beacon 3 sits more than 10 from beacon 1 and from the first leg.
+            start: [6, 7.6], beacons: [[6, 3.6], [-7.6, -8], [-8, 8]], fog: true, grace: true, quiet: 30, hint: true,
+            stream: { every: 7, doubleAfter: 30, types: ['stalker', 'caster', 'stalker', 'brute'] },
             enemies: [[6, 1.8, { type: 'stalker', hp: 2, speed: .5, timer: 99 }],
-                [-6, -4.4, { type: 'stalker', hp: 4, speed: .001, timer: 99 }], [-5.4, -7.2, { type: 'stalker', hp: 4, speed: .001, timer: 99 }], [-7.8, -3.4, { type: 'stalker', hp: 4, speed: .001, timer: 99 }],
-                [6.4, -.6, { type: 'brute', hp: 20, speed: .001, timer: 99 }], [7.2, -4.4, { type: 'stalker', hp: 19, speed: .001, timer: 99 }], [6, -2.6, { type: 'stalker', hp: 18, speed: .001, timer: 99 }],
-                [-1, -1, { spawn: 8, type: 'stalker' }], [-4.5, -1.5, { spawn: 16, type: 'caster' }], [1, -3, { spawn: 28, type: 'brute' }], [3.5, -1.8, { spawn: 40, type: 'stalker' }]] },
+                [-6, -6.4, { type: 'stalker', hp: 3 }], [-5.4, -8.3, { type: 'stalker', hp: 4 }], [-7.9, -5.4, { type: 'stalker', hp: 4 }],
+                [-6.3, 6.6, { type: 'brute', hp: 8 }], [-7.4, 5.6, { type: 'stalker', hp: 4 }], [-5.8, 8.2, { type: 'stalker', hp: 4 }]] },
         { name: 'terrace', ground: '#253c59', accent: '#93c5fd', obstacles: [[-3, 4, 1.3], [3, 0, 1.1], [-4, -3, 1.1], [5, -6, 1.2]], seeds: [[-6, 6], [6, 5], [-6, -5], [6, -2], [0, -7]], enemies: [[-6, 2], [5, 3], [-6, -2], [5, -4], [-2, -7], [2, -7]] },
         { name: 'heart', ground: '#433953', accent: '#c4b5fd', obstacles: [[-4, 4, 1.2], [4, 4, 1.2], [-6, -3, 1.1], [6, -3, 1.1]], seeds: [[-6, 6], [6, 6], [-7, -1], [7, -1], [0, -7]], enemies: [[-5, 1], [5, 1], [-4, -6], [4, -6], [0, -5, true]] }
     ];
@@ -61,6 +60,7 @@
         // An enemy entry is [x, z, boss] or [x, z, { spawn, type, hp, speed, timer }]; spawn > 0 holds it back until that second.
         const all = spec.enemies.map(([x,z,extra],i) => {const o=extra&&typeof extra==='object'?extra:{boss:!!extra},type=o.boss?'boss':o.type||['stalker','caster','brute'][i%3],hp=o.hp||(o.boss?26:type==='brute'?5+s.zone:3+s.zone);return {id:i,x,z,type,boss:!!o.boss,hp,maxHP:hp,phase:'stalk',timer:o.timer??1+random(),speed:o.speed||0,spawn:o.spawn||0,aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0};});
         s.enemies = all.filter(e => !e.spawn); s.spawns = all.filter(e => e.spawn).sort((a,b) => a.spawn-b.spawn);
+        s.nextId = all.length; s.streamAt = 0; s.streamCount = 0;
         s.phase = 'playing'; event(s, 'enter');
     }
     function event(s, name) { s.event = name; s.eventId++; }
@@ -112,8 +112,17 @@
     function lightBeacon(s,b) {
         if(b.lit)return false;
         b.lit=true;b.charge=config.beaconTime;b.litAt=s.time;s.restored++;s.score+=500;
+        const stream=ZONES[s.zone].stream;if(stream&&!s.streamAt)s.streamAt=s.time+stream.every;
         if(s.beacons.every(x=>x.lit)){s.phase='won';event(s,'won');}else event(s,'beacon');
         return true;
+    }
+    // Streamed creatures enter at the island edge point farthest from the player and hunt from any distance.
+    const EDGE=[-8.2,-4.1,0,4.1,8.2].flatMap(v=>[[v,-8.2],[v,8.2],[-8.2,v],[8.2,v]]);
+    function streamEnemy(s,stream){
+        const alive=s.enemies.filter(e=>e.alive),far=([x,z])=>Math.hypot(x-s.player.x,z-s.player.z);
+        const [x,z]=EDGE.filter(([x,z])=>canStand(s,x,z)&&!alive.some(e=>Math.hypot(e.x-x,e.z-z)<1.5)).sort((a,b)=>far(b)-far(a))[0]||[0,-8.2];
+        const type=stream.types[s.streamCount++%stream.types.length],hp=type==='brute'?5+s.zone:3+s.zone;
+        s.enemies.push({id:s.nextId++,x,z,type,boss:false,hp,maxHP:hp,phase:'stalk',timer:1,speed:0,spawn:0,hunt:true,aimX:0,aimZ:0,hit:false,alive:true,flash:0,rage:false,cycle:0});
     }
     function interact(s) {
         if(!config.features.attune||s.phase!=='playing')return false;
@@ -134,6 +143,8 @@
         if(s.phase!=='playing'||!Number.isFinite(dt)||dt<=0)return;
         dt=Math.min(dt,.05);s.elapsed+=dt;s.time+=dt;
         while(s.spawns.length&&s.spawns[0].spawn<=s.time+1e-9)s.enemies.push(s.spawns.shift());
+        const stream=ZONES[s.zone].stream;
+        while(stream&&s.streamAt&&s.time>=s.streamAt-1e-9){for(let n=s.time>=stream.doubleAfter?2:1;n>0;n--)streamEnemy(s,stream);s.streamAt+=stream.every;}
         s.bursts=s.bursts.filter(b=>(b.life-=dt)>0);
         for(const key of ['attackCD','dashCD','gardenCD','bloom'])s[key]=Math.max(0,s[key]-dt);
         s.player.invuln=Math.max(0,s.player.invuln-dt);
@@ -158,7 +169,7 @@
             if(e.phase==='stalk'){
                 const reach=type==='caster'?6.7:type==='brute'?3.6:4.3;
                 const pace=e.speed||(e.boss?.95:type==='brute'?.85:1.35);
-                if(d<10&&d>(type==='caster'?5:1.65))move(s,e,dx*dt*pace,dz*dt*pace);
+                if((d<10||e.hunt)&&d>(type==='caster'?5:1.65))move(s,e,dx*dt*pace,dz*dt*pace);
                 if(type==='caster'&&d<3.2)move(s,e,-dx*dt*1.1,-dz*dt*1.1);
                 if(e.timer<=0&&d<reach){
                     e.phase='warn';e.timer=e.boss?1.05:type==='brute'?1.15:.85;e.aimX=dx;e.aimZ=dz;e.hit=false;
@@ -230,6 +241,7 @@
         es:{start:'Empezar',beaconsHud:'Faros',moveHintKeys:'Muévete con WASD / flechas',moveHintTouch:'Usa las flechas para moverte'}
     };
     for(const code of Object.keys(ONBOARDING))Object.assign(TEXT[code],ONBOARDING[code]);
+    for(const [code,label] of Object.entries({en:'Next island',ko:'다음 섬',ja:'次の島',zh:'下一座岛',es:'Siguiente isla'}))TEXT[code].nextIsland=label;
     let state=null,renderer=null,last=0,frame=0,selectedIsland=0,hintTimer=0,seenEvent=0,seenPhase='',overlayKind='start',soundEnabled=true,camera=[0,11.8,17],lastHud=0,adPending=false,contextLost=false,lastEnvironment=-1;
     const keys=new Set(),held=new Set(),$=id=>document.getElementById(id),lang=()=>typeof I18n!=='undefined'&&TEXT[I18n.currentLang]?I18n.currentLang:'en',t=key=>TEXT[lang()][key]||TEXT.en[key]||key;
     const storage={get(k,fallback=null){try{const v=localStorage.getItem('pv_mosslight_'+k);return v===null?fallback:JSON.parse(v);}catch(_){return fallback;}},set(k,v){try{localStorage.setItem('pv_mosslight_'+k,JSON.stringify(v));}catch(_){}},remove(k){try{localStorage.removeItem('pv_mosslight_'+k);}catch(_){}}};
@@ -288,7 +300,10 @@
             // Personal records moved here from below the game; they are only read at the end of a run.
             const records=document.createElement('small');records.textContent=`${t('best')}: ${Number(storage.get('best',0))||0} · ${t('wins')}: ${Number(storage.get('wins',0))||0} · ${t('saved')}`;
             // A single retry resets the same island immediately; the renderer and terrain cache are reused.
-            actions.append(button(t('retry'),()=>start(state.mode,false,state.date,state.zone),'ml-primary'),records);
+            // "Next island" sits beside retry after a win, once that island is unlocked.
+            const row=document.createElement('div');row.className='ml-result-buttons';row.append(button(t('retry'),()=>start(state.mode,false,state.date,state.zone),'ml-primary'));
+            if(won&&state.zone<2&&unlockedIslands()>state.zone+1){const zone=state.zone+1;row.append(button(t('nextIsland'),()=>start('story',false,null,zone)));}
+            actions.append(row,records);
             const related=document.createElement('nav');related.className='ml-result-links';related.setAttribute('aria-label','More games');for(const [id,name] of [['cloudweft','Cloudweft Passage'],['colorflow','ColorFlow'],['numvault','NumVault']]){const a=document.createElement('a');a.href='/games/'+id+'.html';a.textContent=name;related.append(a);}actions.append(related);
         }
         box.append(title,p,actions);$('ml-overlay').setAttribute('aria-busy',String(adPending));if(!renderer||adPending||contextLost)actions.querySelectorAll('button').forEach(b=>b.disabled=true);

@@ -83,8 +83,8 @@ let activeBrowser;
  const offline=await browser.newContext({viewport:{width:390,height:844}}),op=await offline.newPage();
  await op.goto(base+'/');await op.evaluate(()=>navigator.serviceWorker.ready);await op.reload();
  await op.waitForFunction(()=>!!navigator.serviceWorker.controller);
- assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/pv3d.js?v=25'))),true);
- assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/flagship.js?v=25'))),true);
+ assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/pv3d.js?v=26'))),true);
+ assert.equal(await op.evaluate(async()=>!!(await caches.match('/js/flagship.js?v=26'))),true);
  await offline.setOffline(true);
  for(const game of ['mosslight','cloudweft']){await op.goto(base+'/games/'+game+'.html?lang=ko');await op.waitForFunction(id=>id==='mosslight'?!!window.PVMosslight:!!window.Cloudweft?.inspect,game);await op.locator(game==='mosslight'?'#ml-overlay .ml-primary':'#sf-start').click();}
  checks.push('Version18 cache starts both 3D games offline with localized URLs');await offline.close();
